@@ -1,0 +1,13 @@
+image: 
+- ubuntu
+
+install:
+- sh: sudo apt-get update
+- sh: sudo apt-get install libftdi1
+
+
+build:
+- sh: cmake .
+- sh: make
+
+test: off
