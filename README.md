@@ -8,7 +8,7 @@ first we need to have FTDI D2XX library installed:
   
 then we can download and build bcu:  
   
-$ git clone https://nxf53967@bitbucket.sw.nxp.com/scm/imx/bcu.git  
+$ git clone https://github.com/NXPmicro/bcu.git  
   
 open Board_Control_Utilities.sln with windows visual studio  
   
@@ -26,7 +26,7 @@ $ sudo apt-get install libftdi1
   
 then we can obtain and build bcu:  
   
-$ git clone https://nxf53967@bitbucket.sw.nxp.com/scm/imx/bcu.git  
+$ git clone https://github.com/NXPmicro/bcu.git 
   
 $ cd bcu  
   
