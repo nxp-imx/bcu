@@ -43,7 +43,7 @@ _____________________________________________________________________
   
 # list of available commands & their functions:  
   
-|commands:                  |functions:|  
+|commands                  |descriptions|  
 |----|                     ----------------|
 reset                       |reset the board  
 monitor                    |switch into a tui windows that monitors voltage, current and power consumption inside the board  
@@ -52,7 +52,8 @@ set_gpio [GPIO_NAME] [1/0]        |set a GPIO_NAME pin to be high(1) or low(0). 
 lsftdi                    |show the list of connected boards and the their location IDs  
 lsboard                    |list all supported board models  
 set_boot_mode [BOOTMODE]        |set the boot mode as BOOTMODE  
-help                    |show list of available commands and their functions, as well as options  
+help                    |show list of available commands and their functions, as well as options
+version                 |show version number
   
 ### typical usage of bcu:  
   
@@ -75,25 +76,35 @@ $ bcu set_boot_mode emmc
 ___________________________________________________________________________________________________ 
   
 ## general options for all commands:
-    [-board=BOARD_MODEL]    |set the board model, list of avaliable models is shown in lsboards command  
-    [-id=ID]    |select the target board with location id(when there are multiple boards), the location id can be viewed by using command lsftdi  
+|options|descriptions|
+|----------------|-------|
+|[-board=MODEL]|set the board model, list of avaliable models is shown in lsboards command  
+| [-id=ID]    |select the target board with location id(when there are multiple boards), the location id can be viewed by using command lsftdi  
   
 ## options for specfic command:  
 ### reset:  
-    [-delay=DURATION]    |reset after DURATION ms  
-    [BOOTMODE]        |setting BOOTMODE as the booting method  
+|options|descriptions|
+|----------------|-------|
+ [-delay=DURATION]    |reset after DURATION ms  
+ [BOOTMODE]        |setting BOOTMODE as the booting method  
   
 ### monitor:  
-    [-dump]            |dump data into a file, which can be imported to excel  
+|options|descriptions|
+|----------------|-------|
+[-dump]            |dump data into a file, which can be imported to excel  
   
 ### set_gpio: 
-    [-delay=DURATION]    |set after DURATION ms  
-    [-hold=DURATION]    |hold the output state for DURATION ms  
-    [GPIO_NAME]        |specify which gpio pin should be set, list of available gpio can be found using list gpio command  
-    [0]            |set the pin output low  
-    [1]            |set the pin output high  
-    [-path=PATH]        |for testing purpose only: set the gpio pin specified by path  
+|options||
+|----------------|-------|
+ [-delay=DURATION]    |set after DURATION ms  
+ [-hold=DURATION]    |hold the output state for DURATION ms  
+ [GPIO_NAME]        |specify which gpio pin should be set, list of available gpio can be found using list gpio command  
+ [0]            |set the pin output low  
+ [1]            |set the pin output high  
+ [-path=PATH]        |for testing purpose only: set the gpio pin specified by path  
   
-### set_boot_mode  
-    [BOOTMODE]        |booting from emmc device  
+### set_boot_mode
+|options|descriptions|
+|----------------|-------|  
+[BOOTMODE]        |booting from emmc device  
 _______________________________________________________________________________________________________
