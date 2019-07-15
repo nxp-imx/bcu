@@ -28,6 +28,9 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 */
+
+#define BCU_VERSION_NUMBER "v0.0.1-0-gdc072d0"
+
 #ifdef _WIN32
 #define _CRT_SECURE_NO_WARNINGS //in order to use strcpy without error
 #include <windows.h>
@@ -62,10 +65,17 @@ int GV_MONITOR_TERMINATED=0;
 #define WHITE 37
 #define MAGENTA 35
 
+
+static void print_version()
+{
+	printf("version %s\n\n", BCU_VERSION_NUMBER);
+}
+
+
 static void print_help(char* cmd)
 {
 	if(cmd==NULL){
-		printf("%s\n", "typical usage:");
+		printf("%s\n", "usage:");
 		printf("%s\n\n", "bcu command [-options]");
 		printf("%s\n\n", 	"list of available commands:");
 		printf("	\033[0m%-30s\033[0;32m%s\n", "reset", "reset the board");
@@ -75,6 +85,7 @@ static void print_help(char* cmd)
 		printf("	\033[0m%-30s\033[0;32m%s\n", "lsftdi", "list all boards connected by ftdi device");
 		printf("	\033[0m%-30s\033[0;32m%s\n", "lsboard", "list all supported board models");
 		printf("	\033[0m%-30s\033[0;32m%s\n", "set_boot_mode [BOOTMODE_NAME]", "set BOOTMODE_NAME as boot mode");
+		printf("	\033[0m%-30s\033[0;32m%s\n", "version", "print version number");
 		//printf("\033[0m%-30s\033[0;32m%s\n", "help [COMMAND_NAME]", "/*show details and options of COMMAND_NAME*/");
 
 #ifdef __linux__
@@ -837,6 +848,7 @@ int main(int argc, char **argv)
 {
 	if(argc==1)
 	{
+		print_version();
 		print_help(NULL);
 		return 0;
 	}
@@ -874,10 +886,14 @@ int main(int argc, char **argv)
 
 	}
 	/*
+	due to the unavoidable large chunk size of monitor() function, 
+	it is easier to debug monitor function with a simplified version
+	which is what monitor_test is for
+	*/
+	/*
 	else if(strcmp(cmd, "monitor_test")==0)
 	{
 		monitor_test(&setting);
-
 	}
 	*/
 	else if(strcmp(cmd, "lsftdi")==0)
@@ -891,6 +907,10 @@ int main(int argc, char **argv)
 	else if(strcmp(cmd, "reset")==0)
 	{
 		reset(&setting);
+	}
+	else if(strcmp(cmd, "version")==0)
+	{
+		print_version();
 	}
 	else{
 		printf("%s is a invalid command\n\n", cmd);
