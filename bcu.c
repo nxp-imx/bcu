@@ -53,7 +53,6 @@
 #include "chip.h"
 #include "board.h"
 #include "version.h"
-
 extern int num_of_boards;
 extern struct board_info board_list[];
 
