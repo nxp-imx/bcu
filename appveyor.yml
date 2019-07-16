@@ -1,5 +1,6 @@
 image: 
 - Ubuntu1804
+- Visual Studio 2017
 
 install:
 - sh: sudo apt-get update
@@ -10,3 +11,4 @@ install:
 build_script:
 - sh: cmake .
 - sh: make
+- cmd: msbuild %APPVEYOR_BUILD_FOLDER%/Board_Control_Utilities.sln /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
