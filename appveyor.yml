@@ -8,5 +8,5 @@ install:
 
 
 build_script:
-- sh: cmake -D 'STATIC=1' .
+- sh: cmake .
 - sh: make
