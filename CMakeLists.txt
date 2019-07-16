@@ -14,13 +14,13 @@ add_executable(bcu bcu.c port.c chip.c board.c parser.c)
 link_directories(${LIBUSB_LIBRARY_DIRS} ${LIBFTDI_LIBRARY_DIRS} )
 target_link_libraries (bcu ${LIBUSB_LIBRARIES} ${LIBFTDI_LIBRARIES} )
 #below is for version number generation
-#execute_process(
-#  COMMAND git describe --tags --long
-#  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-#  OUTPUT_VARIABLE GIT_COMMIT_VERSION
-#  OUTPUT_STRIP_TRAILING_WHITESPACE
-#)
-#configure_file(
-#  ${CMAKE_SOURCE_DIR}/version.h.in
-#  ${CMAKE_BINARY_DIR}/version.h
-#)
+execute_process(
+  COMMAND git describe --tags --long
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  OUTPUT_VARIABLE GIT_VERSION
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+configure_file(
+  ${CMAKE_SOURCE_DIR}/version.h.in
+  ${CMAKE_BINARY_DIR}/version.h
+)
