@@ -29,7 +29,6 @@
 *
 */
 
-#define BCU_VERSION_NUMBER "v0.0.1-0-gdc072d0"
 
 #ifdef _WIN32
 #define _CRT_SECURE_NO_WARNINGS //in order to use strcpy without error
@@ -53,7 +52,7 @@
 #include "parser.h"
 #include "chip.h"
 #include "board.h"
-
+#include "version.h"
 extern int num_of_boards;
 extern struct board_info board_list[];
 
@@ -65,10 +64,9 @@ int GV_MONITOR_TERMINATED=0;
 #define WHITE 37
 #define MAGENTA 35
 
-
 static void print_version()
 {
-	printf("version %s\n\n", BCU_VERSION_NUMBER);
+	printf("version %s\n\n", GIT_VERSION);
 }
 
 
