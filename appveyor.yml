@@ -1,13 +1,11 @@
 image: 
-- ubuntu
+- Ubuntu1804
 
 install:
 - sh: sudo apt-get update
 - sh: sudo apt-get install libftdi1
 
 
-build:
+build_script:
 - sh: cmake .
 - sh: make
-
-test: off
