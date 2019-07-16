@@ -1,3 +1,4 @@
+PROJECT(bcu)
 cmake_minimum_required(VERSION 3.4)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -12,3 +13,14 @@ add_executable(bcu bcu.c port.c chip.c board.c parser.c)
 #this link directories is not really needed
 link_directories(${LIBUSB_LIBRARY_DIRS} ${LIBFTDI_LIBRARY_DIRS} )
 target_link_libraries (bcu ${LIBUSB_LIBRARIES} ${LIBFTDI_LIBRARIES} )
+#below is for version number generation
+#execute_process(
+#  COMMAND git describe --tags --long
+#  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+#  OUTPUT_VARIABLE GIT_COMMIT_VERSION
+#  OUTPUT_STRIP_TRAILING_WHITESPACE
+#)
+#configure_file(
+#  ${CMAKE_SOURCE_DIR}/version.h.in
+#  ${CMAKE_BINARY_DIR}/version.h
+#)

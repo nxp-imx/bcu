@@ -20,9 +20,9 @@ ctr-f5 to run
 ____________________________________________________________________  
   # to build and run BCU in Linux:  
   
-first we need to obtain libftdi library:  
+first we need to obtain libftdi1-dev library:  
 $ sudo apt-get update  
-$ sudo apt-get install libftdi1  
+$ sudo apt-get install libftdi1-dev  
   
 then we can obtain and build bcu:  
   
