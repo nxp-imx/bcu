@@ -3,7 +3,8 @@ image:
 
 install:
 - sh: sudo apt-get update
-- sh: sudo apt-get install libftdi1
+- sh: sudo apt-get DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libftdi1
+- sh: sudo apt-get DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libusb-1.0-0-dev
 
 
 build_script:
