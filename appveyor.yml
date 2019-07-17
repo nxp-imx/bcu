@@ -17,6 +17,7 @@ build_script:
 - sh: make
 - cmd: msbuild %APPVEYOR_BUILD_FOLDER%/Board_Control_Utilities.sln /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 - cmd: if exist %APPVEYOR_BUILD_FOLDER%\x64\Debug\Board_Control_Utilities.exe  cp %APPVEYOR_BUILD_FOLDER%\x64\Debug\Board_Control_Utilities.exe  %APPVEYOR_BUILD_FOLDER%\bcu.exe
+- cmd: if exist %APPVEYOR_BUILD_FOLDER%\Debug\Board_Control_Utilities.exe  cp %APPVEYOR_BUILD_FOLDER%\Debug\Board_Control_Utilities.exe  %APPVEYOR_BUILD_FOLDER%\bcu.exe
 
 artifacts:
 - path: bcu.exe
