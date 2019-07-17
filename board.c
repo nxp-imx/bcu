@@ -142,7 +142,7 @@ get the maximum length of the power related variable name
 */
 int get_max_power_name_length(struct board_info* board)
 {
-	int max=0;
+	size_t max=0;
 	int i=0;
 	while(board->mappings[i].name!=NULL)
 	{
