@@ -87,7 +87,7 @@ void* pca9548_create(char* chip_specification, void* parent);
 
 int pca9548_set_channel(struct pca9548* pca9548);
 ///////////////////////////////////////////////////////////////////////
-struct ft2232h{
+struct ft4232h{
 	struct i2c_device i2c_device;
 	struct ftdi_info ftdi_info;
 	int channel;
@@ -95,26 +95,26 @@ struct ft2232h{
 	unsigned char val_bitmask; //define the output value of the bitmask, the value of each bit is only valid when the coresponding direction bit is 1
 
 };
-int ft2232h_i2c_read(void* ft2232h, unsigned char* data_buffer, int is_nack);
-int ft2232h_i2c_write(void* ft2232h, unsigned char data, int is_nack);
-int ft2232h_i2c_start(void* f2232h);
-int ft2232h_i2c_stop(void* ft2232h);
-void* ft2232h_i2c_create(char* chip_specification, void* parent);
-int ft2232h_i2c_init(struct ft2232h* ft);
-int ft2232h_i2c_free(void* ft2232h);
+int ft4232h_i2c_read(void* ft4232h, unsigned char* data_buffer, int is_nack);
+int ft4232h_i2c_write(void* ft4232h, unsigned char data, int is_nack);
+int ft4232h_i2c_start(void* f2232h);
+int ft4232h_i2c_stop(void* ft4232h);
+void* ft4232h_i2c_create(char* chip_specification, void* parent);
+int ft4232h_i2c_init(struct ft4232h* ft);
+int ft4232h_i2c_free(void* ft4232h);
 ///////////////////////////////////////////////////////////////////////
 
-struct ft2232h_gpio{
+struct ft4232h_gpio{
 	struct gpio_device gpio_device;
 	struct ftdi_info ftdi_info;
 	int channel;
 	unsigned char pin_bitmask;
 };
-int ft2232h_gpio_read(void* ft2232h, unsigned char* bit_value_buffer);
-int ft2232h_gpio_write(void* ft2232h, unsigned char bit_value);
-int ft2232h_gpio_toggle(void* ft2232h);
-void* ft2232h_gpio_create(char* chip_specification, void* parent);
-int ft2232h_gpio_free(void* ft2232h);
+int ft4232h_gpio_read(void* ft4232h, unsigned char* bit_value_buffer);
+int ft4232h_gpio_write(void* ft4232h, unsigned char bit_value);
+int ft4232h_gpio_toggle(void* ft4232h);
+void* ft4232h_gpio_create(char* chip_specification, void* parent);
+int ft4232h_gpio_free(void* ft4232h);
 ///////////////////////////////////////////////////////////////////////
 struct pac1934{
 	struct power_device power_device;

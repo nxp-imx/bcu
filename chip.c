@@ -46,8 +46,8 @@ extern char GV_LOCATION_ID[];
 struct name_and_init_func chip_list[]=
 {
 	"pca9548", pca9548_create,
-	"ft2232h_i2c", ft2232h_i2c_create,
-	"ft2232h_gpio", ft2232h_gpio_create,
+	"ft4232h_i2c", ft4232h_i2c_create,
+	"ft4232h_gpio", ft4232h_gpio_create,
 	"pac1934", pac1934_create,
 	"pca6416a", pca6416a_create
 };
@@ -118,20 +118,20 @@ int pca9548_set_channel(struct pca9548* pca9548)
 	return 0;
 }
 
-////////////////////////////////FT2232H///////////////////////////////////
-void* ft2232h_i2c_create(char* chip_specification,void* parent){
-	struct ft2232h* ft=malloc(sizeof(struct ft2232h));
+////////////////////////////////ft4232H///////////////////////////////////
+void* ft4232h_i2c_create(char* chip_specification,void* parent){
+	struct ft4232h* ft=malloc(sizeof(struct ft4232h));
 	if (ft==NULL)
 	{
 		printf("malloc failed\n");
 		return NULL;
 	}
 	ft->i2c_device.device.parent=parent; 
-	ft->i2c_device.i2c_read=ft2232h_i2c_read;
-	ft->i2c_device.i2c_write=ft2232h_i2c_write;
-	ft->i2c_device.i2c_start=ft2232h_i2c_start;
-	ft->i2c_device.i2c_stop=ft2232h_i2c_stop;
-	ft->i2c_device.device.free=ft2232h_i2c_free;
+	ft->i2c_device.i2c_read=ft4232h_i2c_read;
+	ft->i2c_device.i2c_write=ft4232h_i2c_write;
+	ft->i2c_device.i2c_start=ft4232h_i2c_start;
+	ft->i2c_device.i2c_stop=ft4232h_i2c_stop;
+	ft->i2c_device.device.free=ft4232h_i2c_free;
 	ft->channel=extract_parameter_value(chip_specification,"channel");
 	if(extract_parameter_value(chip_specification,"dir_bitmask")==-1)
 	{
@@ -167,13 +167,13 @@ void* ft2232h_i2c_create(char* chip_specification,void* parent){
 		free(ft);
 		return NULL;
 	}
-	ft2232h_i2c_init(ft);
-	//printf("ft2232h created!\n");
+	ft4232h_i2c_init(ft);
+	//printf("ft4232h created!\n");
 	return ft;
 }
 
-int ft2232h_i2c_read(void* ft2232h, unsigned char* data_buffer, int is_nack){
-	struct ft2232h* ft=ft2232h;
+int ft4232h_i2c_read(void* ft4232h, unsigned char* data_buffer, int is_nack){
+	struct ft4232h* ft=ft4232h;
 	unsigned char buffer[MAX_FTDI_BUFFER_SIZE];
 	unsigned char in_buffer[MAX_FTDI_BUFFER_SIZE];
 	int i=0;
@@ -211,8 +211,8 @@ int ft2232h_i2c_read(void* ft2232h, unsigned char* data_buffer, int is_nack){
 
 
 
-int ft2232h_i2c_write(void* ft2232h, unsigned char data, int is_nack){
-	struct ft2232h* ft=ft2232h;
+int ft4232h_i2c_write(void* ft4232h, unsigned char data, int is_nack){
+	struct ft4232h* ft=ft4232h;
 	unsigned char buffer[MAX_FTDI_BUFFER_SIZE];
 	unsigned char in_buffer[MAX_FTDI_BUFFER_SIZE];
 	int i=0;
@@ -276,8 +276,8 @@ int ft2232h_i2c_write(void* ft2232h, unsigned char data, int is_nack){
 	return 0;
 }
 
-int ft2232h_i2c_start(void* ft2232h){
-	struct ft2232h* ft=ft2232h;
+int ft4232h_i2c_start(void* ft4232h){
+	struct ft4232h* ft=ft4232h;
 	unsigned char buffer[MAX_FTDI_BUFFER_SIZE];
 	int i=0;
 	for(int j=0;j<40;j++)
@@ -303,8 +303,8 @@ int ft2232h_i2c_start(void* ft2232h){
 	return 0;
 }
 
-int ft2232h_i2c_stop(void* ft2232h){
-	struct ft2232h* ft=ft2232h;
+int ft4232h_i2c_stop(void* ft4232h){
+	struct ft4232h* ft=ft4232h;
 	unsigned char buffer[MAX_FTDI_BUFFER_SIZE];
 	int i=0;
 
@@ -337,7 +337,7 @@ int ft2232h_i2c_stop(void* ft2232h){
 	return 0;
 }
 
-int ft2232h_i2c_init(struct ft2232h* ft)
+int ft4232h_i2c_init(struct ft4232h* ft)
 {
 	unsigned char buffer[MAX_FTDI_BUFFER_SIZE];
 	int i=0;
@@ -375,29 +375,29 @@ int ft2232h_i2c_init(struct ft2232h* ft)
 	return 0;
 }
 
-int ft2232h_i2c_free(void* ft2232h)
+int ft4232h_i2c_free(void* ft4232h)
 {
-	struct ft2232h* ft=ft2232h;
+	struct ft4232h* ft=ft4232h;
 	ft_close(&ft->ftdi_info);
 	return 0;
 }
 
-///////////////////////////////FT2232H_GPIO/////////////////////////////////
+///////////////////////////////ft4232H_GPIO/////////////////////////////////
 
 
-void* ft2232h_gpio_create(char* chip_specification,void* parent){
+void* ft4232h_gpio_create(char* chip_specification,void* parent){
 	
-	struct ft2232h_gpio* ft=malloc(sizeof(struct ft2232h_gpio));
+	struct ft4232h_gpio* ft=malloc(sizeof(struct ft4232h_gpio));
 	if (ft==NULL)
 	{
 		printf("malloc failed\n");
 		return NULL;
 	}
 	ft->gpio_device.device.parent=parent; 
-	//ft->gpio_device.gpio_read=ft2232h_gpio_read;
-	ft->gpio_device.gpio_write=ft2232h_gpio_write;
-	//ft->gpio_device.gpio_toggle=ft2232h_gpio_toggle;
-	ft->gpio_device.device.free=ft2232h_gpio_free;
+	//ft->gpio_device.gpio_read=ft4232h_gpio_read;
+	ft->gpio_device.gpio_write=ft4232h_gpio_write;
+	//ft->gpio_device.gpio_toggle=ft4232h_gpio_toggle;
+	ft->gpio_device.device.free=ft4232h_gpio_free;
 	ft->gpio_device.pin_bitmask=extract_parameter_value(chip_specification,"pin_bitmask");
 	ft->channel=extract_parameter_value(chip_specification,"channel");
 
@@ -427,9 +427,9 @@ void* ft2232h_gpio_create(char* chip_specification,void* parent){
 }
 
 
-int ft2232h_gpio_write(void* ft2232h, unsigned char bit_value)
+int ft4232h_gpio_write(void* ft4232h, unsigned char bit_value)
 {
-	struct ft2232h_gpio* ft=ft2232h;
+	struct ft4232h_gpio* ft=ft4232h;
 	int mask = 0xFF;
 	if(ft_set_bitmode(&ft->ftdi_info, mask, BM_BITBANG)<0)
 		printf("failed to set bitmode\n");
@@ -449,20 +449,20 @@ int ft2232h_gpio_write(void* ft2232h, unsigned char bit_value)
 }
 
 
-int ft2232h_gpio_read(void* ft2232h, unsigned char* bit_value_buffer)
+int ft4232h_gpio_read(void* ft4232h, unsigned char* bit_value_buffer)
 {
 	printf("read is not yet implemented!\n");
 	return 0;
 }
-int ft2232h_gpio_toggle(void* ft2232h)
+int ft4232h_gpio_toggle(void* ft4232h)
 {
 	printf("toggle is not yet implemented!\n");
 	return 0;
 }
 
-int ft2232h_gpio_free(void* ft2232h)
+int ft4232h_gpio_free(void* ft4232h)
 {
-	struct ft2232h_gpio* ft=ft2232h;
+	struct ft4232h_gpio* ft=ft4232h;
 	ft_close(&ft->ftdi_info);
 	return 0;
 }

@@ -40,27 +40,48 @@
 
 #include "board.h"
 
+//x select channel of pca9548 chip, y select which sensor it is measuring 
+#define IMX8XXL_POWER_PATH(x,y) "/ft4232h_i2c{channel=0;dir_bitmask=0x08;val_bitmask=0x08}/pca9548{channel="#x";addr=0x77}/pac1934{sensor="#y";addr=0x10}"
 
 struct mapping imx8xxl[]={
-	"vdd_main", power, "/ft4232h{channel=1;scl=0;sda=1;sel=2}/pca9548{channel=2;addr=0x77}/pac1934{sensor=4;addr=0x77}",
+	"on_board_5v0",power,IMX8XXL_POWER_PATH(1,1),
+	"vdd_usb_3v3",power,IMX8XXL_POWER_PATH(1,2),
+	"3v3_io",power,IMX8XXL_POWER_PATH(1,3),
+	"3v3_enet",power,IMX8XXL_POWER_PATH(1,4),
+	"3v3_pmic_in",power,IMX8XXL_POWER_PATH(2,1),
+	"on_board_3v3", power, IMX8XXL_POWER_PATH(2,2),
+	"vdd_snvs_4p2",power,IMX8XXL_POWER_PATH(2,3),
+	"vdd_main",power,IMX8XXL_POWER_PATH(2,4),
+	"vdd_memc",power,IMX8XXL_POWER_PATH(3,1),
+	"vdd_ddr_vddq",power,IMX8XXL_POWER_PATH(3,2),
+	"ddr_vdd2",power,IMX8XXL_POWER_PATH(3,3),
+	"vdd_enet0_1p8_3p3",power,IMX8XXL_POWER_PATH(3,4),
+	"1v8_ldo1",power,IMX8XXL_POWER_PATH(4,1),
+	"ddr_vdd1",power,IMX8XXL_POWER_PATH(4,2),
+	"1v8_1",power,IMX8XXL_POWER_PATH(4,3),
+	"1v8_2",power,IMX8XXL_POWER_PATH(4,4),
+	"1v8_3",power,IMX8XXL_POWER_PATH(5,1),
+	"vdd_usb_1p8",power,IMX8XXL_POWER_PATH(5,2),
+	"vdd_pcie_1p8",power,IMX8XXL_POWER_PATH(5,3),
+	"on_board_1v8",power,IMX8XXL_POWER_PATH(5,4),
 	// you put all the pin in the imx8xxl board here
 	//"sd_wp", gpio, "..."
 	NULL, 0, NULL//null terminated   
 };
 
 
-#define SIMULATION_POWER_PATH "/ft2232h_i2c{channel=0;dir_bitmask=0x08;val_bitmask=0x08}/pca9548{channel=1;addr=0x77}"
-#define SIMULATION_GPIO_EXTENDER_PATH "/ft2232h_i2c{channel=0;dir_bitmask=0x08;val_bitmask=0x08}/pca9548{channel=0;addr=0x77}"
+#define SIMULATION_POWER_PATH "/ft4232h_i2c{channel=0;dir_bitmask=0x08;val_bitmask=0x08}/pca9548{channel=1;addr=0x77}"
+#define SIMULATION_GPIO_EXTENDER_PATH "/ft4232h_i2c{channel=0;dir_bitmask=0x08;val_bitmask=0x08}/pca9548{channel=0;addr=0x77}"
 struct mapping simulation_board[]={
 	"vdd_main", power, SIMULATION_POWER_PATH"/pac1934{sensor=2;addr=0x10}",
 	"vdd_snvs", power, SIMULATION_POWER_PATH"/pac1934{sensor=1;addr=0x10}",
-	//"test_monitor", power, "/ft2232h_i2c{channel=0;dir_bitmask=0x08;val_bitmask=0x08}/pca9548{channel=1;addr=0x77}/pca9548{channel=1;addr=0x77}/pac1934{sensor=1;addr=0x10}",
+	//"test_monitor", power, "/ft4232h_i2c{channel=0;dir_bitmask=0x08;val_bitmask=0x08}/pca9548{channel=1;addr=0x77}/pca9548{channel=1;addr=0x77}/pac1934{sensor=1;addr=0x10}",
 	"boot_mode", gpio, SIMULATION_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=0;pin_bitmask=0x0E}",
 	"sd_wp", gpio, SIMULATION_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=0;pin_bitmask=0x10}",
 	"all_port0", gpio, SIMULATION_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=0;pin_bitmask=0xFF}",
-	"reset",gpio,"/ft2232h_gpio{channel=1;pin_bitmask=0x01}",
-	"testmod_sel",gpio,"/ft2232h_gpio{channel=1;pin_bitmask=0x02}",
-	"onoff",gpio,"/ft2232h_gpio{channel=1;pin_bitmask=0x04}",
+	"reset",gpio,"/ft4232h_gpio{channel=1;pin_bitmask=0x01}",
+	"testmod_sel",gpio,"/ft4232h_gpio{channel=1;pin_bitmask=0x02}",
+	"onoff",gpio,"/ft4232h_gpio{channel=1;pin_bitmask=0x04}",
 	"SR_vdd_main",gpio,SIMULATION_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=1;pin_bitmask=0x01}",
 
 	// you put all the pin in the imx8xxl board here
