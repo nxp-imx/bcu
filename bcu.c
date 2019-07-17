@@ -296,12 +296,12 @@ print empty space until the name are filled
 if string length larger than n,
 printf string only up to n character
 */
-static void printfpadding(char* str, int n)
+static void printfpadding(char* str,  size_t n)
 {
 	if(strlen(str)<=n){
 		printf("%s",str );
 
-		for(int i= 0; i < (n-strlen(str) ); i++)
+		for(size_t i= 0; i < (n-strlen(str) ); i++)
 			printf(" ");
 	}
 	else
