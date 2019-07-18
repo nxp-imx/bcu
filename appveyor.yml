@@ -6,6 +6,10 @@ platform:
 - x86
 - x64
 
+init:
+- sh: if [ "${PLATFORM}" = "x86" ]; then exit 0; fi 
+- cmd: IF EXIST "%PROGRAMFILES(x86)%" exit 0
+
 install:
 - sh: sudo apt-get update
 - sh: sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libftdi1-dev
