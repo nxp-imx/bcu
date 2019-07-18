@@ -137,7 +137,6 @@ int ft_close(struct ftdi_info* fi)
 	//printf("%d\n",num);
 	return num;
 #else
-	printf("close!\n");
 	ftdi_usb_close(fi->ftdi);
 	ftdi_free(fi->ftdi);
 	return 0;

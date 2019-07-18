@@ -533,6 +533,15 @@ static void monitor(struct options_setting* setting)
 		strcat(group_string,setting->groups);
 
 	num_of_groups=parse_groups( group_string, groups ,board );
+	if(num_of_groups==-1)
+	{
+		free_device_linkedlist_backward(end_point);
+		if(setting->dump==1)
+		{
+			fclose(fptr);
+		}
+		return;
+	}
 
 
 	while(!GV_MONITOR_TERMINATED)
@@ -901,7 +910,6 @@ static void monitor(struct options_setting* setting)
 
 	}
 
-	
 	free_device_linkedlist_backward(end_point);
 	if(setting->dump==1)
 	{
