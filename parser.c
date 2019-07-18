@@ -571,3 +571,15 @@ int parse_groups(char* input, struct group* groups, struct board_info* board)
 
 	return num_of_groups;
 }
+
+void groups_init(struct group* groups, int num)
+{
+	for (int i = 0; i < num; i++)
+	{
+		groups[i].min = 99999;
+		groups[i].max = 0;
+		groups[i].sum = 0;
+		groups[i].avg = 0;
+		groups[i].avg_data_size = 0;
+	}
+}

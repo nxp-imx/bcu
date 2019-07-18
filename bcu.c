@@ -522,6 +522,7 @@ static void monitor(struct options_setting* setting)
 	//power groups
 	struct group groups[MAX_NUMBER_OF_POWER];
 	char group_string[MAX_NUMBER_OF_POWER*MAX_MAPPING_NAME_LENGTH];
+	groups_init(groups,MAX_NUMBER_OF_POWER);
 	//initialize string
 	strcpy(group_string,"");
 
@@ -843,7 +844,7 @@ static void monitor(struct options_setting* setting)
 			printf("%c[%dm", 0x1B, WHITE);
 			//printf(" |");
 			printf("  ");
-			if(strlen(groups[k].member_list)<monitor_width()-max_group_length-30)
+			if(strlen(groups[k].member_list)<(size_t)(monitor_width()-max_group_length-30))
 				printf("%s\n",groups[k].member_list);
 			else
 			{
