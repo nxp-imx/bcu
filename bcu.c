@@ -558,6 +558,10 @@ static void monitor(struct options_setting* setting)
 
 				if(end_point==NULL){
 					printf("monitor:failed to build device linkedlist\n");
+					if(setting->dump==1)
+					{
+						fclose(fptr);
+					}
 					return;
 				}
 				struct power_device* pd= end_point;

@@ -125,7 +125,7 @@ struct boot_mode simulation_board_boot_modes[]={
 
 struct board_info board_list[]=
 {
-	"simulation_board", simulation_board,simulation_board_boot_modes,"[default:vdd_main]",
+	"simulation_board", simulation_board,simulation_board_boot_modes,"[default_group:vdd_main]",
 	"imx8xxl", imx8xxl,imx8xxl_boot_modes,NULL
 	//"imx9xxl",&imx9xxl_pins,
 	
