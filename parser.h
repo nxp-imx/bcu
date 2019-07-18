@@ -37,18 +37,30 @@
 /*used for storing options specified by user*/
 struct options_setting{
 	char board[100]; //indicating the model of the board, i.e. i.MX8QMEVK
-	char target[100];//identifying the path of the board when more than one board is preseted
 	int delay;
 	int hold;
 	int output_state; 
 	int boot_mode_hex;
 	int active_low;
-	char path[300];
-	char gpio_name[30];
+	char path[MAX_PATH_LENGTH];
+	char gpio_name[MAX_MAPPING_NAME_LENGTH];
 	int location_id;
 	int dump;
+	char groups[MAX_NUMBER_OF_POWER*MAX_MAPPING_NAME_LENGTH];
 };
 
+
+struct group
+{
+	char name[MAX_MAPPING_NAME_LENGTH];
+	float sum;
+	float max;
+	float min;
+	float avg;
+	int avg_data_size;
+	int member_index[MAX_NUMBER_OF_POWER];
+	int num_of_members;
+};
 
 int extract_parameter_string(char* chip_specification, char* parameter_name, char* result);
 int extract_parameter_value(char* chip_specification, char* parameter_name);
@@ -60,5 +72,5 @@ void* build_device_linkedlist_smart(void** new_head, char* new_path, void* old_h
 
 int parse_options(int argc, char** argv, struct options_setting* setting);
 void set_options_default(struct options_setting* setting);
-
+int parse_groups(char* input, struct group* groups, struct board_info* board );
 #endif //PARSER_H

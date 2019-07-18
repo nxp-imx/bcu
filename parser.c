@@ -269,6 +269,11 @@ int parse_options(int argc, char** argv, struct options_setting* setting)
 			setting->hold=atoi(input);
 			printf("hold is %d\n", setting->hold);
 		}
+		else if(strncmp(argv[i], "-group=",6)==0 && strlen(argv[i])>6)
+		{
+			strcpy(setting->groups,input);
+			printf("groups is %s\n", setting->groups);
+		}
 		else if(strcmp(argv[i], "high")==0)
 		{
 			setting->output_state=1;
@@ -492,4 +497,76 @@ void* build_device_linkedlist_smart(void** new_head,char* new_path, void* old_he
 		index++;
 	}
 	return current;
+}
+
+static int parse_group(char* input, struct group* group_ptr, struct board_info* board )
+{
+	//first find name;
+	char* brk=strchr(input, ':');
+	if(brk==NULL)
+		return -1;
+	int length= brk-input;
+	strncpy(group_ptr->name,input,length);
+	group_ptr->name[length]='\0';//null terminated
+	printf("group name: %s\n",  group_ptr->name );
+
+	group_ptr->num_of_members=0;
+	char group_member_string[1000];
+	strcpy(group_member_string,brk+1);
+	char* group_member_name=strtok(group_member_string,",");
+	while(group_member_name!=NULL)
+	{
+		printf("member: %s\n",group_member_name );
+		int power_index=0;
+		int mapping_index=0;
+		int found=0;
+		while(board->mappings[mapping_index].name!=NULL)
+		{
+			if(board->mappings[mapping_index].type==power)
+			{
+				if(strcmp(group_member_name, board->mappings[mapping_index].name)==0)
+				{
+					found=1;
+					group_ptr->member_index[group_ptr->num_of_members]=power_index;
+					group_ptr->num_of_members++;
+					break;
+				}
+				power_index++;
+			}
+			
+			mapping_index++;
+		}
+		if(found==0)
+			return -1;
+		group_member_name=strtok(NULL,",");
+	}
+	return 0;
+}
+
+int parse_groups(char* input, struct group* groups, struct board_info* board)
+{
+	char groups_specification[MAX_NUMBER_OF_POWER][MAX_NUMBER_OF_POWER*MAX_MAPPING_NAME_LENGTH];
+	char* tok;
+	char remaining_input[MAX_NUMBER_OF_POWER*MAX_MAPPING_NAME_LENGTH];
+	strcpy(remaining_input, input);
+	tok=strtok(remaining_input,"]");
+	int num_of_groups=0;
+	while(tok!=NULL)
+	{
+		printf("group_specification: %s\n", tok+1);//+1 because we need to ignore '['
+		strcpy(groups_specification[num_of_groups],tok+1);
+		num_of_groups++;
+		tok=strtok(NULL,"]");
+	}
+
+	for(int i=0; i <num_of_groups;i++){
+		if(parse_group(groups_specification[i],&groups[i], board)==-1){
+			printf("failed to understand the power groups setting\n");
+			return -1;
+		}		
+	}
+
+
+
+	return num_of_groups;
 }

@@ -63,6 +63,7 @@ int GV_MONITOR_TERMINATED=0;
 #define CYAN 36
 #define WHITE 37
 #define MAGENTA 35
+#define BLUE 34
 
 static void print_version()
 {
@@ -485,7 +486,8 @@ static void monitor(struct options_setting* setting)
 	float data_size[MAX_NUMBER_OF_POWER];
 	int sr_level[MAX_NUMBER_OF_POWER];
 
-	//initialize float
+
+	//initialize
 	for(int i =0; i<MAX_NUMBER_OF_POWER ;i++)
 	{
 		vavg[i]=0;vmax[i]=0;vmin[i]=99999;
@@ -516,6 +518,14 @@ static void monitor(struct options_setting* setting)
 		}
 
 	}
+
+	//power groups
+	struct group groups[MAX_NUMBER_OF_POWER];
+	int num_of_groups=0;
+	if(strlen(setting->groups)>0 ){
+		num_of_groups=parse_groups( setting->groups,  groups ,board );
+	}
+
 
 	while(!GV_MONITOR_TERMINATED)
 	{
@@ -556,6 +566,21 @@ static void monitor(struct options_setting* setting)
 				j++;
 			}	
 			i++;
+		}
+
+		//get groups data
+		for(int k=0; k<num_of_groups;k++)
+		{
+			groups[k].sum=0;
+			for(int x=0; x<groups[k].num_of_members;x++)
+			{
+				int mi=groups[k].member_index[x];
+				groups[k].sum+= pnow[mi];
+			}
+			groups[k].max=(groups[k].sum>groups[k].max)? groups[k].sum:groups[k].max;
+			groups[k].min=(groups[k].sum<groups[k].min)? groups[k].sum:groups[k].min;
+			groups[k].avg=(groups[k].avg_data_size*groups[k].avg+groups[k].sum)/(groups[k].avg_data_size+1);
+			groups[k].avg_data_size++;
 		}
 
 		//get SR(sense resistor) switch logic level
@@ -727,7 +752,7 @@ static void monitor(struct options_setting* setting)
 			//printf("%-10s|",board->mappings[name[k]].name);
 			printf("%c[%dm", 0x1B, WHITE);
 			printf("%c ",65+k);//print corresponding letters, start with A
-			printfpadding(board->mappings[name[k]].name, max_length);//-2 is for the extra space the letters take
+			printfpadding(board->mappings[name[k]].name, max_length);
 
 			printf("%c[%dm", 0x1B, GREEN);
 			printf(" |");
@@ -777,7 +802,37 @@ static void monitor(struct options_setting* setting)
 			
 			printf("\n");
 		}
-		
+
+		//display groups
+		printf("%c[%dm", 0x1B, WHITE);
+		printf("\n\n");
+		printfpadding("-----------------------------------------------------------------------------------------------------------------------------------------------",available_width);
+		printfpadding(" ",max_length+3);
+		printf("%c[%dm", 0x1B, BLUE);
+		printf("|Power(mWatt)");
+		printf("\n");
+		printf("%c[%dm", 0x1B, WHITE);
+		printfpadding("group",max_length+2);
+		printf("%c[%dm", 0x1B, BLUE);
+		printf(" |%-6s %-6s %-6s %-6s\n","now","avg","max","min");
+		printf("%c[%dm", 0x1B, WHITE);
+		printfpadding("-----------------------------------------------------------------------------------------------------------------------------------------------",available_width);
+		for(int k=0; k<num_of_groups;k++)
+		{
+			
+
+			printf("%c[%dm", 0x1B, WHITE);
+			printfpadding(groups[k].name,max_length+2);
+			printf("%c[%dm", 0x1B, BLUE);
+			printf(" |");
+			printf("%-6.1f ", groups[k].sum);
+			printf("%-6.1f ", groups[k].avg);
+			printf("%-6.1f ", groups[k].max);
+			printf("%-6.1f\n", groups[k].min);
+
+
+
+		}
 
 		//printf("width: %d \n",monitor_width());
 		printf("\n");

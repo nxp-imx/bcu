@@ -32,8 +32,9 @@
 #define BOARD_H
 
 
-#define MAX_PATH_LENGTH 800
-#define MAX_NUMBER_OF_POWER 100
+#define MAX_PATH_LENGTH 800     //maximum path length allowed
+#define MAX_NUMBER_OF_POWER 100 //maximum number of power types
+#define MAX_MAPPING_NAME_LENGTH 30	//maximum length of the name of the mapping
 
 enum mapping_type
 {
@@ -63,6 +64,7 @@ struct board_info{
 	char* name;
 	struct mapping* mappings;
 	struct boot_mode* boot_modes;
+	char* power_groups;
 };
 
 /*given the name of the board, return coresponding board info struct*/
