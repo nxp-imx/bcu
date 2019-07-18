@@ -85,6 +85,17 @@ struct mapping imx8xxl[]={
 	NULL, 0, NULL//null terminated   
 };
 
+struct boot_mode imx8xxl_boot_modes[]={
+	"efuse", 0x00,
+	"usb", 0x01,
+	"emmc", 0x02,
+	"sd",0x03,
+	"nand", 0x04,
+	"m4_infinite_loop",0x05,
+	"spi", 0x06,
+	"dft_burnin_mode",0x07,
+	NULL, 0
+};
 
 #define SIMULATION_POWER_PATH "/ft4232h_i2c{channel=0;dir_bitmask=0x08;val_bitmask=0x08}/pca9548{channel=1;addr=0x77}"
 #define SIMULATION_GPIO_EXTENDER_PATH "/ft4232h_i2c{channel=0;dir_bitmask=0x08;val_bitmask=0x08}/pca9548{channel=0;addr=0x77}"
@@ -115,7 +126,7 @@ struct boot_mode simulation_board_boot_modes[]={
 struct board_info board_list[]=
 {
 	"simulation_board", simulation_board,simulation_board_boot_modes,"[default:vdd_main]",
-	"imx8xxl", imx8xxl,NULL,NULL
+	"imx8xxl", imx8xxl,imx8xxl_boot_modes,NULL
 	//"imx9xxl",&imx9xxl_pins,
 	
 };
