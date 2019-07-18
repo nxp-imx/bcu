@@ -59,6 +59,7 @@ struct group
 	float avg;
 	int avg_data_size;
 	int member_index[MAX_NUMBER_OF_POWER];
+	char member_list[MAX_MAPPING_NAME_LENGTH*MAX_NUMBER_OF_POWER];
 	int num_of_members;
 };
 

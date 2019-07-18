@@ -506,6 +506,7 @@ static int parse_group(char* input, struct group* group_ptr, struct board_info* 
 	if(brk==NULL)
 		return -1;
 	int length= brk-input;
+	strcpy(group_ptr->member_list,brk+1);
 	strncpy(group_ptr->name,input,length);
 	group_ptr->name[length]='\0';//null terminated
 	printf("group name: %s\n",  group_ptr->name );

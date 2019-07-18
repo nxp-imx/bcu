@@ -98,7 +98,7 @@ struct boot_mode simulation_board_boot_modes[]={
 
 struct board_info board_list[]=
 {
-	"simulation_board", simulation_board,simulation_board_boot_modes,"[vdd_groups:vdd_main]",
+	"simulation_board", simulation_board,simulation_board_boot_modes,"[default:vdd_main]",
 	"imx8xxl", imx8xxl,NULL,NULL
 	//"imx9xxl",&imx9xxl_pins,
 	
@@ -154,6 +154,8 @@ int get_max_power_name_length(struct board_info* board)
 	}
 	return max;
 }
+
+
 
 int get_boot_mode_offset(unsigned char boot_mode_pin_bitmask)
 {

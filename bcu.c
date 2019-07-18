@@ -521,10 +521,17 @@ static void monitor(struct options_setting* setting)
 
 	//power groups
 	struct group groups[MAX_NUMBER_OF_POWER];
+	char group_string[MAX_NUMBER_OF_POWER*MAX_MAPPING_NAME_LENGTH];
+	//initialize string
+	strcpy(group_string,"");
+
 	int num_of_groups=0;
-	if(strlen(setting->groups)>0 ){
-		num_of_groups=parse_groups( setting->groups,  groups ,board );
-	}
+	if(board->power_groups!=NULL)
+		strcat(group_string,board->power_groups);
+	if(strlen(setting->groups)>0)
+		strcat(group_string,setting->groups);
+
+	num_of_groups=parse_groups( group_string, groups ,board );
 
 
 	while(!GV_MONITOR_TERMINATED)
@@ -803,32 +810,46 @@ static void monitor(struct options_setting* setting)
 			printf("\n");
 		}
 
-		//display groups
-		printf("%c[%dm", 0x1B, WHITE);
-		printf("\n\n");
-		printfpadding("-----------------------------------------------------------------------------------------------------------------------------------------------",available_width);
-		printfpadding(" ",max_length+3);
-		printf("%c[%dm", 0x1B, BLUE);
-		printf("|Power(mWatt)");
-		printf("\n");
-		printf("%c[%dm", 0x1B, WHITE);
-		printfpadding("group",max_length+2);
-		printf("%c[%dm", 0x1B, BLUE);
-		printf(" |%-6s %-6s %-6s %-6s\n","now","avg","max","min");
-		printf("%c[%dm", 0x1B, WHITE);
-		printfpadding("-----------------------------------------------------------------------------------------------------------------------------------------------",available_width);
+		//then display group
+		int max_group_length=15;
+		if(num_of_groups>0)
+		{
+						//display groups
+			printf("%c[%dm", 0x1B, WHITE);
+			printf("\n\n");
+			printfpadding("-----------------------------------------------------------------------------------------------------------------------------------------------",available_width);
+			printfpadding(" ",max_group_length+1);
+			printf("%c[%dm", 0x1B, BLUE);
+			printf("|Power(mWatt)");
+			printf("\n");
+			printf("%c[%dm", 0x1B, WHITE);
+			printfpadding("group",max_group_length);
+			printf("%c[%dm", 0x1B, BLUE);
+			printf(" |%-6s %-6s %-6s %-6s","now","avg","max","min");
+			printf("%c[%dm", 0x1B, WHITE);
+			printf("  group members\n");
+			printf("%c[%dm", 0x1B, WHITE);
+			printfpadding("-----------------------------------------------------------------------------------------------------------------------------------------------",available_width);
+		}
 		for(int k=0; k<num_of_groups;k++)
 		{
-			
-
-			printf("%c[%dm", 0x1B, WHITE);
-			printfpadding(groups[k].name,max_length+2);
+			printfpadding(groups[k].name,max_group_length);
 			printf("%c[%dm", 0x1B, BLUE);
 			printf(" |");
 			printf("%-6.1f ", groups[k].sum);
 			printf("%-6.1f ", groups[k].avg);
 			printf("%-6.1f ", groups[k].max);
-			printf("%-6.1f\n", groups[k].min);
+			printf("%-6.1f", groups[k].min);
+			printf("%c[%dm", 0x1B, WHITE);
+			//printf(" |");
+			printf("  ");
+			if(strlen(groups[k].member_list)<monitor_width()-max_group_length-30)
+				printf("%s\n",groups[k].member_list);
+			else
+			{
+				printfpadding(groups[k].member_list,monitor_width()-max_group_length-30-4 );
+				printf("...\n");
+			}
 
 
 
