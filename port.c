@@ -522,7 +522,7 @@ int ft_open_channel_by_id(struct ftdi_info* fi, int channel,char* id)
     fi->ftdi = ftdi_new();
 
     struct ftdi_device_list *devlist, *curdev;
-    if(fi->ftdi<0)
+    if(fi->ftdi==NULL)
     {
     	printf("ftdi_new failed!\n");
     	return -1;

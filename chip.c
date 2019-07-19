@@ -252,7 +252,7 @@ int ft4232h_i2c_write(void* ft4232h, unsigned char data, int is_nack){
 	ft_read(&ft->ftdi_info, in_buffer, 1); 
 	if(is_nack)
 	{
-		if (((in_buffer[0] & 0x0) != 0)) //Check ACK bit 0 on data byte read out
+		if (((in_buffer[0] & 0x1) != 1)) //Check ACK bit 0 on data byte read out
 		{
 			printf("no ack from write\n");
 			return 0; /*Error, can't get the ACK bit from EEPROM */
