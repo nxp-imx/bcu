@@ -4,9 +4,9 @@ image:
 - Visual Studio 2017 
 #- Ubuntu1804
 
-#platform:
-#- x86
-#- x64
+platform:
+- x86
+- x64
 
 init:
 # skip x86 check in linux  
