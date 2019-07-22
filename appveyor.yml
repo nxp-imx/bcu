@@ -13,7 +13,7 @@ init:
 - sh: if [ "${PLATFORM}" = "x86" ]; then exit 0; fi
 # skip x64 check in windows
 - cmd: echo %PLATFORM%
-- cmd: if "%PLATFORM%" equ "x64" echo equal
+- cmd: if "%PLATFORM%" equ "x64" exit 0
 
 install:
 - sh: sudo apt-get update
