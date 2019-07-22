@@ -1,3 +1,5 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/github/NXPmicro/bcu?svg=true)](https://ci.appveyor.com/project/nxpfrankli/bcu-kvqcg)
+
 # to build and run BCU in Windows:  
 
 first we need to have FTDI D2XX library installed:  
