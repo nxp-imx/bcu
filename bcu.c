@@ -218,6 +218,13 @@ static void set_boot_mode(struct options_setting* setting)
 	end_point=build_device_linkedlist_forward(&head,path);
 
 	struct gpio_device* gpio= end_point;
+
+	if(get_boot_mode_offset(gpio->pin_bitmask)<0)
+	{
+		free_device_linkedlist_backward(end_point);
+		return;
+	}
+
 	unsigned char hex_with_offset= setting->boot_mode_hex<<(get_boot_mode_offset(gpio->pin_bitmask));
 	gpio->gpio_write(gpio, hex_with_offset);
 	free_device_linkedlist_backward(end_point);
@@ -424,7 +431,7 @@ static char catch_input_char()
 #ifdef _WIN32
 		ch = _getch();
 #else
-		ch = getchar();
+		ch = (char)getchar();
 #endif
 
 	}
@@ -434,6 +441,11 @@ static void monitor(struct options_setting* setting)
 {
 	signal(SIGINT, handle_sigint); 
 	struct board_info* board=get_board(setting->board);
+	if(board==NULL){
+		printf("entered board model are not supported.\n");
+		return;
+	}
+
 	char* previous_path=NULL;
 	void* head=NULL;
 	void* end_point=NULL;
@@ -558,6 +570,10 @@ static void monitor(struct options_setting* setting)
 
 				if(end_point==NULL){
 					printf("monitor:failed to build device linkedlist\n");
+					if(setting->dump==1)
+					{
+						fclose(fptr);
+					}
 					return;
 				}
 				struct power_device* pd= end_point;

@@ -63,8 +63,10 @@ int ft_init(struct ftdi_info* ftdi)
 	ftdi->FT_open = (pFT_open)GetProcAddress(hGetProcIDDLL, "FT_Open");
 	ftdi->FT_open_ex = (pFT_open_ex)GetProcAddress(hGetProcIDDLL, "FT_OpenEx");
 
-	if (!ftdi->FT_open)
+	if (!ftdi->FT_open){
 		printf("ft_init: load failed\n");
+		return -1;
+	}
 	ftdi->FT_set_bitmode = (pFT_set_bitmode)GetProcAddress(hGetProcIDDLL, "FT_SetBitMode");
 	ftdi->FT_write = (pFT_write)GetProcAddress(hGetProcIDDLL, "FT_Write");
 	ftdi->FT_read = (pFT_read)GetProcAddress(hGetProcIDDLL, "FT_Read");
@@ -76,6 +78,7 @@ int ft_init(struct ftdi_info* ftdi)
 
 
 #endif
+	return 0;
 }
 
 enum d2xx_open_method{
@@ -519,7 +522,7 @@ int ft_open_channel_by_id(struct ftdi_info* fi, int channel,char* id)
     fi->ftdi = ftdi_new();
 
     struct ftdi_device_list *devlist, *curdev;
-    if(fi->ftdi<0)
+    if(fi->ftdi==NULL)
     {
     	printf("ftdi_new failed!\n");
     	return -1;

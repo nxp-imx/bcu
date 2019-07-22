@@ -61,7 +61,7 @@ int extract_parameter_string(char* chip_specification, char* parameter_name, cha
 	 }
 	 char* equal_sign=strchr(ptr,'=');
 	 char* brk=strpbrk(equal_sign,";}");
-	 if(ptr==NULL)
+	 if(equal_sign==NULL)
 	 {
 	 	printf("can not understand the specification \n");
 	 	return -1;
@@ -159,8 +159,12 @@ void* build_device_linkedlist_forward(void** head,char* path )
 
 	if(path[0]=='/')
 		path++; //ignore the first '/'
-
-	strcpy(remaining_path,path);
+	if(strlen(path)<MAX_PATH_LENGTH)
+		strcpy(remaining_path,path);
+	else{
+		printf("entered path exceeded maximum length of the buffer\n");
+		return NULL;
+	}
 	char* chip_specification=strtok(remaining_path,"/");
 	//printf("chip_specification: %s\n", chip_specification);
 	int found=0;
@@ -506,7 +510,12 @@ static int parse_group(char* input, struct group* group_ptr, struct board_info* 
 	if(brk==NULL)
 		return -1;
 	int length= brk-input;
-	strcpy(group_ptr->member_list,brk+1);
+	if(strlen(brk+1)< (MAX_MAPPING_NAME_LENGTH*MAX_NUMBER_OF_POWER))
+		strcpy(group_ptr->member_list,brk+1);
+	else{
+		printf("entered group string exceeded maximum buffer size\n");
+		return -1;
+	}
 	strncpy(group_ptr->name,input,length);
 	group_ptr->name[length]='\0';//null terminated
 	printf("group name: %s\n",  group_ptr->name );

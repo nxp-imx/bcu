@@ -41,8 +41,8 @@
 #include "board.h"
 
 //x select channel of pca9548 chip, y select which sensor it is measuring 
-#define IMX8XXL_POWER_PATH(x,y) "/ft4232h_i2c{channel=0;dir_bitmask=0x08;val_bitmask=0x08}/pca9548{channel="#x";addr=0x77}/pac1934{sensor="#y";addr=0x10}"
-
+#define IMX8XXL_POWER_PATH(channel,sensor) "/ft4232h_i2c{channel=0;dir_bitmask=0x04;val_bitmask=0x00}/pca9548{channel="#channel";addr=0x77}/pac1934{sensor="#sensor";addr=0x10}"
+#define IMX8XXL_EXP_PATH(port,bitmask) "/ft4232h_i2c{channel=0;dir_bitmask=0x04;val_bitmask=0x00}/pca9548{channel=0;addr=0x77}/pca6416a{addr=0x20;port="#port";pin_bitmask=0"#bitmask"}"
 struct mapping imx8xxl[]={
 	"on_board_5v0",power,IMX8XXL_POWER_PATH(1,1),
 	"vdd_usb_3v3",power,IMX8XXL_POWER_PATH(1,2),
@@ -56,7 +56,7 @@ struct mapping imx8xxl[]={
 	"vdd_ddr_vddq",power,IMX8XXL_POWER_PATH(3,2),
 	"ddr_vdd2",power,IMX8XXL_POWER_PATH(3,3),
 	"vdd_enet0_1p8_3p3",power,IMX8XXL_POWER_PATH(3,4),
-	"1v8_ldo1",power,IMX8XXL_POWER_PATH(4,1),
+	"vdd_ana",power,IMX8XXL_POWER_PATH(4,1),
 	"ddr_vdd1",power,IMX8XXL_POWER_PATH(4,2),
 	"1v8_1",power,IMX8XXL_POWER_PATH(4,3),
 	"1v8_2",power,IMX8XXL_POWER_PATH(4,4),
@@ -64,11 +64,38 @@ struct mapping imx8xxl[]={
 	"vdd_usb_1p8",power,IMX8XXL_POWER_PATH(5,2),
 	"vdd_pcie_1p8",power,IMX8XXL_POWER_PATH(5,3),
 	"on_board_1v8",power,IMX8XXL_POWER_PATH(5,4),
+
+	"SR_vdd_main",gpio,IMX8XXL_EXP_PATH(1,0x01),
+	"SR_vdd_memc",gpio,IMX8XXL_EXP_PATH(1,0x02),
+	"SR_vdd_ddr_vddq",gpio,IMX8XXL_EXP_PATH(1,0x04),
+	"SR_vdd_ana",gpio, IMX8XXL_EXP_PATH(1,0x08),
+
+
+	"boot_mode",gpio,IMX8XXL_EXP_PATH(0,0x07),
+	"sd_pwr_host",gpio, IMX8XXL_EXP_PATH(0,0x08),
+	"sd_wp_host",gpio, IMX8XXL_EXP_PATH(0,0x10),
+	"sd_cd_host",gpio, IMX8XXL_EXP_PATH(0,0x20),
+
+	"jtag_select",gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x10}",
+	"reset",gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x20}",
+	"testmod_sel",gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x40}",
+	"pwr_on/off", gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x80}",
 	// you put all the pin in the imx8xxl board here
 	//"sd_wp", gpio, "..."
 	NULL, 0, NULL//null terminated   
 };
 
+struct boot_mode imx8xxl_boot_modes[]={
+	"efuse", 0x00,
+	"usb", 0x01,
+	"emmc", 0x02,
+	"sd",0x03,
+	"nand", 0x04,
+	"m4_infinite_loop",0x05,
+	"spi", 0x06,
+	"dft_burnin_mode",0x07,
+	NULL, 0
+};
 
 #define SIMULATION_POWER_PATH "/ft4232h_i2c{channel=0;dir_bitmask=0x08;val_bitmask=0x08}/pca9548{channel=1;addr=0x77}"
 #define SIMULATION_GPIO_EXTENDER_PATH "/ft4232h_i2c{channel=0;dir_bitmask=0x08;val_bitmask=0x08}/pca9548{channel=0;addr=0x77}"
@@ -98,8 +125,8 @@ struct boot_mode simulation_board_boot_modes[]={
 
 struct board_info board_list[]=
 {
-	"simulation_board", simulation_board,simulation_board_boot_modes,"[default:vdd_main]",
-	"imx8xxl", imx8xxl,NULL,NULL
+	"simulation_board", simulation_board,simulation_board_boot_modes,"[default_group:vdd_main]",
+	"imx8xxl", imx8xxl,imx8xxl_boot_modes,NULL
 	//"imx9xxl",&imx9xxl_pins,
 	
 };
