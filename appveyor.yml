@@ -28,9 +28,9 @@ build_script:
 #- cmd: cov-build --dir cov-int msbuild %APPVEYOR_BUILD_FOLDER%/Board_Control_Utilities.sln /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
 # scheduled coverity check:
-- cmd: if %APPVEYOR_SCHEDULED_BUILD% equ "True" (cov-build --dir cov-int msbuild %APPVEYOR_BUILD_FOLDER%/Board_Control_Utilities.sln /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll") else (msbuild %APPVEYOR_BUILD_FOLDER%/Board_Control_Utilities.sln /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll")
-- cmd: if %APPVEYOR_SCHEDULED_BUILD% equ "True" (7z a -tzip bcu.zip cov-int)
-- cmd: if %APPVEYOR_SCHEDULED_BUILD% equ "True" (curl --form token=%bcu_coverity_token% --form email=frank.li@nxp.com  --form file=@bcu.zip --form version="appveyor_upload"  --form description="attempt to automate coverity scan" https://scan.coverity.com/builds?project=NXPmicro%2Fbcu)
+- cmd: if %APPVEYOR_SCHEDULED_BUILD% == "True" (cov-build --dir cov-int msbuild %APPVEYOR_BUILD_FOLDER%/Board_Control_Utilities.sln /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll") else (msbuild %APPVEYOR_BUILD_FOLDER%/Board_Control_Utilities.sln /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll")
+- cmd: if %APPVEYOR_SCHEDULED_BUILD% == "True" (7z a -tzip bcu.zip cov-int)
+- cmd: if %APPVEYOR_SCHEDULED_BUILD% == "True" (curl --form token=%bcu_coverity_token% --form email=frank.li@nxp.com  --form file=@bcu.zip --form version="appveyor_upload"  --form description="attempt to automate coverity scan" https://scan.coverity.com/builds?project=NXPmicro%2Fbcu)
 
 # get artifact:
 - cmd: if exist %APPVEYOR_BUILD_FOLDER%\Debug\Board_Control_Utilities.exe  cp %APPVEYOR_BUILD_FOLDER%\Debug\Board_Control_Utilities.exe  %APPVEYOR_BUILD_FOLDER%\bcu.exe
