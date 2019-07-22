@@ -1,6 +1,9 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/github/NXPmicro/bcu?svg=true)](https://ci.appveyor.com/project/nxpfrankli/bcu)
+# bcu (Board Control Utilities)
 
+[![Build status](https://ci.appveyor.com/api/projects/status/github/NXPmicro/bcu?svg=true)](https://ci.appveyor.com/project/nxpfrankli/bcu)
 ![GitHub](https://img.shields.io/github/license/NXPmicro/bcu.svg)
+[![Coverity Scan Build Status](https://img.shields.io/coverity/scan/18806.svg)]
+(https://scan.coverity.com/projects/bcu)
 
 # to build and run BCU in Windows:  
 
