@@ -12,8 +12,7 @@ init:
 # skip x86 check in linux  
 - sh: if [ "${PLATFORM}" = "x86" ]; then exit 0; fi
 # skip x64 check in windows
-- cmd: echo "&PROCESSOR_ARCHITECTURE&" 
-- cmd: IF EXIST "%PROGRAMFILES(x86)%" exit 0
+- cmd: if "%PLATFORM%" == "x64" exit 0
 
 install:
 - sh: sudo apt-get update
