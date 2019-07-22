@@ -20,7 +20,9 @@ build_script:
 - sh: cmake .
 - sh: make
 - cmd: echo %PATH%
-- cmd: msbuild %APPVEYOR_BUILD_FOLDER%/Board_Control_Utilities.sln /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+- cmd: cov-build --dir cov-int msbuild %APPVEYOR_BUILD_FOLDER%/Board_Control_Utilities.sln /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+- cmd: 7z a -tzip bcu.zip cov-int
+- cmd: curl --form token=%bcu_coverity_token% --form email=frank.li@nxp.com  --form file=@bcu.zip --form version="appveyor_upload"  --form description="attempt to automate coverity scan" https://scan.coverity.com/builds?project=NXPmicro%2Fbcu 
 - cmd: if exist %APPVEYOR_BUILD_FOLDER%\Debug\Board_Control_Utilities.exe  cp %APPVEYOR_BUILD_FOLDER%\Debug\Board_Control_Utilities.exe  %APPVEYOR_BUILD_FOLDER%\bcu.exe
 
 artifacts:
@@ -37,3 +39,6 @@ deploy:
   artifact: bcu.exe;  bcu;
   draft: true
 
+environment:
+  bcu_coverity_token:
+    secure: YuctP7YsJQIzsrBQtgEfwkYPu3StAEWV9SgPIBjwZDo=
