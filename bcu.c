@@ -67,7 +67,7 @@ int GV_MONITOR_TERMINATED=0;
 
 static void print_version()
 {
-	printf("version %s\n\n", GIT_VERSION);
+	printf("version %s\n", GIT_VERSION);
 }
 
 
@@ -945,9 +945,9 @@ static void lsftdi()
 
 int main(int argc, char **argv)
 {
+	print_version();
 	if(argc==1)
 	{
-		print_version();
 		print_help(NULL);
 		return 0;
 	}
