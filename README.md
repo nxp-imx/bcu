@@ -1,6 +1,8 @@
-# to build and run BCU in Windows:  
-
 [![Build status](https://ci.appveyor.com/api/projects/status/github/NXPmicro/bcu?svg=true)](https://ci.appveyor.com/project/nxpfrankli/bcu)
+
+![GitHub](https://img.shields.io/github/license/NXPmicro/bcu.svg)
+
+# to build and run BCU in Windows:  
 
 first we need to have FTDI D2XX library installed:  
   
