@@ -43,7 +43,7 @@
 //x select channel of pca9548 chip, y select which sensor it is measuring 
 #define IMX8XXL_POWER_PATH(channel,sensor) "/ft4232h_i2c{channel=0;dir_bitmask=0x04;val_bitmask=0x00}/pca9548{channel="#channel";addr=0x77}/pac1934{sensor="#sensor";addr=0x10}"
 #define IMX8XXL_EXP_PATH(port,bitmask) "/ft4232h_i2c{channel=0;dir_bitmask=0x04;val_bitmask=0x00}/pca9548{channel=0;addr=0x77}/pca6416a{addr=0x20;port="#port";pin_bitmask=0"#bitmask"}"
-struct mapping imx8xxl[]={
+struct mapping imx8xxl[] = {
 	"on_board_5v0",power,IMX8XXL_POWER_PATH(1,1),
 	"vdd_usb_3v3",power,IMX8XXL_POWER_PATH(1,2),
 	"3v3_io",power,IMX8XXL_POWER_PATH(1,3),
@@ -85,7 +85,7 @@ struct mapping imx8xxl[]={
 	NULL, 0, NULL//null terminated   
 };
 
-struct boot_mode imx8xxl_boot_modes[]={
+struct boot_mode imx8xxl_boot_modes[] = {
 	"efuse", 0x00,
 	"usb", 0x01,
 	"emmc", 0x02,
@@ -99,7 +99,7 @@ struct boot_mode imx8xxl_boot_modes[]={
 
 #define SIMULATION_POWER_PATH "/ft4232h_i2c{channel=0;dir_bitmask=0x08;val_bitmask=0x08}/pca9548{channel=1;addr=0x77}"
 #define SIMULATION_GPIO_EXTENDER_PATH "/ft4232h_i2c{channel=0;dir_bitmask=0x08;val_bitmask=0x08}/pca9548{channel=0;addr=0x77}"
-struct mapping simulation_board[]={
+struct mapping simulation_board[] = {
 	"vdd_main", power, SIMULATION_POWER_PATH"/pac1934{sensor=2;addr=0x10}",
 	"vdd_snvs", power, SIMULATION_POWER_PATH"/pac1934{sensor=1;addr=0x10}",
 	//"test_monitor", power, "/ft4232h_i2c{channel=0;dir_bitmask=0x08;val_bitmask=0x08}/pca9548{channel=1;addr=0x77}/pca9548{channel=1;addr=0x77}/pac1934{sensor=1;addr=0x10}",
@@ -116,32 +116,74 @@ struct mapping simulation_board[]={
 	NULL, 0, NULL//null terminated   
 };
 
-struct boot_mode simulation_board_boot_modes[]={
+struct boot_mode simulation_board_boot_modes[] = {
 	"emmc", 0x02,
 	"nand", 0x01,
 	"sd", 0x03,
 	NULL, 0
 };
 
-struct board_info board_list[]=
+#define IMX8MPEVK_GPIO_EXTENDER_PATH "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}"
+struct mapping imx8mpevk_board[] = {
+	"boot_mode", gpio, IMX8MPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=0;pin_bitmask=0x0F}",
+	"ft_io1", gpio, IMX8MPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=0;pin_bitmask=0x10}",
+	"ft_io2", gpio, IMX8MPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=0;pin_bitmask=0x20}",
+	"ft_io3", gpio, IMX8MPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=0;pin_bitmask=0x40}",
+	"ft_io4", gpio, IMX8MPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=0;pin_bitmask=0x80}",
+	"remote_en", gpio, IMX8MPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=1;pin_bitmask=0x01}",
+	"ft_io5", gpio, IMX8MPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=1;pin_bitmask=0x02}",
+	"ft_io6", gpio, IMX8MPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=1;pin_bitmask=0x04}",
+	"ft_io7", gpio, IMX8MPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=1;pin_bitmask=0x08}",
+	"ft_io8", gpio, IMX8MPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=1;pin_bitmask=0x10}",
+	"ft_io9", gpio, IMX8MPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=1;pin_bitmask=0x20}",
+	"ft_io10", gpio, IMX8MPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=1;pin_bitmask=0x40}",
+	"ft_io11", gpio, IMX8MPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=1;pin_bitmask=0x80}",
+
+	"reset_b",gpio,"/ft4232h_gpio{channel=0;pin_bitmask=0x10}",
+	"sys_nrst",gpio,"/ft4232h_gpio{channel=0;pin_bitmask=0x20}",
+	"io_nrst",gpio,"/ft4232h_gpio{channel=0;pin_bitmask=0x40}",
+	"onoff",gpio,"/ft4232h_gpio{channel=0;pin_bitmask=0x80}",
+	"io_nint",gpio,"/ft4232h_gpio{channel=1;pin_bitmask=0x08}",
+
+	"ft_gpio1",gpio,"/ft4232h_gpio{channel=1;pin_bitmask=0x10}",
+	"ft_gpio2",gpio,"/ft4232h_gpio{channel=1;pin_bitmask=0x20}",
+	"ft_gpio3",gpio,"/ft4232h_gpio{channel=1;pin_bitmask=0x40}",
+	"ft_gpio4",gpio,"/ft4232h_gpio{channel=1;pin_bitmask=0x80}",
+
+	NULL, 0, NULL//null terminated
+};
+
+struct boot_mode imx8mpevk_board_boot_modes[] = {
+	"fuse", 0x00,
+	"usb", 0x01,
+	"emmc", 0x02,
+	"sd",0x03,
+	"nand_256", 0x04,
+	"nand_512",0x05,
+	"qspi_3b_read", 0x06,
+	"qspi_hyperflash",0x07,
+	"ecspi",0x08,
+	"infinite_loop",0x0E,
+	NULL, 0
+};
+
+struct board_info board_list[] =
 {
 	"simulation_board", simulation_board,simulation_board_boot_modes,"[default_group:vdd_main]",
-	"imx8xxl", imx8xxl,imx8xxl_boot_modes,NULL
+	"imx8xxl", imx8xxl,imx8xxl_boot_modes,NULL,
+	"imx8mpevk", imx8mpevk_board, imx8mpevk_board_boot_modes, NULL
 	//"imx9xxl",&imx9xxl_pins,
-	
 };
 int num_of_boards=sizeof(board_list)/sizeof(struct board_info);
 
-
-
 struct board_info* get_board(char* board_name)
 {
-	for(int i=0; i< num_of_boards; i++)
+	for (int i = 0; i < num_of_boards; i++)
 	{
 
-		if(strcmp(board_name, board_list[i].name )==0)//board found
+		if (strcmp(board_name, board_list[i].name) == 0)//board found
 		{
-			return &board_list[i]; 
+			return &board_list[i];
 		}
 	}
 	printf("board model %s is not supported\n", board_name);
@@ -150,10 +192,10 @@ struct board_info* get_board(char* board_name)
 
 int get_path(char* path, char* gpio_name, struct board_info* board)
 {
-	int i=0;
-	while(board->mappings[i].name!=NULL)
+	int i = 0;
+	while (board->mappings[i].name != NULL)
 	{
-		if(strcmp(gpio_name,board->mappings[i].name)==0)
+		if (strcmp(gpio_name, board->mappings[i].name) == 0)
 		{
 			strcpy(path, board->mappings[i].path);
 			return 0;
@@ -169,13 +211,13 @@ get the maximum length of the power related variable name
 */
 int get_max_power_name_length(struct board_info* board)
 {
-	size_t max=0;
-	int i=0;
-	while(board->mappings[i].name!=NULL)
+	size_t max = 0;
+	int i = 0;
+	while (board->mappings[i].name != NULL)
 	{
-		if(board->mappings[i].type==power&&strlen(board->mappings[i].name)>max)
+		if (board->mappings[i].type == power && strlen(board->mappings[i].name) > max)
 		{
-			max=(int)strlen(board->mappings[i].name);
+			max = (int)strlen(board->mappings[i].name);
 		}
 		i++;
 	}
@@ -186,16 +228,16 @@ int get_max_power_name_length(struct board_info* board)
 
 int get_boot_mode_offset(unsigned char boot_mode_pin_bitmask)
 {
-	int offset=0;
-	unsigned char hex=boot_mode_pin_bitmask;
-	while(hex%2==0)
+	int offset = 0;
+	unsigned char hex = boot_mode_pin_bitmask;
+	while (hex % 2 == 0)
 	{
 		offset++;
-		hex=hex>>1;
+		hex = hex >> 1;
 	}
-	if(offset>8)
+	if (offset > 8)
 	{
-		printf("get_boot_mode_offset: something is wrong with the pin bitmask %x\n", boot_mode_pin_bitmask );
+		printf("get_boot_mode_offset: something is wrong with the pin bitmask %x\n", boot_mode_pin_bitmask);
 		return -1;
 	}
 	//printf("offset is %d\n", offset);
