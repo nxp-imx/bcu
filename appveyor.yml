@@ -16,7 +16,7 @@ init:
 - cmd: if "%PLATFORM%" equ "x64" appveyor exit
 
 install:
-- sh: sudo apt-get update
+# - sh: sudo apt-get update
 - sh: sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libftdi1-dev
 - sh: sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libusb-1.0-0-dev
 
