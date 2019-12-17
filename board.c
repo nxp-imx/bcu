@@ -140,7 +140,7 @@ struct mapping imx8mpevk_board[] = {
 	"ft_io11", gpio, IMX8MPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=1;pin_bitmask=0x80}",
 
 	"reset_b",gpio,"/ft4232h_gpio{channel=0;pin_bitmask=0x10}",
-	"sys_nrst",gpio,"/ft4232h_gpio{channel=0;pin_bitmask=0x20}",
+	"reset",gpio,"/ft4232h_gpio{channel=0;pin_bitmask=0x20}",
 	"io_nrst",gpio,"/ft4232h_gpio{channel=0;pin_bitmask=0x40}",
 	"onoff",gpio,"/ft4232h_gpio{channel=0;pin_bitmask=0x80}",
 	"io_nint",gpio,"/ft4232h_gpio{channel=1;pin_bitmask=0x08}",
