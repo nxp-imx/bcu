@@ -8,9 +8,14 @@ platform:
 - x86
 - x64
 
+configuration: 
+- Debug
+- Release
+
 init:
 # skip x86 check in linux  
 - sh: if [ "${PLATFORM}" = "x86" ]; then exit 0; fi
+- sh: if [ "${CONFIGURATION}" = "Debug" ] ; then exit 0; fi
 # skip x64 check in windows
 - cmd: echo %PLATFORM%
 - cmd: if "%PLATFORM%" equ "x64" appveyor exit
@@ -34,7 +39,7 @@ build_script:
 - cmd: if "%APPVEYOR_SCHEDULED_BUILD%" == "True" (curl --form token=%bcu_coverity_token% --form email=frank.li@nxp.com  --form file=@bcu.zip --form version="appveyor_upload"  --form description="attempt to automate coverity scan" https://scan.coverity.com/builds?project=NXPmicro%2Fbcu)
 
 # get artifact:
-- cmd: if exist %APPVEYOR_BUILD_FOLDER%\Debug\Board_Control_Utilities.exe  cp %APPVEYOR_BUILD_FOLDER%\Debug\Board_Control_Utilities.exe  %APPVEYOR_BUILD_FOLDER%\bcu.exe
+- cmd: if exist %APPVEYOR_BUILD_FOLDER%\Release\Board_Control_Utilities.exe  cp %APPVEYOR_BUILD_FOLDER%\Release\Board_Control_Utilities.exe  %APPVEYOR_BUILD_FOLDER%\bcu.exe
 
 artifacts:
 - path: bcu.exe
