@@ -121,12 +121,16 @@ ________________________________________________________________________________
 
 #### boot usage:
 
-​	1) board power off, plug in debug cable
-​	2) set boot mode first:
-​		sudo ./bcu set_boot_mode sd -board=imx8mpevk
-​	3) enable remote control
-​		sudo ./bcu set_gpio remote_en 1 -board=imx8mpevk
-​	4) board power on
+1) board power off, plug in debug cable  
+2) keep pca6416 enable:  
+    sudo ./bcu set_gpio io_nrst 1 -board=imx8mpevk  
+3) set sys_nrst high:  
+    sudo ./bcu set_gpio reset 1 -board=imx8mpevk  
+4) set boot mode first:  
+    sudo ./bcu set_boot_mode sd -board=imx8mpevk  
+5) enable remote control:  
+    sudo ./bcu set_gpio remote_en 1 -board=imx8mpevk  
+6) board power on  
 
 #### boot mode select for imx8mpevk:
 
