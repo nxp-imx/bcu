@@ -57,19 +57,36 @@ extern int num_of_boards;
 extern struct board_info board_list[];
 
 int GV_MONITOR_TERMINATED=0;
-#define RED 31
-#define GREEN 32
-#define	YELLOW 33
-#define CYAN 36
-#define WHITE 37
-#define MAGENTA 35
-#define BLUE 34
+
+char* g_vt_red = (char*)"\x1B[31m";
+char* g_vt_green = (char*)"\x1B[32m";
+char* g_vt_yellow = (char*)"\x1B[33m";
+char* g_vt_kcyn = (char*)"\x1B[36m";
+char* g_vt_white = (char*)"\x1B[37m";
+char* g_vt_magenta = (char*)"\x1B[35m";
+char* g_vt_blue = (char*)"\x1B[34m";
+char* g_vt_default = (char*)"\x1B[0m";
+char* g_vt_clear = (char*)"\x1B[2J";
+char* g_vt_home = (char*)"\x1B[H";
+
+void clean_vt_color()
+{
+	g_vt_red = (char*)"";
+	g_vt_green = g_vt_red;
+	g_vt_yellow = g_vt_red;
+	g_vt_kcyn = g_vt_red;
+	g_vt_white = g_vt_red;
+	g_vt_magenta = g_vt_red;
+	g_vt_blue = g_vt_red;
+	g_vt_default = g_vt_red;
+	g_vt_clear = (char*)"\n";
+	g_vt_home = (char*)"\n";
+}
 
 static void print_version()
 {
 	printf("version %s\n", GIT_VERSION);
 }
-
 
 static void print_help(char* cmd)
 {
@@ -77,19 +94,19 @@ static void print_help(char* cmd)
 		printf("%s\n", "usage:");
 		printf("%s\n\n", "bcu command [-options]");
 		printf("%s\n\n", 	"list of available commands:");
-		printf("	\033[0m%-30s\033[0;32m%s\n", "reset", "reset the board");
-		printf("	\033[0m%-30s\033[0;32m%s\n", "monitor", "monitor power consumption");
-		printf("	\033[0m%-30s\033[0;32m%s\n", "lsgpio", "show a list of available gpio pin");
-		printf("	\033[0m%-30s\033[0;32m%s\n", "set_gpio [GPIO_NAME] [1/0]", "set pin GPIO_NAME to be high(1) or low(0)");
-		printf("	\033[0m%-30s\033[0;32m%s\n", "lsftdi", "list all boards connected by ftdi device");
-		printf("	\033[0m%-30s\033[0;32m%s\n", "lsboard", "list all supported board models");
-		printf("	\033[0m%-30s\033[0;32m%s\n", "set_boot_mode [BOOTMODE_NAME]", "set BOOTMODE_NAME as boot mode");
-		printf("	\033[0m%-30s\033[0;32m%s\n", "version", "print version number");
-		//printf("\033[0m%-30s\033[0;32m%s\n", "help [COMMAND_NAME]", "/*show details and options of COMMAND_NAME*/");
+		printf("	%s%-30s%s%s\n", g_vt_default, "reset", g_vt_green, "reset the board");
+		printf("	%s%-30s%s%s\n", g_vt_default, "monitor", g_vt_green, "monitor power consumption");
+		printf("	%s%-30s%s%s\n", g_vt_default, "lsgpio", g_vt_green, "show a list of available gpio pin");
+		printf("	%s%-30s%s%s\n", g_vt_default, "set_gpio [GPIO_NAME] [1/0]", g_vt_green, "set pin GPIO_NAME to be high(1) or low(0)");
+		printf("	%s%-30s%s%s\n", g_vt_default, "lsftdi", g_vt_green, "list all boards connected by ftdi device");
+		printf("	%s%-30s%s%s\n", g_vt_default, "lsboard", g_vt_green, "list all supported board models");
+		printf("	%s%-30s%s%s\n", g_vt_default, "set_boot_mode [BOOTMODE_NAME]", g_vt_green, "set BOOTMODE_NAME as boot mode");
+		printf("	%s%-30s%s%s%s\n", g_vt_default, "version", g_vt_green, "print version number", g_vt_default);
+		// printf("%s%-30s%s%s\n", g_vt_default, "help [COMMAND_NAME]", g_vt_green, "/*show details and options of COMMAND_NAME*/");
 
 #ifdef __linux__
-		printf("%c[%dm", 0x1B, CYAN);
-		printf("\n***please remember to run bcu with sudo\033[0m\n\n\n");
+		printf("%s", g_vt_kcyn);
+		printf("\n***please remember to run bcu with sudo%s\n\n\n", g_vt_default);
 #endif
 	}
 	else	
@@ -125,14 +142,14 @@ static void lsboard(struct options_setting* setting)
 	{
 		if(strcmp(setting->board, board_list[i].name)==0)
 		{
-			printf("\033[0;32m");
+			printf("%s", g_vt_green);
 		}
 		printf("	%s",board_list[i].name );
 		if(strcmp(setting->board, board_list[i].name)==0)
 		{
-			printf(" (default)\033[0m");
+			printf(" (default)");
 		}
-		printf("\n");
+		printf("%s", g_vt_default);
 	}
 	return;
 }
@@ -646,9 +663,9 @@ static void monitor(struct options_setting* setting)
 		
 		//then display
 		int available_width=monitor_width();
-		printf("%c[%dm", 0x1B, 32); //set the word as green
-		printf("\033[2J");
-		printf("\033[H"); //move cursor to the 0,0
+		printf("%s", g_vt_green); //set the word as green
+		printf("%s", g_vt_clear);
+		printf("%s", g_vt_home); //move cursor to the 0,0
 
 		if(available_width<60)
 		{
@@ -668,22 +685,22 @@ static void monitor(struct options_setting* setting)
 		printfpadding(" ",location_length);
 		if(available_width-max_length>87)
 		{
-			printf("%c[%dm", 0x1B, GREEN);
+			printf("%s", g_vt_green);
 			printf("%-21s","|Voltage(V)");
-			printf("%c[%dm", 0x1B, YELLOW);
+			printf("%s", g_vt_yellow);
 			printf("%-29s","|Current(mA)");
-			printf("%c[%dm", 0x1B, CYAN);
+			printf("%s", g_vt_kcyn);
 			printf("%-29s","|Power(mWatt)");
-			printf("%c[%dm", 0x1B, RED);
+			printf("%s", g_vt_red);
 			printf("%-6s","|Extra");
 			printf("\n");
-			printf("%c[%dm", 0x1B, WHITE);
+			printf("%s", g_vt_white);
 			printfpadding("location",location_length);
-			printf("%c[%dm", 0x1B, GREEN);
+			printf("%s", g_vt_green);
 			printf("|%-4s %-4s %-4s %-4s","now","avg","max","min");
-			printf("%c[%dm", 0x1B, YELLOW);
+			printf("%s", g_vt_yellow);
 			printf(" |%-6s %-6s %-6s %-6s","now","avg","max","min");
-			printf("%c[%dm", 0x1B, CYAN);
+			printf("%s", g_vt_kcyn);
 			printf(" |%-6s %-6s %-6s %-6s","now","avg","max","min");
 			
 
@@ -691,24 +708,24 @@ static void monitor(struct options_setting* setting)
 		}
 		else if(available_width-max_length>77)
 		{
-			printf("%c[%dm", 0x1B, GREEN);
+			printf("%s", g_vt_green);
 			printf("%-11s","|Voltage(V)");
-			printf("%c[%dm", 0x1B, YELLOW);
+			printf("%s", g_vt_yellow);
 			printf("%-29s","|Current(mA)");
-			printf("%c[%dm", 0x1B, CYAN);
+			printf("%s", g_vt_kcyn);
 			printf("%-29s","|Power(mWatt)");
-			printf("%c[%dm", 0x1B, RED);
+			printf("%s", g_vt_red);
 			printf("%-6s","|Extra");
 			printf("\n");
-			printf("%c[%dm", 0x1B, WHITE);
+			printf("%s", g_vt_white);
 			printfpadding("location",location_length);
-			printf("%c[%dm", 0x1B, GREEN);
+			printf("%s", g_vt_green);
 
 			printf("|%-4s %-4s","now","avg");
-			printf("%c[%dm", 0x1B, YELLOW);
+			printf("%s", g_vt_yellow);
 
 			printf(" |%-6s %-6s %-6s %-6s","now","avg","max","min");
-			printf("%c[%dm", 0x1B, CYAN);
+			printf("%s", g_vt_kcyn);
 
 			printf(" |%-6s %-6s %-6s %-6s","now","avg","max","min");
 
@@ -716,53 +733,53 @@ static void monitor(struct options_setting* setting)
 		}
 		else if(available_width-max_length>67)
 		{
-			printf("%c[%dm", 0x1B, GREEN);
+			printf("%s", g_vt_green);
 			printf("%-11s","|Voltage(V)");
-			printf("%c[%dm", 0x1B, YELLOW);
+			printf("%s", g_vt_yellow);
 			printf("%-15s","|Current(mA)");
-			printf("%c[%dm", 0x1B, CYAN);
+			printf("%s", g_vt_kcyn);
 			printf("%-29s","|Power(mWatt)");
-			printf("%c[%dm", 0x1B, RED);
+			printf("%s", g_vt_red);
 			printf("%-6s","|Extra");
 			printf("\n");
-			printf("%c[%dm", 0x1B, WHITE);
+			printf("%s", g_vt_white);
 			printfpadding("location",location_length);
-			printf("%c[%dm", 0x1B, GREEN);
+			printf("%s", g_vt_green);
 			printf("|%-4s %-4s","now","avg");
-			printf("%c[%dm", 0x1B, YELLOW);
+			printf("%s", g_vt_yellow);
 			printf(" |%-6s %-6s","now","avg");
-			printf("%c[%dm", 0x1B, CYAN);
+			printf("%s", g_vt_kcyn);
 			printf(" |%-6s %-6s %-6s %-6s","now","avg","max","min");
 		}
 		else
 		{
-			printf("%c[%dm", 0x1B, GREEN);
+			printf("%s", g_vt_green);
 
 			printf("%-11s","|Voltage(V)");
-			printf("%c[%dm", 0x1B, YELLOW);
+			printf("%s", g_vt_yellow);
 
 			printf("%-15s","|Current(mA)");
-			printf("%c[%dm", 0x1B, CYAN);
+			printf("%s", g_vt_kcyn);
 
 			printf("%-15s","|Power(mWatt)");
-			printf("%c[%dm", 0x1B, RED);
+			printf("%s", g_vt_red);
 			printf("%-6s","|Extra");
 			printf("\n");
-			printf("%c[%dm", 0x1B, WHITE);
+			printf("%s", g_vt_white);
 			printfpadding("location",location_length);
-			printf("%c[%dm", 0x1B, GREEN);
+			printf("%s", g_vt_green);
 			printf("|%-4s %-4s","now","avg");
-			printf("%c[%dm", 0x1B, YELLOW);
+			printf("%s", g_vt_yellow);
 			printf(" |%-6s %-6s","now","avg");
-			printf("%c[%dm", 0x1B, CYAN);
+			printf("%s", g_vt_kcyn);
 			printf(" |%-6s %-6s","now","avg");
 
 
 		}
-		printf("%c[%dm", 0x1B, RED);
+		printf("%s", g_vt_red);
 		printf("%-6s"," |SR");
 		printf("\n");
-		printf("%c[%dm", 0x1B, WHITE);
+		printf("%s", g_vt_white);
 		printfpadding("-----------------------------------------------------------------------------------------------------------------------------------------------",available_width);
 
 		for(int k=0;k<n;k++ )
@@ -783,14 +800,14 @@ static void monitor(struct options_setting* setting)
 				
 
 			//printf("%-10s|",board->mappings[name[k]].name);
-			printf("%c[%dm", 0x1B, WHITE);
+			printf("%s", g_vt_white);
 			printf("%c ",65+k);//print corresponding letters, start with A
 			printfpadding(board->mappings[name[k]].name, max_length);
 
-			printf("%c[%dm", 0x1B, GREEN);
+			printf("%s", g_vt_green);
 			printf(" |");
 
-			printf("%c[%dm", 0x1B, GREEN);
+			printf("%s", g_vt_green);
 			printf("%-4.2f ",vnow[k]);
 			printf("%-4.2f ",vavg[k]);
 			if(available_width-max_length>87)
@@ -799,10 +816,10 @@ static void monitor(struct options_setting* setting)
 			printf("%-4.2f ",vmin[k]);
 			}
 
-			printf("%c[%dm", 0x1B, YELLOW);
+			printf("%s", g_vt_yellow);
 			printf("|");
 
-			printf("%c[%dm", 0x1B, YELLOW);
+			printf("%s", g_vt_yellow);
 			printf("%-6.1f ",cnow[k]);
 			printf("%-6.1f ",cavg[k]);
 			if(available_width-max_length>77)
@@ -812,10 +829,10 @@ static void monitor(struct options_setting* setting)
 			}
 
 
-			printf("%c[%dm", 0x1B, CYAN);
+			printf("%s", g_vt_kcyn);
 			printf("|");
 
-			printf("%c[%dm", 0x1B, CYAN);
+			printf("%s", g_vt_kcyn);
 			printf("%-6.1f ",pnow[k]);
 			printf("%-6.1f ",pavg[k]);
 			if(available_width-max_length>67)
@@ -823,7 +840,7 @@ static void monitor(struct options_setting* setting)
 			printf("%-6.1f ",pmax[k]);
 			printf("%-6.1f ",pmin[k]);
 			}
-			printf("%c[%dm", 0x1B, RED);
+			printf("%s", g_vt_red);
 			if(sr_level[k]==-1)
 			{
 				printf("|N/A");
@@ -841,32 +858,32 @@ static void monitor(struct options_setting* setting)
 		if(num_of_groups>0)
 		{
 						//display groups
-			printf("%c[%dm", 0x1B, WHITE);
+			printf("%s", g_vt_white);
 			printf("\n\n");
 			printfpadding("-----------------------------------------------------------------------------------------------------------------------------------------------",available_width);
 			printfpadding(" ",max_group_length+1);
-			printf("%c[%dm", 0x1B, BLUE);
+			printf("%s", g_vt_blue);
 			printf("|Power(mWatt)");
 			printf("\n");
-			printf("%c[%dm", 0x1B, WHITE);
+			printf("%s", g_vt_white);
 			printfpadding("group",max_group_length);
-			printf("%c[%dm", 0x1B, BLUE);
+			printf("%s", g_vt_blue);
 			printf(" |%-6s %-6s %-6s %-6s","now","avg","max","min");
-			printf("%c[%dm", 0x1B, WHITE);
+			printf("%s", g_vt_white);
 			printf("  group members\n");
-			printf("%c[%dm", 0x1B, WHITE);
+			printf("%s", g_vt_white);
 			printfpadding("-----------------------------------------------------------------------------------------------------------------------------------------------",available_width);
 		}
 		for(int k=0; k<num_of_groups;k++)
 		{
 			printfpadding(groups[k].name,max_group_length);
-			printf("%c[%dm", 0x1B, BLUE);
+			printf("%s", g_vt_blue);
 			printf(" |");
 			printf("%-6.1f ", groups[k].sum);
 			printf("%-6.1f ", groups[k].avg);
 			printf("%-6.1f ", groups[k].max);
 			printf("%-6.1f", groups[k].min);
-			printf("%c[%dm", 0x1B, WHITE);
+			printf("%s", g_vt_white);
 			//printf(" |");
 			printf("  ");
 			if(strlen(groups[k].member_list)<(size_t)(monitor_width()-max_group_length-30))
@@ -883,7 +900,7 @@ static void monitor(struct options_setting* setting)
 
 		//printf("width: %d \n",monitor_width());
 		printf("\n");
-		printf("%c[%dm", 0x1B, WHITE);
+		printf("%s", g_vt_white);
 		printf("press the letter on keyboard to control coresponding extra sense resistor(Extra SR)\n");
    		printf("Ctrl C to exit...\n"  );
 
@@ -931,8 +948,8 @@ static void monitor(struct options_setting* setting)
 	{
 		fclose(fptr);
 	}
-	printf("\033[2J");
-	printf("\033[H"); //move cursor to the 0,0
+	printf("%s", g_vt_clear);
+	printf("%s", g_vt_home); //move cursor to the 0,0
 	return;
 }
 
@@ -942,10 +959,45 @@ static void lsftdi()
 	return;
 }
 
+static int enable_vt_mode()
+{
+#ifdef _WIN32
+	// Set output mode to handle virtual terminal sequences
+	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+	if (hOut == INVALID_HANDLE_VALUE)
+	{
+		clean_vt_color();
+		return -1;
+	}
+
+	DWORD dwMode = 0;
+	if (!GetConsoleMode(hOut, &dwMode))
+	{
+		clean_vt_color();
+		return -1;
+	}
+
+	dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+	if (!SetConsoleMode(hOut, dwMode))
+	{
+		clean_vt_color();
+		return -1;
+	}
+	return 0;
+#else
+	return 0;
+#endif
+}
 
 int main(int argc, char **argv)
 {
 	print_version();
+
+	if (enable_vt_mode())
+	{
+		printf("Your console don't support VT mode, fail back to verbose mode");
+	}
+
 	if(argc==1)
 	{
 		print_help(NULL);
