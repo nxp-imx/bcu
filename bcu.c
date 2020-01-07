@@ -165,6 +165,7 @@ static void set_gpio(struct options_setting* setting)
 	void* head=NULL;
 	void* end_point;
 	char path[MAX_PATH_LENGTH];
+	int status = -1;
 
 	if(setting->output_state==-1)
 	{
@@ -203,11 +204,16 @@ static void set_gpio(struct options_setting* setting)
 
 	struct gpio_device* gpio= end_point;
 	if(setting->output_state==1)
-		gpio->gpio_write(gpio, 0xFF);
+		status = gpio->gpio_write(gpio, 0xFF);
 	else if (setting->output_state==0)
-		gpio->gpio_write(gpio, 0x00);
+		status = gpio->gpio_write(gpio, 0x00);
 	else if (setting->output_state==2)
-		gpio->gpio_toggle(gpio);
+		status = gpio->gpio_toggle(gpio);
+
+	if (status)
+		printf("set gpio failed, error = 0x%x\n", status);
+	else
+		printf("set gpio successful\n");
 
 	//hold time
 	msleep(setting->hold);
@@ -230,6 +236,7 @@ static void set_boot_mode(struct options_setting* setting)
 	void* head=NULL;
 	void* end_point;
 	char path[MAX_PATH_LENGTH];
+	int status = -1;
 
 	get_path(path,"boot_mode",board);
 	end_point=build_device_linkedlist_forward(&head,path);
@@ -243,7 +250,13 @@ static void set_boot_mode(struct options_setting* setting)
 	}
 
 	unsigned char hex_with_offset= setting->boot_mode_hex<<(get_boot_mode_offset(gpio->pin_bitmask));
-	gpio->gpio_write(gpio, hex_with_offset);
+	status = gpio->gpio_write(gpio, hex_with_offset);
+
+	if (status)
+		printf("set boot mode failed, error = 0x%x\n", status);
+	else
+		printf("set boot mode successful\n");
+
 	free_device_linkedlist_backward(end_point);
 }
 
@@ -255,6 +268,7 @@ static void reset(struct options_setting* setting)
 	void* head=NULL;
 	void* end_point;
 	char path[MAX_PATH_LENGTH];
+	int status = -1;
 
 	if(setting->boot_mode_hex!=-1)
 	{
@@ -274,14 +288,17 @@ static void reset(struct options_setting* setting)
 	msleep(setting->delay);
 
 	struct gpio_device* gpio= end_point;
-	gpio->gpio_write(gpio, 0xFF); //high
+	status = gpio->gpio_write(gpio, 0xFF); //high
 	msleep(500);
-	gpio->gpio_write(gpio, 0x00); //low
+	status |= gpio->gpio_write(gpio, 0x00) << 1; //low
 	msleep(500);
-	gpio->gpio_write(gpio, 0xFF);//high
+	status |= gpio->gpio_write(gpio, 0xFF) << 2;//high
 	msleep(500);
 
-
+	if (status)
+		printf("reset failed, error = 0x%x\n", status);
+	else
+		printf("reset successful\n");
 
 	free_device_linkedlist_backward(end_point);
 }
