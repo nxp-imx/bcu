@@ -35,23 +35,21 @@
 #include "board.h"
 
 /*used for storing options specified by user*/
-struct options_setting{
+struct options_setting {
 	char board[100]; //indicating the model of the board, i.e. i.MX8QMEVK
 	int delay;
 	int hold;
-	int output_state; 
+	int output_state;
 	int boot_mode_hex;
 	int active_low;
 	char path[MAX_PATH_LENGTH];
 	char gpio_name[MAX_MAPPING_NAME_LENGTH];
 	int location_id;
 	int dump;
-	char groups[MAX_NUMBER_OF_POWER*MAX_MAPPING_NAME_LENGTH];
+	char groups[MAX_NUMBER_OF_POWER * MAX_MAPPING_NAME_LENGTH];
 };
 
-
-struct group
-{
+struct group {
 	char name[MAX_MAPPING_NAME_LENGTH];
 	float sum;
 	float max;
@@ -59,7 +57,7 @@ struct group
 	float avg;
 	int avg_data_size;
 	int member_index[MAX_NUMBER_OF_POWER];
-	char member_list[MAX_MAPPING_NAME_LENGTH*MAX_NUMBER_OF_POWER];
+	char member_list[MAX_MAPPING_NAME_LENGTH * MAX_NUMBER_OF_POWER];
 	int num_of_members;
 };
 
@@ -67,12 +65,12 @@ int extract_parameter_string(char* chip_specification, char* parameter_name, cha
 int extract_parameter_value(char* chip_specification, char* parameter_name);
 void get_chip_name(char* chip_specification, char* chip_name);
 void free_device_linkedlist_backward(struct device* ptr);
-void free_device_linkedlist_forward(struct device*ptr);
-void* build_device_linkedlist_forward(void** head,char* path);
+void free_device_linkedlist_forward(struct device* ptr);
+void* build_device_linkedlist_forward(void** head, char* path);
 void* build_device_linkedlist_smart(void** new_head, char* new_path, void* old_head, char* old_path);
 
 int parse_options(int argc, char** argv, struct options_setting* setting);
 void set_options_default(struct options_setting* setting);
-int parse_groups(char* input, struct group* groups, struct board_info* board );
+int parse_groups(char* input, struct group* groups, struct board_info* board);
 void groups_init(struct group* groups, int num);
 #endif //PARSER_H

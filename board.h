@@ -31,16 +31,13 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-
 #define MAX_PATH_LENGTH 800     //maximum path length allowed
 #define MAX_NUMBER_OF_POWER 100 //maximum number of power types
 #define MAX_MAPPING_NAME_LENGTH 30	//maximum length of the name of the mapping
 
-enum mapping_type
-{
+enum mapping_type {
 	power,
 	gpio
-
 };
 
 /*
@@ -49,18 +46,18 @@ to avoid any parsing issue:
 -NO SPACE BETWEEN CHARACTERs
 -TO USE HEX AS PARAMETER, PUT '0x' BEFORE THE NUMBER
 */
-struct mapping{
+struct mapping {
 	char* name;
 	int type;
 	char* path;
 };
 
-struct boot_mode{
+struct boot_mode {
 	char* name;
 	unsigned char boot_mode_hex;
 };
 
-struct board_info{
+struct board_info {
 	char* name;
 	struct mapping* mappings;
 	struct boot_mode* boot_modes;

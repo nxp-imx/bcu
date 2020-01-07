@@ -45,18 +45,14 @@ typedef int(__stdcall* pFT_read)(FT_HANDLE, LPVOID, DWORD, LPDWORD);
 typedef int(__stdcall* pFT_close)(FT_HANDLE);
 typedef int(__stdcall* pFT_create_device_info_list)(LPDWORD);
 typedef int(__stdcall* pFT_get_bitmode)(FT_HANDLE, PUCHAR);
-typedef int(__stdcall* pFT_get_device_info_detail)(DWORD,LPDWORD,LPDWORD,LPDWORD,LPDWORD ,PCHAR,PCHAR,FT_HANDLE*);
-typedef int(__stdcall* pFT_set_timeouts)(FT_HANDLE,  DWORD,DWORD);
-
-
+typedef int(__stdcall* pFT_get_device_info_detail)(DWORD, LPDWORD, LPDWORD, LPDWORD, LPDWORD, PCHAR, PCHAR, FT_HANDLE*);
+typedef int(__stdcall* pFT_set_timeouts)(FT_HANDLE, DWORD, DWORD);
 #endif
-
-
 
 /*is there any difference between ST_handle and fdti_context, does the difference matters?*/
 struct ftdi_info {
 #ifdef _WIN32
-	
+
 	FT_HANDLE ftdi;
 
 	pFT_open FT_open;
@@ -69,7 +65,6 @@ struct ftdi_info {
 	pFT_get_bitmode FT_get_bitmode;
 	pFT_open_ex FT_open_ex;
 	pFT_set_timeouts FT_set_timeouts;
-
 
 #else
 	struct ftdi_context* ftdi;
@@ -88,7 +83,7 @@ enum BITMODE
 };
 
 int ft_init(struct ftdi_info* ftdi);
-int ft_open_channel(struct ftdi_info* fi,int channel);
+int ft_open_channel(struct ftdi_info* fi, int channel);
 int ft_open_channel_by_id(struct ftdi_info* fi, int channel, char* id);
 int ft_close(struct ftdi_info* ftdi);
 int ft_set_bitmode(struct ftdi_info* ftdi, int mask, int mode);
@@ -98,6 +93,5 @@ int ft_read_pins(struct ftdi_info* ftdi, unsigned char* pins);
 int ft_clear_buffer(struct ftdi_info* ftdi);
 void ft_list_devices();
 void msleep(int duration);
-
 
 #endif
