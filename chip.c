@@ -78,10 +78,10 @@ int pca9548_read(void* pca9548, unsigned char* data_buffer, int is_nack){
 	parent->i2c_read(parent, data_buffer ,is_nack);
 	return 0;
 }
-int pca9548_write(void* pca9548, unsigned char data, int is_nack){
+int pca9548_write(void* pca9548, unsigned char data){
 	struct pca9548* pca= pca9548;
 	struct i2c_device* parent=(void*)pca->i2c_device.device.parent;
-	return 	parent->i2c_write(parent, data ,is_nack);
+	return 	parent->i2c_write(parent, data);
 }
 int pca9548_start(void* pca9548){
 	struct pca9548* pca= pca9548;
@@ -107,12 +107,12 @@ int pca9548_set_channel(struct pca9548* pca9548)
 
 	int status;
 	parent->i2c_start(parent);
-	status=parent->i2c_write(parent, addr_plus_write ,0);
+	status=parent->i2c_write(parent, addr_plus_write);
 	if(!status)
 	{
 		printf("oh no! no ack received!\n");
 	}
-	parent->i2c_write(parent, change_channel_cmd ,0);
+	parent->i2c_write(parent, change_channel_cmd);
 	parent->i2c_stop(parent);
 
 	return 0;
@@ -211,7 +211,7 @@ int ft4232h_i2c_read(void* ft4232h, unsigned char* data_buffer, int is_nack){
 
 
 
-int ft4232h_i2c_write(void* ft4232h, unsigned char data, int is_nack){
+int ft4232h_i2c_write(void* ft4232h, unsigned char data){
 	struct ft4232h* ft=ft4232h;
 	unsigned char buffer[MAX_FTDI_BUFFER_SIZE];
 	unsigned char in_buffer[MAX_FTDI_BUFFER_SIZE];
@@ -250,29 +250,13 @@ int ft4232h_i2c_write(void* ft4232h, unsigned char data, int is_nack){
 	buffer[i++] = DIRECTION_SCLOUT_SDAOUT | ft->dir_bitmask; /*Direction*/
 	ft_write(&ft->ftdi_info, buffer, i); //Send off the commands
 	ft_read(&ft->ftdi_info, in_buffer, 1); 
-	if(is_nack)
+
+	if (((in_buffer[0] & 0x1) != 0)) //Check ACK bit 0 on data byte read out
 	{
-		if (((in_buffer[0] & 0x1) != 1)) //Check ACK bit 0 on data byte read out
-		{
-			printf("no ack from write\n");
-			return 0; /*Error, can't get the ACK bit from EEPROM */
-		}
-		else
-			return 1;
+		printf("can't get the ACK bit after write\n");
+		return -1; /*Error, can't get the ACK bit */
 	}
 
-	else
-	{
-		if (((in_buffer[0] & 0x1) != 0)) //Check ACK bit 0 on data byte read out
-		{
-			printf("no nack from write\n");
-			return 0; /*Error, can't get the ACK bit from EEPROM */
-		}
-		else
-			return 1;
-	}
-
-		
 	return 0;
 }
 
@@ -490,16 +474,16 @@ int pac1934_get_voltage(void* pac1934, float* voltage){
 	
 	//first refresh the powerister
 	parent->i2c_start(parent);
-	parent->i2c_write(parent, addr_plus_write,0);
-	parent->i2c_write(parent, 0x00, 0); //refresh;
+	parent->i2c_write(parent, addr_plus_write);
+	parent->i2c_write(parent, 0x00); //refresh;
 	parent->i2c_stop(parent);
 	msleep(1);
 	//read the data
 	parent->i2c_start(parent);
-	parent->i2c_write(parent, addr_plus_write, 0);
-	parent->i2c_write(parent, 0x07+pac->sensor-1, 0); //get voltage;
+	parent->i2c_write(parent, addr_plus_write);
+	parent->i2c_write(parent, 0x07+pac->sensor-1); //get voltage;
 	parent->i2c_start(parent);
-	parent->i2c_write(parent, addr_plus_read, 0);
+	parent->i2c_write(parent, addr_plus_read);
 
 	unsigned char data[2];
 	parent->i2c_read(parent,&data[0], 0);
@@ -518,16 +502,16 @@ int pac1934_get_current(void* pac1934, float* current){
 	
 	//first refresh the powerister
 	parent->i2c_start(parent);
-	parent->i2c_write(parent, addr_plus_write,0);
-	parent->i2c_write(parent, 0x00, 0); //refresh;
+	parent->i2c_write(parent, addr_plus_write);
+	parent->i2c_write(parent, 0x00); //refresh;
 	parent->i2c_stop(parent);
 	msleep(1);
 	//read the data
 	parent->i2c_start(parent);
-	parent->i2c_write(parent, addr_plus_write, 0);
-	parent->i2c_write(parent, 0x0B+pac->sensor-1, 0); //get voltage;
+	parent->i2c_write(parent, addr_plus_write);
+	parent->i2c_write(parent, 0x0B+pac->sensor-1); //get voltage;
 	parent->i2c_start(parent);
-	parent->i2c_write(parent, addr_plus_read, 0);
+	parent->i2c_write(parent, addr_plus_read);
 
 	unsigned char data[2];
 	parent->i2c_read(parent,&data[0], 0);
@@ -577,19 +561,19 @@ int pca6416a_write(void* pca6416a, unsigned char bit_value  )
 	unsigned char current_output[1];
 	//read current output register
 	parent->i2c_start(parent);
-	parent->i2c_write(parent, addr_plus_write ,0);
-	parent->i2c_write(parent, output_cmd,0);
+	parent->i2c_write(parent, addr_plus_write);
+	parent->i2c_write(parent, output_cmd);
 	parent->i2c_start(parent);
-	parent->i2c_write(parent, addr_plus_read ,0);
+	parent->i2c_write(parent, addr_plus_read);
 	parent->i2c_read(parent, current_output,1);
 	parent->i2c_stop(parent);
 
 	unsigned char output_data=( current_output[0]&(~pca->gpio_device.pin_bitmask) )| (bit_value&pca->gpio_device.pin_bitmask ) ;
 	//read current input register
 	parent->i2c_start(parent);
-	parent->i2c_write(parent, addr_plus_write ,0);
-	parent->i2c_write(parent, output_cmd,0);
-	parent->i2c_write(parent, output_data,1);
+	parent->i2c_write(parent, addr_plus_write);
+	parent->i2c_write(parent, output_cmd);
+	parent->i2c_write(parent, output_data);
 	parent->i2c_stop(parent);
 	return 0;
 
@@ -603,10 +587,10 @@ int pca6416a_read(void* pca6416a, unsigned char* bit_value_buffer  )
 	unsigned char addr_plus_read=(pca->addr<<1)+1;
 	unsigned char input_cmd=(pca->port)+0x00; //x00h is the input command
 	parent->i2c_start(parent);
-	parent->i2c_write(parent, addr_plus_write ,0);
-	parent->i2c_write(parent, input_cmd,0);
+	parent->i2c_write(parent, addr_plus_write);
+	parent->i2c_write(parent, input_cmd);
 	parent->i2c_start(parent);
-	parent->i2c_write(parent, addr_plus_read ,0);
+	parent->i2c_write(parent, addr_plus_read);
 	parent->i2c_read(parent, bit_value_buffer,1);
 	parent->i2c_stop(parent);
 
@@ -628,10 +612,10 @@ int pca6416a_set_direction(struct pca6416a* pca)
 
 	//read current configuration register
 	parent->i2c_start(parent);
-	parent->i2c_write(parent, addr_plus_write ,0);
-	parent->i2c_write(parent, configure_cmd,0);
+	parent->i2c_write(parent, addr_plus_write);
+	parent->i2c_write(parent, configure_cmd);
 	parent->i2c_start(parent);
-	parent->i2c_write(parent, addr_plus_read ,0);
+	parent->i2c_write(parent, addr_plus_read);
 	parent->i2c_read(parent, &current_config,1);
 	parent->i2c_stop(parent);
 
@@ -639,9 +623,9 @@ int pca6416a_set_direction(struct pca6416a* pca)
 
 
 	parent->i2c_start(parent);
-	parent->i2c_write(parent, addr_plus_write ,0);
-	parent->i2c_write(parent, configure_cmd,0);
-	parent->i2c_write(parent, input_bitmask,1);
+	parent->i2c_write(parent, addr_plus_write);
+	parent->i2c_write(parent, configure_cmd);
+	parent->i2c_write(parent, input_bitmask);
 	parent->i2c_stop(parent);
 	return 0;
 }
@@ -657,19 +641,19 @@ int pca6416a_toggle(void* pca6416a)
 	unsigned char current_output[1];
 	//read current output register
 	parent->i2c_start(parent);
-	parent->i2c_write(parent, addr_plus_write ,0);
-	parent->i2c_write(parent, output_cmd,0);
+	parent->i2c_write(parent, addr_plus_write);
+	parent->i2c_write(parent, output_cmd);
 	parent->i2c_start(parent);
-	parent->i2c_write(parent, addr_plus_read ,0);
+	parent->i2c_write(parent, addr_plus_read);
 	parent->i2c_read(parent, current_output,1);
 	parent->i2c_stop(parent);
 
 	unsigned char output_data= current_output[0]^pca->gpio_device.pin_bitmask;
 	//read current input register
 	parent->i2c_start(parent);
-	parent->i2c_write(parent, addr_plus_write ,0);
-	parent->i2c_write(parent, output_cmd,0);
-	parent->i2c_write(parent, output_data,1);
+	parent->i2c_write(parent, addr_plus_write);
+	parent->i2c_write(parent, output_cmd);
+	parent->i2c_write(parent, output_data);
 	parent->i2c_stop(parent);
 	return 0;
 
@@ -682,10 +666,10 @@ int pca6416a_get_output(void* pca6416a, unsigned char* current_output  )
 	unsigned char addr_plus_read=(pca->addr<<1)+1;
 	unsigned char output_cmd=(pca->port)+0x02; //x02h is the output command for port 0
 	parent->i2c_start(parent);
-	parent->i2c_write(parent, addr_plus_write ,0);
-	parent->i2c_write(parent, output_cmd,0);
+	parent->i2c_write(parent, addr_plus_write);
+	parent->i2c_write(parent, output_cmd);
 	parent->i2c_start(parent);
-	parent->i2c_write(parent, addr_plus_read ,0);
+	parent->i2c_write(parent, addr_plus_read);
 	parent->i2c_read(parent, current_output,1);
 	parent->i2c_stop(parent);
 	*current_output=(*current_output )&pca->gpio_device.pin_bitmask;
