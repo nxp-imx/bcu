@@ -37,7 +37,6 @@
 #include<string.h>
 #include<ctype.h>
 
-
 #include "board.h"
 
 //x select channel of pca9548 chip, y select which sensor it is measuring 
@@ -174,7 +173,7 @@ struct board_info board_list[] =
 	"imx8mpevk", imx8mpevk_board, imx8mpevk_board_boot_modes, NULL
 	//"imx9xxl",&imx9xxl_pins,
 };
-int num_of_boards=sizeof(board_list)/sizeof(struct board_info);
+int num_of_boards = sizeof(board_list) / sizeof(struct board_info);
 
 struct board_info* get_board(char* board_name)
 {
@@ -207,8 +206,8 @@ int get_path(char* path, char* gpio_name, struct board_info* board)
 }
 
 /*
-get the maximum length of the power related variable name
-*/
+ * get the maximum length of the power related variable name
+ */
 int get_max_power_name_length(struct board_info* board)
 {
 	size_t max = 0;
@@ -223,8 +222,6 @@ int get_max_power_name_length(struct board_info* board)
 	}
 	return max;
 }
-
-
 
 int get_boot_mode_offset(unsigned char boot_mode_pin_bitmask)
 {
@@ -242,5 +239,4 @@ int get_boot_mode_offset(unsigned char boot_mode_pin_bitmask)
 	}
 	//printf("offset is %d\n", offset);
 	return offset;
-
 }
