@@ -46,7 +46,7 @@ struct device{
 struct i2c_device{
 	struct device device;
 	int (*i2c_read)(void*,unsigned char*,int); //Read one byte, give ack/nack
-	int (*i2c_write)(void*,unsigned char,int); //Write one byte, check ack/nack
+	int (*i2c_write)(void*,unsigned char); //Write one byte, check ack/nack
 	int (*i2c_start)(void*);
 	int (*i2c_stop)(void*); //sending Start/Stop Condition
 
@@ -80,7 +80,7 @@ struct pca9548{
 	int addr;
 };
 int pca9548_read(void* pca9548, unsigned char* data_buffer, int is_nack);
-int pca9548_write(void* pca9548, unsigned char data, int is_nack);
+int pca9548_write(void* pca9548, unsigned char data);
 int pca9548_start(void* pca9548);
 int pca9548_stop(void* pca9548);
 void* pca9548_create(char* chip_specification, void* parent);
@@ -96,7 +96,7 @@ struct ft4232h{
 
 };
 int ft4232h_i2c_read(void* ft4232h, unsigned char* data_buffer, int is_nack);
-int ft4232h_i2c_write(void* ft4232h, unsigned char data, int is_nack);
+int ft4232h_i2c_write(void* ft4232h, unsigned char data);
 int ft4232h_i2c_start(void* f2232h);
 int ft4232h_i2c_stop(void* ft4232h);
 void* ft4232h_i2c_create(char* chip_specification, void* parent);
@@ -132,7 +132,7 @@ struct pca6416a{
 	unsigned char pin_bitmask; //specify which pin to use
 };
 int pca6416a_read(void* pca6416a, unsigned char* bit_value_buffer);
-int pca6416a_write(void* pca6416a, unsigned char bit_value  );
+int pca6416a_write(void* pca6416a, unsigned char bit_value);
 int pca6416a_toggle(void* pca6416a);
 void* pca6416a_create(char* chip_specification,void* parent);
 int pca6416a_set_direction(struct pca6416a* pca);
