@@ -176,7 +176,7 @@ int ft4232h_i2c_read(void* ft4232h, unsigned char* data_buffer, int is_nack){
 	struct ft4232h* ft=ft4232h;
 	unsigned char buffer[MAX_FTDI_BUFFER_SIZE];
 	unsigned char in_buffer[MAX_FTDI_BUFFER_SIZE];
-	int i=0;
+	int i = 0, ftStatus = 0;
 	#ifdef __linux__
 	ft_clear_buffer(&ft->ftdi_info);
 	#endif
@@ -201,8 +201,10 @@ int ft4232h_i2c_read(void* ft4232h, unsigned char* data_buffer, int is_nack){
 		buffer[i++] = 0x80;// MSB zero means ACK
 	else
 		buffer[i++] = 0x00;// MSB zero means ACK
-	ft_write(&ft->ftdi_info, buffer, i); //Send off the commands
-	ft_read(&ft->ftdi_info, in_buffer, 1); //Read one byte 
+	ftStatus = ft_write(&ft->ftdi_info, buffer, i); //Send off the commands
+	if (ftStatus) return ftStatus;
+	ftStatus = ft_read(&ft->ftdi_info, in_buffer, 1); //Read one byte
+	if (ftStatus) return ftStatus;
 	*data_buffer = in_buffer[0]; 
 
 	return 0;
@@ -215,7 +217,7 @@ int ft4232h_i2c_write(void* ft4232h, unsigned char data){
 	struct ft4232h* ft=ft4232h;
 	unsigned char buffer[MAX_FTDI_BUFFER_SIZE];
 	unsigned char in_buffer[MAX_FTDI_BUFFER_SIZE];
-	int i=0;
+	int i = 0, ftStatus = 0;
 	#ifdef __linux__ 
 	ft_clear_buffer(&ft->ftdi_info);
 	#endif
@@ -248,8 +250,10 @@ int ft4232h_i2c_write(void* ft4232h, unsigned char data){
 	buffer[i++] = MPSSE_CMD_SET_DATA_BITS_LOWBYTE;/* MPSSE command */
 	buffer[i++] = VALUE_SCLLOW_SDALOW |ft->val_bitmask; /*Value*/
 	buffer[i++] = DIRECTION_SCLOUT_SDAOUT | ft->dir_bitmask; /*Direction*/
-	ft_write(&ft->ftdi_info, buffer, i); //Send off the commands
-	ft_read(&ft->ftdi_info, in_buffer, 1); 
+	ftStatus = ft_write(&ft->ftdi_info, buffer, i); //Send off the commands
+	if (ftStatus) return ftStatus;
+	ftStatus = ft_read(&ft->ftdi_info, in_buffer, 1);
+	if (ftStatus) return ftStatus;
 
 	if (((in_buffer[0] & 0x1) != 0)) //Check ACK bit 0 on data byte read out
 	{
@@ -263,7 +267,7 @@ int ft4232h_i2c_write(void* ft4232h, unsigned char data){
 int ft4232h_i2c_start(void* ft4232h){
 	struct ft4232h* ft=ft4232h;
 	unsigned char buffer[MAX_FTDI_BUFFER_SIZE];
-	int i=0;
+	int i = 0, ftStatus = 0;
 	for(int j=0;j<40;j++)
 	{
 		buffer[i++]=MPSSE_CMD_SET_DATA_BITS_LOWBYTE;
@@ -282,7 +286,9 @@ int ft4232h_i2c_start(void* ft4232h){
 	buffer[i++]=VALUE_SCLLOW_SDALOW | ft->val_bitmask;
 	buffer[i++]=DIRECTION_SCLOUT_SDAOUT | ft->dir_bitmask;
 
-	ft_write(&ft->ftdi_info, buffer, i); //Send off the commands
+	ftStatus = ft_write(&ft->ftdi_info, buffer, i); //Send off the commands
+	if (ftStatus)
+		return ftStatus;
 
 	return 0;
 }
@@ -290,7 +296,7 @@ int ft4232h_i2c_start(void* ft4232h){
 int ft4232h_i2c_stop(void* ft4232h){
 	struct ft4232h* ft=ft4232h;
 	unsigned char buffer[MAX_FTDI_BUFFER_SIZE];
-	int i=0;
+	int i = 0, ftStatus = 0;
 
 	/* SCL low, SDA low */
 	for(int j=0;j<25;j++)
@@ -316,7 +322,9 @@ int ft4232h_i2c_stop(void* ft4232h){
 	//buffer[i++]=0x80;
 	//buffer[i++]=0x00;
 	//buffer[i++]=0x10; /* Tristate the SCL & SDA pins */
-	ft_write(&ft->ftdi_info, buffer, i); //Send off the commands
+	ftStatus = ft_write(&ft->ftdi_info, buffer, i); //Send off the commands
+	if (ftStatus)
+		return ftStatus;
 
 	return 0;
 }
@@ -324,7 +332,7 @@ int ft4232h_i2c_stop(void* ft4232h){
 int ft4232h_i2c_init(struct ft4232h* ft)
 {
 	unsigned char buffer[MAX_FTDI_BUFFER_SIZE];
-	int i=0;
+	int i = 0, ftStatus = 0;
 
 	ft_set_bitmode(&ft->ftdi_info, 0, 0); //resetting the controller
 	ft_set_bitmode(&ft->ftdi_info, 0, BM_MPSSE);//set as MPSSE
@@ -335,7 +343,9 @@ int ft4232h_i2c_init(struct ft4232h* ft)
 	buffer[i++] = MPSSE_CMD_DISABLE_CLOCK_DIVIDE_BY_5; //Ensure disable clock divide by 5 for 60Mhz master clock
 	buffer[i++] = MPSSE_CMD_DISABLE_ADAPTIVE_CLOCKING; //Ensure turn off adaptive clocking
 	buffer[i++] = MPSSE_CMD_ENABLE_3PHASE_CLOCKING; //Enable 3 phase data clock, used by I2C to allow data on both clock edges
-	ft_write(&ft->ftdi_info, buffer, i);
+	ftStatus = ft_write(&ft->ftdi_info, buffer, i);
+	if (ftStatus)
+		return ftStatus;
 
 	i = 0; //Clear output buffer
 	buffer[i++] = MPSSE_CMD_SET_DATA_BITS_LOWBYTE; //Command to set directions of lower 8 pins and force value on bits set as output
@@ -347,12 +357,16 @@ int ft4232h_i2c_init(struct ft4232h* ft)
 	buffer[i++] =(unsigned char) (CLOCK_DIVISOR & '\xFF'); //Set 0xValueL of clock divisor
 	buffer[i++] =(unsigned char) ( (CLOCK_DIVISOR >> 8) & '\xFF'); //Set 0xValueH of clock divisor
 
-	ft_write(&ft->ftdi_info, buffer, i);
+	ftStatus = ft_write(&ft->ftdi_info, buffer, i);
+	if (ftStatus)
+		return ftStatus;
 	i = 0; //Clear output buffer
 	msleep(20); //Delay for a while
 	//Turn off loop back in case
 	buffer[i++] = MPSEE_CMD_DISABLE_LOOPBACK; //Command to turn off loop back of TDI/TDO connection
-	ft_write(&ft->ftdi_info, buffer, i);
+	ftStatus = ft_write(&ft->ftdi_info, buffer, i);
+	if (ftStatus)
+		return ftStatus;
 	msleep(30); //Delay for a while
 
 	//printf("I2C initialization finished!\n");
@@ -362,7 +376,12 @@ int ft4232h_i2c_init(struct ft4232h* ft)
 int ft4232h_i2c_free(void* ft4232h)
 {
 	struct ft4232h* ft=ft4232h;
-	ft_close(&ft->ftdi_info);
+	int ftStatus = 0;
+
+	ftStatus = ft_close(&ft->ftdi_info);
+	if (ftStatus)
+		return ftStatus;
+
 	return 0;
 }
 
@@ -559,22 +578,37 @@ int pca6416a_write(void* pca6416a, unsigned char bit_value  )
 
 	unsigned char output_cmd=(pca->port)+0x02; //x02h is the output command for port 0
 	unsigned char current_output[1];
+	int bSucceed = 0;
+
 	//read current output register
-	parent->i2c_start(parent);
-	parent->i2c_write(parent, addr_plus_write);
-	parent->i2c_write(parent, output_cmd);
-	parent->i2c_start(parent);
-	parent->i2c_write(parent, addr_plus_read);
-	parent->i2c_read(parent, current_output,1);
-	parent->i2c_stop(parent);
+	bSucceed = parent->i2c_start(parent);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_write(parent, addr_plus_write);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_write(parent, output_cmd);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_start(parent);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_write(parent, addr_plus_read);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_read(parent, current_output,1);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_stop(parent);
+	if (bSucceed) return bSucceed;
 
 	unsigned char output_data=( current_output[0]&(~pca->gpio_device.pin_bitmask) )| (bit_value&pca->gpio_device.pin_bitmask ) ;
 	//read current input register
-	parent->i2c_start(parent);
-	parent->i2c_write(parent, addr_plus_write);
-	parent->i2c_write(parent, output_cmd);
-	parent->i2c_write(parent, output_data);
-	parent->i2c_stop(parent);
+	bSucceed = parent->i2c_start(parent);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_write(parent, addr_plus_write);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_write(parent, output_cmd);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_write(parent, output_data);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_stop(parent);
+	if (bSucceed) return bSucceed;
+
 	return 0;
 
 }
@@ -586,13 +620,22 @@ int pca6416a_read(void* pca6416a, unsigned char* bit_value_buffer  )
 	unsigned char addr_plus_write=(pca->addr<<1)+0;
 	unsigned char addr_plus_read=(pca->addr<<1)+1;
 	unsigned char input_cmd=(pca->port)+0x00; //x00h is the input command
-	parent->i2c_start(parent);
-	parent->i2c_write(parent, addr_plus_write);
-	parent->i2c_write(parent, input_cmd);
-	parent->i2c_start(parent);
-	parent->i2c_write(parent, addr_plus_read);
-	parent->i2c_read(parent, bit_value_buffer,1);
-	parent->i2c_stop(parent);
+	int bSucceed = 0;
+
+	bSucceed = parent->i2c_start(parent);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_write(parent, addr_plus_write);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_write(parent, input_cmd);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_start(parent);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_write(parent, addr_plus_read);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_read(parent, bit_value_buffer,1);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_stop(parent);
+	if (bSucceed) return bSucceed;
 
 	//mask away unwanted value;
 	*bit_value_buffer=(*bit_value_buffer)& (~pca->gpio_device.pin_bitmask);
@@ -609,24 +652,37 @@ int pca6416a_set_direction(struct pca6416a* pca)
 
 	unsigned char configure_cmd=(pca->port)+0x06; //x06h is the io configuration command
 	unsigned char current_config;
+	int bSucceed = 0;
 
 	//read current configuration register
-	parent->i2c_start(parent);
-	parent->i2c_write(parent, addr_plus_write);
-	parent->i2c_write(parent, configure_cmd);
-	parent->i2c_start(parent);
-	parent->i2c_write(parent, addr_plus_read);
-	parent->i2c_read(parent, &current_config,1);
-	parent->i2c_stop(parent);
+	bSucceed = parent->i2c_start(parent);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_write(parent, addr_plus_write);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_write(parent, configure_cmd);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_start(parent);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_write(parent, addr_plus_read);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_read(parent, &current_config,1);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_stop(parent);
+	if (bSucceed) return bSucceed;
 
 	unsigned char input_bitmask= (~(pca->gpio_device.pin_bitmask))& current_config;
 
+	bSucceed = parent->i2c_start(parent);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_write(parent, addr_plus_write);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_write(parent, configure_cmd);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_write(parent, input_bitmask);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_stop(parent);
+	if (bSucceed) return bSucceed;
 
-	parent->i2c_start(parent);
-	parent->i2c_write(parent, addr_plus_write);
-	parent->i2c_write(parent, configure_cmd);
-	parent->i2c_write(parent, input_bitmask);
-	parent->i2c_stop(parent);
 	return 0;
 }
 
@@ -639,22 +695,37 @@ int pca6416a_toggle(void* pca6416a)
 
 	unsigned char output_cmd=(pca->port)+0x02; //x02h is the output command for port 0
 	unsigned char current_output[1];
+	int bSucceed = 0;
+
 	//read current output register
-	parent->i2c_start(parent);
-	parent->i2c_write(parent, addr_plus_write);
-	parent->i2c_write(parent, output_cmd);
-	parent->i2c_start(parent);
-	parent->i2c_write(parent, addr_plus_read);
-	parent->i2c_read(parent, current_output,1);
-	parent->i2c_stop(parent);
+	bSucceed = parent->i2c_start(parent);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_write(parent, addr_plus_write);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_write(parent, output_cmd);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_start(parent);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_write(parent, addr_plus_read);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_read(parent, current_output,1);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_stop(parent);
+	if (bSucceed) return bSucceed;
 
 	unsigned char output_data= current_output[0]^pca->gpio_device.pin_bitmask;
 	//read current input register
-	parent->i2c_start(parent);
-	parent->i2c_write(parent, addr_plus_write);
-	parent->i2c_write(parent, output_cmd);
-	parent->i2c_write(parent, output_data);
-	parent->i2c_stop(parent);
+	bSucceed = parent->i2c_start(parent);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_write(parent, addr_plus_write);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_write(parent, output_cmd);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_write(parent, output_data);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_stop(parent);
+	if (bSucceed) return bSucceed;
+
 	return 0;
 
 }
@@ -665,13 +736,22 @@ int pca6416a_get_output(void* pca6416a, unsigned char* current_output  )
 	unsigned char addr_plus_write=(pca->addr<<1)+0;
 	unsigned char addr_plus_read=(pca->addr<<1)+1;
 	unsigned char output_cmd=(pca->port)+0x02; //x02h is the output command for port 0
-	parent->i2c_start(parent);
-	parent->i2c_write(parent, addr_plus_write);
-	parent->i2c_write(parent, output_cmd);
-	parent->i2c_start(parent);
-	parent->i2c_write(parent, addr_plus_read);
-	parent->i2c_read(parent, current_output,1);
-	parent->i2c_stop(parent);
+	int bSucceed = 0;
+
+	bSucceed = parent->i2c_start(parent);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_write(parent, addr_plus_write);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_write(parent, output_cmd);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_start(parent);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_write(parent, addr_plus_read);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_read(parent, current_output,1);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_stop(parent);
+	if (bSucceed) return bSucceed;
 	*current_output=(*current_output )&pca->gpio_device.pin_bitmask;
 	return 0;
 
