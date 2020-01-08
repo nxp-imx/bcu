@@ -350,12 +350,10 @@ static void reset(struct options_setting* setting)
 	msleep(setting->delay);
 
 	struct gpio_device* gpio = end_point;
-	status = gpio->gpio_write(gpio, 0xFF); //high
-	msleep(500);
+	status = 0;
 	status |= gpio->gpio_write(gpio, 0x00) << 1; //low
 	msleep(500);
 	status |= gpio->gpio_write(gpio, 0xFF) << 2;//high
-	msleep(500);
 
 	if (status)
 		printf("reset failed, error = 0x%x\n", status);
