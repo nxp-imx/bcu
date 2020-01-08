@@ -50,6 +50,7 @@ struct mapping {
 	char* name;
 	int type;
 	char* path;
+	unsigned char initinfo; //High 4 bits means initid, Low 4 bits means default output state for this pin
 };
 
 struct boot_mode {
@@ -68,6 +69,8 @@ struct board_info {
 struct board_info* get_board(char* board_name);
 /*given board_info, and the desired variable name, find the coresponding path of the variable*/
 int get_path(char* path, char* gpio_name, struct board_info* board);
+/*given board_info, and the initid, find the coresponding gpio name, path and output state of the variable*/
+int get_gpio_info_by_initid(char* gpio_name, char* path, int initid, struct board_info* board);
 /*get the length of the longest power-related variable name*/
 int get_max_power_name_length(struct board_info* board);
 /*convert bitmask to offset of the boot mode, for example, bitmask 0x38 offset is 3, because 00111000>>3=00000111 */

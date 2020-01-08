@@ -119,18 +119,14 @@ ________________________________________________________________________________
 
 ## i.MX8MP-EVK
 
-#### boot usage:
+#### initialization usage:
 
-1) board power off, plug in debug cable  
-2) keep pca6416 enable:  
-    sudo ./bcu set_gpio io_nrst 1 -board=imx8mpevk  
-3) set sys_nrst high:  
-    sudo ./bcu set_gpio reset 1 -board=imx8mpevk  
-4) set boot mode first:  
-    sudo ./bcu set_boot_mode sd -board=imx8mpevk  
-5) enable remote control:  
-    sudo ./bcu set_gpio remote_en 1 -board=imx8mpevk  
-6) board power on  
+sudo ./bcu init [boot mode] -board=imx8mpevk  
+
+#### reset usage:
+
+sudo ./bcu reset [boot mode] -board=imx8mpevk  
+**RESET function does NOT dependent on initialization. Can be use alone.**  
 
 #### boot mode select for imx8mpevk:
 

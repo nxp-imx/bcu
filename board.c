@@ -43,45 +43,45 @@
 #define IMX8XXL_POWER_PATH(channel,sensor) "/ft4232h_i2c{channel=0;dir_bitmask=0x04;val_bitmask=0x00}/pca9548{channel="#channel";addr=0x77}/pac1934{sensor="#sensor";addr=0x10}"
 #define IMX8XXL_EXP_PATH(port,bitmask) "/ft4232h_i2c{channel=0;dir_bitmask=0x04;val_bitmask=0x00}/pca9548{channel=0;addr=0x77}/pca6416a{addr=0x20;port="#port";pin_bitmask=0"#bitmask"}"
 struct mapping imx8xxl[] = {
-	"on_board_5v0",power,IMX8XXL_POWER_PATH(1,1),
-	"vdd_usb_3v3",power,IMX8XXL_POWER_PATH(1,2),
-	"3v3_io",power,IMX8XXL_POWER_PATH(1,3),
-	"3v3_enet",power,IMX8XXL_POWER_PATH(1,4),
-	"3v3_pmic_in",power,IMX8XXL_POWER_PATH(2,1),
-	"on_board_3v3", power, IMX8XXL_POWER_PATH(2,2),
-	"vdd_snvs_4p2",power,IMX8XXL_POWER_PATH(2,3),
-	"vdd_main",power,IMX8XXL_POWER_PATH(2,4),
-	"vdd_memc",power,IMX8XXL_POWER_PATH(3,1),
-	"vdd_ddr_vddq",power,IMX8XXL_POWER_PATH(3,2),
-	"ddr_vdd2",power,IMX8XXL_POWER_PATH(3,3),
-	"vdd_enet0_1p8_3p3",power,IMX8XXL_POWER_PATH(3,4),
-	"vdd_ana",power,IMX8XXL_POWER_PATH(4,1),
-	"ddr_vdd1",power,IMX8XXL_POWER_PATH(4,2),
-	"1v8_1",power,IMX8XXL_POWER_PATH(4,3),
-	"1v8_2",power,IMX8XXL_POWER_PATH(4,4),
-	"1v8_3",power,IMX8XXL_POWER_PATH(5,1),
-	"vdd_usb_1p8",power,IMX8XXL_POWER_PATH(5,2),
-	"vdd_pcie_1p8",power,IMX8XXL_POWER_PATH(5,3),
-	"on_board_1v8",power,IMX8XXL_POWER_PATH(5,4),
+	"on_board_5v0",power,IMX8XXL_POWER_PATH(1,1), 0x00,
+	"vdd_usb_3v3",power,IMX8XXL_POWER_PATH(1,2), 0x00,
+	"3v3_io",power,IMX8XXL_POWER_PATH(1,3), 0x00,
+	"3v3_enet",power,IMX8XXL_POWER_PATH(1,4), 0x00,
+	"3v3_pmic_in",power,IMX8XXL_POWER_PATH(2,1), 0x00,
+	"on_board_3v3", power, IMX8XXL_POWER_PATH(2,2), 0x00,
+	"vdd_snvs_4p2",power,IMX8XXL_POWER_PATH(2,3), 0x00,
+	"vdd_main",power,IMX8XXL_POWER_PATH(2,4), 0x00,
+	"vdd_memc",power,IMX8XXL_POWER_PATH(3,1), 0x00,
+	"vdd_ddr_vddq",power,IMX8XXL_POWER_PATH(3,2), 0x00,
+	"ddr_vdd2",power,IMX8XXL_POWER_PATH(3,3), 0x00,
+	"vdd_enet0_1p8_3p3",power,IMX8XXL_POWER_PATH(3,4), 0x00,
+	"vdd_ana",power,IMX8XXL_POWER_PATH(4,1), 0x00,
+	"ddr_vdd1",power,IMX8XXL_POWER_PATH(4,2), 0x00,
+	"1v8_1",power,IMX8XXL_POWER_PATH(4,3), 0x00,
+	"1v8_2",power,IMX8XXL_POWER_PATH(4,4), 0x00,
+	"1v8_3",power,IMX8XXL_POWER_PATH(5,1), 0x00,
+	"vdd_usb_1p8",power,IMX8XXL_POWER_PATH(5,2), 0x00,
+	"vdd_pcie_1p8",power,IMX8XXL_POWER_PATH(5,3), 0x00,
+	"on_board_1v8",power,IMX8XXL_POWER_PATH(5,4), 0x00,
 
-	"SR_vdd_main",gpio,IMX8XXL_EXP_PATH(1,0x01),
-	"SR_vdd_memc",gpio,IMX8XXL_EXP_PATH(1,0x02),
-	"SR_vdd_ddr_vddq",gpio,IMX8XXL_EXP_PATH(1,0x04),
-	"SR_vdd_ana",gpio, IMX8XXL_EXP_PATH(1,0x08),
+	"SR_vdd_main",gpio,IMX8XXL_EXP_PATH(1,0x01), 0x00,
+	"SR_vdd_memc",gpio,IMX8XXL_EXP_PATH(1,0x02), 0x00,
+	"SR_vdd_ddr_vddq",gpio,IMX8XXL_EXP_PATH(1,0x04), 0x00,
+	"SR_vdd_ana",gpio, IMX8XXL_EXP_PATH(1,0x08), 0x00,
 
 
-	"boot_mode",gpio,IMX8XXL_EXP_PATH(0,0x07),
-	"sd_pwr_host",gpio, IMX8XXL_EXP_PATH(0,0x08),
-	"sd_wp_host",gpio, IMX8XXL_EXP_PATH(0,0x10),
-	"sd_cd_host",gpio, IMX8XXL_EXP_PATH(0,0x20),
+	"boot_mode",gpio,IMX8XXL_EXP_PATH(0,0x07), 0x00,
+	"sd_pwr_host",gpio, IMX8XXL_EXP_PATH(0,0x08), 0x00,
+	"sd_wp_host",gpio, IMX8XXL_EXP_PATH(0,0x10), 0x00,
+	"sd_cd_host",gpio, IMX8XXL_EXP_PATH(0,0x20), 0x00,
 
-	"jtag_select",gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x10}",
-	"reset",gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x20}",
-	"testmod_sel",gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x40}",
-	"pwr_on/off", gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x80}",
+	"jtag_select",gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x10}", 0x00,
+	"reset",gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x20}", 0x00,
+	"testmod_sel",gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x40}", 0x00,
+	"pwr_on/off", gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x80}", 0x00,
 	// you put all the pin in the imx8xxl board here
 	//"sd_wp", gpio, "..."
-	NULL, 0, NULL//null terminated   
+	NULL, 0, NULL, 0//null terminated
 };
 
 struct boot_mode imx8xxl_boot_modes[] = {
@@ -99,20 +99,20 @@ struct boot_mode imx8xxl_boot_modes[] = {
 #define SIMULATION_POWER_PATH "/ft4232h_i2c{channel=0;dir_bitmask=0x08;val_bitmask=0x08}/pca9548{channel=1;addr=0x77}"
 #define SIMULATION_GPIO_EXTENDER_PATH "/ft4232h_i2c{channel=0;dir_bitmask=0x08;val_bitmask=0x08}/pca9548{channel=0;addr=0x77}"
 struct mapping simulation_board[] = {
-	"vdd_main", power, SIMULATION_POWER_PATH"/pac1934{sensor=2;addr=0x10}",
-	"vdd_snvs", power, SIMULATION_POWER_PATH"/pac1934{sensor=1;addr=0x10}",
-	//"test_monitor", power, "/ft4232h_i2c{channel=0;dir_bitmask=0x08;val_bitmask=0x08}/pca9548{channel=1;addr=0x77}/pca9548{channel=1;addr=0x77}/pac1934{sensor=1;addr=0x10}",
-	"boot_mode", gpio, SIMULATION_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=0;pin_bitmask=0x0E}",
-	"sd_wp", gpio, SIMULATION_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=0;pin_bitmask=0x10}",
-	"all_port0", gpio, SIMULATION_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=0;pin_bitmask=0xFF}",
-	"reset",gpio,"/ft4232h_gpio{channel=1;pin_bitmask=0x01}",
-	"testmod_sel",gpio,"/ft4232h_gpio{channel=1;pin_bitmask=0x02}",
-	"onoff",gpio,"/ft4232h_gpio{channel=1;pin_bitmask=0x04}",
-	"SR_vdd_main",gpio,SIMULATION_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=1;pin_bitmask=0x01}",
+	"vdd_main", power, SIMULATION_POWER_PATH"/pac1934{sensor=2;addr=0x10}", 0x00,
+	"vdd_snvs", power, SIMULATION_POWER_PATH"/pac1934{sensor=1;addr=0x10}", 0x00,
+	//"test_monitor", power, "/ft4232h_i2c{channel=0;dir_bitmask=0x08;val_bitmask=0x08}/pca9548{channel=1;addr=0x77}/pca9548{channel=1;addr=0x77}/pac1934{sensor=1;addr=0x10}", 0x00,
+	"boot_mode", gpio, SIMULATION_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=0;pin_bitmask=0x0E}", 0x00,
+	"sd_wp", gpio, SIMULATION_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=0;pin_bitmask=0x10}", 0x00,
+	"all_port0", gpio, SIMULATION_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=0;pin_bitmask=0xFF}", 0x00,
+	"reset",gpio,"/ft4232h_gpio{channel=1;pin_bitmask=0x01}", 0x00,
+	"testmod_sel",gpio,"/ft4232h_gpio{channel=1;pin_bitmask=0x02}", 0x00,
+	"onoff",gpio,"/ft4232h_gpio{channel=1;pin_bitmask=0x04}", 0x00,
+	"SR_vdd_main",gpio,SIMULATION_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=1;pin_bitmask=0x01}", 0x00,
 
 	// you put all the pin in the imx8xxl board here
 	//"sd_wp", gpio, "..."
-	NULL, 0, NULL//null terminated   
+	NULL, 0, NULL, 0//null terminated
 };
 
 struct boot_mode simulation_board_boot_modes[] = {
@@ -124,32 +124,32 @@ struct boot_mode simulation_board_boot_modes[] = {
 
 #define IMX8MPEVK_GPIO_EXTENDER_PATH "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}"
 struct mapping imx8mpevk_board[] = {
-	"boot_mode", gpio, IMX8MPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=0;pin_bitmask=0x0F}",
-	"ft_io1", gpio, IMX8MPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=0;pin_bitmask=0x10}",
-	"ft_io2", gpio, IMX8MPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=0;pin_bitmask=0x20}",
-	"ft_io3", gpio, IMX8MPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=0;pin_bitmask=0x40}",
-	"ft_io4", gpio, IMX8MPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=0;pin_bitmask=0x80}",
-	"remote_en", gpio, IMX8MPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=1;pin_bitmask=0x01}",
-	"ft_io5", gpio, IMX8MPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=1;pin_bitmask=0x02}",
-	"ft_io6", gpio, IMX8MPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=1;pin_bitmask=0x04}",
-	"ft_io7", gpio, IMX8MPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=1;pin_bitmask=0x08}",
-	"ft_io8", gpio, IMX8MPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=1;pin_bitmask=0x10}",
-	"ft_io9", gpio, IMX8MPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=1;pin_bitmask=0x20}",
-	"ft_io10", gpio, IMX8MPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=1;pin_bitmask=0x40}",
-	"ft_io11", gpio, IMX8MPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=1;pin_bitmask=0x80}",
+	"boot_mode", gpio, IMX8MPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=0;pin_bitmask=0x0F}", 0x30,
+	"ft_io1", gpio, IMX8MPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=0;pin_bitmask=0x10}", 0x00,
+	"ft_io2", gpio, IMX8MPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=0;pin_bitmask=0x20}", 0x00,
+	"ft_io3", gpio, IMX8MPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=0;pin_bitmask=0x40}", 0x00,
+	"ft_io4", gpio, IMX8MPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=0;pin_bitmask=0x80}", 0x00,
+	"remote_en", gpio, IMX8MPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=1;pin_bitmask=0x01}", 0x41,
+	"ft_io5", gpio, IMX8MPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=1;pin_bitmask=0x02}", 0x00,
+	"ft_io6", gpio, IMX8MPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=1;pin_bitmask=0x04}", 0x00,
+	"ft_io7", gpio, IMX8MPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=1;pin_bitmask=0x08}", 0x00,
+	"ft_io8", gpio, IMX8MPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=1;pin_bitmask=0x10}", 0x00,
+	"ft_io9", gpio, IMX8MPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=1;pin_bitmask=0x20}", 0x00,
+	"ft_io10", gpio, IMX8MPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=1;pin_bitmask=0x40}", 0x00,
+	"ft_io11", gpio, IMX8MPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=1;pin_bitmask=0x80}", 0x00,
 
-	"reset_b",gpio,"/ft4232h_gpio{channel=0;pin_bitmask=0x10}",
-	"reset",gpio,"/ft4232h_gpio{channel=0;pin_bitmask=0x20}",
-	"io_nrst",gpio,"/ft4232h_gpio{channel=0;pin_bitmask=0x40}",
-	"onoff",gpio,"/ft4232h_gpio{channel=0;pin_bitmask=0x80}",
-	"io_nint",gpio,"/ft4232h_gpio{channel=1;pin_bitmask=0x08}",
+	"reset_b",gpio,"/ft4232h_gpio{channel=0;pin_bitmask=0x10}", 0x00,
+	"reset",gpio,"/ft4232h_gpio{channel=0;pin_bitmask=0x20}", 0x21,
+	"io_nrst",gpio,"/ft4232h_gpio{channel=0;pin_bitmask=0x40}", 0x11,
+	"onoff",gpio,"/ft4232h_gpio{channel=0;pin_bitmask=0x80}", 0x00,
+	"io_nint",gpio,"/ft4232h_gpio{channel=1;pin_bitmask=0x08}", 0x00,
 
-	"ft_gpio1",gpio,"/ft4232h_gpio{channel=1;pin_bitmask=0x10}",
-	"ft_gpio2",gpio,"/ft4232h_gpio{channel=1;pin_bitmask=0x20}",
-	"ft_gpio3",gpio,"/ft4232h_gpio{channel=1;pin_bitmask=0x40}",
-	"ft_gpio4",gpio,"/ft4232h_gpio{channel=1;pin_bitmask=0x80}",
+	"ft_gpio1",gpio,"/ft4232h_gpio{channel=1;pin_bitmask=0x10}", 0x00,
+	"ft_gpio2",gpio,"/ft4232h_gpio{channel=1;pin_bitmask=0x20}", 0x00,
+	"ft_gpio3",gpio,"/ft4232h_gpio{channel=1;pin_bitmask=0x40}", 0x00,
+	"ft_gpio4",gpio,"/ft4232h_gpio{channel=1;pin_bitmask=0x80}", 0x00,
 
-	NULL, 0, NULL//null terminated
+	NULL, 0, NULL, 0//null terminated
 };
 
 struct boot_mode imx8mpevk_board_boot_modes[] = {
@@ -202,6 +202,23 @@ int get_path(char* path, char* gpio_name, struct board_info* board)
 		i++;
 	}
 	//printf("path not found\n");
+	return -1;
+}
+
+int get_gpio_info_by_initid(char* gpio_name, char* path, int initid, struct board_info* board)
+{
+	int i = 0;
+	while (board->mappings[i].name != NULL)
+	{
+		if ((board->mappings[i].initinfo >> 4) == initid)
+		{
+			strcpy(gpio_name, board->mappings[i].name);
+			strcpy(path, board->mappings[i].path);
+			return (board->mappings[i].initinfo) & 0x0F;
+		}
+		i++;
+	}
+
 	return -1;
 }
 

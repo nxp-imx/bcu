@@ -555,7 +555,7 @@ int ft_open_channel_by_id(struct ftdi_info* fi, int channel, char* id)
 		}
 		if (id == NULL || strcmp(location_id[i], id) == 0)
 		{
-			printf("found device specified\n");
+			// printf("found device specified\n");
 			found = 1;
 			int status = ftdi_set_interface(fi->ftdi, channel + 1);
 			status = ftdi_usb_open_dev(fi->ftdi, curdev->dev);
