@@ -212,9 +212,9 @@ int ft4232h_i2c_read(void* ft4232h, unsigned char* data_buffer, int is_nack)
 	else
 		buffer[i++] = 0x00;// MSB zero means ACK
 	ftStatus = ft_write(&ft->ftdi_info, buffer, i); //Send off the commands
-	if (ftStatus) return ftStatus;
+	if (ftStatus < 0) return ftStatus;
 	ftStatus = ft_read(&ft->ftdi_info, in_buffer, 1); //Read one byte
-	if (ftStatus) return ftStatus;
+	if (ftStatus < 0) return ftStatus;
 	*data_buffer = in_buffer[0];
 
 	return 0;
@@ -258,9 +258,9 @@ int ft4232h_i2c_write(void* ft4232h, unsigned char data)
 	buffer[i++] = VALUE_SCLLOW_SDALOW | ft->val_bitmask; /*Value*/
 	buffer[i++] = DIRECTION_SCLOUT_SDAOUT | ft->dir_bitmask; /*Direction*/
 	ftStatus = ft_write(&ft->ftdi_info, buffer, i); //Send off the commands
-	if (ftStatus) return ftStatus;
+	if (ftStatus < 0) return ftStatus;
 	ftStatus = ft_read(&ft->ftdi_info, in_buffer, 1);
-	if (ftStatus) return ftStatus;
+	if (ftStatus < 0) return ftStatus;
 
 	if (((in_buffer[0] & 0x1) != 0)) //Check ACK bit 0 on data byte read out
 	{
@@ -295,7 +295,7 @@ int ft4232h_i2c_start(void* ft4232h)
 	buffer[i++] = DIRECTION_SCLOUT_SDAOUT | ft->dir_bitmask;
 
 	ftStatus = ft_write(&ft->ftdi_info, buffer, i); //Send off the commands
-	if (ftStatus)
+	if (ftStatus < 0)
 		return ftStatus;
 
 	return 0;
@@ -332,7 +332,7 @@ int ft4232h_i2c_stop(void* ft4232h)
 	//buffer[i++]=0x00;
 	//buffer[i++]=0x10; /* Tristate the SCL & SDA pins */
 	ftStatus = ft_write(&ft->ftdi_info, buffer, i); //Send off the commands
-	if (ftStatus)
+	if (ftStatus < 0)
 		return ftStatus;
 
 	return 0;
@@ -350,7 +350,7 @@ int ft4232h_i2c_init(struct ft4232h* ft)
 	buffer[i++] = MPSSE_CMD_DISABLE_ADAPTIVE_CLOCKING; //Ensure turn off adaptive clocking
 	buffer[i++] = MPSSE_CMD_ENABLE_3PHASE_CLOCKING; //Enable 3 phase data clock, used by I2C to allow data on both clock edges
 	ftStatus = ft_write(&ft->ftdi_info, buffer, i);
-	if (ftStatus)
+	if (ftStatus < 0)
 		return ftStatus;
 
 	i = 0; //Clear output buffer
@@ -364,14 +364,14 @@ int ft4232h_i2c_init(struct ft4232h* ft)
 	buffer[i++] = (unsigned char)((CLOCK_DIVISOR >> 8) & '\xFF'); //Set 0xValueH of clock divisor
 
 	ftStatus = ft_write(&ft->ftdi_info, buffer, i);
-	if (ftStatus)
+	if (ftStatus < 0)
 		return ftStatus;
 	i = 0; //Clear output buffer
 	msleep(20); //Delay for a while
 	//Turn off loop back in case
 	buffer[i++] = MPSEE_CMD_DISABLE_LOOPBACK; //Command to turn off loop back of TDI/TDO connection
 	ftStatus = ft_write(&ft->ftdi_info, buffer, i);
-	if (ftStatus)
+	if (ftStatus < 0)
 		return ftStatus;
 	msleep(30); //Delay for a while
 
@@ -385,7 +385,7 @@ int ft4232h_i2c_free(void* ft4232h)
 	int ftStatus = 0;
 
 	ftStatus = ft_close(&ft->ftdi_info);
-	if (ftStatus)
+	if (ftStatus < 0)
 		return ftStatus;
 
 	return 0;
