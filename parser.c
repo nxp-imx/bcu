@@ -109,7 +109,7 @@ void free_device_linkedlist_backward(struct device* ptr)
 		void* parent = ptr->parent;
 		if (parent == NULL) //if we have reached the end, the the device must be ftdi, so we must close and free the ftdidevice;
 		{
-			printf("closing and freeing ftdi device\n");
+			//printf("closing and freeing ftdi device\n");
 			struct device* ft = delete_this;
 			ft->free(ft);
 		}
@@ -130,7 +130,7 @@ void free_device_linkedlist_forward(struct device* ptr)
 		void* parent = ptr->parent;
 		if (parent == NULL) //if the device has no parent, then the device must be ftdi, so we must close and free the ftdidevice;
 		{
-			printf("closing and freeing ftdi device\n");
+			//printf("closing and freeing ftdi device\n");
 			struct device* ft = delete_this;
 			ft->free(ft);
 		}

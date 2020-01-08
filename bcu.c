@@ -252,6 +252,80 @@ static void set_boot_mode(struct options_setting* setting)
 	free_device_linkedlist_backward(end_point);
 }
 
+static void initialize(struct options_setting* setting)
+{
+	struct board_info* board = get_board(setting->board);
+	if (board == NULL)
+		return;
+	void* head = NULL;
+	void* end_point;
+	char path[MAX_PATH_LENGTH];
+	char name[MAX_MAPPING_NAME_LENGTH];
+	int status = 0, initid = 1, output = 0, k = 0;
+
+	while (output >= 0)
+	{
+		output = get_gpio_info_by_initid(name, path, initid, board);
+		if (output < 0)
+		{
+			printf("board initialization finished\n");
+			break;
+		}
+
+		if (strcmp(name, "boot_mode") == 0)
+		{
+			if (setting->boot_mode_hex != -1)
+				set_boot_mode(setting);
+			else
+			{
+				printf("please give boot_mode, assuming 'sd' this time\n");
+				while (board->boot_modes[k].name != NULL)
+				{
+					if (strcmp(board->boot_modes[k].name, "sd") == 0)
+					{
+						setting->boot_mode_hex = board->boot_modes[k].boot_mode_hex;
+						break;
+					}
+					k++;
+				}
+				if (setting->boot_mode_hex != -1)
+					set_boot_mode(setting);
+				else
+				{
+					printf("could not recognize boot mode: sd, please give boot_mode\n");
+					printf("initialization failed\n");
+					return;
+				}
+			}
+
+			initid++;
+			continue;
+		}
+
+		end_point = build_device_linkedlist_forward(&head, path);
+		if (end_point == NULL)
+		{
+			printf("set_gpio: error building device linked list\n");
+			break;
+		}
+
+		struct gpio_device* gpio = end_point;
+		if (output)
+			status = gpio->gpio_write(gpio, 0xFF);
+		else
+			status = gpio->gpio_write(gpio, 0x00);
+
+		if (status)
+			printf("set %s %s failed, error = 0x%x\n", name, output ? "high" : "low", status);
+		else
+			printf("set %s %s successful\n", name, output ? "high" : "low");
+
+		initid++;
+
+		free_device_linkedlist_backward(end_point);
+	}
+}
+
 static void reset(struct options_setting* setting)
 {
 	struct board_info* board = get_board(setting->board);
@@ -262,10 +336,7 @@ static void reset(struct options_setting* setting)
 	char path[MAX_PATH_LENGTH];
 	int status = -1;
 
-	if (setting->boot_mode_hex != -1)
-	{
-		set_boot_mode(setting);
-	}
+	initialize(setting);
 
 	get_path(path, "reset", board);
 	end_point = build_device_linkedlist_forward(&head, path);
@@ -293,7 +364,6 @@ static void reset(struct options_setting* setting)
 
 	free_device_linkedlist_backward(end_point);
 }
-
 
 static int monitor_width()
 {
@@ -1040,6 +1110,10 @@ int main(int argc, char** argv)
 	else if (strcmp(cmd, "reset") == 0)
 	{
 		reset(&setting);
+	}
+	else if (strcmp(cmd, "init") == 0)
+	{
+		initialize(&setting);
 	}
 	else if (strcmp(cmd, "version") == 0)
 	{
