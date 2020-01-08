@@ -95,11 +95,11 @@ static void print_help(char* cmd)
 		printf("%s\n\n", "list of available commands:");
 		printf("	%s%-30s%s%s\n", g_vt_default, "reset", g_vt_green, "reset the board");
 		printf("	%s%-30s%s%s\n", g_vt_default, "monitor", g_vt_green, "monitor power consumption");
-		printf("	%s%-30s%s%s\n", g_vt_default, "lsgpio", g_vt_green, "show a list of available gpio pin");
 		printf("	%s%-30s%s%s\n", g_vt_default, "set_gpio [GPIO_NAME] [1/0]", g_vt_green, "set pin GPIO_NAME to be high(1) or low(0)");
+		printf("	%s%-30s%s%s\n", g_vt_default, "set_boot_mode [BOOTMODE_NAME]", g_vt_green, "set BOOTMODE_NAME as boot mode");
+		printf("	%s%-30s%s%s\n", g_vt_default, "lsgpio", g_vt_green, "show a list of available gpio pin");
 		printf("	%s%-30s%s%s\n", g_vt_default, "lsftdi", g_vt_green, "list all boards connected by ftdi device");
 		printf("	%s%-30s%s%s\n", g_vt_default, "lsboard", g_vt_green, "list all supported board models");
-		printf("	%s%-30s%s%s\n", g_vt_default, "set_boot_mode [BOOTMODE_NAME]", g_vt_green, "set BOOTMODE_NAME as boot mode");
 		printf("	%s%-30s%s%s%s\n", g_vt_default, "version", g_vt_green, "print version number", g_vt_default);
 		// printf("%s%-30s%s%s\n", g_vt_default, "help [COMMAND_NAME]", g_vt_green, "/*show details and options of COMMAND_NAME*/");
 
