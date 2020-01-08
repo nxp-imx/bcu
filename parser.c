@@ -209,7 +209,7 @@ void* build_device_linkedlist_forward(void** head, char* path)
 
 void set_options_default(struct options_setting* setting)
 {
-	strcpy(setting->board, "imx8mpevk");
+	strcpy(setting->board, "simulation_board");
 	setting->path[0] = '\0';
 	setting->location_id = -1;
 	setting->output_state = -1;
