@@ -61,11 +61,11 @@ extern struct board_info board_list[];
 
 int GV_MONITOR_TERMINATED = 0;
 
-char* g_vt_red = (char*)"\x1B[31m";
-char* g_vt_green = (char*)"\x1B[32m";
-char* g_vt_yellow = (char*)"\x1B[33m";
+char* g_vt_red = (char*)"\x1B[91m";
+char* g_vt_green = (char*)"\x1B[92m";
+char* g_vt_yellow = (char*)"\x1B[93m";
 char* g_vt_kcyn = (char*)"\x1B[36m";
-char* g_vt_white = (char*)"\x1B[37m";
+char* g_vt_white = (char*)"\x1B[97m";
 char* g_vt_magenta = (char*)"\x1B[35m";
 char* g_vt_blue = (char*)"\x1B[34m";
 char* g_vt_default = (char*)"\x1B[0m";
