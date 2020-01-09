@@ -156,6 +156,20 @@ static void lsboard(struct options_setting* setting)
 	return;
 }
 
+static void lsbootmode(struct options_setting* setting)
+{
+	struct board_info* board = get_board(setting->board);
+	if (board == NULL)
+		return;
+	int i = 0;
+	printf("\navailable boot mode:\n\n");
+	while (board->boot_modes[i].name != NULL)
+	{
+		printf("	%s\n", board->boot_modes[i].name);
+		i++;
+	}
+}
+
 static void set_gpio(struct options_setting* setting)
 {
 	struct board_info* board = get_board(setting->board);
@@ -1168,6 +1182,10 @@ int main(int argc, char** argv)
 	else if (strcmp(cmd, "lsboard") == 0)
 	{
 		lsboard(&setting);
+	}
+	else if (strcmp(cmd, "lsbootmode") == 0)
+	{
+		lsbootmode(&setting);
 	}
 	else if (strcmp(cmd, "reset") == 0)
 	{
