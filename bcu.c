@@ -97,8 +97,9 @@ static void print_help(char* cmd)
 		printf("%s\n", "usage:");
 		printf("%s\n\n", "bcu command [-options]");
 		printf("%s\n\n", "list of available commands:");
-		printf("	%s%-30s%s%s\n", g_vt_default, "init [BOOTMODE_NAME]", g_vt_green, "initialize the board");
 		printf("	%s%-30s%s%s\n", g_vt_default, "reset", g_vt_green, "reset the board");
+		printf("	%s%-30s%s%s\n", g_vt_default, "init [BOOTMODE_NAME]", g_vt_green, "enable the remote control with a boot mode");
+		printf("	%s%-30s%s%s\n", g_vt_default, "deinit [BOOTMODE_NAME]", g_vt_green, "disable the remote control");
 		printf("	%s%-30s%s%s\n", g_vt_default, "monitor", g_vt_green, "monitor power consumption");
 		printf("	%s%-30s%s%s\n", g_vt_default, "set_gpio [GPIO_NAME] [1/0]", g_vt_green, "set pin GPIO_NAME to be high(1) or low(0)");
 		printf("	%s%-30s%s%s\n", g_vt_default, "set_boot_mode [BOOTMODE_NAME]", g_vt_green, "set BOOTMODE_NAME as boot mode");
@@ -254,6 +255,31 @@ static void set_boot_mode(struct options_setting* setting)
 	else
 		printf("set boot mode successfully\n");
 
+	free_device_linkedlist_backward(end_point);
+}
+
+static void deinitialize(struct options_setting* setting)
+{
+	struct board_info* board = get_board(setting->board);
+	if (board == NULL)
+		return;
+	void* head = NULL;
+	void* end_point;
+	char path[MAX_PATH_LENGTH];
+	int status = -1;
+
+	get_path(path, "remote_en", board);
+	end_point = build_device_linkedlist_forward(&head, path);
+	struct gpio_device* gpio = end_point;
+	if (end_point == NULL)
+	{
+		printf("set_gpio: error building device linked list\n");
+		return;
+	}
+
+	status = gpio->gpio_write(gpio, 0x00); //low
+	if (!status)
+		printf("%sDISABLE%s remote control\n", g_vt_red, g_vt_default);
 	free_device_linkedlist_backward(end_point);
 }
 
@@ -1150,6 +1176,10 @@ int main(int argc, char** argv)
 	else if (strcmp(cmd, "init") == 0)
 	{
 		initialize(&setting, DONT_RESET);
+	}
+	else if (strcmp(cmd, "deinit") == 0)
+	{
+		deinitialize(&setting);
 	}
 	else if (strcmp(cmd, "version") == 0)
 	{
