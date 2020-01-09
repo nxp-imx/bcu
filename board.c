@@ -96,32 +96,6 @@ struct boot_mode imx8xxl_boot_modes[] = {
 	NULL, 0
 };
 
-#define SIMULATION_POWER_PATH "/ft4232h_i2c{channel=0;dir_bitmask=0x08;val_bitmask=0x08}/pca9548{channel=1;addr=0x77}"
-#define SIMULATION_GPIO_EXTENDER_PATH "/ft4232h_i2c{channel=0;dir_bitmask=0x08;val_bitmask=0x08}/pca9548{channel=0;addr=0x77}"
-struct mapping simulation_board[] = {
-	"vdd_main", power, SIMULATION_POWER_PATH"/pac1934{sensor=2;addr=0x10}", 0x00,
-	"vdd_snvs", power, SIMULATION_POWER_PATH"/pac1934{sensor=1;addr=0x10}", 0x00,
-	//"test_monitor", power, "/ft4232h_i2c{channel=0;dir_bitmask=0x08;val_bitmask=0x08}/pca9548{channel=1;addr=0x77}/pca9548{channel=1;addr=0x77}/pac1934{sensor=1;addr=0x10}", 0x00,
-	"boot_mode", gpio, SIMULATION_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=0;pin_bitmask=0x0E}", 0x00,
-	"sd_wp", gpio, SIMULATION_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=0;pin_bitmask=0x10}", 0x00,
-	"all_port0", gpio, SIMULATION_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=0;pin_bitmask=0xFF}", 0x00,
-	"reset",gpio,"/ft4232h_gpio{channel=1;pin_bitmask=0x01}", 0x00,
-	"testmod_sel",gpio,"/ft4232h_gpio{channel=1;pin_bitmask=0x02}", 0x00,
-	"onoff",gpio,"/ft4232h_gpio{channel=1;pin_bitmask=0x04}", 0x00,
-	"SR_vdd_main",gpio,SIMULATION_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=1;pin_bitmask=0x01}", 0x00,
-
-	// you put all the pin in the imx8xxl board here
-	//"sd_wp", gpio, "..."
-	NULL, 0, NULL, 0//null terminated
-};
-
-struct boot_mode simulation_board_boot_modes[] = {
-	"emmc", 0x02,
-	"nand", 0x01,
-	"sd", 0x03,
-	NULL, 0
-};
-
 #define IMX8MPEVK_GPIO_EXTENDER_PATH "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}"
 struct mapping imx8mpevk_board[] = {
 	"boot_mode", gpio, IMX8MPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=0;pin_bitmask=0x0F}", 0x30,
@@ -168,7 +142,6 @@ struct boot_mode imx8mpevk_board_boot_modes[] = {
 
 struct board_info board_list[] =
 {
-	"simulation_board", simulation_board,simulation_board_boot_modes,"[default_group:vdd_main]",
 	"imx8xxl", imx8xxl,imx8xxl_boot_modes,NULL,
 	"imx8mpevk", imx8mpevk_board, imx8mpevk_board_boot_modes, NULL
 	//"imx9xxl",&imx9xxl_pins,
