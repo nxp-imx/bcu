@@ -151,7 +151,7 @@ static void lsboard(struct options_setting* setting)
 		{
 			printf(" (default)");
 		}
-		printf("%s", g_vt_default);
+		printf("%s\n", g_vt_default);
 	}
 	return;
 }
