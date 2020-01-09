@@ -297,11 +297,11 @@ static void deinitialize(struct options_setting* setting)
 	free_device_linkedlist_backward(end_point);
 }
 
-static int initialize(struct options_setting* setting, int isreset)
+static void initialize(struct options_setting* setting, int isreset)
 {
 	struct board_info* board = get_board(setting->board);
 	if (board == NULL)
-		return -1;
+		return;
 	void* head = NULL;
 	void* end_point;
 	char path[MAX_PATH_LENGTH];
@@ -348,7 +348,7 @@ static int initialize(struct options_setting* setting, int isreset)
 					{
 						printf("could not recognize boot mode: sd, please give boot_mode\n");
 						printf("initialization failed\n");
-						return -1;
+						return;
 					}
 				}
 			}
