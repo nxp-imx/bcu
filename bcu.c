@@ -52,6 +52,10 @@
 #include "chip.h"
 #include "board.h"
 #include "version.h"
+
+#define DONT_RESET	0
+#define RESET_NOW	1
+
 extern int num_of_boards;
 extern struct board_info board_list[];
 
@@ -93,6 +97,7 @@ static void print_help(char* cmd)
 		printf("%s\n", "usage:");
 		printf("%s\n\n", "bcu command [-options]");
 		printf("%s\n\n", "list of available commands:");
+		printf("	%s%-30s%s%s\n", g_vt_default, "init [BOOTMODE_NAME]", g_vt_green, "initialize the board");
 		printf("	%s%-30s%s%s\n", g_vt_default, "reset", g_vt_green, "reset the board");
 		printf("	%s%-30s%s%s\n", g_vt_default, "monitor", g_vt_green, "monitor power consumption");
 		printf("	%s%-30s%s%s\n", g_vt_default, "set_gpio [GPIO_NAME] [1/0]", g_vt_green, "set pin GPIO_NAME to be high(1) or low(0)");
@@ -206,7 +211,7 @@ static void set_gpio(struct options_setting* setting)
 	if (status)
 		printf("set gpio failed, error = 0x%x\n", status);
 	else
-		printf("set gpio successful\n");
+		printf("set gpio successfully\n");
 
 	//hold time
 	msleep(setting->hold);
@@ -247,16 +252,16 @@ static void set_boot_mode(struct options_setting* setting)
 	if (status)
 		printf("set boot mode failed, error = 0x%x\n", status);
 	else
-		printf("set boot mode successful\n");
+		printf("set boot mode successfully\n");
 
 	free_device_linkedlist_backward(end_point);
 }
 
-static void initialize(struct options_setting* setting)
+static int initialize(struct options_setting* setting, int isreset)
 {
 	struct board_info* board = get_board(setting->board);
 	if (board == NULL)
-		return;
+		return -1;
 	void* head = NULL;
 	void* end_point;
 	char path[MAX_PATH_LENGTH];
@@ -268,7 +273,10 @@ static void initialize(struct options_setting* setting)
 		output = get_gpio_info_by_initid(name, path, initid, board);
 		if (output < 0)
 		{
-			printf("board initialization finished\n");
+			if (isreset)
+				printf("rebooting...\n");
+			else
+				printf("board initialization finished\n");
 			break;
 		}
 
@@ -278,23 +286,30 @@ static void initialize(struct options_setting* setting)
 				set_boot_mode(setting);
 			else
 			{
-				printf("please give boot_mode, assuming 'sd' this time\n");
-				while (board->boot_modes[k].name != NULL)
+				if (isreset == RESET_NOW)
 				{
-					if (strcmp(board->boot_modes[k].name, "sd") == 0)
-					{
-						setting->boot_mode_hex = board->boot_modes[k].boot_mode_hex;
-						break;
-					}
-					k++;
+					printf("will boot by %sBOOT SWITCH%s\n", g_vt_yellow, g_vt_default);
 				}
-				if (setting->boot_mode_hex != -1)
-					set_boot_mode(setting);
 				else
 				{
-					printf("could not recognize boot mode: sd, please give boot_mode\n");
-					printf("initialization failed\n");
-					return;
+					printf("please give boot_mode, assuming 'sd' this time\n");
+					while (board->boot_modes[k].name != NULL)
+					{
+						if (strcmp(board->boot_modes[k].name, "sd") == 0)
+						{
+							setting->boot_mode_hex = board->boot_modes[k].boot_mode_hex;
+							break;
+						}
+						k++;
+					}
+					if (setting->boot_mode_hex != -1)
+						set_boot_mode(setting);
+					else
+					{
+						printf("could not recognize boot mode: sd, please give boot_mode\n");
+						printf("initialization failed\n");
+						return -1;
+					}
 				}
 			}
 
@@ -318,7 +333,12 @@ static void initialize(struct options_setting* setting)
 		if (status)
 			printf("set %s %s failed, error = 0x%x\n", name, output ? "high" : "low", status);
 		else
-			printf("set %s %s successful\n", name, output ? "high" : "low");
+		{
+			if (strcmp(name, "remote_en") == 0)
+				printf("%sENABLE%s remote control\n", g_vt_green, g_vt_default);
+			else
+				printf("set %s %s successfully\n", name, output ? "high" : "low");
+		}
 
 		initid++;
 
@@ -336,7 +356,7 @@ static void reset(struct options_setting* setting)
 	char path[MAX_PATH_LENGTH];
 	int status = -1;
 
-	initialize(setting);
+	initialize(setting, RESET_NOW);
 
 	get_path(path, "reset", board);
 	end_point = build_device_linkedlist_forward(&head, path);
@@ -350,17 +370,35 @@ static void reset(struct options_setting* setting)
 	msleep(setting->delay);
 
 	struct gpio_device* gpio = end_point;
-	status = 0;
-	status |= gpio->gpio_write(gpio, 0x00) << 1; //low
+	status = gpio->gpio_write(gpio, 0x00); //low
 	msleep(500);
-	status |= gpio->gpio_write(gpio, 0xFF) << 2;//high
+	if (setting->boot_mode_hex != -1)
+	{
+		status |= gpio->gpio_write(gpio, 0xFF) << 1;//high
+	}
+	free_device_linkedlist_backward(end_point);
+
+	if (setting->boot_mode_hex == -1)
+	{
+		get_path(path, "remote_en", board);
+		end_point = build_device_linkedlist_forward(&head, path);
+		gpio = end_point;
+		if (end_point == NULL)
+		{
+			printf("set_gpio: error building device linked list\n");
+			return;
+		}
+
+		status |= gpio->gpio_write(gpio, 0x00) << 2; //low
+		if (!status)
+			printf("%sDISABLE%s remote control, boot by %sBOOT SWITCH%s\n", g_vt_red, g_vt_default, g_vt_yellow, g_vt_default);
+		free_device_linkedlist_backward(end_point);
+	}
 
 	if (status)
 		printf("reset failed, error = 0x%x\n", status);
 	else
-		printf("reset successful\n");
-
-	free_device_linkedlist_backward(end_point);
+		printf("reset successfully\n");
 }
 
 static int monitor_width()
@@ -1111,7 +1149,7 @@ int main(int argc, char** argv)
 	}
 	else if (strcmp(cmd, "init") == 0)
 	{
-		initialize(&setting);
+		initialize(&setting, DONT_RESET);
 	}
 	else if (strcmp(cmd, "version") == 0)
 	{
