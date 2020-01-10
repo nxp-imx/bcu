@@ -77,6 +77,8 @@
 #define DATA_SIZE_8BITS						0x07
 #define DATA_SIZE_1BIT						0x00
 
-#define CLOCK_DIVISOR 0x012B
+#define CLOCK_DIVISOR_100K 0x12B
+#define CLOCK_DIVISOR_200K 0x95
+#define CLOCK_DIVISOR_400K 0x4A
 
 #endif

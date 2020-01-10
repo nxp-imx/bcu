@@ -348,7 +348,7 @@ int ft4232h_i2c_init(struct ft4232h* ft)
 
 	buffer[i++] = MPSSE_CMD_DISABLE_CLOCK_DIVIDE_BY_5; //Ensure disable clock divide by 5 for 60Mhz master clock
 	buffer[i++] = MPSSE_CMD_DISABLE_ADAPTIVE_CLOCKING; //Ensure turn off adaptive clocking
-	buffer[i++] = MPSSE_CMD_ENABLE_3PHASE_CLOCKING; //Enable 3 phase data clock, used by I2C to allow data on both clock edges
+	buffer[i++] = MPSSE_CMD_DISABLE_3PHASE_CLOCKING; //Disable 3 phase data clock, used by I2C to allow data on one clock edges
 	ftStatus = ft_write(&ft->ftdi_info, buffer, i);
 	if (ftStatus < 0)
 		return ftStatus;
@@ -360,8 +360,8 @@ int ft4232h_i2c_init(struct ft4232h* ft)
 	// The SK clock frequency can be worked out by below algorithm with divide by 5 set as off
 	// SK frequency = 60MHz /((1 + [(1 +0xValueH*256) OR 0xValueL])*2)
 	buffer[i++] = MPSSE_CMD_SET_CLOCK_DIVISOR; //Command to set clock divisor
-	buffer[i++] = (unsigned char)(CLOCK_DIVISOR & '\xFF'); //Set 0xValueL of clock divisor
-	buffer[i++] = (unsigned char)((CLOCK_DIVISOR >> 8) & '\xFF'); //Set 0xValueH of clock divisor
+	buffer[i++] = (unsigned char)(CLOCK_DIVISOR_400K & '\xFF'); //Set 0xValueL of clock divisor
+	buffer[i++] = (unsigned char)((CLOCK_DIVISOR_400K >> 8) & '\xFF'); //Set 0xValueH of clock divisor
 
 	ftStatus = ft_write(&ft->ftdi_info, buffer, i);
 	if (ftStatus < 0)
