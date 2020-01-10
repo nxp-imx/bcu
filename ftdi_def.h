@@ -79,6 +79,6 @@
 
 #define CLOCK_DIVISOR_100K 0x12B
 #define CLOCK_DIVISOR_200K 0x95
-#define CLOCK_DIVISOR_400K 0x4A
+#define CLOCK_DIVISOR_400K 0x4D  //0x4A is real 400KHz, but the tlow of SCL will be less than 1.3us. set it as 384.6KHz
 
 #endif
