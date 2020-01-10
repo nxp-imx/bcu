@@ -39,7 +39,7 @@ $ cmake .
 
 $ make  
 
-$ sudo ./bcu command  
+$ sudo ./bcu command [-options]  
 
 linux user: please remember to run bcu with sudo to avoid permission issue  
 
@@ -48,17 +48,20 @@ _____________________________________________________________________
 
 # list of available commands & their functions:  
 
-| commands                   | descriptions                                                 |
-| -------------------------- | ------------------------------------------------------------ |
-| reset                      | reset the board                                              |
-| monitor                    | switch into a tui windows that monitors voltage, current and power consumption inside the board |
-| lsgpio                     | show a list of available gpio pin                            |
-| set_gpio [GPIO_NAME] [1/0] | set a GPIO_NAME pin to be high(1) or low(0). all GPIO_NAMEs are shown in lsgpio command |
-| lsftdi                     | show the list of connected boards and the their location IDs |
-| lsboard                    | list all supported board models                              |
-| set_boot_mode [BOOTMODE]   | set the boot mode as BOOTMODE                                |
-| help                       | show list of available commands and their functions, as well as options |
-| version                    | show version number                                          |
+| commands                                       | descriptions                                                 |
+| ---------------------------------------------- | ------------------------------------------------------------ |
+| reset  [BOOTMODE_NAME] [-board=] [-id=]        | reset the board                                              |
+| init   [BOOTMODE_NAME] [-board=] [-id=]        | enable the remote control with a boot mode                   |
+| deinit [BOOTMODE_NAME] [-board=] [-id=]        | disable the remote control                                   |
+| monitor                                        | switch into a tui windows that monitors voltage, current and power consumption inside the board |
+| set_gpio [GPIO_NAME] [1/0] [-board=] [-id=]    | set pin GPIO_NAME to be high(1) or low(0)                    |
+| set_boot_mode [BOOTMODE_NAME] [-board=] [-id=] | set BOOTMODE_NAME as boot mode                               |
+| lsftdi                                         | show the list of connected boards and the their location IDs |
+| lsboard                                        | list all supported board models                              |
+| lsbootmode [-board=]                           | show a list of available boot mode of a board                |
+| lsgpio [-board=]                               | show a list of available gpio pin of a board                 |
+| help                                           | show list of available commands and their functions, as well as options |
+| version                                        | show version number                                          |
 
 ### typical usage of bcu:  
 
@@ -121,12 +124,24 @@ ________________________________________________________________________________
 
 #### initialization usage:
 
-sudo ./bcu init [boot mode] -board=imx8mpevk  
+$ sudo ./bcu init [boot mode] -board=imx8mpevk  
 
 #### reset usage:
 
-sudo ./bcu reset [boot mode] -board=imx8mpevk  
+$ sudo ./bcu reset [boot mode] -board=imx8mpevk  
 **RESET function does NOT dependent on initialization. Can be use alone.**  
+
+#### multi-board usage:
+
+If there are more than one board plug-in your host, you can use [-id=] to operate the specific board.  
+
+1. get the id number  
+$ sudo ./bcu lsftdi  
+We can get the board id here:  
+board[0] location_id=**1-1**  
+
+2. if we want to reset id=1-1 board  
+$ sudo ./bcu reset [sd] -board=imx8mpevk -id=1-1  
 
 #### boot mode select for imx8mpevk:
 
