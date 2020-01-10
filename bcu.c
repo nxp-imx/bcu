@@ -97,22 +97,22 @@ static void print_help(char* cmd)
 		printf("%s\n", "Usage:");
 		printf("%s\n\n", "bcu command [-options]");
 		printf("%s\n", "list of available commands:");
-		printf("	%s%-40s%s%s\n", g_vt_default, "reset  [BOOTMODE_NAME] [-board=]", g_vt_green, "reset the board (optional [BOOTMODE_NAME])");
-		printf("	%s%-40s%s%s\n", g_vt_default, "init   [BOOTMODE_NAME] [-board=]", g_vt_green, "enable the remote control with a boot mode");
-		printf("	%s%-40s%s%s\n", g_vt_default, "deinit [BOOTMODE_NAME] [-board=]", g_vt_green, "disable the remote control");
+		printf("	%s%-50s%s%s\n", g_vt_default, "reset  [BOOTMODE_NAME] [-board=] [-id=]", g_vt_green, "reset the board (optional [BOOTMODE_NAME])");
+		printf("	%s%-50s%s%s\n", g_vt_default, "init   [BOOTMODE_NAME] [-board=] [-id=]", g_vt_green, "enable the remote control with a boot mode");
+		printf("	%s%-50s%s%s\n", g_vt_default, "deinit [BOOTMODE_NAME] [-board=] [-id=]", g_vt_green, "disable the remote control");
 		printf("\n");
-		printf("	%s%-40s%s%s\n", g_vt_default, "monitor", g_vt_green, "monitor power consumption");
+		printf("	%s%-50s%s%s\n", g_vt_default, "monitor", g_vt_green, "monitor power consumption");
 		printf("\n");
-		printf("	%s%-40s%s%s\n", g_vt_default, "set_gpio [GPIO_NAME] [1/0] [-board=]", g_vt_green, "set pin GPIO_NAME to be high(1) or low(0)");
-		printf("	%s%-40s%s%s\n", g_vt_default, "set_boot_mode [BOOTMODE_NAME] [-board=]", g_vt_green, "set BOOTMODE_NAME as boot mode");
+		printf("	%s%-50s%s%s\n", g_vt_default, "set_gpio [GPIO_NAME] [1/0] [-board=] [-id=]", g_vt_green, "set pin GPIO_NAME to be high(1) or low(0)");
+		printf("	%s%-50s%s%s\n", g_vt_default, "set_boot_mode [BOOTMODE_NAME] [-board=] [-id=]", g_vt_green, "set BOOTMODE_NAME as boot mode");
 		printf("\n");
-		printf("	%s%-40s%s%s\n", g_vt_default, "lsftdi", g_vt_green, "list all boards connected by ftdi device");
-		printf("	%s%-40s%s%s\n", g_vt_default, "lsboard", g_vt_green, "list all supported board models");
-		printf("	%s%-40s%s%s\n", g_vt_default, "lsbootmode [-board=]", g_vt_green, "show a list of available boot mode of a board");
-		printf("	%s%-40s%s%s\n", g_vt_default, "lsgpio [-board=]", g_vt_green, "show a list of available gpio pin of a board");
+		printf("	%s%-50s%s%s\n", g_vt_default, "lsftdi", g_vt_green, "list all boards connected by ftdi device");
+		printf("	%s%-50s%s%s\n", g_vt_default, "lsboard", g_vt_green, "list all supported board models");
+		printf("	%s%-50s%s%s\n", g_vt_default, "lsbootmode [-board=]", g_vt_green, "show a list of available boot mode of a board");
+		printf("	%s%-50s%s%s\n", g_vt_default, "lsgpio     [-board=]", g_vt_green, "show a list of available gpio pin of a board");
 		printf("\n");
-		printf("	%s%-40s%s%s%s\n", g_vt_default, "version", g_vt_green, "print version number", g_vt_default);
-		// printf("%s%-40s%s%s\n", g_vt_default, "help [COMMAND_NAME]", g_vt_green, "/*show details and options of COMMAND_NAME*/");
+		printf("	%s%-50s%s%s%s\n", g_vt_default, "version", g_vt_green, "print version number", g_vt_default);
+		// printf("%s%-50s%s%s\n", g_vt_default, "help [COMMAND_NAME]", g_vt_green, "/*show details and options of COMMAND_NAME*/");
 
 #ifdef __linux__
 		printf("%s", g_vt_kcyn);
