@@ -68,7 +68,7 @@ struct mapping imx8xxl[] = {
 	"emmc0",power,IMX8XXL_POWER_PATH(6,3), 0x00,
 	"on_board_12v0",power,IMX8XXL_POWER_PATH(6,4), 0x00,
 
-	"boot_mode",gpio,IMX8XXL_EXP_PATH(0,0x07), 0x30,
+	"boot_mode",gpio,IMX8XXL_EXP_PATH(0,0x07), 0x40,
 	"sd_pwr",gpio, IMX8XXL_EXP_PATH(0,0x08), 0x00,
 	"sd_wp",gpio, IMX8XXL_EXP_PATH(0,0x10), 0x00,
 	"sd_cd",gpio, IMX8XXL_EXP_PATH(0,0x20), 0x00,
@@ -77,12 +77,12 @@ struct mapping imx8xxl[] = {
 	"vdd_ddrio",gpio, IMX8XXL_EXP_PATH(1,0x04), 0x00,
 	"vdd_ana",gpio, IMX8XXL_EXP_PATH(1,0x08), 0x00,
 	"testmod_sel",gpio, IMX8XXL_EXP_PATH(,0x40), 0x00,
-	"bootmode_sel",gpio, IMX8XXL_EXP_PATH(1,0x80), 0x41,
+	"bootmode_sel",gpio, IMX8XXL_EXP_PATH(1,0x80), 0x51,
 
 	"reset",gpio, "/ft4232h_gpio{channel=0;pin_bitmask=0x20}", 0x11,
 	"jtag_sel",gpio, "/ft4232h_gpio{channel=0;pin_bitmask=0x40}", 0x00,
-	"onoff", gpio, "/ft4232h_gpio{channel=0;pin_bitmask=0x80}", 0x00,
-	"remote_en",gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x10}", 0x21,
+	"onoff", gpio, "/ft4232h_gpio{channel=0;pin_bitmask=0x80}", 0x21,
+	"remote_en",gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x10}", 0x31,
 	// you put all the pin in the imx8xxl board here
 	//"sd_wp", gpio, "..."
 	NULL, 0, NULL, 0//null terminated
