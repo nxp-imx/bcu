@@ -65,6 +65,8 @@ struct board_info {
 	char* power_groups;
 };
 
+/*find if there is the gpio_name on the board*/
+int have_gpio(char* gpio_name, struct board_info* board);
 /*given the name of the board, return coresponding board info struct*/
 struct board_info* get_board(char* board_name);
 /*given board_info, and the desired variable name, find the coresponding path of the variable*/

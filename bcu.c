@@ -175,6 +175,35 @@ static void lsbootmode(struct options_setting* setting)
 	}
 }
 
+struct gpio_device* get_gpio(char* gpio_name, struct board_info* board)
+{
+	int i = 0;
+	char path[MAX_PATH_LENGTH];
+	void* head = NULL;
+	void* end_point;
+	struct gpio_device* gpio = NULL;
+
+	if (get_path(path, gpio_name, board) == -1)
+		return NULL;
+	end_point = build_device_linkedlist_forward(&head, path);
+	if (end_point == NULL)
+	{
+		printf("get_gpio: error building device linked list\n");
+		return NULL;
+	}
+	gpio = end_point;
+
+	return gpio;
+}
+
+void free_gpio(struct gpio_device* gpio)
+{
+	void* end_point = (void*)gpio;
+	free_device_linkedlist_backward(end_point);
+	gpio = NULL;
+	return;
+}
+
 static void set_gpio(struct options_setting* setting)
 {
 	struct board_info* board = get_board(setting->board);
@@ -250,19 +279,19 @@ static void set_boot_mode(struct options_setting* setting)
 	struct board_info* board = get_board(setting->board);
 	if (board == NULL)
 		return;
-	void* head = NULL;
-	void* end_point;
-	char path[MAX_PATH_LENGTH];
+	struct gpio_device* gpio = NULL;
 	int status = -1;
 
-	get_path(path, "boot_mode", board);
-	end_point = build_device_linkedlist_forward(&head, path);
-
-	struct gpio_device* gpio = end_point;
+	gpio = get_gpio("boot_mode", board);
+	if (gpio == NULL)
+	{
+		printf("set_boot_mode: No boot_mode configuration!\n");
+		return;
+	}
 
 	if (get_boot_mode_offset(gpio->pin_bitmask) < 0)
 	{
-		free_device_linkedlist_backward(end_point);
+		free_gpio(gpio);
 		return;
 	}
 
@@ -274,7 +303,7 @@ static void set_boot_mode(struct options_setting* setting)
 	else
 		printf("set boot mode successfully\n");
 
-	free_device_linkedlist_backward(end_point);
+	free_gpio(gpio);
 }
 
 static void deinitialize(struct options_setting* setting)
@@ -282,24 +311,20 @@ static void deinitialize(struct options_setting* setting)
 	struct board_info* board = get_board(setting->board);
 	if (board == NULL)
 		return;
-	void* head = NULL;
-	void* end_point;
-	char path[MAX_PATH_LENGTH];
+	struct gpio_device* gpio = NULL;
 	int status = -1;
 
-	get_path(path, "remote_en", board);
-	end_point = build_device_linkedlist_forward(&head, path);
-	struct gpio_device* gpio = end_point;
-	if (end_point == NULL)
+	gpio = get_gpio("remote_en", board);
+	if (gpio == NULL)
 	{
-		printf("deinitialize: error building device linked list\n");
+		printf("set_boot_mode: No boot_mode configuration!\n");
 		return;
 	}
 
 	status = gpio->gpio_write(gpio, 0x00); //low
 	if (!status)
 		printf("%sDISABLE%s remote control\n", g_vt_red, g_vt_default);
-	free_device_linkedlist_backward(end_point);
+	free_gpio(gpio);
 }
 
 static void initialize(struct options_setting* setting, int isreset)
@@ -396,16 +421,13 @@ static void reset(struct options_setting* setting)
 	struct board_info* board = get_board(setting->board);
 	if (board == NULL)
 		return;
-	void* head = NULL;
-	void* end_point;
-	char path[MAX_PATH_LENGTH];
+	struct gpio_device* gpio = NULL;
 	int status = -1;
 
 	initialize(setting, RESET_NOW);
 
-	get_path(path, "reset", board);
-	end_point = build_device_linkedlist_forward(&head, path);
-	if (end_point == NULL)
+	gpio = get_gpio("reset", board);
+	if (gpio == NULL)
 	{
 		printf("reset: error building device linked list\n");
 		return;
@@ -414,63 +436,56 @@ static void reset(struct options_setting* setting)
 	//delay
 	msleep(setting->delay);
 
-	struct gpio_device* gpio = end_point;
 	status = gpio->gpio_write(gpio, 0x00); //reset low
 	msleep(500);
 	if (setting->boot_mode_hex != -1)
 	{
 		status |= gpio->gpio_write(gpio, 0xFF) << 1;//reset high
 	}
-	free_device_linkedlist_backward(end_point);
+	free_gpio(gpio);
 
 	if (setting->boot_mode_hex == -1)
 	{
-		if (get_path(path, "bootmode_sel", board) != -1)
+		if (have_gpio("bootmode_sel", board) != -1)
 		{
-			end_point = build_device_linkedlist_forward(&head, path);
-			gpio = end_point;
-			if (end_point == NULL)
+			gpio = get_gpio("bootmode_sel", board);
+			if (gpio == NULL)
 			{
 				printf("reset: error building device linked list\n");
 				return;
 			}
 			status |= gpio->gpio_write(gpio, 0x00) << 2; //bootmode_sel low
-			free_device_linkedlist_backward(end_point);
+			free_gpio(gpio);
 
 			msleep(10);
 
-			get_path(path, "reset", board);
-			end_point = build_device_linkedlist_forward(&head, path);
-			gpio = end_point;
-			if (end_point == NULL)
+			gpio = get_gpio("reset", board);
+			if (gpio == NULL)
 			{
 				printf("reset: error building device linked list\n");
 				return;
 			}
 			status |= gpio->gpio_write(gpio, 0xFF) << 3; //reset high
-			free_device_linkedlist_backward(end_point);
+			free_gpio(gpio);
+
 			if (!status)
 			{
 				printf("%sDISABLE%s remote bootmode control, boot by %sBOOT SWITCH%s\n", g_vt_red, g_vt_default, g_vt_yellow, g_vt_default);
 				printf("remote control is still %sENABLED%s\n", g_vt_green, g_vt_default);
 			}
-			free_device_linkedlist_backward(end_point);
 		}
 		else
 		{
-			get_path(path, "remote_en", board);
-			end_point = build_device_linkedlist_forward(&head, path);
-			gpio = end_point;
-			if (end_point == NULL)
+			gpio = get_gpio("remote_en", board);
+			if (gpio == NULL)
 			{
 				printf("reset: error building device linked list\n");
 				return;
 			}
-
-			status |= gpio->gpio_write(gpio, 0x00) << 2; //low
+			status |= gpio->gpio_write(gpio, 0x00) << 2; //remote_en low
 			if (!status)
 				printf("%sDISABLE%s remote control, boot by %sBOOT SWITCH%s\n", g_vt_red, g_vt_default, g_vt_yellow, g_vt_default);
-			free_device_linkedlist_backward(end_point);
+			free_gpio(gpio);
 		}
 	}
 

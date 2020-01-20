@@ -152,6 +152,20 @@ struct board_info board_list[] =
 };
 int num_of_boards = sizeof(board_list) / sizeof(struct board_info);
 
+int have_gpio(char* gpio_name, struct board_info* board)
+{
+	int i = 0;
+	while (board->mappings[i].name != NULL)
+	{
+		if (strcmp(gpio_name, board->mappings[i].name) == 0)
+		{
+			return 0;
+		}
+		i++;
+	}
+	return -1;
+}
+
 struct board_info* get_board(char* board_name)
 {
 	for (int i = 0; i < num_of_boards; i++)
