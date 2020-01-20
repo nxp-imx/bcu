@@ -100,6 +100,11 @@ struct boot_mode imx8xxl_boot_modes[] = {
 	NULL, 0
 };
 
+struct board_links imx8xxlevk_board_links[] = {
+	"",
+	""
+};
+
 #define IMX8MPEVK_GPIO_EXTENDER_PATH "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}"
 struct mapping imx8mpevk_board[] = {
 	"boot_mode", gpio, IMX8MPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=0;pin_bitmask=0x0F}", 0x30,
@@ -144,10 +149,15 @@ struct boot_mode imx8mpevk_board_boot_modes[] = {
 	NULL, 0
 };
 
+struct board_links imx8mpevk_board_links[] = {
+	"http://shlinux22.ap.freescale.net/internal-only/Linux_IMX_Core/latest/common_bsp/imx-boot/imx-boot-imx8mpevk-sd.bin-flash_evk",
+	""
+};
+
 struct board_info board_list[] =
 {
-	"imx8dxlevk", imx8xxl, imx8xxl_boot_modes, NULL,
-	"imx8mpevk", imx8mpevk_board, imx8mpevk_board_boot_modes, NULL
+	"imx8dxlevk", imx8xxl, imx8xxl_boot_modes, NULL, imx8xxlevk_board_links,
+	"imx8mpevk", imx8mpevk_board, imx8mpevk_board_boot_modes, NULL, imx8mpevk_board_links
 	//"imx9xxl",&imx9xxl_pins,
 };
 int num_of_boards = sizeof(board_list) / sizeof(struct board_info);

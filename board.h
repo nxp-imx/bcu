@@ -58,11 +58,17 @@ struct boot_mode {
 	unsigned char boot_mode_hex;
 };
 
+struct board_links {
+	char* flashbin;
+	char* sdcard;
+};
+
 struct board_info {
 	char* name;
 	struct mapping* mappings;
 	struct boot_mode* boot_modes;
 	char* power_groups;
+	struct board_links* links;
 };
 
 /*find if there is the gpio_name on the board*/
