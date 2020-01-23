@@ -24,6 +24,7 @@ ctr-shift+B to build the solution
 ctr-f5 to run  
 
 You can download prebuild image from https://github.com/NXPmicro/bcu/releases
+
 **Make sure no application open remote control port. Generally is first two uart ports. otherwise you will get fail to open ftdi device.** 
 
 ____________________________________________________________________
