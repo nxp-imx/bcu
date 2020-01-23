@@ -11,17 +11,20 @@ first we need to have FTDI D2XX library installed:
 1. go to https://www.ftdichip.com/Drivers/D2XX.htm  
 2. click "setup executable" and download the zip file  
 3. unzip the file and install the library
-4. **Make sure no application open remote control port. Generally is first two uart ports. otherwise you will get fail to open ftdi device.** 
 
-then we can download and build bcu:  
+then we can load and build bcu:  
 
 $ git clone https://github.com/NXPmicro/bcu.git  
 
 open Board_Control_Utilities.sln with windows visual studio  
 
+
 ctr-shift+B to build the solution  
 
 ctr-f5 to run  
+
+You can download prebuild image from https://github.com/NXPmicro/bcu/releases
+**Make sure no application open remote control port. Generally is first two uart ports. otherwise you will get fail to open ftdi device.** 
 
 ____________________________________________________________________
   # to build and run BCU in Linux:  
