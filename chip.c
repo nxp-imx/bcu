@@ -116,7 +116,7 @@ int pca9548_set_channel(struct pca9548* pca9548)
 	int status;
 	parent->i2c_start(parent);
 	status = parent->i2c_write(parent, addr_plus_write);
-	if (!status)
+	if (status)
 	{
 		printf("oh no! no ack received!\n");
 	}
