@@ -10,7 +10,8 @@ first we need to have FTDI D2XX library installed:
 
 1. go to https://www.ftdichip.com/Drivers/D2XX.htm  
 2. click "setup executable" and download the zip file  
-3. unzip the file and install the library  
+3. unzip the file and install the library
+4. **Make sure no application open remote control port. Generally is first two uart ports. otherwise you will get fail to open ftdi device.** 
 
 then we can download and build bcu:  
 
