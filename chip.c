@@ -348,7 +348,7 @@ int ft4232h_i2c_init(struct ft4232h* ft)
 
 	buffer[i++] = MPSSE_CMD_DISABLE_CLOCK_DIVIDE_BY_5; //Ensure disable clock divide by 5 for 60Mhz master clock
 	buffer[i++] = MPSSE_CMD_DISABLE_ADAPTIVE_CLOCKING; //Ensure turn off adaptive clocking
-	buffer[i++] = MPSSE_CMD_DISABLE_3PHASE_CLOCKING; //Disable 3 phase data clock, used by I2C to allow data on one clock edges
+	buffer[i++] = MPSSE_CMD_ENABLE_3PHASE_CLOCKING; //PAC 1934 need it. Enable 3 phase data clock, used by I2C to allow data on one clock edges
 	ftStatus = ft_write(&ft->ftdi_info, buffer, i);
 	if (ftStatus < 0)
 		return ftStatus;
@@ -503,7 +503,11 @@ int pac1934_get_voltage(void* pac1934, float* voltage)
 
 	//first refresh the powerister
 	parent->i2c_start(parent);
-	parent->i2c_write(parent, addr_plus_write);
+	if(parent->i2c_write(parent, addr_plus_write))
+	{
+		printf("pac 1934 failure get ack\n");
+		return -1;
+	};
 	parent->i2c_write(parent, 0x00); //refresh;
 	parent->i2c_stop(parent);
 	msleep(1);
@@ -519,7 +523,7 @@ int pac1934_get_voltage(void* pac1934, float* voltage)
 	parent->i2c_read(parent, &data[1], 1); //last bit should be ack
 
 	parent->i2c_stop(parent);
-	//printf("data in register: %02x%02x\n", data[0], data[1] );
+	//printf("voltage data in register: %02x%02x\n", data[0], data[1] );
 	*voltage = ((float)(((data[0] << 8) + data[1]) * 32)) / (65535);
 	return 0;
 }
