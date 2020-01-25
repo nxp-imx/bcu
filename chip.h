@@ -117,6 +117,9 @@ struct pac1934 {
 	struct power_device power_device;
 	int sensor;
 	int addr;
+	int rs1;
+	int rs2;
+	int cur_rs;
 };
 int pac1934_get_current(void* pac1934, float* buffer);
 int pac1934_get_voltage(void* pac1934, float* buffer);

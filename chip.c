@@ -490,6 +490,9 @@ void* pac1934_create(char* chip_specification, void* parent)
 	pac->power_device.power_get_voltage = pac1934_get_voltage;
 	pac->sensor = extract_parameter_value(chip_specification, "sensor");
 	pac->addr = extract_parameter_value(chip_specification, "addr");
+	pac->rs1 = extract_parameter_value(chip_specification, "rsense1");
+	pac->rs2 = extract_parameter_value(chip_specification, "rsense2");
+	pac->cur_rs = pac->rs1;
 	//printf("pac1934 created!\n");
 	return pac;
 }
@@ -553,8 +556,10 @@ int pac1934_get_current(void* pac1934, float* current)
 	parent->i2c_read(parent, &data[1], 1); //last bit should be ack
 
 	parent->i2c_stop(parent);
-	//printf("data in register: %02x%02x\n", data[0], data[1] );
+//	printf("data in register: %02x%02x\n", data[0], data[1] );
 	*current = ((float)(((data[0] << 8) + data[1]) * 1)) / (65535);
+	*current = (*current) * 100000 / pac->cur_rs;
+//	printf("current %f\n", *current);
 	return 0;
 }
 
