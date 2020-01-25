@@ -162,8 +162,8 @@ struct board_links imx8mpevk_board_links[] = {
 
 struct board_info board_list[] =
 {
-	"imx8dxlevk", imx8xxl, imx8xxl_boot_modes, NULL, imx8xxlevk_board_links,
-	"imx8mpevk", imx8mpevk_board, imx8mpevk_board_boot_modes, NULL, imx8mpevk_board_links
+	{"imx8dxlevk", imx8xxl, imx8xxl_boot_modes, NULL, imx8xxlevk_board_links},
+	{"imx8mpevk", imx8mpevk_board, imx8mpevk_board_boot_modes, NULL, imx8mpevk_board_links},
 	//"imx9xxl",&imx9xxl_pins,
 };
 int num_of_boards = sizeof(board_list) / sizeof(struct board_info);
