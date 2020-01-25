@@ -83,7 +83,7 @@ struct mapping imx8xxl[] = {
 	{"exp5_p14", gpio, IMX8XXL_EXP_PATH(1,0x10), 0x00},
 	{"exp5_p15", gpio, IMX8XXL_EXP_PATH(1,0x20), 0x00},
 	{"testmod_sel",gpio, IMX8XXL_EXP_PATH(,0x40), 0x00},
-	{"bootmode_sel",gpio, IMX8XXL_EXP_PATH(1,0x80), 0x51},
+	{"bootmode_sel",gpio, IMX8XXL_EXP_PATH(1,0x80), 0x50},
 
 	{"reset",gpio, "/ft4232h_gpio{channel=0;pin_bitmask=0x20}", 0x11},
 	{"jtag_sel",gpio, "/ft4232h_gpio{channel=0;pin_bitmask=0x40}", 0x00},
