@@ -95,14 +95,14 @@ struct mapping imx8xxl[] = {
 };
 
 struct boot_mode imx8xxl_boot_modes[] = {
-	"efuse", 0x00,
-	"usb", 0x01,
-	"emmc", 0x02,
-	"sd",0x03,
-	"nand", 0x04,
-	"m4_infinite_loop",0x05,
-	"spi", 0x06,
-	"dft_burnin_mode",0x07,
+	{"efuse", 0x00},
+	{"usb", 0x01},
+	{"emmc", 0x02},
+	{"sd",0x03},
+	{"nand", 0x04},
+	{"m4_infinite_loop",0x05},
+	{"spi", 0x06},
+	{"dft_burnin_mode",0x07},
 	NULL, 0
 };
 
@@ -162,7 +162,9 @@ struct board_links imx8mpevk_board_links[] = {
 
 struct board_info board_list[] =
 {
-	{"imx8dxlevk", imx8xxl, imx8xxl_boot_modes, NULL, imx8xxlevk_board_links},
+	{"imx8dxlevk", imx8xxl, imx8xxl_boot_modes, 
+		"[chip_power:vdd_main,3v3_io,vdd_usb_3v3,3v3_enet,vdd_snvs_4p2,vdd_memc,vdd_ddr_vddq,vdd_enet0_1p8_3p3,vdd_ana,1v8_1,1v8_2,1v8_3,1v8_4,1v8_5]", 
+		imx8xxlevk_board_links},
 	{"imx8mpevk", imx8mpevk_board, imx8mpevk_board_boot_modes, NULL, imx8mpevk_board_links},
 	//"imx9xxl",&imx9xxl_pins,
 };
