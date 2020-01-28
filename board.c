@@ -41,9 +41,9 @@
 
 //x select channel of pca9548 chip, y select which sensor it is measuring 
 //rsense use mOhm
-#define IMX8XXL_POWER_PATH(channel, sensor, rsense1, rsense2) "/ft4232h_i2c{channel=1;dir_bitmask=0x10;val_bitmask=0x00}/pca9548{channel="#channel";addr=0x70}/pac1934{sensor="#sensor";addr=0x10;rsense1="#rsense1";rsense2="#rsense2"}"
+#define IMX8XXL_POWER_PATH(channel, sensor, rsense1, rsense2) "/ft4232h_i2c{channel=1;dir_bitmask=0x60;val_bitmask=0x40}/pca9548{channel="#channel";addr=0x70}/pac1934{sensor="#sensor";addr=0x10;rsense1="#rsense1";rsense2="#rsense2"}"
 
-#define IMX8XXL_EXP_PATH(port,bitmask) "/ft4232h_i2c{channel=1;dir_bitmask=0x10;val_bitmask=0x00}/pca9548{channel=0;addr=0x70}/pca6416a{addr=0x20;port="#port";pin_bitmask="#bitmask"}"
+#define IMX8XXL_EXP_PATH(port,bitmask) "/ft4232h_i2c{channel=1;dir_bitmask=0x60;val_bitmask=0x40}/pca9548{channel=0;addr=0x70}/pca6416a{addr=0x20;port="#port";pin_bitmask="#bitmask";opendrain=1;}"
 struct mapping imx8xxl[] = {
 	{"on_board_5v0",power,IMX8XXL_POWER_PATH(1,1,10,10), 0x00},
 	{"vdd_usb_3v3",power,IMX8XXL_POWER_PATH(1,2,1650,1650), 0x00},
@@ -88,7 +88,8 @@ struct mapping imx8xxl[] = {
 	{"reset",gpio, "/ft4232h_gpio{channel=0;pin_bitmask=0x20}", 0x11},
 	{"jtag_sel",gpio, "/ft4232h_gpio{channel=0;pin_bitmask=0x40}", 0x00},
 	{"onoff", gpio, "/ft4232h_gpio{channel=0;pin_bitmask=0x80}", 0x21},
-	{"remote_en",gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x10}", 0x31},
+	{"remote_en",gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x20}", 0x30},
+	{"ft_reset", gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x40}", 0x71},
 	// you put all the pin in the imx8xxl board here
 	//"sd_wp", gpio, "..."
 	{NULL, 0, NULL, 0}//null terminated
