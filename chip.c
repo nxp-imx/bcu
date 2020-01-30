@@ -476,6 +476,20 @@ int ft4232h_gpio_free(void* ft4232h)
 	return 0;
 }
 
+int pac1934_switch(void *pac1934, int i)
+{
+	struct pac1934* pac = pac1934;
+
+	if (i == 0)
+		pac->cur_rs = pac->rs1;
+	else if (i == 1)
+		pac->cur_rs =  pac->rs2;
+	else
+		return -1;
+
+	return 0;
+}
+
 ////////////////////////////////PAC1934///////////////////////////////////
 void* pac1934_create(char* chip_specification, void* parent)
 {
@@ -488,6 +502,7 @@ void* pac1934_create(char* chip_specification, void* parent)
 	pac->power_device.device.parent = parent;
 	pac->power_device.power_get_current = pac1934_get_current;
 	pac->power_device.power_get_voltage = pac1934_get_voltage;
+	pac->power_device.switch_sensor = pac1934_switch;
 	pac->sensor = extract_parameter_value(chip_specification, "sensor");
 	pac->addr = extract_parameter_value(chip_specification, "addr");
 	pac->rs1 = extract_parameter_value(chip_specification, "rsense1");
@@ -588,7 +603,7 @@ void* pca6416a_create(char* chip_specification, void* parent)
 		pca6416a_set_direction(pca, ~pca->gpio_device.pin_bitmask);
 	else
 		pca6416a_set_output(pca, ~pca->gpio_device.pin_bitmask);
-	//printf("pca6416a created!\n");
+
 	return pca;
 }
 
@@ -652,6 +667,9 @@ int pca6416a_read(void* pca6416a, unsigned char* bit_value_buffer)
 	unsigned char input_cmd = (pca->port) + 0x00; //x00h is the input command
 	int bSucceed = 0;
 
+	if(pca->gpio_device.opendrain > 0)
+		input_cmd = (pca->port) + 0x6;
+
 	bSucceed = parent->i2c_start(parent);
 	if (bSucceed) return bSucceed;
 	bSucceed = parent->i2c_write(parent, addr_plus_write);
@@ -669,7 +687,6 @@ int pca6416a_read(void* pca6416a, unsigned char* bit_value_buffer)
 
 	//mask away unwanted value;
 	*bit_value_buffer = (*bit_value_buffer) & (~pca->gpio_device.pin_bitmask);
-
 	return 0;
 }
 
@@ -699,9 +716,7 @@ int pca6416a_set_direction(struct pca6416a* pca, unsigned char value)
 	bSucceed = parent->i2c_stop(parent);
 	if (bSucceed) return bSucceed;
 
-	unsigned char input_bitmask = value & (current_config | pca->gpio_device.pin_bitmask);
-
-	printf("set dir %x\n", input_bitmask);
+	unsigned char input_bitmask = (value | (~pca->gpio_device.pin_bitmask)) & (current_config | pca->gpio_device.pin_bitmask);
 
 	bSucceed = parent->i2c_start(parent);
 	if (bSucceed) return bSucceed;
@@ -769,6 +784,9 @@ int pca6416a_get_output(void* pca6416a, unsigned char* current_output)
 	unsigned char output_cmd = (pca->port) + 0x02; //x02h is the output command for port 0
 	int bSucceed = 0;
 
+	if (pca->gpio_device.opendrain > 0)
+                output_cmd = (pca->port) + 0x6;
+
 	bSucceed = parent->i2c_start(parent);
 	if (bSucceed) return bSucceed;
 	bSucceed = parent->i2c_write(parent, addr_plus_write);
@@ -783,6 +801,8 @@ int pca6416a_get_output(void* pca6416a, unsigned char* current_output)
 	if (bSucceed) return bSucceed;
 	bSucceed = parent->i2c_stop(parent);
 	if (bSucceed) return bSucceed;
+
 	*current_output = (*current_output) & pca->gpio_device.pin_bitmask;
+
 	return 0;
 }

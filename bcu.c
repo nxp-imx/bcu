@@ -778,7 +778,7 @@ static void monitor(struct options_setting* setting)
 		return;
 	}
 
-	char* previous_path = NULL;
+	char previous_path[MAX_PATH_LENGTH];
 	void* head = NULL;
 	void* end_point = NULL;
 
@@ -787,8 +787,6 @@ static void monitor(struct options_setting* setting)
 	float power = 0;
 	char ch = ' ';
 	char sr_path[MAX_PATH_LENGTH];
-	char sr_path2[MAX_PATH_LENGTH];
-	char sr_path3[MAX_PATH_LENGTH];
 
 	char sr_name[100];
 	unsigned long start;
@@ -840,16 +838,16 @@ static void monitor(struct options_setting* setting)
 		name[i] = 0;
 	}
 	int previous_width = monitor_width();
-
+#if 0
 	//initialize all available SR(sense resistor) switch logic level
-	for (int k = 0; k < n; k++)
+	for (int k = 0; k < index; k++)
 	{
 		strcpy(sr_name, "SR_");
-		strcat(sr_name, board->mappings[name[k]].name);
-		if (get_path(sr_path3, sr_name, board) != -1)
+		strcat(sr_name, board->mappings[k].name);
+		if (get_path(sr_path, sr_name, board) != -1)
 		{
-			end_point = build_device_linkedlist_smart(&head, sr_path3, head, previous_path);
-			previous_path = sr_path;
+			end_point = build_device_linkedlist_smart(&head, sr_path, head, NULL);
+			strcpy(previous_path, sr_path);
 			if (end_point == NULL) {
 				printf("monitor:failed to build device linkedlist\n");
 				return;
@@ -858,6 +856,7 @@ static void monitor(struct options_setting* setting)
 			gd->gpio_write(gd, 0xFF);
 		}
 	}
+#endif
 
 	//power groups
 	struct group groups[MAX_NUMBER_OF_POWER];
@@ -893,7 +892,7 @@ static void monitor(struct options_setting* setting)
 			if (board->mappings[i].type == power)
 			{
 				end_point = build_device_linkedlist_smart(&head, board->mappings[i].path, head, previous_path);
-				previous_path = board->mappings[i].path;
+				strcpy(previous_path, board->mappings[i].path);
 
 				if (end_point == NULL) {
 					printf("monitor:failed to build device linkedlist\n");
@@ -904,6 +903,12 @@ static void monitor(struct options_setting* setting)
 					return;
 				}
 				struct power_device* pd = end_point;
+				
+				if(sr_level[j] == 0)
+					pd->switch_sensor(pd, 1);
+				else
+					pd->switch_sensor(pd, 0);
+
 				pd->power_get_voltage(pd, &voltage);
 				msleep(1);
 				pd->power_get_current(pd, &current);
@@ -952,7 +957,8 @@ static void monitor(struct options_setting* setting)
 			if (get_path(sr_path, sr_name, board) != -1)
 			{
 				end_point = build_device_linkedlist_smart(&head, sr_path, head, previous_path);
-				previous_path = sr_path;
+				strcpy(previous_path, sr_path);
+
 				if (end_point == NULL) {
 					printf("monitor:failed to build device linkedlist\n");
 					return;
@@ -960,10 +966,12 @@ static void monitor(struct options_setting* setting)
 				struct gpio_device* gd = end_point;
 				unsigned char data;
 				gd->gpio_get_output(gd, &data);
+
 				if (data == 0)
 					sr_level[k] = 0;
 				else
 					sr_level[k] = 1;
+
 			}
 			else
 			{
@@ -1202,10 +1210,11 @@ static void monitor(struct options_setting* setting)
 
 		//finally,switch the SR
 		ch = catch_input_char();
-		//printf("\npressed: %c\n",ch);
+		printf("\npressed: %c\n",ch);
 		if (isalpha(ch))
 		{
-			int sr_index = (int)ch - 97;//97 is the ascii code for letter a
+			ch = toupper(ch);
+			int sr_index = (int)ch - 'A';//is the ascii code for letter a
 			if (sr_index < n && sr_index < MAX_NUMBER_OF_POWER && sr_index >= 0)
 			{
 				strcpy(sr_name, "SR_");
@@ -1213,10 +1222,10 @@ static void monitor(struct options_setting* setting)
 					return;
 				strcat(sr_name, board->mappings[name[sr_index]].name);
 
-				if (get_path(sr_path2, sr_name, board) != -1)
+				if (get_path(sr_path, sr_name, board) != -1)
 				{
-					end_point = build_device_linkedlist_smart(&head, sr_path2, head, previous_path);
-					previous_path = sr_path2;
+					end_point = build_device_linkedlist_smart(&head, sr_path, head, previous_path);
+					strcpy(previous_path, sr_path);
 					if (end_point == NULL) {
 						printf("monitor:failed to build device linkedlist\n");
 						return;
@@ -1228,6 +1237,11 @@ static void monitor(struct options_setting* setting)
 						gd->gpio_write(gd, 0xFF);
 					else
 						gd->gpio_write(gd, 0x00);
+
+					data =~data;
+
+					sr_level[sr_index] = data ==0? 0: 1;
+
 				}
 			}
 		}

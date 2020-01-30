@@ -55,6 +55,7 @@ struct power_device {
 	struct device device;
 	int (*power_get_voltage)(void*, float*);
 	int (*power_get_current)(void*, float*);
+	int (*switch_sensor)(void *, int i);
 };
 
 struct gpio_device {
