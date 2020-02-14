@@ -139,6 +139,18 @@ int ft_close(struct ftdi_info* fi)
 #else
 	ft_set_bitmode(fi, 0, 0); //resetting the controller
 
+	if (fi->ftdi->usb_dev != NULL)
+		if (libusb_release_interface(fi->ftdi->usb_dev, fi->ftdi->interface) < 0)
+			printf("release interface failure\n");
+
+	if (fi->ftdi->usb_dev != NULL)
+		if (libusb_attach_kernel_driver(fi->ftdi->usb_dev, fi->ftdi->interface) < 0)
+			printf("failure attach kernel driver again\n");
+
+	if (fi->ftdi->usb_dev != NULL)
+                if (libusb_kernel_driver_active(fi->ftdi->usb_dev, fi->ftdi->interface) < 0)
+                        printf("failure active kernel driver again\n");
+
 	ftdi_usb_close(fi->ftdi);
 	ftdi_free(fi->ftdi);
 	return 0;
