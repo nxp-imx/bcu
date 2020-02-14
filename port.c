@@ -137,6 +137,8 @@ int ft_close(struct ftdi_info* fi)
 	//printf("%d\n",num);
 	return num;
 #else
+	ft_set_bitmode(fi, 0, 0); //resetting the controller
+
 	ftdi_usb_close(fi->ftdi);
 	ftdi_free(fi->ftdi);
 	return 0;
