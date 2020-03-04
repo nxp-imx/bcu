@@ -999,7 +999,7 @@ static void monitor(struct options_setting* setting)
 		if (available_width - max_length > 87)
 		{
 			printf("%s", g_vt_green);
-			printf("%-21s", "|Voltage(V)");
+			printf("%-25s", "|Voltage(V)");
 			printf("%s", g_vt_yellow);
 			printf("%-29s", "|Current(mA)");
 			printf("%s", g_vt_kcyn);
@@ -1010,7 +1010,7 @@ static void monitor(struct options_setting* setting)
 			printf("%s", g_vt_white);
 			printfpadding("location", location_length);
 			printf("%s", g_vt_green);
-			printf("|%-4s %-4s %-4s %-4s", "now", "avg", "max", "min");
+			printf("|%-5s %-5s %-5s %-5s", "now", "avg", "max", "min");
 			printf("%s", g_vt_yellow);
 			printf(" |%-6s %-6s %-6s %-6s", "now", "avg", "max", "min");
 			printf("%s", g_vt_kcyn);
@@ -1113,12 +1113,12 @@ static void monitor(struct options_setting* setting)
 			printf(" |");
 
 			printf("%s", g_vt_green);
-			printf("%-4.2f ", vnow[k]);
-			printf("%-4.2f ", vavg[k]);
+			printf("%-5.2f ", vnow[k]);
+			printf("%-5.2f ", vavg[k]);
 			if (available_width - max_length > 87)
 			{
-				printf("%-4.2f ", vmax[k]);
-				printf("%-4.2f ", vmin[k]);
+				printf("%-5.2f ", vmax[k]);
+				printf("%-5.2f ", vmin[k]);
 			}
 
 			printf("%s", g_vt_yellow);
