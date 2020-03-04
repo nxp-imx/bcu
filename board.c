@@ -78,7 +78,7 @@ struct mapping imx8xxl[] = {
 	{"exp5_p07", gpio, IMX8XXL_EXP_PATH(0, 0x80), 0x00},
 	{"SR_vdd_main",gpio, IMX8XXL_EXP_PATH(1,0x01), 0x00},
 	{"SR_vdd_memc",gpio, IMX8XXL_EXP_PATH(1,0x02), 0x00},
-	{"SR_vdd_ddrio",gpio, IMX8XXL_EXP_PATH(1,0x04), 0x00},
+	{"SR_vdd_ddr_vddq",gpio, IMX8XXL_EXP_PATH(1,0x04), 0x00},
 	{"SR_vdd_ana",gpio, IMX8XXL_EXP_PATH(1,0x08), 0x00},
 	{"exp5_p14", gpio, IMX8XXL_EXP_PATH(1,0x10), 0x00},
 	{"exp5_p15", gpio, IMX8XXL_EXP_PATH(1,0x20), 0x00},
