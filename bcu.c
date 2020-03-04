@@ -891,6 +891,35 @@ static void monitor(struct options_setting* setting)
 		{
 			if (board->mappings[i].type == power)
 			{
+				name[j] = i;
+
+				//get SR(sense resistor) switch logic level
+				strcpy(sr_name, "SR_");
+				strcat(sr_name, board->mappings[name[j]].name);
+				if (get_path(sr_path, sr_name, board) != -1)
+				{
+					
+					end_point = build_device_linkedlist_smart(&head, sr_path, head, previous_path);
+					strcpy(previous_path, sr_path);
+
+					if (end_point == NULL) {
+						printf("monitor:failed to build device linkedlist\n");
+						return;
+					}
+					struct gpio_device* gd = end_point;
+					unsigned char data;
+					gd->gpio_get_output(gd, &data);
+
+					if (data == 0)
+						sr_level[j] = 0;
+					else
+						sr_level[j] = 1;
+				}
+				else
+				{
+					sr_level[j] = -1;
+				}
+
 				end_point = build_device_linkedlist_smart(&head, board->mappings[i].path, head, previous_path);
 				strcpy(previous_path, board->mappings[i].path);
 
@@ -913,7 +942,6 @@ static void monitor(struct options_setting* setting)
 				msleep(1);
 				pd->power_get_current(pd, &current);
 				float power = current * voltage;
-				name[j] = i;
 				vnow[j] = voltage;
 				cnow[j] = current;
 				pnow[j] = power;
@@ -946,37 +974,6 @@ static void monitor(struct options_setting* setting)
 			groups[k].min = (groups[k].sum < groups[k].min) ? groups[k].sum : groups[k].min;
 			groups[k].avg = (groups[k].avg_data_size * groups[k].avg + groups[k].sum) / (groups[k].avg_data_size + 1);
 			groups[k].avg_data_size++;
-		}
-
-		//get SR(sense resistor) switch logic level
-
-		for (int k = 0; k < n; k++)
-		{
-			strcpy(sr_name, "SR_");
-			strcat(sr_name, board->mappings[name[k]].name);
-			if (get_path(sr_path, sr_name, board) != -1)
-			{
-				end_point = build_device_linkedlist_smart(&head, sr_path, head, previous_path);
-				strcpy(previous_path, sr_path);
-
-				if (end_point == NULL) {
-					printf("monitor:failed to build device linkedlist\n");
-					return;
-				}
-				struct gpio_device* gd = end_point;
-				unsigned char data;
-				gd->gpio_get_output(gd, &data);
-
-				if (data == 0)
-					sr_level[k] = 0;
-				else
-					sr_level[k] = 1;
-
-			}
-			else
-			{
-				sr_level[k] = -1;
-			}
 		}
 
 		//then display
