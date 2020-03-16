@@ -41,7 +41,7 @@
 
 //x select channel of pca9548 chip, y select which sensor it is measuring 
 //rsense use mOhm
-#define IMX8XXL_POWER_PATH(channel, sensor, rsense1, rsense2) "/ft4232h_i2c{channel=1;dir_bitmask=0x60;val_bitmask=0x40}/pca9548{channel="#channel";addr=0x70}/pac1934{sensor="#sensor";addr=0x10;rsense1="#rsense1";rsense2="#rsense2"}"
+#define IMX8XXL_POWER_PATH(channel, sensor, rsense1, rsense2) "/ft4232h_i2c{channel=1;dir_bitmask=0x60;val_bitmask=0x40}/pca9548{channel="#channel";addr=0x70}/pac1934{group="#channel";sensor="#sensor";addr=0x10;rsense1="#rsense1";rsense2="#rsense2"}"
 
 #define IMX8XXL_EXP_PATH(port,bitmask) "/ft4232h_i2c{channel=1;dir_bitmask=0x60;val_bitmask=0x40}/pca9548{channel=0;addr=0x70}/pca6416a{addr=0x20;port="#port";pin_bitmask="#bitmask";opendrain=1;}"
 struct mapping imx8xxl[] = {
@@ -163,7 +163,7 @@ struct board_links imx8mpevk_board_links[] = {
 
 struct board_info board_list[] =
 {
-	{"imx8dxlevk", imx8xxl, imx8xxl_boot_modes, 
+	{"imx8dxlevk", imx8xxl, imx8xxl_boot_modes,// NULL,
 		"[chip_power:vdd_main,3v3_io,vdd_usb_3v3,3v3_enet,vdd_snvs_4p2,vdd_memc,vdd_ddr_vddq,vdd_enet0_1p8_3p3,vdd_ana,1v8_1,1v8_2,1v8_3,1v8_4,1v8_5]", 
 		imx8xxlevk_board_links},
 	{"imx8mpevk", imx8mpevk_board, imx8mpevk_board_boot_modes, NULL, imx8mpevk_board_links},

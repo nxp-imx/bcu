@@ -51,10 +51,21 @@ struct i2c_device {
 	int (*i2c_stop)(void*); //sending Start/Stop Condition
 };
 
+#define MAX_PAC193X_CHANNELS 4
+struct pac193x_reg_data {
+	double	vbus[MAX_PAC193X_CHANNELS];
+	double	vsense[MAX_PAC193X_CHANNELS];
+
+	char	num_enabled_channels;
+};
+
 struct power_device {
 	struct device device;
-	int (*power_get_voltage)(void*, float*);
-	int (*power_get_current)(void*, float*);
+	int (*power_get_group)(void*);
+	int (*power_get_sensor)(void*);
+	int (*power_get_res)(void*);
+	int (*power_set_snapshot)(void*);
+	int (*power_get_data)(void*, struct pac193x_reg_data*);
 	int (*switch_sensor)(void *, int i);
 };
 
@@ -117,14 +128,19 @@ int ft4232h_gpio_free(void* ft4232h);
 ///////////////////////////////////////////////////////////////////////
 struct pac1934 {
 	struct power_device power_device;
+	int group;
 	int sensor;
 	int addr;
 	int rs1;
 	int rs2;
 	int cur_rs;
 };
-int pac1934_get_current(void* pac1934, float* buffer);
-int pac1934_get_voltage(void* pac1934, float* buffer);
+int pac1934_switch(void *pac1934, int i);
+int get_pac1934_group(void* pac1934);
+int get_pac1934_sensor(void* pac1934);
+int get_pac1934_res(void* pac1934);
+int pac1934_snapshot(void* pac1934);
+int pac1934_get_data(void* pac1934, struct pac193x_reg_data* pac_reg);
 void* pac1934_create(char* chip_specification, void* parent);
 ////////////////////////////////////////////////////////////////////////
 struct pca6416a {

@@ -782,9 +782,9 @@ static void monitor(struct options_setting* setting)
 	void* head = NULL;
 	void* end_point = NULL;
 
-	float voltage = 0;
-	float current = 0;
-	float power = 0;
+	double voltage = 0;
+	double current = 0;
+	double power = 0;
 	char ch = ' ';
 	char sr_path[MAX_PATH_LENGTH];
 
@@ -822,10 +822,10 @@ static void monitor(struct options_setting* setting)
 	//ideally I should be able to use n as the size of array, but Visual studio does not allow variable length array declaration...
 	// so 100 maximum variable for now...I could use dynamic memory allocation instead, but then I will have to free it one by one in the end..
 	int name[MAX_NUMBER_OF_POWER];
-	float vnow[MAX_NUMBER_OF_POWER]; float vavg[MAX_NUMBER_OF_POWER]; float vmax[MAX_NUMBER_OF_POWER]; float vmin[MAX_NUMBER_OF_POWER];
-	float cnow[MAX_NUMBER_OF_POWER]; float cavg[MAX_NUMBER_OF_POWER]; float cmax[MAX_NUMBER_OF_POWER]; float cmin[MAX_NUMBER_OF_POWER];
-	float pnow[MAX_NUMBER_OF_POWER]; float pavg[MAX_NUMBER_OF_POWER]; float pmax[MAX_NUMBER_OF_POWER]; float pmin[MAX_NUMBER_OF_POWER];
-	float data_size[MAX_NUMBER_OF_POWER];
+	double vnow[MAX_NUMBER_OF_POWER]; double vavg[MAX_NUMBER_OF_POWER]; double vmax[MAX_NUMBER_OF_POWER]; double vmin[MAX_NUMBER_OF_POWER];
+	double cnow[MAX_NUMBER_OF_POWER]; double cavg[MAX_NUMBER_OF_POWER]; double cmax[MAX_NUMBER_OF_POWER]; double cmin[MAX_NUMBER_OF_POWER];
+	double pnow[MAX_NUMBER_OF_POWER]; double pavg[MAX_NUMBER_OF_POWER]; double pmax[MAX_NUMBER_OF_POWER]; double pmin[MAX_NUMBER_OF_POWER];
+	double data_size[MAX_NUMBER_OF_POWER];
 	int sr_level[MAX_NUMBER_OF_POWER];
 
 	//initialize
@@ -882,8 +882,79 @@ static void monitor(struct options_setting* setting)
 		return;
 	}
 
+	int a = 0, pac_group_num = 0, last_pac_group = 0, pac_channel_num = 0;
+	struct pac193x_reg_data pac_data[MAX_NUMBER_OF_POWER];
+	char pac193x_group_path[MAX_NUMBER_OF_POWER][MAX_PATH_LENGTH];
+	while (board->mappings[a].name != NULL)
+	{
+		if (board->mappings[a].type == power)
+		{
+			end_point = build_device_linkedlist_smart(&head, board->mappings[a].path, head, previous_path);
+			strcpy(previous_path, board->mappings[a].path);
+
+			if (end_point == NULL) {
+				printf("monitor:failed to build device linkedlist\n");
+				if (setting->dump == 1)
+				{
+					fclose(fptr);
+				}
+				return;
+			}
+			struct power_device* pd = end_point;
+
+			if(last_pac_group != pd->power_get_group(pd))
+			{
+				strcpy(pac193x_group_path[pac_group_num++], board->mappings[a].path);
+				last_pac_group = pd->power_get_group(pd);
+			}
+
+			pac_channel_num++;
+		}
+		a++;
+	}
+#if 1
 	while (!GV_MONITOR_TERMINATED)
 	{
+		for(a = 0; a < pac_group_num; a++)
+		{
+			end_point = build_device_linkedlist_smart(&head, pac193x_group_path[a], head, previous_path);
+			strcpy(previous_path, pac193x_group_path[a]);
+
+			if (end_point == NULL) {
+				printf("monitor:failed to build device linkedlist\n");
+				if (setting->dump == 1)
+				{
+					fclose(fptr);
+				}
+				return;
+			}
+			struct power_device* pd = end_point;
+
+			pd->power_set_snapshot(pd);
+		}
+		// msleep(1);
+		for(a = 0; a < pac_group_num; a++)
+		{
+			end_point = build_device_linkedlist_smart(&head, pac193x_group_path[a], head, previous_path);
+			strcpy(previous_path, pac193x_group_path[a]);
+
+			if (end_point == NULL) {
+				printf("monitor:failed to build device linkedlist\n");
+				if (setting->dump == 1)
+				{
+					fclose(fptr);
+				}
+				return;
+			}
+			struct power_device* pd = end_point;
+
+			pd->power_get_data(pd, &pac_data[a]);
+		}
+		// usleep(100);
+		// for(a = 0; a < pac_channel_num; a++)
+		// {
+		// }
+
 		//first calculate the value and store them in array
 		int i = 0;//i is the index of all mappings
 		int j = 0;//j is the index of the power related mapping only
@@ -938,10 +1009,16 @@ static void monitor(struct options_setting* setting)
 				else
 					pd->switch_sensor(pd, 0);
 
-				pd->power_get_voltage(pd, &voltage);
-				msleep(1);
-				pd->power_get_current(pd, &current);
-				float power = current * voltage;
+				voltage = pac_data[pd->power_get_group(pd) - 1].vbus[pd->power_get_sensor(pd) - 1];
+				current = pac_data[pd->power_get_group(pd) - 1].vsense[pd->power_get_sensor(pd) - 1] / pd->power_get_res(pd);
+
+				
+				// printf("group=%d, sensor=%d, voltage %f----------------------\n",pd->power_get_group(pd), pd->power_get_sensor(pd), voltage);
+				// printf("current %f\n", current);
+				// pd->power_get_data(pd, pac_data);
+				// msleep(1);
+				// pd->power_get_current(pd, &current);
+				double power = current * voltage;
 				vnow[j] = voltage;
 				cnow[j] = current;
 				pnow[j] = power;
@@ -951,9 +1028,9 @@ static void monitor(struct options_setting* setting)
 				vmax[j] = (voltage > vmax[j]) ? voltage : vmax[j];
 				cmax[j] = (current > cmax[j]) ? current : cmax[j];
 				pmax[j] = (power > pmax[j]) ? power : pmax[j];
-				cavg[j] = (data_size[j] * cavg[j] + current) / (float)(data_size[j] + 1);
-				vavg[j] = (data_size[j] * vavg[j] + voltage) / (float)(data_size[j] + 1);
-				pavg[j] = (data_size[j] * pavg[j] + power) / ((float)(data_size[j] + 1));
+				cavg[j] = (data_size[j] * cavg[j] + current) / (double)(data_size[j] + 1);
+				vavg[j] = (data_size[j] * vavg[j] + voltage) / (double)(data_size[j] + 1);
+				pavg[j] = (data_size[j] * pavg[j] + power) / ((double)(data_size[j] + 1));
 				data_size[j] = data_size[j] + 1;
 
 				j++;
@@ -961,6 +1038,7 @@ static void monitor(struct options_setting* setting)
 			i++;
 		}
 
+#if 1
 		//get groups data
 		for (int k = 0; k < num_of_groups; k++)
 		{
@@ -1243,7 +1321,8 @@ static void monitor(struct options_setting* setting)
 			}
 		}
 		if (!isalpha(ch))
-			msleep(1000);
+			msleep(100);
+#endif
 	}
 
 	free_device_linkedlist_backward(end_point);
@@ -1253,6 +1332,7 @@ static void monitor(struct options_setting* setting)
 	}
 	printf("%s", g_vt_clear);
 	printf("%s", g_vt_home); //move cursor to the 0,0
+#endif
 	return;
 }
 
