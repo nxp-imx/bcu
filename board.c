@@ -59,7 +59,7 @@ struct mapping imx8xxl[] = {
 	{"vdd_enet0_1p8_3p3",power,IMX8XXL_POWER_PATH(3,4, 3320, 3320), 0x00},
 	{"vdd_ana",power,IMX8XXL_POWER_PATH(4,1, 10000, 10000), 0x00},
 	{"ddr_vdd1",power,IMX8XXL_POWER_PATH(4,2, 10, 10), 0x00},
-	{"1v8_1",power,IMX8XXL_POWER_PATH(4,3, 60, 60), 0x00},
+	{"1v8_1",power,IMX8XXL_POWER_PATH(4,3, 600, 600), 0x00},
 	{"1v8_2",power,IMX8XXL_POWER_PATH(4,4, 1000, 1000), 0x00},
 	{"1v8_3",power,IMX8XXL_POWER_PATH(5,1, 1000, 1000), 0x00},
 	{"1v8_4",power,IMX8XXL_POWER_PATH(5,2, 680, 680), 0x00},
