@@ -55,7 +55,8 @@ int extract_parameter_string(char* chip_specification, char* parameter_name, cha
 	char* ptr = strstr(chip_specification, parameter_name);
 	if (ptr == NULL)
 	{
-		printf("could not locate parameter %s\n", parameter_name);
+		if(strcmp(parameter_name, "sensor2") != 0)
+			printf("could not locate parameter %s\n", parameter_name);
 		return -1;
 	}
 	char* equal_sign = strchr(ptr, '=');

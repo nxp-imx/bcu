@@ -496,7 +496,9 @@ void* pac1934_create(char* chip_specification, void* parent)
 	pac->sensor = extract_parameter_value(chip_specification, "sensor");
 	pac->addr = extract_parameter_value(chip_specification, "addr");
 	pac->rs1 = extract_parameter_value(chip_specification, "rsense1");
+	pac->sensor2 = extract_parameter_value(chip_specification, "sensor2");
 	pac->rs2 = extract_parameter_value(chip_specification, "rsense2");
+	pac->cur_sensor = pac->sensor;
 	pac->cur_rs = pac->rs1;
 	//printf("pac1934 created!\n");
 	return pac;
@@ -507,9 +509,16 @@ int pac1934_switch(void *pac1934, int i)
 	struct pac1934* pac = pac1934;
 
 	if (i == 0)
+	{
+		pac->cur_sensor = pac->sensor;
 		pac->cur_rs = pac->rs1;
+	}
 	else if (i == 1)
+	{
+		if(pac->sensor2 != -1)
+			pac->cur_sensor = pac->sensor2;
 		pac->cur_rs =  pac->rs2;
+	}
 	else
 		return -1;
 
@@ -527,7 +536,7 @@ int get_pac1934_sensor(void* pac1934)
 {
 	struct pac1934* pac = pac1934;
 
-	return pac->sensor;
+	return pac->cur_sensor;
 }
 
 int get_pac1934_res(void* pac1934)
@@ -738,7 +747,7 @@ void* pca6416a_create(char* chip_specification, void* parent)
 	pca->addr = extract_parameter_value(chip_specification, "addr");
 	pca->port = extract_parameter_value(chip_specification, "port");
 
-	if (pca->gpio_device.opendrain < 0)
+	if (pca->gpio_device.opendrain <= 0)
 		pca6416a_set_direction(pca, ~pca->gpio_device.pin_bitmask);
 	else
 		pca6416a_set_output(pca, ~pca->gpio_device.pin_bitmask);

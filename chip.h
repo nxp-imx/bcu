@@ -132,7 +132,9 @@ struct pac1934 {
 	int sensor;
 	int addr;
 	int rs1;
+	int sensor2;
 	int rs2;
+	int cur_sensor;
 	int cur_rs;
 };
 int pac1934_switch(void *pac1934, int i);
