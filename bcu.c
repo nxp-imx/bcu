@@ -827,6 +827,7 @@ static void monitor(struct options_setting* setting)
 	double pnow[MAX_NUMBER_OF_POWER]; double pavg[MAX_NUMBER_OF_POWER]; double pmax[MAX_NUMBER_OF_POWER]; double pmin[MAX_NUMBER_OF_POWER];
 	double data_size[MAX_NUMBER_OF_POWER];
 	int sr_level[MAX_NUMBER_OF_POWER];
+	float cur_range[MAX_NUMBER_OF_POWER];
 
 	//initialize
 	for (int i = 0; i < MAX_NUMBER_OF_POWER; i++)
@@ -1011,8 +1012,8 @@ static void monitor(struct options_setting* setting)
 
 				voltage = pac_data[pd->power_get_group(pd) - 1].vbus[pd->power_get_sensor(pd) - 1];
 				current = pac_data[pd->power_get_group(pd) - 1].vsense[pd->power_get_sensor(pd) - 1] / pd->power_get_res(pd);
+				cur_range[j] = 100000.0 / pd->power_get_res(pd) ;
 
-				
 				// printf("group=%d, sensor=%d, voltage %f----------------------\n",pd->power_get_group(pd), pd->power_get_sensor(pd), voltage);
 				// printf("current %f\n", current);
 				// pd->power_get_data(pd, pac_data);
@@ -1161,7 +1162,7 @@ static void monitor(struct options_setting* setting)
 			printf(" |%-6s %-6s", "now", "avg");
 		}
 		printf("%s", g_vt_red);
-		printf("%-6s", " |SR");
+		printf("%-6s", " |SR - Range(mA)");
 		printf("\n");
 		printf("%s", g_vt_white);
 		printfpadding("-----------------------------------------------------------------------------------------------------------------------------------------------", available_width);
@@ -1225,11 +1226,11 @@ static void monitor(struct options_setting* setting)
 			printf("%s", g_vt_red);
 			if (sr_level[k] == -1)
 			{
-				printf("|N/A");
+				printf("|N/A - %-5.1f", cur_range[k]);
 			}
 			else
 			{
-				printf("|%d", sr_level[k]);
+				printf("|%3d - %-5.1f", sr_level[k], cur_range[k]);
 			}
 
 			printf("\n");
