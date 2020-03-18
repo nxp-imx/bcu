@@ -46,6 +46,7 @@ struct options_setting {
 	char gpio_name[MAX_MAPPING_NAME_LENGTH];
 	int location_id;
 	int dump;
+	char dumpname[50];
 	char groups[MAX_NUMBER_OF_POWER * MAX_MAPPING_NAME_LENGTH];
 };
 

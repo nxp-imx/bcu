@@ -795,7 +795,7 @@ static void monitor(struct options_setting* setting)
 
 	if (setting->dump == 1)
 	{
-		fptr = fopen("monitor_record.csv", "w+");
+		fptr = fopen(setting->dumpname, "w+");
 
 		/*print first row*/
 		int i = 0;

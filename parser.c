@@ -267,7 +267,7 @@ int parse_options(int argc, char** argv, struct options_setting* setting)
 			setting->hold = atoi(input);
 			printf("hold is %d\n", setting->hold);
 		}
-		else if (strncmp(argv[i], "-group=", 6) == 0 && strlen(argv[i]) > 6)
+		else if (strncmp(argv[i], "-group=", 7) == 0 && strlen(argv[i]) > 7)
 		{
 			strcpy(setting->groups, input);
 			printf("groups is %s\n", setting->groups);
@@ -297,10 +297,27 @@ int parse_options(int argc, char** argv, struct options_setting* setting)
 			setting->output_state = 0;
 			printf("will set gpio low\n");
 		}
+		else if (strncmp(argv[i], "-dump=", 6) == 0 && strlen(argv[i]) > 6)
+		{
+			setting->dump = 1;
+			strcpy(setting->dumpname, input);
+			int len1 = strlen(setting->dumpname), len2 = strlen(".csv");
+			if (len1 < len2)
+				strcpy(setting->dumpname, "monitor_record.csv");
+			else
+			{
+				if(strcmp(setting->dumpname + len1 - len2, ".csv"))
+				{
+					strcat(setting->dumpname, ".csv");
+				}
+			}
+			printf("dump data into %s file\n", setting->dumpname);
+		}
 		else if (strcmp(argv[i], "-dump") == 0)
 		{
 			setting->dump = 1;
-			printf("dump data into .csv file\n");
+			strcpy(setting->dumpname, "monitor_record.csv");
+			printf("dump data into %s file\n", setting->dumpname);
 		}
 		else if (strncmp(argv[i], "-board=", 7) == 0 && strlen(argv[i]) > 7)
 		{
