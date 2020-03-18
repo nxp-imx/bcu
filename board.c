@@ -117,15 +117,10 @@ struct board_links imx8xxlevk_board_links[] = {
 #define IMX8MPEVK_GPIO_EXTENDER_PATH "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}"
 struct mapping imx8mpevk_board[] = {
 	{"vdd_arm", power, IMX8MPEVK_POWER_SWITCH_PATH(1, 1, 0x11, 20, 2, 5010), 0x00},
-	// {"vdd_arm", power, IMX8MPEVK_POWER_PATH(1, 2, 0x11, 5010, 5010), 0x00},
 	{"nvcc_dram_1v1", power, IMX8MPEVK_POWER_SWITCH_PATH(1, 3, 0x11, 50, 4, 10050), 0x00},
-	// {"on_board_5v0", power, IMX8MPEVK_POWER_PATH(1, 4, 0x11, , ), 0x00},
 	{"vsys_5v", power, IMX8MPEVK_POWER_SWITCH_PATH(2, 1, 0x12, 20, 2, 2020), 0x00},
-	// {"on_board_5v0", power, IMX8MPEVK_POWER_PATH(2, 2, 0x12, , ), 0x00},
 	{"vdd_soc", power, IMX8MPEVK_POWER_SWITCH_PATH(2, 3, 0x12, 10, 4, 2010), 0x00},
-	// {"on_board_5v0", power, IMX8MPEVK_POWER_PATH(2, 4, 0x12, , ), 0x00},
 	{"lpd4_vddq", power, IMX8MPEVK_POWER_SWITCH_PATH(3, 1, 0x13, 50, 2, 10050), 0x00},
-	// {"on_board_5v0", power, IMX8MPEVK_POWER_PATH(3, 2, 0x13, , ), 0x00},
 	{"lpd4_vdd2", power, IMX8MPEVK_POWER_PATH(3, 3, 0x13, 100, 100), 0x00},
 	{"nvcc_sd2", power, IMX8MPEVK_POWER_PATH(3, 4, 0x13, 1000, 1000), 0x00},
 	{"vdd_lvds_1V8", power, IMX8MPEVK_POWER_PATH(4, 1, 0x14, 2000, 2000), 0x00},

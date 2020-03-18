@@ -577,15 +577,6 @@ int pac1934_get_data(void* pac1934, struct pac193x_reg_data* pac_reg)
 	#define DATA_LEN 17
 	unsigned char data[DATA_LEN];
 
-	// parent->i2c_start(parent);
-	// parent->i2c_write(parent, addr_plus_write);
-	// parent->i2c_write(parent, 0x1C); //get ctrl;
-	// parent->i2c_start(parent);
-	// parent->i2c_write(parent, addr_plus_read);
-	// for(k=0; k<11; k++)
-	// 	parent->i2c_read(parent, &ctrl[k], 0);
-	// parent->i2c_read(parent, &ctrl[11], 1);
-
 	parent->i2c_start(parent);
 	parent->i2c_write(parent, addr_plus_write);
 	parent->i2c_write(parent, 0x07); //start get data;
@@ -600,131 +591,26 @@ int pac1934_get_data(void* pac1934, struct pac193x_reg_data* pac_reg)
 	// for(k=0; k<76; k++)
 	// 	printf("data[%d]=0x%x\n", k, data[k]);
 
-	int startcount = 0;
-	// printf("voltage %d: %f\n", 1, ((float)(((data[startcount] << 8) + data[startcount + 1]) * 32)) / (65535));
-	// printf("voltage %d: %f\n", 2, ((float)(((data[startcount + 2] << 8) + data[startcount + 3]) * 32)) / (65535));
-	// printf("voltage %d: %f\n", 3, ((float)(((data[startcount + 4] << 8) + data[startcount + 5]) * 32)) / (65535));
-	// printf("voltage %d: %f\n", 4, ((float)(((data[startcount + 6] << 8) + data[startcount + 7]) * 32)) / (65535));
-	pac_reg->vbus[0] = ((double)(((data[startcount] << 8) + data[startcount + 1]) * 32)) / (65535);
-	pac_reg->vbus[1] = ((double)(((data[startcount + 2] << 8) + data[startcount + 3]) * 32)) / (65535);
-	pac_reg->vbus[2] = ((double)(((data[startcount + 4] << 8) + data[startcount + 5]) * 32)) / (65535);
-	pac_reg->vbus[3] = ((double)(((data[startcount + 6] << 8) + data[startcount + 7]) * 32)) / (65535);
+	// printf("voltage %d: %f\n", 1, ((double)(((data[0] << 8) + data[1]) * 32)) / (65535));
+	// printf("voltage %d: %f\n", 2, ((double)(((data[2] << 8) + data[3]) * 32)) / (65535));
+	// printf("voltage %d: %f\n", 3, ((double)(((data[4] << 8) + data[5]) * 32)) / (65535));
+	// printf("voltage %d: %f\n", 4, ((double)(((data[6] << 8) + data[7]) * 32)) / (65535));
+	pac_reg->vbus[0] = ((double)(((data[0] << 8) + data[1]) * 32)) / (65535);
+	pac_reg->vbus[1] = ((double)(((data[2] << 8) + data[3]) * 32)) / (65535);
+	pac_reg->vbus[2] = ((double)(((data[4] << 8) + data[5]) * 32)) / (65535);
+	pac_reg->vbus[3] = ((double)(((data[6] << 8) + data[7]) * 32)) / (65535);
 
-	// printf("current %d: %f\n", 1, (((float)(((data[startcount + 8] << 8) + data[startcount + 9]) * 1)) / (65535)) * 100000 / pac->cur_rs);
-	// printf("current %d: %f\n", 2, (((float)(((data[startcount + 10] << 8) + data[startcount + 11]) * 1)) / (65535)) * 100000 / pac->cur_rs);
-	// printf("current %d: %f\n", 3, (((float)(((data[startcount + 12] << 8) + data[startcount + 13]) * 1)) / (65535)) * 100000 / pac->cur_rs);
-	// printf("current %d: %f\n", 4, (((float)(((data[startcount + 14] << 8) + data[startcount + 15]) * 1)) / (65535)) * 100000 / pac->cur_rs);
-	pac_reg->vsense[0] = (((double)(((data[startcount + 8] << 8) + data[startcount + 9]) * 1)) / (65535)) * 100000;
-	pac_reg->vsense[1] = (((double)(((data[startcount + 10] << 8) + data[startcount + 11]) * 1)) / (65535)) * 100000;
-	pac_reg->vsense[2] = (((double)(((data[startcount + 12] << 8) + data[startcount + 13]) * 1)) / (65535)) * 100000;
-	pac_reg->vsense[3] = (((double)(((data[startcount + 14] << 8) + data[startcount + 15]) * 1)) / (65535)) * 100000;
+	// printf("current %d: %f\n", 1, (((double)(((data[8] << 8) + data[9]) * 1)) / (65535)) * 100000);
+	// printf("current %d: %f\n", 2, (((double)(((data[10] << 8) + data[11]) * 1)) / (65535)) * 100000);
+	// printf("current %d: %f\n", 3, (((double)(((data[12] << 8) + data[13]) * 1)) / (65535)) * 100000);
+	// printf("current %d: %f\n", 4, (((double)(((data[14] << 8) + data[15]) * 1)) / (65535)) * 100000);
+	pac_reg->vsense[0] = (((double)(((data[8] << 8) + data[9]) * 1)) / (65535)) * 100000;
+	pac_reg->vsense[1] = (((double)(((data[10] << 8) + data[11]) * 1)) / (65535)) * 100000;
+	pac_reg->vsense[2] = (((double)(((data[12] << 8) + data[13]) * 1)) / (65535)) * 100000;
+	pac_reg->vsense[3] = (((double)(((data[14] << 8) + data[15]) * 1)) / (65535)) * 100000;
 
 	return 0;
 }
-
-// int pac1934_get_voltage(void* pac1934, float* voltage)
-// {
-// 	struct pac1934* pac = pac1934;
-// 	struct i2c_device* parent = (void*)pac->power_device.device.parent;
-// 	char addr_plus_write = (pac->addr) << 1;
-// 	char addr_plus_read = (pac->addr << 1) + 1;
-
-// 	//first refresh the powerister
-// 	parent->i2c_start(parent);
-// 	if(parent->i2c_write(parent, addr_plus_write))
-// 	{
-// 		printf("pac 1934 failure get ack\n");
-// 		return -1;
-// 	};
-// 	parent->i2c_write(parent, 0x00); //refresh;
-// 	parent->i2c_stop(parent);
-// 	msleep(1);
-// 	//read the data
-// 	// parent->i2c_start(parent);
-// 	// parent->i2c_write(parent, addr_plus_write);
-// 	// parent->i2c_write(parent, 0x07 + pac->sensor - 1); //get voltage;
-// 	// parent->i2c_start(parent);
-// 	// parent->i2c_write(parent, addr_plus_read);
-
-// 	// unsigned char data[2];
-// 	// parent->i2c_read(parent, &data[0], 0);
-// 	// parent->i2c_read(parent, &data[1], 1); //last bit should be ack
-
-// 	// parent->i2c_stop(parent);
-// 	// printf("voltage data in register: %02x%02x\n", data[0], data[1] );
-// 	// *voltage = ((float)(((data[0] << 8) + data[1]) * 32)) / (65535);
-
-// 	unsigned char ctrl[12];
-// 	int k;
-// 	// parent->i2c_start(parent);
-// 	// parent->i2c_write(parent, addr_plus_write);
-// 	// parent->i2c_write(parent, 0x1C); //get ctrl;
-// 	// parent->i2c_start(parent);
-// 	// parent->i2c_write(parent, addr_plus_read);
-// 	// for(k=0; k<11; k++)
-// 	// 	parent->i2c_read(parent, &ctrl[k], 0);
-// 	// parent->i2c_read(parent, &ctrl[11], 1);
-// 	#define DATA_LEN 16
-// 	unsigned char data[DATA_LEN];
-// 	parent->i2c_start(parent);
-// 	parent->i2c_write(parent, addr_plus_write);
-// 	parent->i2c_write(parent, 0x07); //get data;
-// 	parent->i2c_start(parent);
-// 	parent->i2c_write(parent, addr_plus_read);
-// 	for(k=0; k<DATA_LEN-1; k++)
-// 		parent->i2c_read(parent, &data[k], 0);
-// 	parent->i2c_read(parent, &data[DATA_LEN-1], 1);
-
-// 	// for(k=0; k<12; k++)
-// 	// 	printf("ctrl[%d]=0x%x\n", k, ctrl[k]);
-// 	// for(k=0; k<76; k++)
-// 	// 	printf("data[%d]=0x%x\n", k, data[k]);
-
-// 	int startcount = 0;
-// 	printf("voltage %d: %f\n", 1, ((float)(((data[startcount] << 8) + data[startcount + 1]) * 32)) / (65535));
-// 	printf("voltage %d: %f\n", 2, ((float)(((data[startcount + 2] << 8) + data[startcount + 3]) * 32)) / (65535));
-// 	printf("voltage %d: %f\n", 3, ((float)(((data[startcount + 4] << 8) + data[startcount + 5]) * 32)) / (65535));
-// 	printf("voltage %d: %f\n", 4, ((float)(((data[startcount + 6] << 8) + data[startcount + 7]) * 32)) / (65535));
-
-// 	printf("current %d: %f\n", 1, (((float)(((data[startcount + 8] << 8) + data[startcount + 9]) * 1)) / (65535)) * 100000 / pac->cur_rs);
-// 	printf("current %d: %f\n", 2, (((float)(((data[startcount + 10] << 8) + data[startcount + 11]) * 1)) / (65535)) * 100000 / pac->cur_rs);
-// 	printf("current %d: %f\n", 3, (((float)(((data[startcount + 12] << 8) + data[startcount + 13]) * 1)) / (65535)) * 100000 / pac->cur_rs);
-// 	printf("current %d: %f\n", 4, (((float)(((data[startcount + 14] << 8) + data[startcount + 15]) * 1)) / (65535)) * 100000 / pac->cur_rs);
-
-// 	return 0;
-// }
-
-// int pac1934_get_current(void* pac1934, float* current)
-// {
-// 	struct pac1934* pac = pac1934;
-// 	struct i2c_device* parent = (void*)pac->power_device.device.parent;
-// 	char addr_plus_write = (pac->addr) << 1;
-// 	char addr_plus_read = (pac->addr << 1) + 1;
-
-// 	//first refresh the powerister
-// 	parent->i2c_start(parent);
-// 	parent->i2c_write(parent, addr_plus_write);
-// 	parent->i2c_write(parent, 0x00); //refresh;
-// 	parent->i2c_stop(parent);
-// 	msleep(1);
-// 	//read the data
-// 	parent->i2c_start(parent);
-// 	parent->i2c_write(parent, addr_plus_write);
-// 	parent->i2c_write(parent, 0x0B + pac->sensor - 1); //get voltage;
-// 	parent->i2c_start(parent);
-// 	parent->i2c_write(parent, addr_plus_read);
-
-// 	unsigned char data[2];
-// 	parent->i2c_read(parent, &data[0], 0);
-// 	parent->i2c_read(parent, &data[1], 1); //last bit should be ack
-
-// 	parent->i2c_stop(parent);
-// //	printf("data in register: %02x%02x\n", data[0], data[1] );
-// 	*current = (((float)(((data[0] << 8) + data[1]) * 1)) / (65535)) * 100000 / pac->cur_rs;
-// 	*current = (*current) * 100000 / pac->cur_rs;
-// //	printf("current %f\n", *current);
-// 	return 0;
-// }
 
 ////////////////////////PCA6416A//////////////////////////////////
 

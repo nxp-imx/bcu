@@ -883,6 +883,7 @@ static void monitor(struct options_setting* setting)
 		return;
 	}
 
+	//get first channels of all groups of rails
 	int a = 0, pac_group_num = 0, last_pac_group = 0, pac_channel_num = 0;
 	struct pac193x_reg_data pac_data[MAX_NUMBER_OF_POWER];
 	char pac193x_group_path[MAX_NUMBER_OF_POWER][MAX_PATH_LENGTH];
@@ -916,6 +917,7 @@ static void monitor(struct options_setting* setting)
 #if 1
 	while (!GV_MONITOR_TERMINATED)
 	{
+		//first refresh all pac1934's
 		for(a = 0; a < pac_group_num; a++)
 		{
 			end_point = build_device_linkedlist_smart(&head, pac193x_group_path[a], head, previous_path);
@@ -951,12 +953,8 @@ static void monitor(struct options_setting* setting)
 
 			pd->power_get_data(pd, &pac_data[a]);
 		}
-		// usleep(100);
-		// for(a = 0; a < pac_channel_num; a++)
-		// {
-		// }
 
-		//first calculate the value and store them in array
+		//calculate the value and store them in array
 		int i = 0;//i is the index of all mappings
 		int j = 0;//j is the index of the power related mapping only
 		while (board->mappings[i].name != NULL)
@@ -1014,11 +1012,7 @@ static void monitor(struct options_setting* setting)
 				current = pac_data[pd->power_get_group(pd) - 1].vsense[pd->power_get_sensor(pd) - 1] / pd->power_get_res(pd);
 				cur_range[j] = 100000.0 / pd->power_get_res(pd) ;
 
-				// printf("group=%d, sensor=%d, voltage %f----------------------\n",pd->power_get_group(pd), pd->power_get_sensor(pd), voltage);
 				// printf("current %f\n", current);
-				// pd->power_get_data(pd, pac_data);
-				// msleep(1);
-				// pd->power_get_current(pd, &current);
 				double power = current * voltage;
 				vnow[j] = voltage;
 				cnow[j] = current;
