@@ -1008,7 +1008,7 @@ static void monitor(struct options_setting* setting)
 				else
 					pd->switch_sensor(pd, 0);
 
-				voltage = pac_data[pd->power_get_group(pd) - 1].vbus[pd->power_get_sensor(pd) - 1];
+				voltage = pac_data[pd->power_get_group(pd) - 1].vbus[pd->power_get_sensor(pd) - 1] - (pac_data[pd->power_get_group(pd) - 1].vsense[pd->power_get_sensor(pd) - 1] / 1000000);
 				current = pac_data[pd->power_get_group(pd) - 1].vsense[pd->power_get_sensor(pd) - 1] / pd->power_get_res(pd);
 				cur_range[j] = 100000.0 / pd->power_get_res(pd) ;
 
