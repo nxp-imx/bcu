@@ -68,6 +68,14 @@ char* g_vt_kcyn = (char*)"\x1B[36m";
 char* g_vt_white = (char*)"\x1B[97m";
 char* g_vt_magenta = (char*)"\x1B[35m";
 char* g_vt_blue = (char*)"\x1B[34m";
+#ifdef _WIN32
+char* g_vt_back_enable = (char*)"\x1B[4m";
+char* g_vt_back_default = (char*)"\x1B[24m";
+#endif
+#ifdef linux
+char* g_vt_back_enable = (char*)"\x1B[100m";
+char* g_vt_back_default = (char*)"\x1B[49m";
+#endif
 char* g_vt_default = (char*)"\x1B[0m";
 char* g_vt_clear = (char*)"\x1B[2J";
 char* g_vt_home = (char*)"\x1B[H";
@@ -81,6 +89,8 @@ void clean_vt_color()
 	g_vt_white = g_vt_red;
 	g_vt_magenta = g_vt_red;
 	g_vt_blue = g_vt_red;
+	g_vt_back_enable = g_vt_red;
+	g_vt_back_default = g_vt_red;
 	g_vt_default = g_vt_red;
 	g_vt_clear = (char*)"\n";
 	g_vt_home = (char*)"\n";
@@ -827,6 +837,7 @@ static void monitor(struct options_setting* setting)
 	double pnow[MAX_NUMBER_OF_POWER]; double pavg[MAX_NUMBER_OF_POWER]; double pmax[MAX_NUMBER_OF_POWER]; double pmin[MAX_NUMBER_OF_POWER];
 	double data_size[MAX_NUMBER_OF_POWER];
 	int sr_level[MAX_NUMBER_OF_POWER];
+	int range_level[MAX_NUMBER_OF_POWER] = {0};
 	float cur_range[MAX_NUMBER_OF_POWER];
 
 	//initialize
@@ -1010,22 +1021,59 @@ static void monitor(struct options_setting* setting)
 
 				voltage = pac_data[pd->power_get_group(pd) - 1].vbus[pd->power_get_sensor(pd) - 1] - (pac_data[pd->power_get_group(pd) - 1].vsense[pd->power_get_sensor(pd) - 1] / 1000000);
 				current = pac_data[pd->power_get_group(pd) - 1].vsense[pd->power_get_sensor(pd) - 1] / pd->power_get_res(pd);
-				cur_range[j] = 100000.0 / pd->power_get_res(pd) ;
+				if ( (!(range_level[j] & 0xf) && cavg[j] < 1 && cavg[j] > 0) || ((range_level[j] & 0xf) && cavg[j] < 1000 && cavg[j] > 0))
+				{
+					current *= 1000;
+					range_level[j] = (char)(1 | range_level[j] << 4);  //uA
+				}
+				else
+					range_level[j] = (char)(0 | range_level[j] << 4);  //mA
+
+				cur_range[j] = 100000.0 / pd->power_get_res(pd);
+				// cur_range[j] = pac_data[pd->power_get_group(pd) - 1].vsense[pd->power_get_sensor(pd) - 1];
 
 				// printf("current %f\n", current);
 				double power = current * voltage;
 				vnow[j] = voltage;
 				cnow[j] = current;
 				pnow[j] = power;
-				vmin[j] = (voltage < vmin[j]) ? voltage : vmin[j];
-				cmin[j] = (current < cmin[j]) ? current : cmin[j];
-				pmin[j] = (power < pmin[j]) ? power : pmin[j];
-				vmax[j] = (voltage > vmax[j]) ? voltage : vmax[j];
-				cmax[j] = (current > cmax[j]) ? current : cmax[j];
-				pmax[j] = (power > pmax[j]) ? power : pmax[j];
-				cavg[j] = (data_size[j] * cavg[j] + current) / (double)(data_size[j] + 1);
-				vavg[j] = (data_size[j] * vavg[j] + voltage) / (double)(data_size[j] + 1);
-				pavg[j] = (data_size[j] * pavg[j] + power) / ((double)(data_size[j] + 1));
+				if (range_level[j] == 0x0 || range_level[j] == 0x11)
+				{
+					vmin[j] = (voltage < vmin[j]) ? voltage : vmin[j];
+					cmin[j] = (current < cmin[j]) ? current : cmin[j];
+					pmin[j] = (power < pmin[j]) ? power : pmin[j];
+					vmax[j] = (voltage > vmax[j]) ? voltage : vmax[j];
+					cmax[j] = (current > cmax[j]) ? current : cmax[j];
+					pmax[j] = (power > pmax[j]) ? power : pmax[j];
+					cavg[j] = (data_size[j] * cavg[j] + current) / (double)(data_size[j] + 1);
+					vavg[j] = (data_size[j] * vavg[j] + voltage) / (double)(data_size[j] + 1);
+					pavg[j] = (data_size[j] * pavg[j] + power) / ((double)(data_size[j] + 1));
+				}
+				else if (range_level[j] == 0x01)
+				{
+					vmin[j] = (voltage < vmin[j]) ? voltage : vmin[j];
+					cmin[j] = (current < cmin[j] * 1000) ? current : cmin[j] * 1000;
+					pmin[j] = (power < pmin[j] * 1000) ? power : pmin[j] * 1000;
+					vmax[j] = (voltage > vmax[j]) ? voltage : vmax[j];
+					cmax[j] = (current > cmax[j] * 1000) ? current : cmax[j] * 1000;
+					pmax[j] = (power > pmax[j] * 1000) ? power : pmax[j] * 1000;
+					cavg[j] = (data_size[j] * cavg[j] * 1000 + current) / (double)(data_size[j] + 1);
+					vavg[j] = (data_size[j] * vavg[j] + voltage) / (double)(data_size[j] + 1);
+					pavg[j] = (data_size[j] * pavg[j] * 1000 + power) / ((double)(data_size[j] + 1));
+				} 
+				else if (range_level[j] == 0x10)
+				{
+					vmin[j] = (voltage < vmin[j]) ? voltage : vmin[j];
+					cmin[j] = (current < cmin[j] / 1000) ? current : cmin[j] / 1000;
+					pmin[j] = (power < pmin[j] / 1000) ? power : pmin[j] / 1000;
+					vmax[j] = (voltage > vmax[j]) ? voltage : vmax[j];
+					cmax[j] = (current > cmax[j] / 1000) ? current : cmax[j] / 1000;
+					pmax[j] = (power > pmax[j] / 1000) ? power : pmax[j] / 1000;
+					cavg[j] = (data_size[j] / cavg[j] / 1000 + current) / (double)(data_size[j] + 1);
+					vavg[j] = (data_size[j] / vavg[j] + voltage) / (double)(data_size[j] + 1);
+					pavg[j] = (data_size[j] / pavg[j] / 1000 + power) / ((double)(data_size[j] + 1));
+				}
+
 				data_size[j] = data_size[j] + 1;
 
 				j++;
@@ -1074,9 +1122,17 @@ static void monitor(struct options_setting* setting)
 			printf("%s", g_vt_green);
 			printf("%-25s", "|Voltage(V)");
 			printf("%s", g_vt_yellow);
-			printf("%-29s", "|Current(mA)");
+			printf("%s", "|Current(mA)/");
+			printf("%s", g_vt_back_enable);
+			printf("%s", "(uA)");
+			printf("%s", g_vt_back_default);
+			printf("%13s", " ");
 			printf("%s", g_vt_kcyn);
-			printf("%-29s", "|Power(mWatt)");
+			printf("%s", "|Power(mWatt)/");
+			printf("%s", g_vt_back_enable);
+			printf("%s", "(uWatt)");
+			printf("%s", g_vt_back_default);
+			printf("%9s", " ");
 			printf("%s", g_vt_red);
 			printf("%-6s", "|Extra");
 			printf("\n");
@@ -1085,18 +1141,26 @@ static void monitor(struct options_setting* setting)
 			printf("%s", g_vt_green);
 			printf("|%-5s %-5s %-5s %-5s", "now", "avg", "max", "min");
 			printf("%s", g_vt_yellow);
-			printf(" |%-6s %-6s %-6s %-6s", "now", "avg", "max", "min");
+			printf(" |%-6s %-6s %-7s %-6s", "now", "avg", "max", "min");
 			printf("%s", g_vt_kcyn);
-			printf(" |%-6s %-6s %-6s %-6s", "now", "avg", "max", "min");
+			printf(" |%-6s %-6s %-7s %-6s", "now", "avg", "max", "min");
 		}
 		else if (available_width - max_length > 77)
 		{
 			printf("%s", g_vt_green);
 			printf("%-11s", "|Voltage(V)");
 			printf("%s", g_vt_yellow);
-			printf("%-29s", "|Current(mA)");
+			printf("%s", "|Current(mA)/");
+			printf("%s", g_vt_back_enable);
+			printf("%s", "(uA)");
+			printf("%s", g_vt_back_default);
+			printf("%12s", " ");
 			printf("%s", g_vt_kcyn);
-			printf("%-29s", "|Power(mWatt)");
+			printf("%s", "|Power(mWatt)/");
+			printf("%s", g_vt_back_enable);
+			printf("%s", "(uWatt)");
+			printf("%s", g_vt_back_default);
+			printf("%9s", " ");
 			printf("%s", g_vt_red);
 			printf("%-6s", "|Extra");
 			printf("\n");
@@ -1117,9 +1181,15 @@ static void monitor(struct options_setting* setting)
 			printf("%s", g_vt_green);
 			printf("%-11s", "|Voltage(V)");
 			printf("%s", g_vt_yellow);
-			printf("%-15s", "|Current(mA)");
+			printf("%s", "|Current(mA)/");
+			printf("%s", g_vt_back_enable);
+			printf("%s", "(uA)");
+			printf("%s", g_vt_back_default);
 			printf("%s", g_vt_kcyn);
-			printf("%-29s", "|Power(mWatt)");
+			printf("%s", "|Power(mWatt)/");
+			printf("%s", g_vt_back_enable);
+			printf("%s", "(uWatt)");
+			printf("%s", g_vt_back_default);
 			printf("%s", g_vt_red);
 			printf("%-6s", "|Extra");
 			printf("\n");
@@ -1139,10 +1209,16 @@ static void monitor(struct options_setting* setting)
 			printf("%-11s", "|Voltage(V)");
 			printf("%s", g_vt_yellow);
 
-			printf("%-15s", "|Current(mA)");
+			printf("%s", "|Current(mA)/");
+			printf("%s", g_vt_back_enable);
+			printf("%s", "(uA)");
+			printf("%s", g_vt_back_default);
 			printf("%s", g_vt_kcyn);
 
-			printf("%-15s", "|Power(mWatt)");
+			printf("%s", "|Power(mWatt)/");
+			printf("%s", g_vt_back_enable);
+			printf("%s", "(uWatt)");
+			printf("%s", g_vt_back_default);
 			printf("%s", g_vt_red);
 			printf("%-6s", "|Extra");
 			printf("\n");
@@ -1197,12 +1273,14 @@ static void monitor(struct options_setting* setting)
 			printf("%s", g_vt_yellow);
 			printf("|");
 
+			if(range_level[k] == 0x01 || range_level[k] == 0x11)
+				printf("%s", g_vt_back_enable);
 			printf("%s", g_vt_yellow);
 			printf("%-6.1f ", cnow[k]);
 			printf("%-6.1f ", cavg[k]);
 			if (available_width - max_length > 77)
 			{
-				printf("%-6.1f ", cmax[k]);
+				printf("%-7.1f ", cmax[k]);
 				printf("%-6.1f ", cmin[k]);
 			}
 
@@ -1214,9 +1292,12 @@ static void monitor(struct options_setting* setting)
 			printf("%-6.1f ", pavg[k]);
 			if (available_width - max_length > 67)
 			{
-				printf("%-6.1f ", pmax[k]);
+				printf("%-7.1f ", pmax[k]);
 				printf("%-6.1f ", pmin[k]);
 			}
+			if(range_level[k] == 0x01 || range_level[k] == 0x11)
+				printf("%s", g_vt_back_default);
+
 			printf("%s", g_vt_red);
 			if (sr_level[k] == -1)
 			{
@@ -1315,8 +1396,8 @@ static void monitor(struct options_setting* setting)
 				}
 			}
 		}
-		if (!isalpha(ch))
-			msleep(100);
+		// if (!isalpha(ch))
+		// 	msleep(100);
 #endif
 	}
 
