@@ -111,7 +111,7 @@ int ft_open_channel(struct ftdi_info* fi, int channel)
 		printf("open channel can only range from 0 to 3");
 
 	}
-	fi->FT_set_timeouts(fi->ftdi, 10, 10);
+	fi->FT_set_timeouts(fi->ftdi, 300, 300);
 	//status = fi->FT_open_ex(0x192, FT_OPEN_BY_LOCATION, &fi->ftdi);
 	return status;
 
