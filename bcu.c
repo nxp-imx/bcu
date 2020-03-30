@@ -800,8 +800,11 @@ static void monitor(struct options_setting* setting)
 	char sr_path[MAX_PATH_LENGTH];
 
 	char sr_name[100];
-	unsigned long start, times = 1;
+	unsigned long start, avgstart, maxminstart;
 	get_msecond(&start);
+	avgstart = start;
+	maxminstart = start;
+	unsigned long times = 1;
 	FILE* fptr = NULL;
 
 	if (setting->dump == 1)
@@ -1377,6 +1380,9 @@ static void monitor(struct options_setting* setting)
 			//printf("width: %d \n",monitor_width());
 			printf("\n");
 			printf("%s", g_vt_white);
+			unsigned long now;
+			get_msecond(&now);
+			printf("Capture time:\n   Avg:%ldms\nMinMax:%ldms\n", now - avgstart, now - maxminstart);
 			printf("press the letter on keyboard to control coresponding extra sense resistor(Extra SR)\n");
 			//printf("Ctrl C to exit...\n");
 		}
@@ -1394,6 +1400,54 @@ static void monitor(struct options_setting* setting)
 			//finally,switch the SR
 			ch = catch_input_char();
 			printf("\npressed: %c\n", ch);
+			if (isxdigit(ch))
+			{
+				int hotkey_index = (int)ch - '0';
+				switch (hotkey_index)
+				{
+				case 1:
+					for (int k = 0; k < n; k++)
+					{
+						cavg[k] = 0;
+						vavg[k] = 0;
+						pavg[k] = 0;
+						data_size[k] = 0;
+					}
+					get_msecond(&avgstart);
+					break;
+				case 2:
+					for (int k = 0; k < n; k++)
+					{
+						cmin[k] = 0;
+						vmin[k] = 0;
+						pmin[k] = 0;
+						cmax[k] = 0;
+						vmax[k] = 0;
+						pmax[k] = 0;
+					}
+					get_msecond(&maxminstart);
+					break;
+				case 3:
+					for (int k = 0; k < n; k++)
+					{
+						cavg[k] = 0;
+						vavg[k] = 0;
+						pavg[k] = 0;
+						data_size[k] = 0;
+						cmin[k] = 0;
+						vmin[k] = 0;
+						pmin[k] = 0;
+						cmax[k] = 0;
+						vmax[k] = 0;
+						pmax[k] = 0;
+					}
+					get_msecond(&maxminstart);
+					avgstart = maxminstart;
+					break;
+				default:
+					break;
+				}
+			}
 			if (isalpha(ch))
 			{
 				ch = toupper(ch);
