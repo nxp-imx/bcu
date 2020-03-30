@@ -807,6 +807,11 @@ static void monitor(struct options_setting* setting)
 	if (setting->dump == 1)
 	{
 		fptr = fopen(setting->dumpname, "w+");
+		if (fptr == NULL)
+		{
+			printf("\nOpen file ERROR!\nPlease check if the \"%s\" file is still opened.\nExit...\n", setting->dumpname);
+			return;
+		}
 
 		/*print first row*/
 		int i = 0;
@@ -986,6 +991,10 @@ static void monitor(struct options_setting* setting)
 
 					if (end_point == NULL) {
 						printf("monitor:failed to build device linkedlist\n");
+						if (setting->dump == 1)
+						{
+							fclose(fptr);
+						}
 						return;
 					}
 					struct gpio_device* gd = end_point;
