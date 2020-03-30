@@ -1456,9 +1456,9 @@ static void monitor(struct options_setting* setting)
 			case 2:
 				for (int k = 0; k < n; k++)
 				{
-					cmin[k] = 0;
-					vmin[k] = 0;
-					pmin[k] = 0;
+					cmin[k] = 99999;
+					vmin[k] = 99999;
+					pmin[k] = 99999;
 					cmax[k] = 0;
 					vmax[k] = 0;
 					pmax[k] = 0;
@@ -1472,9 +1472,9 @@ static void monitor(struct options_setting* setting)
 					vavg[k] = 0;
 					pavg[k] = 0;
 					data_size[k] = 0;
-					cmin[k] = 0;
-					vmin[k] = 0;
-					pmin[k] = 0;
+					cmin[k] = 99999;
+					vmin[k] = 99999;
+					pmin[k] = 99999;
 					cmax[k] = 0;
 					vmax[k] = 0;
 					pmax[k] = 0;
