@@ -32,6 +32,7 @@
 #ifdef _WIN32
 #define _CRT_SECURE_NO_WARNINGS //in order to use strcpy without error
 #include <windows.h>
+#include <processthreadsapi.h>
 #endif
 
 #ifdef linux
@@ -111,7 +112,7 @@ static void print_help(char* cmd)
 		printf("	%s%-50s%s%s\n", g_vt_default, "init   [BOOTMODE_NAME] [-board=] [-id=]", g_vt_green, "enable the remote control with a boot mode");
 		printf("	%s%-50s%s%s\n", g_vt_default, "deinit [BOOTMODE_NAME] [-board=] [-id=]", g_vt_green, "disable the remote control");
 		printf("\n");
-		printf("	%s%-50s%s%s\n", g_vt_default, "monitor [-board=] [-id=] [-dump/-dump=]", g_vt_green, "monitor power consumption");
+		printf("	%s%-50s%s%s\n", g_vt_default, "monitor [-board=] [-id=] [-dump/-dump=] [-nodisplay]", g_vt_green, "monitor power consumption");
 		printf("\n");
 		printf("	%s%-50s%s%s\n", g_vt_default, "set_gpio [GPIO_NAME] [1/0] [-board=] [-id=]", g_vt_green, "set pin GPIO_NAME to be high(1) or low(0)");
 		printf("	%s%-50s%s%s\n", g_vt_default, "set_boot_mode [BOOTMODE_NAME] [-board=] [-id=]", g_vt_green, "set BOOTMODE_NAME as boot mode");
@@ -799,7 +800,7 @@ static void monitor(struct options_setting* setting)
 	char sr_path[MAX_PATH_LENGTH];
 
 	char sr_name[100];
-	unsigned long start;
+	unsigned long start, times = 1;
 	get_msecond(&start);
 	FILE* fptr = NULL;
 
@@ -1097,145 +1098,149 @@ static void monitor(struct options_setting* setting)
 			groups[k].avg_data_size++;
 		}
 
-		//then display
-		int available_width = monitor_width();
-		printf("%s", g_vt_green); //set the word as green
+		int max_length, location_length, available_width;
 		printf("%s", g_vt_clear);
 		printf("%s", g_vt_home); //move cursor to the 0,0
-
-		if (available_width < 60)
+		if (setting->nodisplay == 0)
 		{
-			printf("the command line window's width is too narrow\n");
-			printf("current width: %d\n", available_width);
-			printf("please set window's width to be at least 80 character wide\n");
-			msleep(1000);
-			continue;
-		}
+			//then display
+			available_width = monitor_width();
+			printf("%s", g_vt_green); //set the word as green
 
-		int max_length = (get_max_power_name_length(board) <= 25) ? get_max_power_name_length(board) : 25;
-		max_length = (max_length < 8) ? 8 : max_length; //the word "location" has a minimum of 8 letters
-		int location_length = max_length + 3;//1 for letter, 1 for space between letter and location_name, 1 for space between location and '|''
+			if (available_width < 60)
+			{
+				printf("the command line window's width is too narrow\n");
+				printf("current width: %d\n", available_width);
+				printf("please set window's width to be at least 80 character wide\n");
+				msleep(1000);
+				continue;
+			}
 
-		printfpadding(" ", location_length);
-		if (available_width - max_length > 87)
-		{
-			printf("%s", g_vt_green);
-			printf("%-25s", "|Voltage(V)");
-			printf("%s", g_vt_yellow);
-			printf("%s", "|Current(mA)/");
-			printf("%s", g_vt_back_enable);
-			printf("%s", "(uA)");
-			printf("%s", g_vt_back_default);
-			printf("%13s", " ");
-			printf("%s", g_vt_kcyn);
-			printf("%s", "|Power(mWatt)/");
-			printf("%s", g_vt_back_enable);
-			printf("%s", "(uWatt)");
-			printf("%s", g_vt_back_default);
-			printf("%9s", " ");
+			max_length = (get_max_power_name_length(board) <= 25) ? get_max_power_name_length(board) : 25;
+			max_length = (max_length < 8) ? 8 : max_length; //the word "location" has a minimum of 8 letters
+			location_length = max_length + 3;//1 for letter, 1 for space between letter and location_name, 1 for space between location and '|''
+
+			printfpadding(" ", location_length);
+			if (available_width - max_length > 87)
+			{
+				printf("%s", g_vt_green);
+				printf("%-25s", "|Voltage(V)");
+				printf("%s", g_vt_yellow);
+				printf("%s", "|Current(mA)/");
+				printf("%s", g_vt_back_enable);
+				printf("%s", "(uA)");
+				printf("%s", g_vt_back_default);
+				printf("%13s", " ");
+				printf("%s", g_vt_kcyn);
+				printf("%s", "|Power(mWatt)/");
+				printf("%s", g_vt_back_enable);
+				printf("%s", "(uWatt)");
+				printf("%s", g_vt_back_default);
+				printf("%9s", " ");
+				printf("%s", g_vt_red);
+				printf("%-6s", "|Extra");
+				printf("\n");
+				printf("%s", g_vt_white);
+				printfpadding("location", location_length);
+				printf("%s", g_vt_green);
+				printf("|%-5s %-5s %-5s %-5s", "now", "avg", "max", "min");
+				printf("%s", g_vt_yellow);
+				printf(" |%-6s %-6s %-7s %-6s", "now", "avg", "max", "min");
+				printf("%s", g_vt_kcyn);
+				printf(" |%-6s %-6s %-7s %-6s", "now", "avg", "max", "min");
+			}
+			else if (available_width - max_length > 77)
+			{
+				printf("%s", g_vt_green);
+				printf("%-11s", "|Voltage(V)");
+				printf("%s", g_vt_yellow);
+				printf("%s", "|Current(mA)/");
+				printf("%s", g_vt_back_enable);
+				printf("%s", "(uA)");
+				printf("%s", g_vt_back_default);
+				printf("%12s", " ");
+				printf("%s", g_vt_kcyn);
+				printf("%s", "|Power(mWatt)/");
+				printf("%s", g_vt_back_enable);
+				printf("%s", "(uWatt)");
+				printf("%s", g_vt_back_default);
+				printf("%9s", " ");
+				printf("%s", g_vt_red);
+				printf("%-6s", "|Extra");
+				printf("\n");
+				printf("%s", g_vt_white);
+				printfpadding("location", location_length);
+				printf("%s", g_vt_green);
+
+				printf("|%-4s %-4s", "now", "avg");
+				printf("%s", g_vt_yellow);
+
+				printf(" |%-6s %-6s %-6s %-6s", "now", "avg", "max", "min");
+				printf("%s", g_vt_kcyn);
+
+				printf(" |%-6s %-6s %-6s %-6s", "now", "avg", "max", "min");
+			}
+			else if (available_width - max_length > 67)
+			{
+				printf("%s", g_vt_green);
+				printf("%-11s", "|Voltage(V)");
+				printf("%s", g_vt_yellow);
+				printf("%s", "|Current(mA)/");
+				printf("%s", g_vt_back_enable);
+				printf("%s", "(uA)");
+				printf("%s", g_vt_back_default);
+				printf("%s", g_vt_kcyn);
+				printf("%s", "|Power(mWatt)/");
+				printf("%s", g_vt_back_enable);
+				printf("%s", "(uWatt)");
+				printf("%s", g_vt_back_default);
+				printf("%s", g_vt_red);
+				printf("%-6s", "|Extra");
+				printf("\n");
+				printf("%s", g_vt_white);
+				printfpadding("location", location_length);
+				printf("%s", g_vt_green);
+				printf("|%-4s %-4s", "now", "avg");
+				printf("%s", g_vt_yellow);
+				printf(" |%-6s %-6s", "now", "avg");
+				printf("%s", g_vt_kcyn);
+				printf(" |%-6s %-6s %-6s %-6s", "now", "avg", "max", "min");
+			}
+			else
+			{
+				printf("%s", g_vt_green);
+
+				printf("%-11s", "|Voltage(V)");
+				printf("%s", g_vt_yellow);
+
+				printf("%s", "|Current(mA)/");
+				printf("%s", g_vt_back_enable);
+				printf("%s", "(uA)");
+				printf("%s", g_vt_back_default);
+				printf("%s", g_vt_kcyn);
+
+				printf("%s", "|Power(mWatt)/");
+				printf("%s", g_vt_back_enable);
+				printf("%s", "(uWatt)");
+				printf("%s", g_vt_back_default);
+				printf("%s", g_vt_red);
+				printf("%-6s", "|Extra");
+				printf("\n");
+				printf("%s", g_vt_white);
+				printfpadding("location", location_length);
+				printf("%s", g_vt_green);
+				printf("|%-4s %-4s", "now", "avg");
+				printf("%s", g_vt_yellow);
+				printf(" |%-6s %-6s", "now", "avg");
+				printf("%s", g_vt_kcyn);
+				printf(" |%-6s %-6s", "now", "avg");
+			}
 			printf("%s", g_vt_red);
-			printf("%-6s", "|Extra");
+			printf("%-6s", " |SR - Range(mA)");
 			printf("\n");
 			printf("%s", g_vt_white);
-			printfpadding("location", location_length);
-			printf("%s", g_vt_green);
-			printf("|%-5s %-5s %-5s %-5s", "now", "avg", "max", "min");
-			printf("%s", g_vt_yellow);
-			printf(" |%-6s %-6s %-7s %-6s", "now", "avg", "max", "min");
-			printf("%s", g_vt_kcyn);
-			printf(" |%-6s %-6s %-7s %-6s", "now", "avg", "max", "min");
+			printfpadding("-----------------------------------------------------------------------------------------------------------------------------------------------", available_width);
 		}
-		else if (available_width - max_length > 77)
-		{
-			printf("%s", g_vt_green);
-			printf("%-11s", "|Voltage(V)");
-			printf("%s", g_vt_yellow);
-			printf("%s", "|Current(mA)/");
-			printf("%s", g_vt_back_enable);
-			printf("%s", "(uA)");
-			printf("%s", g_vt_back_default);
-			printf("%12s", " ");
-			printf("%s", g_vt_kcyn);
-			printf("%s", "|Power(mWatt)/");
-			printf("%s", g_vt_back_enable);
-			printf("%s", "(uWatt)");
-			printf("%s", g_vt_back_default);
-			printf("%9s", " ");
-			printf("%s", g_vt_red);
-			printf("%-6s", "|Extra");
-			printf("\n");
-			printf("%s", g_vt_white);
-			printfpadding("location", location_length);
-			printf("%s", g_vt_green);
-
-			printf("|%-4s %-4s", "now", "avg");
-			printf("%s", g_vt_yellow);
-
-			printf(" |%-6s %-6s %-6s %-6s", "now", "avg", "max", "min");
-			printf("%s", g_vt_kcyn);
-
-			printf(" |%-6s %-6s %-6s %-6s", "now", "avg", "max", "min");
-		}
-		else if (available_width - max_length > 67)
-		{
-			printf("%s", g_vt_green);
-			printf("%-11s", "|Voltage(V)");
-			printf("%s", g_vt_yellow);
-			printf("%s", "|Current(mA)/");
-			printf("%s", g_vt_back_enable);
-			printf("%s", "(uA)");
-			printf("%s", g_vt_back_default);
-			printf("%s", g_vt_kcyn);
-			printf("%s", "|Power(mWatt)/");
-			printf("%s", g_vt_back_enable);
-			printf("%s", "(uWatt)");
-			printf("%s", g_vt_back_default);
-			printf("%s", g_vt_red);
-			printf("%-6s", "|Extra");
-			printf("\n");
-			printf("%s", g_vt_white);
-			printfpadding("location", location_length);
-			printf("%s", g_vt_green);
-			printf("|%-4s %-4s", "now", "avg");
-			printf("%s", g_vt_yellow);
-			printf(" |%-6s %-6s", "now", "avg");
-			printf("%s", g_vt_kcyn);
-			printf(" |%-6s %-6s %-6s %-6s", "now", "avg", "max", "min");
-		}
-		else
-		{
-			printf("%s", g_vt_green);
-
-			printf("%-11s", "|Voltage(V)");
-			printf("%s", g_vt_yellow);
-
-			printf("%s", "|Current(mA)/");
-			printf("%s", g_vt_back_enable);
-			printf("%s", "(uA)");
-			printf("%s", g_vt_back_default);
-			printf("%s", g_vt_kcyn);
-
-			printf("%s", "|Power(mWatt)/");
-			printf("%s", g_vt_back_enable);
-			printf("%s", "(uWatt)");
-			printf("%s", g_vt_back_default);
-			printf("%s", g_vt_red);
-			printf("%-6s", "|Extra");
-			printf("\n");
-			printf("%s", g_vt_white);
-			printfpadding("location", location_length);
-			printf("%s", g_vt_green);
-			printf("|%-4s %-4s", "now", "avg");
-			printf("%s", g_vt_yellow);
-			printf(" |%-6s %-6s", "now", "avg");
-			printf("%s", g_vt_kcyn);
-			printf(" |%-6s %-6s", "now", "avg");
-		}
-		printf("%s", g_vt_red);
-		printf("%-6s", " |SR - Range(mA)");
-		printf("\n");
-		printf("%s", g_vt_white);
-		printfpadding("-----------------------------------------------------------------------------------------------------------------------------------------------", available_width);
 
 		for (int k = 0; k < n; k++)
 		{
@@ -1247,152 +1252,169 @@ static void monitor(struct options_setting* setting)
 						get_msecond(&now);
 						fprintf(fptr, "%ld,", (long)now - start);//add time before the first element
 					}
-					fprintf(fptr, "%f,%f,", vnow[k], cnow[k]);
+					fprintf(fptr, "%lf,%lf,", vnow[k], cnow[k]);
 				}
 				else
-					fprintf(fptr, "%f,%f\n", vnow[k], cnow[k]);
+					fprintf(fptr, "%lf,%lf\n", vnow[k], cnow[k]);
 			}
 
-			//printf("%-10s|",board->mappings[name[k]].name);
-			printf("%s", g_vt_white);
-			printf("%c ", 65 + k);//print corresponding letters, start with A
-			printfpadding(board->mappings[name[k]].name, max_length);
-
-			printf("%s", g_vt_green);
-			printf(" |");
-
-			printf("%s", g_vt_green);
-			printf("%-5.2f ", vnow[k]);
-			printf("%-5.2f ", vavg[k]);
-			if (available_width - max_length > 87)
+			if (setting->nodisplay == 0)
 			{
-				printf("%-5.2f ", vmax[k]);
-				printf("%-5.2f ", vmin[k]);
-			}
+				//printf("%-10s|",board->mappings[name[k]].name);
+				printf("%s", g_vt_white);
+				printf("%c ", 65 + k);//print corresponding letters, start with A
+				printfpadding(board->mappings[name[k]].name, max_length);
 
-			printf("%s", g_vt_yellow);
-			printf("|");
+				printf("%s", g_vt_green);
+				printf(" |");
 
-			if(range_level[k] == 0x01 || range_level[k] == 0x11)
-				printf("%s", g_vt_back_enable);
-			printf("%s", g_vt_yellow);
-			printf("%-6.1f ", cnow[k]);
-			printf("%-6.1f ", cavg[k]);
-			if (available_width - max_length > 77)
-			{
-				printf("%-7.1f ", cmax[k]);
-				printf("%-6.1f ", cmin[k]);
-			}
-
-			printf("%s", g_vt_kcyn);
-			printf("|");
-
-			printf("%s", g_vt_kcyn);
-			printf("%-6.1f ", pnow[k]);
-			printf("%-6.1f ", pavg[k]);
-			if (available_width - max_length > 67)
-			{
-				printf("%-7.1f ", pmax[k]);
-				printf("%-6.1f ", pmin[k]);
-			}
-			if(range_level[k] == 0x01 || range_level[k] == 0x11)
-				printf("%s", g_vt_back_default);
-
-			printf("%s", g_vt_red);
-			if (sr_level[k] == -1)
-			{
-				printf("|N/A - %-5.1f", cur_range[k]);
-			}
-			else
-			{
-				printf("|%3d - %-5.1f", sr_level[k], cur_range[k]);
-			}
-
-			printf("\n");
-		}
-
-		//then display group
-		int max_group_length = 15;
-		if (num_of_groups > 0)
-		{
-			//display groups
-			printf("%s", g_vt_white);
-			printf("\n\n");
-			printfpadding("-----------------------------------------------------------------------------------------------------------------------------------------------", available_width);
-			printfpadding(" ", max_group_length + 1);
-			printf("%s", g_vt_blue);
-			printf("|Power(mWatt)");
-			printf("\n");
-			printf("%s", g_vt_white);
-			printfpadding("group", max_group_length);
-			printf("%s", g_vt_blue);
-			printf(" |%-6s %-6s %-6s %-6s", "now", "avg", "max", "min");
-			printf("%s", g_vt_white);
-			printf("  group members\n");
-			printf("%s", g_vt_white);
-			printfpadding("-----------------------------------------------------------------------------------------------------------------------------------------------", available_width);
-		}
-		for (int k = 0; k < num_of_groups; k++)
-		{
-			printfpadding(groups[k].name, max_group_length);
-			printf("%s", g_vt_blue);
-			printf(" |");
-			printf("%-6.1f ", groups[k].sum);
-			printf("%-6.1f ", groups[k].avg);
-			printf("%-6.1f ", groups[k].max);
-			printf("%-6.1f", groups[k].min);
-			printf("%s", g_vt_white);
-			//printf(" |");
-			printf("  ");
-			if (strlen(groups[k].member_list) < (size_t)(monitor_width() - max_group_length - 30))
-				printf("%s\n", groups[k].member_list);
-			else
-			{
-				printfpadding(groups[k].member_list, monitor_width() - max_group_length - 30 - 4);
-				printf("...\n");
-			}
-		}
-
-		//printf("width: %d \n",monitor_width());
-		printf("\n");
-		printf("%s", g_vt_white);
-		printf("press the letter on keyboard to control coresponding extra sense resistor(Extra SR)\n");
-		printf("Ctrl C to exit...\n");
-
-		//finally,switch the SR
-		ch = catch_input_char();
-		printf("\npressed: %c\n",ch);
-		if (isalpha(ch))
-		{
-			ch = toupper(ch);
-			int sr_index = (int)ch - 'A';//is the ascii code for letter a
-			if (sr_index < n && sr_index < MAX_NUMBER_OF_POWER && sr_index >= 0)
-			{
-				strcpy(sr_name, "SR_");
-				if (board->mappings[name[sr_index]].name == NULL)
-					return;
-				strcat(sr_name, board->mappings[name[sr_index]].name);
-
-				if (get_path(sr_path, sr_name, board) != -1)
+				printf("%s", g_vt_green);
+				printf("%-5.2f ", vnow[k]);
+				printf("%-5.2f ", vavg[k]);
+				if (available_width - max_length > 87)
 				{
-					end_point = build_device_linkedlist_smart(&head, sr_path, head, previous_path);
-					strcpy(previous_path, sr_path);
-					if (end_point == NULL) {
-						printf("monitor:failed to build device linkedlist\n");
+					printf("%-5.2f ", vmax[k]);
+					printf("%-5.2f ", vmin[k]);
+				}
+
+				printf("%s", g_vt_yellow);
+				printf("|");
+
+				if(range_level[k] == 0x01 || range_level[k] == 0x11)
+					printf("%s", g_vt_back_enable);
+				printf("%s", g_vt_yellow);
+				printf("%-6.1f ", cnow[k]);
+				printf("%-6.1f ", cavg[k]);
+				if (available_width - max_length > 77)
+				{
+					printf("%-7.1f ", cmax[k]);
+					printf("%-6.1f ", cmin[k]);
+				}
+
+				printf("%s", g_vt_kcyn);
+				printf("|");
+
+				printf("%s", g_vt_kcyn);
+				printf("%-6.1f ", pnow[k]);
+				printf("%-6.1f ", pavg[k]);
+				if (available_width - max_length > 67)
+				{
+					printf("%-7.1f ", pmax[k]);
+					printf("%-6.1f ", pmin[k]);
+				}
+				if(range_level[k] == 0x01 || range_level[k] == 0x11)
+					printf("%s", g_vt_back_default);
+
+				printf("%s", g_vt_red);
+				if (sr_level[k] == -1)
+				{
+					printf("|N/A - %-5.1f", cur_range[k]);
+				}
+				else
+				{
+					printf("|%3d - %-5.1f", sr_level[k], cur_range[k]);
+				}
+
+				printf("\n");
+			}
+		}
+
+		if (setting->nodisplay == 0)
+		{
+			//then display group
+			int max_group_length = 15;
+			if (num_of_groups > 0)
+			{
+				//display groups
+				printf("%s", g_vt_white);
+				printf("\n\n");
+				printfpadding("-----------------------------------------------------------------------------------------------------------------------------------------------", available_width);
+				printfpadding(" ", max_group_length + 1);
+				printf("%s", g_vt_blue);
+				printf("|Power(mWatt)");
+				printf("\n");
+				printf("%s", g_vt_white);
+				printfpadding("group", max_group_length);
+				printf("%s", g_vt_blue);
+				printf(" |%-6s %-6s %-6s %-6s", "now", "avg", "max", "min");
+				printf("%s", g_vt_white);
+				printf("  group members\n");
+				printf("%s", g_vt_white);
+				printfpadding("-----------------------------------------------------------------------------------------------------------------------------------------------", available_width);
+			}
+			for (int k = 0; k < num_of_groups; k++)
+			{
+				printfpadding(groups[k].name, max_group_length);
+				printf("%s", g_vt_blue);
+				printf(" |");
+				printf("%-6.1f ", groups[k].sum);
+				printf("%-6.1f ", groups[k].avg);
+				printf("%-6.1f ", groups[k].max);
+				printf("%-6.1f", groups[k].min);
+				printf("%s", g_vt_white);
+				//printf(" |");
+				printf("  ");
+				if (strlen(groups[k].member_list) < (size_t)(monitor_width() - max_group_length - 30))
+					printf("%s\n", groups[k].member_list);
+				else
+				{
+					printfpadding(groups[k].member_list, monitor_width() - max_group_length - 30 - 4);
+					printf("...\n");
+				}
+			}
+
+			//printf("width: %d \n",monitor_width());
+			printf("\n");
+			printf("%s", g_vt_white);
+			printf("press the letter on keyboard to control coresponding extra sense resistor(Extra SR)\n");
+			//printf("Ctrl C to exit...\n");
+		}
+
+		if (setting->dump == 1)
+		{
+			unsigned long now;
+			get_msecond(&now);
+			printf("\nDump data to \"%s\" for %ldms, %ld times\n", setting->dumpname, now - start, times++);
+			printf("Ctrl C to exit...\n");
+		}
+		
+		if (setting->nodisplay == 0)
+		{
+			//finally,switch the SR
+			ch = catch_input_char();
+			printf("\npressed: %c\n", ch);
+			if (isalpha(ch))
+			{
+				ch = toupper(ch);
+				int sr_index = (int)ch - 'A';//is the ascii code for letter a
+				if (sr_index < n && sr_index < MAX_NUMBER_OF_POWER && sr_index >= 0)
+				{
+					strcpy(sr_name, "SR_");
+					if (board->mappings[name[sr_index]].name == NULL)
 						return;
+					strcat(sr_name, board->mappings[name[sr_index]].name);
+
+					if (get_path(sr_path, sr_name, board) != -1)
+					{
+						end_point = build_device_linkedlist_smart(&head, sr_path, head, previous_path);
+						strcpy(previous_path, sr_path);
+						if (end_point == NULL) {
+							printf("monitor:failed to build device linkedlist\n");
+							return;
+						}
+						struct gpio_device* gd = end_point;
+						unsigned char data;
+						gd->gpio_get_output(gd, &data);
+						if (data == 0)
+							gd->gpio_write(gd, 0xFF);
+						else
+							gd->gpio_write(gd, 0x00);
+
+						data = ~data;
+
+						sr_level[sr_index] = data == 0 ? 0 : 1;
+
 					}
-					struct gpio_device* gd = end_point;
-					unsigned char data;
-					gd->gpio_get_output(gd, &data);
-					if (data == 0)
-						gd->gpio_write(gd, 0xFF);
-					else
-						gd->gpio_write(gd, 0x00);
-
-					data =~data;
-
-					sr_level[sr_index] = data ==0? 0: 1;
-
 				}
 			}
 		}
@@ -1450,6 +1472,9 @@ static int enable_vt_mode()
 
 int main(int argc, char** argv)
 {
+#ifdef _WIN32
+	SetThreadPriority(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
+#endif
 	print_version();
 
 	if (enable_vt_mode())

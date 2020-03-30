@@ -47,6 +47,7 @@ struct options_setting {
 	int location_id;
 	int dump;
 	char dumpname[50];
+	int nodisplay;
 	char groups[MAX_NUMBER_OF_POWER * MAX_MAPPING_NAME_LENGTH];
 };
 

@@ -319,6 +319,13 @@ int parse_options(int argc, char** argv, struct options_setting* setting)
 			strcpy(setting->dumpname, "monitor_record.csv");
 			printf("dump data into %s file\n", setting->dumpname);
 		}
+		else if (strcmp(argv[i], "-nodisplay") == 0)
+		{
+			setting->nodisplay = 1;
+			setting->dump = 1;
+			strcpy(setting->dumpname, "monitor_record.csv");
+			printf("dump data into %s file\n", setting->dumpname);
+		}
 		else if (strncmp(argv[i], "-board=", 7) == 0 && strlen(argv[i]) > 7)
 		{
 			//do nothing
