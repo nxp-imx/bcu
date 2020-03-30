@@ -47,6 +47,7 @@
 #include <time.h>
 #include <signal.h>
 #include <ctype.h>
+#include <math.h>
 
 #include "port.h"
 #include "parser.h"
@@ -112,7 +113,8 @@ static void print_help(char* cmd)
 		printf("	%s%-50s%s%s\n", g_vt_default, "init   [BOOTMODE_NAME] [-board=] [-id=]", g_vt_green, "enable the remote control with a boot mode");
 		printf("	%s%-50s%s%s\n", g_vt_default, "deinit [BOOTMODE_NAME] [-board=] [-id=]", g_vt_green, "disable the remote control");
 		printf("\n");
-		printf("	%s%-50s%s%s\n", g_vt_default, "monitor [-board=] [-id=] [-dump/-dump=] [-nodisplay]", g_vt_green, "monitor power consumption");
+		printf("	%s%-50s%s%s\n", g_vt_default, "monitor [-board=] [-id=] [-dump/-dump=]", g_vt_green, "monitor power consumption");
+		printf("	%s%-50s%s%s\n", g_vt_default, "        [-nodisplay] [-hz=]", g_vt_green, "");
 		printf("\n");
 		printf("	%s%-50s%s%s\n", g_vt_default, "set_gpio [GPIO_NAME] [1/0] [-board=] [-id=]", g_vt_green, "set pin GPIO_NAME to be high(1) or low(0)");
 		printf("	%s%-50s%s%s\n", g_vt_default, "set_boot_mode [BOOTMODE_NAME] [-board=] [-id=]", g_vt_green, "set BOOTMODE_NAME as boot mode");
@@ -936,8 +938,21 @@ static void monitor(struct options_setting* setting)
 		a++;
 	}
 #if 1
+	unsigned long last_display = 0, now_display;
 	while (!GV_MONITOR_TERMINATED)
 	{
+		get_msecond(&now_display);
+		int candisplay = 0, interval;
+		interval = now_display - last_display;
+		if (interval > setting->refreshms || last_display == 0)
+		{
+			candisplay = 1;
+			last_display = now_display;
+		}
+		else
+		{
+			candisplay = 0;
+		}
 		//first refresh all pac1934's
 		for(a = 0; a < pac_group_num; a++)
 		{
@@ -1112,12 +1127,35 @@ static void monitor(struct options_setting* setting)
 			groups[k].avg_data_size++;
 		}
 
-		int max_length, location_length, available_width;
-		printf("%s", g_vt_clear);
-		printf("%s", g_vt_home); //move cursor to the 0,0
-		if (setting->nodisplay == 0)
+		//dump data to file
+		for (int k = 0; k < n; k++)
 		{
-			//then display
+			if (setting->dump == 1)
+			{
+				if ((k + 1) < n) {
+					if (k == 0) {
+						unsigned long now;
+						get_msecond(&now);
+						fprintf(fptr, "%ld,", (long)now - start);//add time before the first element
+					}
+					fprintf(fptr, "%lf,%lf,", vnow[k], cnow_fwrite[k]);
+				}
+				else
+					fprintf(fptr, "%lf,%lf\n", vnow[k], cnow_fwrite[k]);
+			}
+		}
+		if (setting->dump == 1)
+			times++;
+
+		//then display
+		int max_length, location_length, available_width;
+		if (candisplay == 1 || (setting->dump == 1 && setting->nodisplay == 1))
+		{
+			printf("%s", g_vt_clear);
+			printf("%s", g_vt_home); //move cursor to the 0,0
+		}
+		if (setting->nodisplay == 0 && candisplay == 1)
+		{
 			available_width = monitor_width();
 			printf("%s", g_vt_green); //set the word as green
 
@@ -1254,25 +1292,8 @@ static void monitor(struct options_setting* setting)
 			printf("\n");
 			printf("%s", g_vt_white);
 			printfpadding("-----------------------------------------------------------------------------------------------------------------------------------------------", available_width);
-		}
 
-		for (int k = 0; k < n; k++)
-		{
-			if (setting->dump == 1)
-			{
-				if ((k + 1) < n) {
-					if (k == 0) {
-						unsigned long now;
-						get_msecond(&now);
-						fprintf(fptr, "%ld,", (long)now - start);//add time before the first element
-					}
-					fprintf(fptr, "%lf,%lf,", vnow[k], cnow_fwrite[k]);
-				}
-				else
-					fprintf(fptr, "%lf,%lf\n", vnow[k], cnow_fwrite[k]);
-			}
-
-			if (setting->nodisplay == 0)
+			for (int k = 0; k < n; k++)
 			{
 				//printf("%-10s|",board->mappings[name[k]].name);
 				printf("%s", g_vt_white);
@@ -1331,10 +1352,7 @@ static void monitor(struct options_setting* setting)
 
 				printf("\n");
 			}
-		}
 
-		if (setting->nodisplay == 0)
-		{
 			//then display group
 			int max_group_length = 15;
 			if (num_of_groups > 0)
@@ -1382,104 +1400,108 @@ static void monitor(struct options_setting* setting)
 			printf("%s", g_vt_white);
 			unsigned long now;
 			get_msecond(&now);
-			printf("Capture time:\n   Avg:%ldms\nMinMax:%ldms\n", now - avgstart, now - maxminstart);
-			printf("press the letter on keyboard to control coresponding extra sense resistor(Extra SR)\n");
-			//printf("Ctrl C to exit...\n");
+			printf("Capture time:\n   Avg:%ldms\nMinMax:%ldms\n\n", now - avgstart, now - maxminstart);
+			if(last_display != 0)
+				printf("Real display Hz: %d\n\n", (int)ceil(1000.0 / interval));
+			//printf("press the letter on keyboard to control coresponding extra sense resistor(Extra SR)\n");
+			if (!((candisplay == 1 || setting->nodisplay == 1) && setting->dump == 1))
+				printf("Ctrl C to exit...\n\n");
 		}
 
-		if (setting->dump == 1)
+		if ((candisplay == 1 || setting->nodisplay == 1) && setting->dump == 1)
 		{
 			unsigned long now;
 			get_msecond(&now);
-			printf("\nDump data to \"%s\" for %ldms, %ld times\n", setting->dumpname, now - start, times++);
-			printf("Ctrl C to exit...\n");
+			printf("Dump data to \"%s\" for %ldms, %ld times\n", setting->dumpname, now - start, times);
+			printf("Ctrl C to exit...\n\n");
 		}
 		
-		if (setting->nodisplay == 0)
+		//finally,switch the SR
+		ch = catch_input_char();
+		if (setting->nodisplay == 0 && candisplay == 1)
 		{
-			//finally,switch the SR
-			ch = catch_input_char();
-			printf("\npressed: %c\n", ch);
-			if (isxdigit(ch))
+			printf("press the letter on keyboard to control coresponding extra sense resistor(Extra SR)\n");
+			printf("pressed: %c\n", ch);
+		}
+		if (isxdigit(ch))
+		{
+			int hotkey_index = (int)ch - '0';
+			switch (hotkey_index)
 			{
-				int hotkey_index = (int)ch - '0';
-				switch (hotkey_index)
+			case 1:
+				for (int k = 0; k < n; k++)
 				{
-				case 1:
-					for (int k = 0; k < n; k++)
-					{
-						cavg[k] = 0;
-						vavg[k] = 0;
-						pavg[k] = 0;
-						data_size[k] = 0;
-					}
-					get_msecond(&avgstart);
-					break;
-				case 2:
-					for (int k = 0; k < n; k++)
-					{
-						cmin[k] = 0;
-						vmin[k] = 0;
-						pmin[k] = 0;
-						cmax[k] = 0;
-						vmax[k] = 0;
-						pmax[k] = 0;
-					}
-					get_msecond(&maxminstart);
-					break;
-				case 3:
-					for (int k = 0; k < n; k++)
-					{
-						cavg[k] = 0;
-						vavg[k] = 0;
-						pavg[k] = 0;
-						data_size[k] = 0;
-						cmin[k] = 0;
-						vmin[k] = 0;
-						pmin[k] = 0;
-						cmax[k] = 0;
-						vmax[k] = 0;
-						pmax[k] = 0;
-					}
-					get_msecond(&maxminstart);
-					avgstart = maxminstart;
-					break;
-				default:
-					break;
+					cavg[k] = 0;
+					vavg[k] = 0;
+					pavg[k] = 0;
+					data_size[k] = 0;
 				}
-			}
-			if (isalpha(ch))
-			{
-				ch = toupper(ch);
-				int sr_index = (int)ch - 'A';//is the ascii code for letter a
-				if (sr_index < n && sr_index < MAX_NUMBER_OF_POWER && sr_index >= 0)
+				get_msecond(&avgstart);
+				break;
+			case 2:
+				for (int k = 0; k < n; k++)
 				{
-					strcpy(sr_name, "SR_");
-					if (board->mappings[name[sr_index]].name == NULL)
+					cmin[k] = 0;
+					vmin[k] = 0;
+					pmin[k] = 0;
+					cmax[k] = 0;
+					vmax[k] = 0;
+					pmax[k] = 0;
+				}
+				get_msecond(&maxminstart);
+				break;
+			case 3:
+				for (int k = 0; k < n; k++)
+				{
+					cavg[k] = 0;
+					vavg[k] = 0;
+					pavg[k] = 0;
+					data_size[k] = 0;
+					cmin[k] = 0;
+					vmin[k] = 0;
+					pmin[k] = 0;
+					cmax[k] = 0;
+					vmax[k] = 0;
+					pmax[k] = 0;
+				}
+				get_msecond(&maxminstart);
+				avgstart = maxminstart;
+				break;
+			default:
+				break;
+			}
+		}
+		if (isalpha(ch))
+		{
+			ch = toupper(ch);
+			int sr_index = (int)ch - 'A';//is the ascii code for letter a
+			if (sr_index < n && sr_index < MAX_NUMBER_OF_POWER && sr_index >= 0)
+			{
+				strcpy(sr_name, "SR_");
+				if (board->mappings[name[sr_index]].name == NULL)
+					return;
+				strcat(sr_name, board->mappings[name[sr_index]].name);
+
+				if (get_path(sr_path, sr_name, board) != -1)
+				{
+					end_point = build_device_linkedlist_smart(&head, sr_path, head, previous_path);
+					strcpy(previous_path, sr_path);
+					if (end_point == NULL) {
+						printf("monitor:failed to build device linkedlist\n");
 						return;
-					strcat(sr_name, board->mappings[name[sr_index]].name);
-
-					if (get_path(sr_path, sr_name, board) != -1)
-					{
-						end_point = build_device_linkedlist_smart(&head, sr_path, head, previous_path);
-						strcpy(previous_path, sr_path);
-						if (end_point == NULL) {
-							printf("monitor:failed to build device linkedlist\n");
-							return;
-						}
-						struct gpio_device* gd = end_point;
-						unsigned char data;
-						gd->gpio_get_output(gd, &data);
-						if (data == 0)
-							gd->gpio_write(gd, 0xFF);
-						else
-							gd->gpio_write(gd, 0x00);
-
-						data = ~data;
-
-						sr_level[sr_index] = data == 0 ? 0 : 1;
-
 					}
+					struct gpio_device* gd = end_point;
+					unsigned char data;
+					gd->gpio_get_output(gd, &data);
+					if (data == 0)
+						gd->gpio_write(gd, 0xFF);
+					else
+						gd->gpio_write(gd, 0x00);
+
+					data = ~data;
+
+					sr_level[sr_index] = data == 0 ? 0 : 1;
+
 				}
 			}
 		}

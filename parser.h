@@ -48,6 +48,7 @@ struct options_setting {
 	int dump;
 	char dumpname[50];
 	int nodisplay;
+	int refreshms;
 	char groups[MAX_NUMBER_OF_POWER * MAX_MAPPING_NAME_LENGTH];
 };
 

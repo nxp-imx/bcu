@@ -326,6 +326,11 @@ int parse_options(int argc, char** argv, struct options_setting* setting)
 			strcpy(setting->dumpname, "monitor_record.csv");
 			printf("dump data into %s file\n", setting->dumpname);
 		}
+		else if (strncmp(argv[i], "-hz=", 4) == 0 && strlen(argv[i]) > 4)
+		{
+			int hz = atoi(input);
+			setting->refreshms = 1000 / hz;
+		}
 		else if (strncmp(argv[i], "-board=", 7) == 0 && strlen(argv[i]) > 7)
 		{
 			//do nothing

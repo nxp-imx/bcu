@@ -12,7 +12,7 @@ include_directories(${PROJECT_SOURCE_DIR})
 add_executable(bcu bcu.c port.c chip.c board.c parser.c)
 #this link directories is not really needed
 link_directories(${LIBUSB_LIBRARY_DIRS} ${LIBFTDI_LIBRARY_DIRS} )
-target_link_libraries (bcu ${LIBUSB_LIBRARIES} ${LIBFTDI_LIBRARIES} )
+target_link_libraries (bcu ${LIBUSB_LIBRARIES} ${LIBFTDI_LIBRARIES} -lm)
 #below is for version number generation
 #execute_process(
 #  COMMAND git describe --tags --long
