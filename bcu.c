@@ -1400,7 +1400,19 @@ static void monitor(struct options_setting* setting)
 			printf("%s", g_vt_white);
 			unsigned long now;
 			get_msecond(&now);
-			printf("Capture time:\n   Avg:%ldms\nMinMax:%ldms\n\n", now - avgstart, now - maxminstart);
+			int cap_interval;
+			printf("Capture time:\n");
+			cap_interval = now - avgstart;
+			if (cap_interval > 10000)
+				printf("   Avg:%.3fs\n", cap_interval / 1000.0);
+			else
+				printf("   Avg:%dms\n", cap_interval);
+			cap_interval = now - maxminstart;
+			if (cap_interval > 10000)
+				printf("MinMax:%.3fs\n\n", cap_interval / 1000.0);
+			else
+				printf("MinMax:%dms\n\n", cap_interval);
+
 			if(last_display != 0)
 				printf("Real display Hz: %d\n\n", (int)ceil(1000.0 / interval));
 			//printf("press the letter on keyboard to control coresponding extra sense resistor(Extra SR)\n");
@@ -1412,7 +1424,7 @@ static void monitor(struct options_setting* setting)
 		{
 			unsigned long now;
 			get_msecond(&now);
-			printf("Dump data to \"%s\" for %ldms, %ld times\n", setting->dumpname, now - start, times);
+			printf("Dump data to \"%s\" for %ldms, %ld times, %ld times/sec\n", setting->dumpname, now - start, times, 1000 / ((now - start) / times));
 			printf("Ctrl C to exit...\n\n");
 		}
 		
@@ -1420,6 +1432,9 @@ static void monitor(struct options_setting* setting)
 		ch = catch_input_char();
 		if (setting->nodisplay == 0 && candisplay == 1)
 		{
+			printf("press 1 on keyboard to reset Avg\n");
+			printf("press 2 on keyboard to reset MaxMin\n");
+			printf("press 3 on keyboard to reset Avg and MaxMin\n");
 			printf("press the letter on keyboard to control coresponding extra sense resistor(Extra SR)\n");
 			printf("pressed: %c\n", ch);
 		}
