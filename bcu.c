@@ -1084,9 +1084,9 @@ static void monitor(struct options_setting* setting)
 					vmax[j] = (voltage > vmax[j]) ? voltage : vmax[j];
 					cmax[j] = (current > cmax[j] / 1000) ? current : cmax[j] / 1000;
 					pmax[j] = (power > pmax[j] / 1000) ? power : pmax[j] / 1000;
-					cavg[j] = (data_size[j] / cavg[j] / 1000 + current) / (double)(data_size[j] + 1);
-					vavg[j] = (data_size[j] / vavg[j] + voltage) / (double)(data_size[j] + 1);
-					pavg[j] = (data_size[j] / pavg[j] / 1000 + power) / ((double)(data_size[j] + 1));
+					cavg[j] = (data_size[j] * cavg[j] / 1000 + current) / (double)(data_size[j] + 1);
+					vavg[j] = (data_size[j] * vavg[j] + voltage) / (double)(data_size[j] + 1);
+					pavg[j] = (data_size[j] * pavg[j] / 1000 + power) / ((double)(data_size[j] + 1));
 				}
 
 				data_size[j] = data_size[j] + 1;
