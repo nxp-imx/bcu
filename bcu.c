@@ -842,6 +842,7 @@ static void monitor(struct options_setting* setting)
 	double cnow[MAX_NUMBER_OF_POWER]; double cavg[MAX_NUMBER_OF_POWER]; double cmax[MAX_NUMBER_OF_POWER]; double cmin[MAX_NUMBER_OF_POWER];
 	double pnow[MAX_NUMBER_OF_POWER]; double pavg[MAX_NUMBER_OF_POWER]; double pmax[MAX_NUMBER_OF_POWER]; double pmin[MAX_NUMBER_OF_POWER];
 	double data_size[MAX_NUMBER_OF_POWER];
+	double cnow_fwrite[MAX_NUMBER_OF_POWER];
 	int sr_level[MAX_NUMBER_OF_POWER];
 	int range_level[MAX_NUMBER_OF_POWER] = {0};
 	float cur_range[MAX_NUMBER_OF_POWER];
@@ -1031,6 +1032,7 @@ static void monitor(struct options_setting* setting)
 
 				voltage = pac_data[pd->power_get_group(pd) - 1].vbus[pd->power_get_sensor(pd) - 1] - (pac_data[pd->power_get_group(pd) - 1].vsense[pd->power_get_sensor(pd) - 1] / 1000000);
 				current = pac_data[pd->power_get_group(pd) - 1].vsense[pd->power_get_sensor(pd) - 1] / pd->power_get_res(pd);
+				cnow_fwrite[j] = current;
 				if ( (!(range_level[j] & 0xf) && cavg[j] < 1 && cavg[j] > 0) || ((range_level[j] & 0xf) && cavg[j] < 1000 && cavg[j] > 0))
 				{
 					current *= 1000;
@@ -1261,10 +1263,10 @@ static void monitor(struct options_setting* setting)
 						get_msecond(&now);
 						fprintf(fptr, "%ld,", (long)now - start);//add time before the first element
 					}
-					fprintf(fptr, "%lf,%lf,", vnow[k], cnow[k]);
+					fprintf(fptr, "%lf,%lf,", vnow[k], cnow_fwrite[k]);
 				}
 				else
-					fprintf(fptr, "%lf,%lf\n", vnow[k], cnow[k]);
+					fprintf(fptr, "%lf,%lf\n", vnow[k], cnow_fwrite[k]);
 			}
 
 			if (setting->nodisplay == 0)
