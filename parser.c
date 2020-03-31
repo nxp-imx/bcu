@@ -218,6 +218,9 @@ void set_options_default(struct options_setting* setting)
 	setting->boot_mode_hex = -1;
 	setting->gpio_name[0] = '\0';
 	setting->dump = 0;
+	setting->nodisplay = 0;
+	setting->dumpname[0] = '\0';
+	setting->refreshms = 0;
 }
 
 
@@ -227,20 +230,6 @@ void set_options_default(struct options_setting* setting)
 extern char GV_LOCATION_ID[];
 int parse_options(int argc, char** argv, struct options_setting* setting)
 {
-	//find if the board model is specified first,
-	//this way, board dependent setting such as choosing board-specific gpio pin are done correctly	
-	for (int i = 2; i < argc; i++)
-	{
-		//printf("parsing %s\n", argv[i]);
-		char* begin = strchr(argv[i], '=');
-		char* input = begin + 1;
-		if (strncmp(argv[i], "-board=", 7) == 0 && strlen(argv[i]) > 7)
-		{
-			strcpy(setting->board, input);
-			printf("board model is %s\n", setting->board);
-		}
-	}
-
 	for (int i = 2; i < argc; i++)
 	{
 		//printf("parsing %s\n", argv[i]);

@@ -79,11 +79,28 @@ struct gpio_device {
 	int opendrain;
 };
 
+struct eeprom_device {
+	struct device device;
+	int (*eeprom_read)(void*, unsigned char*);
+	int (*eeprom_write)(void*, unsigned char*);
+	int (*eeprom_check_board)(void*);//you dont have to implement unless it is used in monitor
+};
+
 struct name_and_init_func {
 	char* name;
 	void* (*create_funcptr)(char*, void*);
 };
 
+///////////////////////////////////////////////////////////////////////
+struct at24cxx {
+	struct eeprom_device eeprom_device;
+	// int channel; //indicate which i2c channel to choose
+	int addr;
+};
+int at24cxx_read(void* at24cxx, unsigned char* data_buffer);
+int at24cxx_write(void* at24cxx, unsigned char* data_buffer);
+int at24cxx_check_board(void* at24cxx);
+void* at24cxx_create(char* chip_specification, void* parent);
 ///////////////////////////////////////////////////////////////////////
 struct pca9548 {
 	struct i2c_device i2c_device;

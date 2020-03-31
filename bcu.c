@@ -1404,17 +1404,17 @@ static void monitor(struct options_setting* setting)
 			printf("Capture time:\n");
 			cap_interval = now - avgstart;
 			if (cap_interval > 10000)
-				printf("   Avg:%.3fs\n", cap_interval / 1000.0);
+				printf("   Avg:%.3fs        ", cap_interval / 1000.0);
 			else
-				printf("   Avg:%dms\n", cap_interval);
+				printf("   Avg:%dms        ", cap_interval);
 			cap_interval = now - maxminstart;
 			if (cap_interval > 10000)
-				printf("MinMax:%.3fs\n\n", cap_interval / 1000.0);
+				printf("MinMax:%.3fs        ", cap_interval / 1000.0);
 			else
-				printf("MinMax:%dms\n\n", cap_interval);
+				printf("MinMax:%dms        ", cap_interval);
 
 			if(last_display != 0)
-				printf("Real display Hz: %d\n\n", (int)ceil(1000.0 / interval));
+				printf("Real display Hz: %d\n", (int)ceil(1000.0 / interval));
 			//printf("press the letter on keyboard to control coresponding extra sense resistor(Extra SR)\n");
 			if (!((candisplay == 1 || setting->nodisplay == 1) && setting->dump == 1))
 				printf("Ctrl C to exit...\n\n");
@@ -1432,9 +1432,7 @@ static void monitor(struct options_setting* setting)
 		ch = catch_input_char();
 		if (setting->nodisplay == 0 && candisplay == 1)
 		{
-			printf("press 1 on keyboard to reset Avg\n");
-			printf("press 2 on keyboard to reset MaxMin\n");
-			printf("press 3 on keyboard to reset Avg and MaxMin\n");
+			printf("Hot-key: 1=reset Avg; 2=reset MaxMin; 3=reset Avg and MaxMin\n");
 			printf("press the letter on keyboard to control coresponding extra sense resistor(Extra SR)\n");
 			printf("pressed: %c\n", ch);
 		}
@@ -1572,6 +1570,47 @@ static int enable_vt_mode()
 #endif
 }
 
+int find_board_by_eeprom(struct options_setting* setting)
+{
+	void* head = NULL;
+	void* end_point;
+	int status, i, j;
+
+	for (i = 0; i < num_of_boards; i++)
+	{
+		strcpy(setting->board, board_list[i].name);
+		struct board_info* board=get_board(setting->board);
+		j = 0;
+		while(board->mappings[j].name!=NULL)
+		{
+			if(board->mappings[j].type == bcu_eeprom)
+			{
+				end_point = build_device_linkedlist_forward(&head, board->mappings[j].path);
+				if (end_point == NULL)
+				{
+					printf("set_gpio: error building device linked list\n");
+					return -1;
+				}
+
+				struct eeprom_device* eeprom = end_point;
+				status = eeprom->eeprom_check_board(eeprom);
+				if (status == 0)
+				{
+					free_device_linkedlist_backward(end_point);
+					return 0;
+				}
+				else
+				{
+					free_device_linkedlist_backward(end_point);
+					break;
+				}
+			}
+			j++;
+		}
+	}
+	return -1;
+}
+
 int main(int argc, char** argv)
 {
 #ifdef _WIN32
@@ -1594,6 +1633,33 @@ int main(int argc, char** argv)
 	struct options_setting setting;
 	memset(&setting, 0, sizeof(struct options_setting));//initialized to zero
 	set_options_default(&setting);
+
+	//find if the board model is specified first,
+	//this way, board dependent setting such as choosing board-specific gpio pin are done correctly
+	int argc_count;
+	for (argc_count = 2; argc_count < argc; argc_count++)
+	{
+		//printf("parsing %s\n", argv[argc_count]);
+		char* begin = strchr(argv[argc_count], '=');
+		char* input = begin + 1;
+		if (strncmp(argv[argc_count], "-board=", 7) == 0 && strlen(argv[argc_count]) > 7)
+		{
+			strcpy(setting.board, input);
+			printf("board model is %s\n", setting.board);
+			break;
+		}
+	}
+	if (argc_count == argc)
+	{
+		if (find_board_by_eeprom(&setting))
+		{
+			printf("Cannot auto find the board...\n");
+			return 0;
+		}
+		else
+			printf("Auto find the board: %s\n", setting.board);
+	}
+
 	if (parse_options(argc, argv, &setting) == -1) {
 		return 0;
 	}

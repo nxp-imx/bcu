@@ -37,7 +37,8 @@
 
 enum mapping_type {
 	power,
-	gpio
+	gpio,
+	bcu_eeprom
 };
 
 /*

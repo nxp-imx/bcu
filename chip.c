@@ -48,9 +48,59 @@ struct name_and_init_func chip_list[] =
 	"ft4232h_i2c", ft4232h_i2c_create,
 	"ft4232h_gpio", ft4232h_gpio_create,
 	"pac1934", pac1934_create,
-	"pca6416a", pca6416a_create
+	"pca6416a", pca6416a_create,
+	"at24cxx", at24cxx_create
 };
 int num_of_chips = sizeof(chip_list) / sizeof(struct name_and_init_func);
+
+//////////////////////////AT24CXX//////////////////////////////////
+void* at24cxx_create(char* chip_specification, void* parent)
+{
+	struct at24cxx* at24 = (struct at24cxx*)malloc(sizeof(struct at24cxx));
+	if (at24 == NULL)
+	{
+		printf("malloc failed\n");
+		return NULL;
+	}
+	at24->eeprom_device.device.parent = parent;
+	at24->eeprom_device.eeprom_read = at24cxx_read;
+	at24->eeprom_device.eeprom_write = at24cxx_write;
+	at24->eeprom_device.eeprom_check_board = at24cxx_check_board;
+	at24->addr = extract_parameter_value(chip_specification, "addr");
+	//printf("AT24CXX created!\n");
+	return at24;
+}
+int at24cxx_read(void* at24cxx, unsigned char* data_buffer)
+{
+	return 0;
+}
+
+int at24cxx_write(void* at24cxx, unsigned char* data_buffer)
+{
+	return 0;
+}
+
+int at24cxx_check_board(void* at24cxx)
+{
+	struct at24cxx* at24 = at24cxx;
+	struct i2c_device* parent = (void*)at24->eeprom_device.device.parent;
+	char addr_plus_write = (at24->addr) << 1;
+	char addr_plus_read = (at24->addr << 1) + 1;
+
+	//refresh the powerister
+	parent->i2c_start(parent);
+	if(parent->i2c_write(parent, addr_plus_write))
+	{
+		parent->i2c_stop(parent);
+		// printf("pac 1934 failure get ack\n");
+		return -1;
+	}
+	else
+	{
+		parent->i2c_stop(parent);
+		return 0;
+	}
+}
 
 //////////////////////////PCA9548//////////////////////////////////
 void* pca9548_create(char* chip_specification, void* parent)
