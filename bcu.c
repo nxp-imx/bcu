@@ -1638,11 +1638,14 @@ int main(int argc, char** argv)
 	{
 		if (find_board_by_eeprom(&setting))
 		{
-			printf("Cannot auto find the board...\n");
-			return 0;
+			printf("Can't auto recognize the board...\n");
+			printf("For now, only 8MPLUSLPD4-CPU don't have eeprom. Assuming use \"imx8mpevk\"...\n");
+			printf("Please also notice if there is any other board connected to this host.\n");
+			printf("Try \"bcu lsftdi\" to find the right -id=...\n");
+			strcpy(setting.board, "imx8mpevk");
 		}
 		else
-			printf("Auto find the board: %s\n", setting.board);
+			printf("Auto recognized the board: %s\n", setting.board);
 	}
 
 	if (parse_options(argc, argv, &setting) == -1) {
