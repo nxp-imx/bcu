@@ -171,7 +171,7 @@ struct mapping imx8mpevk_board[] = {
 	{"ft_gpio3",gpio,"/ft4232h_gpio{channel=1;pin_bitmask=0x40}", 0x00},
 	{"ft_gpio4",gpio,"/ft4232h_gpio{channel=1;pin_bitmask=0x80}", 0x00},
 
-	{"at24cxx", bcu_eeprom, "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}/at24cxx{addr=0xA0;}", 0x00},
+	{"at24cxx", bcu_eeprom, "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}/at24cxx{addr=0x50;}", 0x00},
 
 	{NULL, 0, NULL, 0}//null terminated
 };

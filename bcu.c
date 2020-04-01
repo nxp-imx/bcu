@@ -1634,22 +1634,7 @@ int main(int argc, char** argv)
 	memset(&setting, 0, sizeof(struct options_setting));//initialized to zero
 	set_options_default(&setting);
 
-	//find if the board model is specified first,
-	//this way, board dependent setting such as choosing board-specific gpio pin are done correctly
-	int argc_count;
-	for (argc_count = 2; argc_count < argc; argc_count++)
-	{
-		//printf("parsing %s\n", argv[argc_count]);
-		char* begin = strchr(argv[argc_count], '=');
-		char* input = begin + 1;
-		if (strncmp(argv[argc_count], "-board=", 7) == 0 && strlen(argv[argc_count]) > 7)
-		{
-			strcpy(setting.board, input);
-			printf("board model is %s\n", setting.board);
-			break;
-		}
-	}
-	if (argc_count == argc)
+	if (parse_board_id_options(argc, argv, &setting) == 1)
 	{
 		if (find_board_by_eeprom(&setting))
 		{

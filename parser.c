@@ -228,6 +228,35 @@ void set_options_default(struct options_setting* setting)
  * parse the options entered in command line, stores them in the option_setting structure, which use for actual command
  */
 extern char GV_LOCATION_ID[];
+int parse_board_id_options(int argc, char** argv, struct options_setting* setting)
+{
+	//find if the board model is specified first,
+	//this way, board dependent setting such as choosing board-specific gpio pin are done correctly
+	int argc_count;
+	for (argc_count = 2; argc_count < argc; argc_count++)
+	{
+		//printf("parsing %s\n", argv[argc_count]);
+		char* begin = strchr(argv[argc_count], '=');
+		char* input = begin + 1;
+		if (strncmp(argv[argc_count], "-board=", 7) == 0 && strlen(argv[argc_count]) > 7)
+		{
+			strcpy(setting->board, input);
+			printf("board model is %s\n", setting->board);
+			break;
+		}
+
+		if (strncmp(argv[argc_count], "-id=", 4) == 0 && strlen(argv[argc_count]) > 4)
+		{
+			strcpy(GV_LOCATION_ID, input);
+			// printf("location_id is %s\n", GV_LOCATION_ID);
+		}
+	}
+	if (argc_count == argc)
+		return 1; //Not provide -board, try auto find board then
+	else
+		return 0; //Provide -board, no need to auto find board
+}
+
 int parse_options(int argc, char** argv, struct options_setting* setting)
 {
 	for (int i = 2; i < argc; i++)
