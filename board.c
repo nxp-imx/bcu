@@ -92,6 +92,37 @@ struct mapping imx8xxl[] = {
 	{"ft_reset", gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x40}", 0x71},
 
 	{"at24cxx", bcu_eeprom, "/ft4232h_i2c{channel=1;dir_bitmask=0x60;val_bitmask=0x40}/at24cxx{addr=0x57;}", 0x00},
+	{NULL, 0, NULL, 0}//null terminated
+};
+
+struct mapping imx8dxl_ddr3[] = {
+	{"on_board_12v0",power,IMX8XXL_POWER_PATH(1,1,10,10), 0x00},
+	{"3v3_MICRO",power,IMX8XXL_POWER_PATH(1,2,10,10), 0x00},
+	{"vdd_main",power,IMX8XXL_POWER_PATH(1,3, 50, 50), 0x00},
+	{"vdd_memc",power,IMX8XXL_POWER_PATH(1,4, 50,50), 0x00},
+
+	{"vdd_ddr_vddq",power,IMX8XXL_POWER_PATH(2,1,120,120), 0x00},
+	{"vdd_ddr", power, IMX8XXL_POWER_PATH(2,2, 10, 10), 0x00},
+	{"vdd_vtt",power,IMX8XXL_POWER_PATH(2,3,10,10), 0x00},
+	{"vdd_ddr_pll",power,IMX8XXL_POWER_PATH(2,4, 1000, 1000), 0x00},
+
+	{"boot_mode",gpio,IMX8XXL_EXP_PATH(0,0x07), 0x40},
+	{"sd_pwr",gpio, IMX8XXL_EXP_PATH(0,0x08), 0x00},
+	{"sd_wp",gpio, IMX8XXL_EXP_PATH(0,0x10), 0x00},
+	{"sd_cd",gpio, IMX8XXL_EXP_PATH(0,0x20), 0x00},
+	{"exp5_p06", gpio, IMX8XXL_EXP_PATH(0, 0x40), 0x00},
+	{"exp5_p07", gpio, IMX8XXL_EXP_PATH(0, 0x80), 0x00},
+	{"exp5_p14", gpio, IMX8XXL_EXP_PATH(1,0x10), 0x00},
+	{"exp5_p15", gpio, IMX8XXL_EXP_PATH(1,0x20), 0x00},
+	{"testmod_sel",gpio, IMX8XXL_EXP_PATH(,0x40), 0x00},
+	{"bootmode_sel",gpio, IMX8XXL_EXP_PATH(1,0x80), 0x50},
+
+	{"reset",gpio, "/ft4232h_gpio{channel=0;pin_bitmask=0x20}", 0x11},
+	{"jtag_sel",gpio, "/ft4232h_gpio{channel=0;pin_bitmask=0x40}", 0x01},
+	{"onoff", gpio, "/ft4232h_gpio{channel=0;pin_bitmask=0x80}", 0x21},
+	{"remote_en",gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x20}", 0x30},
+	{"ft_reset", gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x40}", 0x71},
+
 	// you put all the pin in the imx8xxl board here
 	//"sd_wp", gpio, "..."
 	{NULL, 0, NULL, 0}//null terminated
@@ -229,6 +260,7 @@ struct board_info board_list[] =
 	{"imx8dxlevk", imx8xxl, imx8xxl_boot_modes,// NULL,
 		"[chip_power:vdd_main,3v3_io,vdd_usb_3v3,3v3_enet,vdd_snvs_4p2,vdd_memc,vdd_ddr_vddq,vdd_enet0_1p8_3p3,vdd_ana,1v8_1,1v8_2,1v8_3,1v8_4,1v8_5]", 
 		imx8xxlevk_board_links},
+	{"imx8dxl_ddr3_evk", imx8dxl_ddr3, imx8xxl_boot_modes, NULL, imx8xxlevk_board_links},
 	{"imx8mpevkpwr", imx8mpevkpwr_board, imx8mpevk_board_boot_modes, NULL, imx8mpevk_board_links},
 	{"imx8mpevk", imx8mpevk_board, imx8mpevk_board_boot_modes, NULL, imx8mpevk_board_links},
 	//"imx9xxl",&imx9xxl_pins,
