@@ -70,10 +70,10 @@ struct mapping imx8xxl[] = {
 	{"emmc0",power,IMX8XXL_POWER_PATH(6,3,3000,3000), 0x00},
 	{"on_board_12v0",power,IMX8XXL_POWER_PATH(6,4, 10, 10), 0x00},
 
-	{"boot_mode",gpio,IMX8XXL_EXP_PATH(0,0x07), 0x40},
-	{"sd_pwr",gpio, IMX8XXL_EXP_PATH(0,0x08), 0x00},
-	{"sd_wp",gpio, IMX8XXL_EXP_PATH(0,0x10), 0x00},
-	{"sd_cd",gpio, IMX8XXL_EXP_PATH(0,0x20), 0x00},
+	{"boot_mode",gpio,IMX8XXL_EXP_PATH(0,0x07), 0x80},
+	{"sd_pwr",gpio, IMX8XXL_EXP_PATH(0,0x08), 0x51},
+	{"sd_wp",gpio, IMX8XXL_EXP_PATH(0,0x10), 0x61},
+	{"sd_cd",gpio, IMX8XXL_EXP_PATH(0,0x20), 0x71},
 	{"exp5_p06", gpio, IMX8XXL_EXP_PATH(0, 0x40), 0x00},
 	{"exp5_p07", gpio, IMX8XXL_EXP_PATH(0, 0x80), 0x00},
 	{"SR_vdd_main",gpio, IMX8XXL_EXP_PATH(1,0x01), 0x00},
@@ -83,13 +83,13 @@ struct mapping imx8xxl[] = {
 	{"exp5_p14", gpio, IMX8XXL_EXP_PATH(1,0x10), 0x00},
 	{"exp5_p15", gpio, IMX8XXL_EXP_PATH(1,0x20), 0x00},
 	{"testmod_sel",gpio, IMX8XXL_EXP_PATH(,0x40), 0x00},
-	{"bootmode_sel",gpio, IMX8XXL_EXP_PATH(1,0x80), 0x50},
+	{"bootmode_sel",gpio, IMX8XXL_EXP_PATH(1,0x80), 0x90},
 
 	{"reset",gpio, "/ft4232h_gpio{channel=0;pin_bitmask=0x20}", 0x11},
 	{"jtag_sel",gpio, "/ft4232h_gpio{channel=0;pin_bitmask=0x40}", 0x01},
 	{"onoff", gpio, "/ft4232h_gpio{channel=0;pin_bitmask=0x80}", 0x21},
-	{"remote_en",gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x20}", 0x30},
-	{"ft_reset", gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x40}", 0x71},
+	{"remote_en",gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x20}", 0x40},
+	{"ft_reset", gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x40}", 0x31},
 
 	{"at24cxx", bcu_eeprom, "/ft4232h_i2c{channel=1;dir_bitmask=0x60;val_bitmask=0x40}/at24cxx{addr=0x57;}", 0x00},
 	{NULL, 0, NULL, 0}//null terminated
