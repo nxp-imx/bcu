@@ -346,8 +346,8 @@ int parse_options(int argc, char** argv, struct options_setting* setting)
 		}
 		else if (strncmp(argv[i], "-hz=", 4) == 0 && strlen(argv[i]) > 4)
 		{
-			int hz = atoi(input);
-			setting->refreshms = 1000 / hz;
+			float hz = atof(input);
+			setting->refreshms = 1000.0 / hz;
 		}
 		else if (strncmp(argv[i], "-board=", 7) == 0 && strlen(argv[i]) > 7)
 		{

@@ -1418,7 +1418,7 @@ static void monitor(struct options_setting* setting)
 				printf("MinMax:%dms        ", cap_interval);
 
 			if(last_display != 0)
-				printf("Real display Hz: %d\n", (int)ceil(1000.0 / interval));
+				printf("Real display Hz: %.1f\n", (1000.0 / interval));
 			//printf("press the letter on keyboard to control coresponding extra sense resistor(Extra SR)\n");
 			if (!((candisplay == 1 || setting->nodisplay == 1) && setting->dump == 1))
 				printf("Ctrl C to exit...\n\n");
