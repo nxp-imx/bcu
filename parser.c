@@ -320,7 +320,7 @@ int parse_options(int argc, char** argv, struct options_setting* setting)
 			setting->dump = 1;
 			strcpy(setting->dumpname, input);
 			int len1 = strlen(setting->dumpname), len2 = strlen(".csv");
-			if (len1 < len2)
+			if (len1 == 0)
 				strcpy(setting->dumpname, "monitor_record.csv");
 			else
 			{
