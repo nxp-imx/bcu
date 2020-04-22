@@ -627,8 +627,12 @@ int pac1934_get_data(void* pac1934, struct pac193x_reg_data* pac_reg)
 	#define DATA_LEN 17
 	unsigned char data[DATA_LEN];
 
+	int status = 0;
+
 	parent->i2c_start(parent);
-	parent->i2c_write(parent, addr_plus_write);
+	status = parent->i2c_write(parent, addr_plus_write);
+	if (status < 0)
+		return status;
 	parent->i2c_write(parent, 0x07); //start get data;
 	parent->i2c_start(parent);
 	parent->i2c_write(parent, addr_plus_read);
