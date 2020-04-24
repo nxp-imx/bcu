@@ -1161,7 +1161,7 @@ static void monitor(struct options_setting* setting)
 
 		//then display
 		int max_length, location_length, available_width, available_height;
-		if (candisplay == 1 || (setting->dump == 1 && setting->nodisplay == 1))
+		if (candisplay == 1)
 		{
 			printf("%s", g_vt_clear);
 			printf("%s", g_vt_home); //move cursor to the 0,0
@@ -1428,17 +1428,16 @@ static void monitor(struct options_setting* setting)
 
 			if(last_display != 0)
 				printf("Display freq: %.1fHz\n", (1000.0 / interval));
-			//printf("press the letter on keyboard to control coresponding extra sense resistor(Extra SR)\n");
-			// if (!((candisplay == 1 || setting->nodisplay == 1) && setting->dump == 1))
-			// 	printf("Ctrl C to exit...\n\n");
 		}
 
-		if ((candisplay == 1 || setting->nodisplay == 1) && setting->dump == 1)
+		if (candisplay == 1 && setting->dump == 1)
 		{
 			unsigned long now;
 			get_msecond(&now);
 			printf("Dump data to \"%s\" for %ldms, %ld times, %ld times/sec\n", setting->dumpname, now - start, times, 1000 / ((now - start) / times));
-			printf("Ctrl-C to exit...\n\n");
+			if (setting->nodisplay == 1)
+				printf("Ctrl-C to exit...\n");
+			printf("\n");
 		}
 		
 		//finally,switch the SR
