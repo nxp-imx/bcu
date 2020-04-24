@@ -57,6 +57,8 @@
 
 #define DONT_RESET	0
 #define RESET_NOW	1
+#define GET_COLUMN	0
+#define GET_ROW		1
 
 extern int num_of_boards;
 extern struct board_info board_list[];
@@ -617,7 +619,7 @@ static void uuu(struct options_setting* setting)
 }
 #endif
 
-static int monitor_width()
+static int monitor_size(int columns_or_rows)
 {
 #ifdef _WIN32
 	//printf("monitor_dimension not yet implemented for windows\n");
@@ -630,7 +632,10 @@ static int monitor_width()
 
 	//printf("columns: %d\n", columns);
 	//printf("rows: %d\n", rows);
-	return columns;
+	if (columns_or_rows == 0)
+		return columns;
+	else
+		return rows;
 
 #else
 	struct winsize w;
@@ -638,7 +643,10 @@ static int monitor_width()
 
 	//printf ("current lines %d\n", w.ws_row);
 	//printf ("current columns %d\n", w.ws_col);
-	return w.ws_col;
+	if (columns_or_rows == GET_COLUMN)
+		return w.ws_col;
+	else
+		return w.ws_row;
 #endif
 }
 
@@ -861,7 +869,7 @@ static void monitor(struct options_setting* setting)
 		data_size[i] = 0;
 		name[i] = 0;
 	}
-	int previous_width = monitor_width();
+	int previous_width = monitor_size(GET_COLUMN);
 #if 0
 	//initialize all available SR(sense resistor) switch logic level
 	for (int k = 0; k < index; k++)
@@ -1152,7 +1160,7 @@ static void monitor(struct options_setting* setting)
 			times++;
 
 		//then display
-		int max_length, location_length, available_width;
+		int max_length, location_length, available_width, available_height;
 		if (candisplay == 1 || (setting->dump == 1 && setting->nodisplay == 1))
 		{
 			printf("%s", g_vt_clear);
@@ -1160,7 +1168,8 @@ static void monitor(struct options_setting* setting)
 		}
 		if (setting->nodisplay == 0 && candisplay == 1)
 		{
-			available_width = monitor_width();
+			available_width = monitor_size(GET_COLUMN);
+			available_height = monitor_size(GET_ROW);
 			printf("%s", g_vt_green); //set the word as green
 
 			if (available_width < 60)
@@ -1363,7 +1372,7 @@ static void monitor(struct options_setting* setting)
 			{
 				//display groups
 				printf("%s", g_vt_white);
-				printf("\n\n");
+				// printf("\n\n");
 				printfpadding("-----------------------------------------------------------------------------------------------------------------------------------------------", available_width);
 				printfpadding(" ", max_group_length + 1);
 				printf("%s", g_vt_blue);
@@ -1390,22 +1399,22 @@ static void monitor(struct options_setting* setting)
 				printf("%s", g_vt_white);
 				//printf(" |");
 				printf("  ");
-				if (strlen(groups[k].member_list) < (size_t)(monitor_width() - max_group_length - 30))
+				if (strlen(groups[k].member_list) < (size_t)(monitor_size(GET_COLUMN) - max_group_length - 30))
 					printf("%s\n", groups[k].member_list);
 				else
 				{
-					printfpadding(groups[k].member_list, monitor_width() - max_group_length - 30 - 4);
+					printfpadding(groups[k].member_list, monitor_size(GET_COLUMN) - max_group_length - 30 - 10);
 					printf("...\n");
 				}
 			}
 
-			//printf("width: %d \n",monitor_width());
+			//printf("width: %d \n",monitor_size(GET_COLUMN));
 			printf("\n");
 			printf("%s", g_vt_white);
 			unsigned long now;
 			get_msecond(&now);
 			int cap_interval;
-			printf("Capture time:\n");
+			printf("Capture time:");
 			cap_interval = now - avgstart;
 			if (cap_interval > 10000)
 				printf("   Avg:%.3fs        ", cap_interval / 1000.0);
@@ -1418,10 +1427,10 @@ static void monitor(struct options_setting* setting)
 				printf("MinMax:%dms        ", cap_interval);
 
 			if(last_display != 0)
-				printf("Real display Hz: %.1f\n", (1000.0 / interval));
+				printf("Display freq: %.1fHz\n", (1000.0 / interval));
 			//printf("press the letter on keyboard to control coresponding extra sense resistor(Extra SR)\n");
-			if (!((candisplay == 1 || setting->nodisplay == 1) && setting->dump == 1))
-				printf("Ctrl C to exit...\n\n");
+			// if (!((candisplay == 1 || setting->nodisplay == 1) && setting->dump == 1))
+			// 	printf("Ctrl C to exit...\n\n");
 		}
 
 		if ((candisplay == 1 || setting->nodisplay == 1) && setting->dump == 1)
@@ -1429,16 +1438,20 @@ static void monitor(struct options_setting* setting)
 			unsigned long now;
 			get_msecond(&now);
 			printf("Dump data to \"%s\" for %ldms, %ld times, %ld times/sec\n", setting->dumpname, now - start, times, 1000 / ((now - start) / times));
-			printf("Ctrl C to exit...\n\n");
+			printf("Ctrl-C to exit...\n\n");
 		}
 		
 		//finally,switch the SR
 		ch = catch_input_char();
-		if (setting->nodisplay == 0 && candisplay == 1)
+		if (setting->nodisplay == 0 && candisplay == 1 && available_height >= 40)
 		{
-			printf("Hot-key: 1=reset Avg; 2=reset MaxMin; 3=reset Avg and MaxMin\n");
+			printf("Hot-key: 1=reset Avg; 2=reset MaxMin; 3=reset Avg and MaxMin; Ctrl-C to exit...\n");
 			printf("press the letter on keyboard to control coresponding extra sense resistor(Extra SR)\n");
 			printf("pressed: %c\n", ch);
+		}
+		else if (available_height < 40)
+		{
+			printf("press letter to switch sense resistor; Ctrl-C to exit...\n");
 		}
 		if (isxdigit(ch))
 		{
