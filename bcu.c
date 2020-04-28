@@ -1311,7 +1311,13 @@ static void monitor(struct options_setting* setting)
 				//printf("%-10s|",board->mappings[name[k]].name);
 				printf("%s", g_vt_white);
 				printf("%c ", 65 + k);//print corresponding letters, start with A
-				printfpadding(board->mappings[name[k]].name, max_length);
+				if(range_level[k] == 0x01 || range_level[k] == 0x11)
+				{
+					printf("*");
+					printfpadding(board->mappings[name[k]].name, max_length - 1);
+				}
+				else
+					printfpadding(board->mappings[name[k]].name, max_length);
 
 				printf("%s", g_vt_green);
 				printf(" |");
