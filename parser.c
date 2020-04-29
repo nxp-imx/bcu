@@ -221,6 +221,7 @@ void set_options_default(struct options_setting* setting)
 	setting->nodisplay = 0;
 	setting->dumpname[0] = '\0';
 	setting->refreshms = 0;
+	setting->use_rms = 0;
 }
 
 
@@ -348,6 +349,10 @@ int parse_options(int argc, char** argv, struct options_setting* setting)
 		{
 			float hz = atof(input);
 			setting->refreshms = 1000.0 / hz;
+		}
+		else if (strcmp(argv[i], "-rms") == 0)
+		{
+			setting->use_rms = 1;
 		}
 		else if (strncmp(argv[i], "-board=", 7) == 0 && strlen(argv[i]) > 7)
 		{

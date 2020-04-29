@@ -1087,7 +1087,6 @@ static void monitor(struct options_setting* setting)
 					vmax[j] = (voltage > vmax[j]) ? voltage : vmax[j];
 					cmax[j] = (current > cmax[j]) ? current : cmax[j];
 					pmax[j] = (power > pmax[j]) ? power : pmax[j];
-					cavg[j] = (data_size[j] * cavg[j] + current) / (double)(data_size[j] + 1);
 					vavg[j] = (data_size[j] * vavg[j] + voltage) / (double)(data_size[j] + 1);
 					pavg[j] = (data_size[j] * pavg[j] + power) / ((double)(data_size[j] + 1));
 				}
@@ -1099,7 +1098,7 @@ static void monitor(struct options_setting* setting)
 					vmax[j] = (voltage > vmax[j]) ? voltage : vmax[j];
 					cmax[j] = (current > cmax[j] * 1000) ? current : cmax[j] * 1000;
 					pmax[j] = (power > pmax[j] * 1000) ? power : pmax[j] * 1000;
-					cavg[j] = (data_size[j] * cavg[j] * 1000 + current) / (double)(data_size[j] + 1);
+					cavg[j] *= 1000;
 					vavg[j] = (data_size[j] * vavg[j] + voltage) / (double)(data_size[j] + 1);
 					pavg[j] = (data_size[j] * pavg[j] * 1000 + power) / ((double)(data_size[j] + 1));
 				} 
@@ -1111,10 +1110,15 @@ static void monitor(struct options_setting* setting)
 					vmax[j] = (voltage > vmax[j]) ? voltage : vmax[j];
 					cmax[j] = (current > cmax[j] / 1000) ? current : cmax[j] / 1000;
 					pmax[j] = (power > pmax[j] / 1000) ? power : pmax[j] / 1000;
-					cavg[j] = (data_size[j] * cavg[j] / 1000 + current) / (double)(data_size[j] + 1);
+					cavg[j] /= 1000;
 					vavg[j] = (data_size[j] * vavg[j] + voltage) / (double)(data_size[j] + 1);
 					pavg[j] = (data_size[j] * pavg[j] / 1000 + power) / ((double)(data_size[j] + 1));
 				}
+
+				if (setting->use_rms)
+					cavg[j] = sqrt((data_size[j] * cavg[j] * cavg[j] + current * current) / (double)(data_size[j] + 1));
+				else
+					cavg[j] = (data_size[j] * cavg[j] + current) / (double)(data_size[j] + 1);
 
 				data_size[j] = data_size[j] + 1;
 
@@ -1210,7 +1214,10 @@ static void monitor(struct options_setting* setting)
 				printf("%s", g_vt_green);
 				printf("|%-5s %-5s %-5s %-5s", "now", "avg", "max", "min");
 				printf("%s", g_vt_yellow);
-				printf(" |%-6s %-6s %-7s %-6s", "now", "avg", "max", "min");
+				if (setting->use_rms)
+					printf(" |%-6s %-6s %-7s %-6s", "now", "rms", "max", "min");
+				else
+					printf(" |%-6s %-6s %-7s %-6s", "now", "avg", "max", "min");
 				printf("%s", g_vt_kcyn);
 				printf(" |%-6s %-6s %-7s %-6s", "now", "avg", "max", "min");
 			}
@@ -1239,8 +1246,10 @@ static void monitor(struct options_setting* setting)
 
 				printf("|%-4s %-4s", "now", "avg");
 				printf("%s", g_vt_yellow);
-
-				printf(" |%-6s %-6s %-6s %-6s", "now", "avg", "max", "min");
+				if (setting->use_rms)
+					printf(" |%-6s %-6s %-6s %-6s", "now", "rms", "max", "min");
+				else
+					printf(" |%-6s %-6s %-6s %-6s", "now", "avg", "max", "min");
 				printf("%s", g_vt_kcyn);
 
 				printf(" |%-6s %-6s %-6s %-6s", "now", "avg", "max", "min");
@@ -1267,7 +1276,10 @@ static void monitor(struct options_setting* setting)
 				printf("%s", g_vt_green);
 				printf("|%-4s %-4s", "now", "avg");
 				printf("%s", g_vt_yellow);
-				printf(" |%-6s %-6s", "now", "avg");
+				if (setting->use_rms)
+					printf(" |%-6s %-6s", "now", "rms");
+				else
+					printf(" |%-6s %-6s", "now", "avg");
 				printf("%s", g_vt_kcyn);
 				printf(" |%-6s %-6s %-6s %-6s", "now", "avg", "max", "min");
 			}
@@ -1296,7 +1308,10 @@ static void monitor(struct options_setting* setting)
 				printf("%s", g_vt_green);
 				printf("|%-4s %-4s", "now", "avg");
 				printf("%s", g_vt_yellow);
-				printf(" |%-6s %-6s", "now", "avg");
+				if (setting->use_rms)
+					printf(" |%-6s %-6s", "now", "rms");
+				else
+					printf(" |%-6s %-6s", "now", "avg");
 				printf("%s", g_vt_kcyn);
 				printf(" |%-6s %-6s", "now", "avg");
 			}
@@ -1423,9 +1438,9 @@ static void monitor(struct options_setting* setting)
 			printf("Capture time:");
 			cap_interval = now - avgstart;
 			if (cap_interval > 10000)
-				printf("   Avg:%.3fs        ", cap_interval / 1000.0);
+				printf("   %s:%.3fs        ", setting->use_rms ? "RMS" : "Avg", cap_interval / 1000.0);
 			else
-				printf("   Avg:%dms        ", cap_interval);
+				printf("   %s:%dms        ", setting->use_rms ? "RMS" : "Avg", cap_interval);
 			cap_interval = now - maxminstart;
 			if (cap_interval > 10000)
 				printf("MinMax:%.3fs        ", cap_interval / 1000.0);
@@ -1450,7 +1465,8 @@ static void monitor(struct options_setting* setting)
 		ch = catch_input_char();
 		if (setting->nodisplay == 0 && candisplay == 1 && available_height >= 40)
 		{
-			printf("Hot-key: 1=reset Avg; 2=reset MaxMin; 3=reset Avg and MaxMin; Ctrl-C to exit...\n");
+			printf("Hot-key: 1=reset %s; 2=reset MaxMin; 3=reset %s and MaxMin; Ctrl-C to exit...\n",
+						setting->use_rms ? "RMS" : "Avg", setting->use_rms ? "RMS" : "Avg");
 			printf("press the letter on keyboard to control coresponding extra sense resistor(Extra SR)\n");
 			printf("pressed: %c\n", ch);
 		}
