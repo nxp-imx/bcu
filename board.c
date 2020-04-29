@@ -236,6 +236,77 @@ struct mapping imx8mpevk_board[] = {
 	{NULL, 0, NULL, 0}//null terminated
 };
 
+#define IMX8MPVBD_POWER_SWITCH_PATH(channel, group, sensor1, addr, rsense1, sensor2, rsense2) "/ft4232h_i2c{channel="#channel";dir_bitmask=0xF0;val_bitmask=0x00}/pac1934{group="#group";sensor="#sensor1";addr="#addr";rsense1="#rsense1";sensor2="#sensor2";rsense2="#rsense2"}"
+#define IMX8MPVBD_POWER_PATH(channel, group, sensor, addr, rsense1, rsense2) "/ft4232h_i2c{channel="#channel";dir_bitmask=0xF0;val_bitmask=0x00}/pac1934{group="#group";sensor="#sensor";addr="#addr";rsense1="#rsense1";rsense2="#rsense2"}"
+#define IMX8MPVBD_GPIO_EXTENDER_PATH(channel, addr, port, pin_bitmask) "/ft4232h_i2c{channel="#channel";dir_bitmask=0xF0;val_bitmask=0x00}/pca6416a{addr="#addr";port="#port";pin_bitmask="#pin_bitmask";opendrain=0;}"
+struct mapping imx8mpddr3l_board[] = {
+	{"vdd_avpll_1p8", power, IMX8MPVBD_POWER_PATH(1, 1, 1, 0x10, 1000, 1000), 0x00},
+	{"nvcc_dram_1v35", power, IMX8MPVBD_POWER_SWITCH_PATH(1, 1, 2, 0x10, 50, 3, 1050), 0x00},
+	{"vdd_dram_pll_1p8", power, IMX8MPVBD_POWER_PATH(1, 1, 4, 0x10, 1000, 11000), 0x00},
+	{"vdd_arm", power, IMX8MPVBD_POWER_SWITCH_PATH(1, 2, 1, 0x11, 20, 2, 2020), 0x00},
+	{"vdd_soc", power, IMX8MPVBD_POWER_SWITCH_PATH(1, 2, 4, 0x11, 10, 3, 1010), 0x00},
+	{"vdd_pci_1p8", power, IMX8MPVBD_POWER_PATH(1, 3, 1, 0x12, 1000, 11000), 0x00},
+	{"vdd_ana_1p8", power, IMX8MPVBD_POWER_PATH(1, 3, 2, 0x12, 1000, 11000), 0x00},
+	{"pmic_dcdc_5v", power, IMX8MPVBD_POWER_SWITCH_PATH(1, 3, 3, 0x12, 10, 4, 1010), 0x00},
+	{"vdd_sai_pll_1p8", power, IMX8MPVBD_POWER_PATH(1, 4, 1, 0x13, 1000, 1000), 0x00},
+	{"vdd_hdmi_1p8", power, IMX8MPVBD_POWER_PATH(1, 4, 2, 0x13, 1000, 1000), 0x00},
+	{"vdd_earc_1p8", power, IMX8MPVBD_POWER_PATH(1, 4, 3, 0x13, 1000, 11000), 0x00},
+	{"vdd_mipi_1p8", power, IMX8MPVBD_POWER_PATH(1, 4, 4, 0x13, 1000, 11000), 0x00},
+	{"vdd_arm_pll_1p8", power, IMX8MPVBD_POWER_PATH(1, 5, 1, 0x14, 1000, 11000), 0x00},
+	{"vdd_usb_1p8", power, IMX8MPVBD_POWER_PATH(1, 5, 2, 0x14, 1000, 11000), 0x00},
+	{"vdd_24m_xtal_1p8", power, IMX8MPVBD_POWER_PATH(1, 5, 3, 0x14, 2000, 2000), 0x00},
+	{"vdd_lvds_1p8", power, IMX8MPVBD_POWER_PATH(1, 5, 4, 0x14, 1000, 11000), 0x00},
+	{"vdd_ana1_pll_0p8", power, IMX8MPVBD_POWER_PATH(0, 6, 1, 0x15, 1000, 11000), 0x00},
+	{"vdd_arm_pll_0p8", power, IMX8MPVBD_POWER_PATH(0, 6, 2, 0x15, 1000, 11000), 0x00},
+	{"vdd_dram_pll_0p8", power, IMX8MPVBD_POWER_PATH(0, 6, 3, 0x15, 1000, 11000), 0x00},
+	{"vdd_pci_0p8", power, IMX8MPVBD_POWER_PATH(0, 6, 4, 0x15, 1000, 11000), 0x00},
+	{"vdd_1v8", power, IMX8MPVBD_POWER_SWITCH_PATH(0, 7, 1, 0x16, 100, 2, 600), 0x00},
+	{"nvcc_snvs_1v8_cpu", power, IMX8MPVBD_POWER_PATH(0, 7, 3, 0x16, 2500, 2500), 0x00},
+	{"nvcc_sd2", power, IMX8MPVBD_POWER_PATH(0, 7, 4, 0x16, 500, 2500), 0x00},
+	{"vdd_3v3", power, IMX8MPVBD_POWER_SWITCH_PATH(0, 8, 2, 0x17, 100, 1, 600), 0x00},
+	{"vdd_3v3_cpu_1", power, IMX8MPVBD_POWER_PATH(0, 8, 3, 0x17, 1000, 11000), 0x00},
+	{"vdd_3v3_cpu_0", power, IMX8MPVBD_POWER_PATH(0, 8, 4, 0x17, 1000, 11000), 0x00},
+	{"vdd_usb_0p8", power, IMX8MPVBD_POWER_PATH(0, 9, 1, 0x18, 1000, 11000), 0x00},
+	{"vdd_sai_pll_0p8", power, IMX8MPVBD_POWER_PATH(0, 9, 2, 0x18, 1000, 1000), 0x00},
+	{"vdd_mipi_0p8", power, IMX8MPVBD_POWER_PATH(0, 9, 3, 0x18, 1000, 11000), 0x00},
+	{"vdd_hdmi_0p8", power, IMX8MPVBD_POWER_PATH(0, 9, 4, 0x18, 1000, 11000), 0x00},
+	{"vdd_1v8_cpu_0", power, IMX8MPVBD_POWER_PATH(0, 10, 1, 0x19, 1000, 11000), 0x00},
+	{"vdd_1v8_cpu_1", power, IMX8MPVBD_POWER_PATH(0, 10, 2, 0x19, 1000, 11000), 0x00},
+
+	{"SR_vdd_soc", gpio, IMX8MPVBD_GPIO_EXTENDER_PATH(0, 0x23, 1, 0x01), 0x00},
+	{"SR_vdd_pci_0p8", gpio, IMX8MPVBD_GPIO_EXTENDER_PATH(0, 0x23, 1, 0x02), 0x00},
+	{"SR_vdd_dram_pll_0p8", gpio, IMX8MPVBD_GPIO_EXTENDER_PATH(0, 0x23, 1, 0x04), 0x00},
+	{"SR_vdd_arm_pll_0p8", gpio, IMX8MPVBD_GPIO_EXTENDER_PATH(0, 0x23, 1, 0x08), 0x00},
+	{"SR_vdd_ana1_pll_0p8", gpio, IMX8MPVBD_GPIO_EXTENDER_PATH(0, 0x23, 1, 0x10), 0x00},
+	{"SR_vdd_hdmi_0p8", gpio, IMX8MPVBD_GPIO_EXTENDER_PATH(0, 0x23, 1, 0x20), 0x00},
+	{"SR_vdd_mipi_0p8", gpio, IMX8MPVBD_GPIO_EXTENDER_PATH(0, 0x23, 1, 0x40), 0x00},
+	{"SR_vdd_usb_0p8", gpio, IMX8MPVBD_GPIO_EXTENDER_PATH(0, 0x23, 1, 0x80), 0x00},
+	{"SR_vdd_3v3_cpu_0", gpio, IMX8MPVBD_GPIO_EXTENDER_PATH(0, 0x23, 2, 0x01), 0x00},
+	{"SR_vdd_3v3_cpu_1", gpio, IMX8MPVBD_GPIO_EXTENDER_PATH(0, 0x23, 2, 0x02), 0x00},
+	{"SR_vdd_3v3", gpio, IMX8MPVBD_GPIO_EXTENDER_PATH(0, 0x23, 2, 0x04), 0x00},
+	{"SR_vdd_1v8_cpu_0", gpio, IMX8MPVBD_GPIO_EXTENDER_PATH(0, 0x23, 2, 0x08), 0x00},
+	{"SR_vdd_1v8_cpu_1", gpio, IMX8MPVBD_GPIO_EXTENDER_PATH(0, 0x23, 2, 0x10), 0x00},
+	{"SR_vdd_1v8", gpio, IMX8MPVBD_GPIO_EXTENDER_PATH(0, 0x23, 2, 0x20), 0x00},
+	{"SR_nvcc_sd2", gpio, IMX8MPVBD_GPIO_EXTENDER_PATH(0, 0x23, 2, 0x40), 0x00},
+	{"SR_vdd_dram_pll_1p8", gpio, IMX8MPVBD_GPIO_EXTENDER_PATH(0, 0x23, 2, 0x80), 0x00},
+
+	{"SR_vdd_earc_1p8", gpio, IMX8MPVBD_GPIO_EXTENDER_PATH(1, 0x22, 0, 0x08), 0x00},
+	{"SR_vdd_mipi_1p8", gpio, IMX8MPVBD_GPIO_EXTENDER_PATH(1, 0x22, 0, 0x10), 0x00},
+	{"SR_vdd_arm_pll_1p8", gpio, IMX8MPVBD_GPIO_EXTENDER_PATH(1, 0x22, 0, 0x20), 0x00},
+	{"SR_vdd_usb_1p8", gpio, IMX8MPVBD_GPIO_EXTENDER_PATH(1, 0x22, 0, 0x40), 0x00},
+	{"SR_pmic_dcdc_5v", gpio, IMX8MPVBD_GPIO_EXTENDER_PATH(1, 0x22, 0, 0x80), 0x00},
+	{"dcdc_5v_en", gpio, IMX8MPVBD_GPIO_EXTENDER_PATH(1, 0x22, 1, 0x04), 0x00},
+	{"SR_vdd_pci_1p8", gpio, IMX8MPVBD_GPIO_EXTENDER_PATH(1, 0x22, 1, 0x08), 0x00},
+	{"SR_vdd_ana_1p8", gpio, IMX8MPVBD_GPIO_EXTENDER_PATH(1, 0x22, 1, 0x10), 0x00},
+	{"SR_vdd_lvds_1p8", gpio, IMX8MPVBD_GPIO_EXTENDER_PATH(1, 0x22, 1, 0x20), 0x00},
+	{"SR_vdd_arm", gpio, IMX8MPVBD_GPIO_EXTENDER_PATH(1, 0x22, 1, 0x40), 0x00},
+	{"SR_nvcc_dram_1v35", gpio, IMX8MPVBD_GPIO_EXTENDER_PATH(1, 0x22, 1, 0x80), 0x00},
+
+	// {"at24cxx", bcu_eeprom, "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}/at24cxx{addr=0x50;}", 0x00},
+
+	{NULL, 0, NULL, 0}//null terminated
+};
+
 struct boot_mode imx8mpevk_board_boot_modes[] = {
 	{"fuse", 0x00},
 	{"usb", 0x01},
@@ -263,6 +334,7 @@ struct board_info board_list[] =
 	{"imx8dxl_ddr3_evk", imx8dxl_ddr3, imx8xxl_boot_modes, NULL, imx8xxlevk_board_links},
 	{"imx8mpevkpwr", imx8mpevkpwr_board, imx8mpevk_board_boot_modes, NULL, imx8mpevk_board_links},
 	{"imx8mpevk", imx8mpevk_board, imx8mpevk_board_boot_modes, NULL, imx8mpevk_board_links},
+	{"imx8mpddr3l", imx8mpddr3l_board, NULL, NULL, NULL},
 	//"imx9xxl",&imx9xxl_pins,
 };
 int num_of_boards = sizeof(board_list) / sizeof(struct board_info);
