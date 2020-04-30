@@ -65,8 +65,10 @@ struct group {
 	int num_of_members;
 };
 
+int update_parameter_string(char* path, char* parameter_name, char* str);
 int extract_parameter_string(char* chip_specification, char* parameter_name, char* result);
 int extract_parameter_value(char* chip_specification, char* parameter_name);
+int get_chip_specification_by_chipname(char* path, char* chip_specification, char* chipname);
 void get_chip_name(char* chip_specification, char* chip_name);
 void free_device_linkedlist_backward(struct device* ptr);
 void free_device_linkedlist_forward(struct device* ptr);

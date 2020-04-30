@@ -123,7 +123,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
@@ -137,16 +137,28 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="bcu.c" />
+    <ClCompile Include="bcu_parser.c" />
+    <ClCompile Include="bcu_yaml.c" />
     <ClCompile Include="board.c" />
     <ClCompile Include="chip.c" />
-    <ClCompile Include="parser.c" />
+    <ClCompile Include="libyaml\src\api.c" />
+    <ClCompile Include="libyaml\src\dumper.c" />
+    <ClCompile Include="libyaml\src\emitter.c" />
+    <ClCompile Include="libyaml\src\loader.c" />
+    <ClCompile Include="libyaml\src\parser.c" />
+    <ClCompile Include="libyaml\src\reader.c" />
+    <ClCompile Include="libyaml\src\scanner.c" />
+    <ClCompile Include="libyaml\src\writer.c" />
     <ClCompile Include="port.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="bcu_yaml.h" />
     <ClInclude Include="board.h" />
     <ClInclude Include="chip.h" />
     <ClInclude Include="ftdi_def.h" />
-    <ClInclude Include="parser.h" />
+    <ClInclude Include="bcu_parser.h" />
+    <ClInclude Include="libyaml\include\yaml.h" />
+    <ClInclude Include="libyaml\src\yaml_private.h" />
     <ClInclude Include="port.h" />
     <ClInclude Include="version.h" />
   </ItemGroup>

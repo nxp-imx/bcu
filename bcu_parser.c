@@ -38,7 +38,7 @@
 #include<string.h>
 #include<ctype.h>
 
-#include "parser.h"
+#include "bcu_parser.h"
 #include "chip.h"
 #include "board.h"
 
@@ -49,6 +49,33 @@ extern int num_of_chips;
 extern struct board_info board_list[];
 extern int num_of_boards;
 
+
+int update_parameter_string(char* path, char* parameter_name, char* str)
+{
+	char tpath[MAX_PATH_LENGTH];
+	char* ptr = strstr(path, parameter_name);
+	if (ptr == NULL)
+	{
+		printf("could not locate parameter %s\n", parameter_name);
+		return -1;
+	}
+	char* equal_sign = strchr(ptr, '=');
+	char* brk = strpbrk(equal_sign, ";}");
+	if (equal_sign == NULL)
+	{
+		printf("can not understand the specification \n");
+		return -1;
+	}
+	strcpy(tpath, brk);
+	equal_sign[1] = '\0';
+	strcat(equal_sign, str);
+	strcat(equal_sign, tpath);
+	//int length = (int)(brk - equal_sign - 1);
+	//strncpy(result, equal_sign + 1, length);
+	//*(result + length) = '\0';
+	return 0;
+
+}
 
 int extract_parameter_string(char* chip_specification, char* parameter_name, char* result)
 {
@@ -142,7 +169,29 @@ void free_device_linkedlist_forward(struct device* ptr)
 	return;
 }
 
+int get_chip_specification_by_chipname(char* path, char* chip_specification, char* chipname)
+{
+	char now_chip_name[MAX_CHIP_SPEC_LENGTH];
+	char remaining_path[MAX_PATH_LENGTH];
 
+	if (path[0] == '/')
+		path++; //ignore the first '/'
+	if (strlen(path) < MAX_PATH_LENGTH)
+		strcpy(remaining_path, path);
+
+	strcpy(chip_specification, strtok(remaining_path, "/"));
+
+	while (chip_specification != NULL)
+	{
+		get_chip_name(chip_specification, now_chip_name);
+		if (strcmp(chipname, now_chip_name) == 0) {
+			return 0;
+		}
+
+		strcpy(chip_specification, strtok(NULL, "/"));
+	}
+	return -1;
+}
 
 void* build_device_linkedlist_forward(void** head, char* path)
 {

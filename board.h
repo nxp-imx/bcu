@@ -74,10 +74,16 @@ struct board_info {
 
 /*find if there is the gpio_name on the board*/
 int have_gpio(char* gpio_name, struct board_info* board);
+struct board_info* get_board_by_id(int id);
+int get_board_numer(void);
 /*given the name of the board, return coresponding board info struct*/
 struct board_info* get_board(char* board_name);
 /*given board_info, and the desired variable name, find the coresponding path of the variable*/
-int get_path(char* path, char* gpio_name, struct board_info* board);
+int get_path(char* path, char* item_name, struct board_info* board);
+/*set path of the item*/
+int set_path(char* path, char* item_name, struct board_info* board);
+/*get the item location by item_name*/
+int get_item_location(char* item_name, struct board_info* board);
 /*given board_info, and the initid, find the coresponding gpio name, path and output state of the variable*/
 int get_gpio_info_by_initid(char* gpio_name, char* path, int initid, struct board_info* board);
 /*get the length of the longest power-related variable name*/

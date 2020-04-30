@@ -27,7 +27,34 @@
     <ClCompile Include="board.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="parser.c">
+    <ClCompile Include="libyaml\src\api.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libyaml\src\dumper.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libyaml\src\emitter.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libyaml\src\loader.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libyaml\src\parser.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libyaml\src\reader.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libyaml\src\scanner.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libyaml\src\writer.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bcu_parser.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bcu_yaml.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -41,13 +68,22 @@
     <ClInclude Include="chip.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="parser.h">
+    <ClInclude Include="bcu_parser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ftdi_def.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="version.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libyaml\src\yaml_private.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libyaml\include\yaml.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bcu_yaml.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -33,7 +33,7 @@
 #include<string.h>
 #include<ctype.h>
 
-#include "parser.h"
+#include "bcu_parser.h"
 #include "chip.h"
 #include "port.h"
 #include "ftdi_def.h"

@@ -405,12 +405,40 @@ struct board_info* get_board(char* board_name)
 	return NULL;
 }
 
-int get_path(char* path, char* gpio_name, struct board_info* board)
+struct board_info* get_board_by_id(int id)
+{
+	if (id >= num_of_boards)
+		return NULL;
+
+	return &board_list[id];
+}
+
+int get_board_numer(void)
+{
+	return num_of_boards;
+}
+
+int get_item_location(char* item_name, struct board_info* board)
 {
 	int i = 0;
 	while (board->mappings[i].name != NULL)
 	{
-		if (strcmp(gpio_name, board->mappings[i].name) == 0)
+		if (strcmp(item_name, board->mappings[i].name) == 0)
+		{
+			return i;
+		}
+		i++;
+	}
+	//printf("path not found\n");
+	return -1;
+}
+
+int get_path(char* path, char* item_name, struct board_info* board)
+{
+	int i = 0;
+	while (board->mappings[i].name != NULL)
+	{
+		if (strcmp(item_name, board->mappings[i].name) == 0)
 		{
 			strcpy(path, board->mappings[i].path);
 			return 0;
@@ -421,12 +449,29 @@ int get_path(char* path, char* gpio_name, struct board_info* board)
 	return -1;
 }
 
+int set_path(char* path, char* item_name, struct board_info* board)
+{
+	int i = 0;
+	while (board->mappings[i].name != NULL)
+	{
+		if (strcmp(item_name, board->mappings[i].name) == 0)
+		{
+			board->mappings[i].path = malloc(sizeof(char) * MAX_PATH_LENGTH);
+			strcpy(board->mappings[i].path, path);
+			return 0;
+		}
+		i++;
+	}
+	//printf("gpio/power not found\n");
+	return -1;
+}
+
 int get_gpio_info_by_initid(char* gpio_name, char* path, int initid, struct board_info* board)
 {
 	int i = 0;
 	while (board->mappings[i].name != NULL)
 	{
-		if ((board->mappings[i].initinfo >> 4) == initid)
+		if (board->mappings[i].type == gpio && (board->mappings[i].initinfo >> 4) == initid)
 		{
 			strcpy(gpio_name, board->mappings[i].name);
 			strcpy(path, board->mappings[i].path);

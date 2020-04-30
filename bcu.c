@@ -50,7 +50,7 @@
 #include <math.h>
 
 #include "port.h"
-#include "parser.h"
+#include "bcu_parser.h"
 #include "chip.h"
 #include "board.h"
 #include "version.h"
@@ -1165,6 +1165,8 @@ static void monitor(struct options_setting* setting)
 
 		//then display
 		int max_length, location_length, available_width, available_height;
+		available_width = monitor_size(GET_COLUMN);
+		available_height = monitor_size(GET_ROW);
 		if (candisplay == 1)
 		{
 			printf("%s", g_vt_clear);
@@ -1172,8 +1174,6 @@ static void monitor(struct options_setting* setting)
 		}
 		if (setting->nodisplay == 0 && candisplay == 1)
 		{
-			available_width = monitor_size(GET_COLUMN);
-			available_height = monitor_size(GET_ROW);
 			printf("%s", g_vt_green); //set the word as green
 
 			if (available_width < 60)
@@ -1649,12 +1649,17 @@ int find_board_by_eeprom(struct options_setting* setting)
 	return -1;
 }
 
+#include "bcu_yaml.h"
+
 int main(int argc, char** argv)
 {
 #ifdef _WIN32
 	SetThreadPriority(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
 #endif
 	print_version();
+
+	if (readConf() < 0)
+		writeConf();
 
 	if (enable_vt_mode())
 	{
