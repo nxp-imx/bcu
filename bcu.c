@@ -1157,6 +1157,8 @@ static void monitor(struct options_setting* setting)
 			for (int x = 0; x < groups[k].num_of_members; x++)
 			{
 				int mi = groups[k].member_index[x];
+				if (range_level[mi] == 0x01 || range_level[mi] == 0x11)
+					pnow[mi] /= 1000;
 				groups[k].sum += pnow[mi];
 			}
 			groups[k].max = (groups[k].sum > groups[k].max) ? groups[k].sum : groups[k].max;
