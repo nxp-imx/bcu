@@ -996,9 +996,17 @@ static void monitor(struct options_setting* setting)
 			}
 			struct power_device* pd = end_point;
 
-			if (pd->power_get_data(pd, &pac_data[a]) < 0)
+			int b;
+			for (b = 0; b < 50; b++)
 			{
-				printf("PCA1934 cannot access!\n");
+				if (pd->power_get_data(pd, &pac_data[a]) >= 0)
+				{
+					break;
+				}
+			}
+			if (b == 50)
+			{
+				printf("PAC1934 cannot access!\n");
 				return;
 			}
 		}
