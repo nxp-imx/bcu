@@ -127,38 +127,25 @@ ________________________________________________________________________________
 
 ## i.MX8MP-EVK
 
-#### initialization usage:
+- imx8mpevk: do not have power measurement function
 
-$ sudo ./bcu init [boot mode] -board=imx8mpevk  
+- imx8mpevkpwr: have power measurement function
 
-#### reset usage:
+  **!!!NOTE!!!**
+  Please make sure your imx8mp power CPU board has done this rework:
+  https://nxp1.sharepoint.com/:b:/r/sites/MCUlibrary/mscale865/03_Applications/Power%20Measurement/Rework%20Instructions%20For%20IMX8MPLUSLPD4-PWR%20RevA%20VER0.1.pdf?csf=1&web=1&e=U1q6sq
+  If your board is not reworked, please use the 1.0.28 or older version of BCU.
 
-$ sudo ./bcu reset [boot mode] -board=imx8mpevk  
-**RESET function does NOT dependent on initialization. Can be use alone.**  
+- imx8mpddr3l: VDB
 
-#### multi-board usage:
+- imx8mpddr4: VDB
 
-If there are more than one board plug-in your host, you can use [-id=] to operate the specific board.  
+## i.MX8DXL-EVK
 
-1. get the id number  
-$ sudo ./bcu lsftdi  
-We can get the board id here:  
-board[0] location_id=**1-1**  
+- imx8dxlevk
+- imx8dxl_ddr3_evk
 
-2. if we want to reset id=1-1 board  
-$ sudo ./bcu reset [sd] -board=imx8mpevk -id=1-1  
+_______________________________________________________________________________________________________
 
-#### boot mode select for imx8mpevk:
+#### **For more details, please check the BCU release note in the latest release.**
 
-| SW4[1/2/3/4] | cmd string      | bootmode                          |
-| ------------ | --------------- | --------------------------------- |
-| 0000         | fuse            | Internal Fuses                    |
-| 0001         | usb             | USB Serial Download               |
-| 0010         | emmc            | EMMC/USDHC3                       |
-| 0011         | sd              | USDHC2                            |
-| 0100         | nand_256        | NAND 8-bit single device 256 page |
-| 0101         | nand_512        | NAND 8-bit single device 512 page |
-| 0110         | qspi_3b_read    | QSPI 3B Read                      |
-| 0111         | qspi_hyperflash | QSPI Hyperflash 3.3V              |
-| 1000         | ecspi           | ecSPI Boot                        |
-| 1110         | infinite_loop   | Infinite Loop Mode                |
