@@ -857,6 +857,7 @@ static void monitor(struct options_setting* setting)
 	double data_size[MAX_NUMBER_OF_POWER];
 	double cnow_fwrite[MAX_NUMBER_OF_POWER];
 	int sr_level[MAX_NUMBER_OF_POWER];
+	int range_control = 0;
 	int range_level[MAX_NUMBER_OF_POWER] = {0};
 	float cur_range[MAX_NUMBER_OF_POWER];
 
@@ -1063,13 +1064,26 @@ static void monitor(struct options_setting* setting)
 				voltage = pac_data[pd->power_get_group(pd) - 1].vbus[pd->power_get_sensor(pd) - 1] - (pac_data[pd->power_get_group(pd) - 1].vsense[pd->power_get_sensor(pd) - 1] / 1000000);
 				current = pac_data[pd->power_get_group(pd) - 1].vsense[pd->power_get_sensor(pd) - 1] / pd->power_get_res(pd);
 				cnow_fwrite[j] = current;
-				if ( (!(range_level[j] & 0xf) && cavg[j] < 1 && cavg[j] > 0) || ((range_level[j] & 0xf) && cavg[j] < 1000 && cavg[j] > 0))
+
+				if (range_control == 1)
+				{
+					range_level[j] = (char)(0 | range_level[j] << 4);  //mA
+				}
+				else if (range_control == 2)
 				{
 					current *= 1000;
 					range_level[j] = (char)(1 | range_level[j] << 4);  //uA
 				}
 				else
-					range_level[j] = (char)(0 | range_level[j] << 4);  //mA
+				{
+					if ( (!(range_level[j] & 0xf) && cavg[j] < 1 && cavg[j] > 0) || ((range_level[j] & 0xf) && cavg[j] < 1000 && cavg[j] > 0))
+					{
+						current *= 1000;
+						range_level[j] = (char)(1 | range_level[j] << 4);  //uA
+					}
+					else
+						range_level[j] = (char)(0 | range_level[j] << 4);  //mA
+				}
 
 				cur_range[j] = 100000.0 / pd->power_get_res(pd);
 				// cur_range[j] = pac_data[pd->power_get_group(pd) - 1].vsense[pd->power_get_sensor(pd) - 1];
@@ -1465,7 +1479,7 @@ static void monitor(struct options_setting* setting)
 		ch = catch_input_char();
 		if (setting->nodisplay == 0 && candisplay == 1 && available_height >= 40)
 		{
-			printf("Hot-key: 1=reset %s; 2=reset MaxMin; 3=reset %s and MaxMin; Ctrl-C to exit...\n",
+			printf("Hot-key: 1=reset %s; 2=reset MaxMin; 3=reset %s and MaxMin; 4=switch show auto/mA/uA; Ctrl-C to exit...\n",
 						setting->use_rms ? "RMS" : "Avg", setting->use_rms ? "RMS" : "Avg");
 			printf("press the letter on keyboard to control coresponding extra sense resistor(Extra SR)\n");
 			printf("pressed: %c\n", ch);
@@ -1517,6 +1531,11 @@ static void monitor(struct options_setting* setting)
 				}
 				get_msecond(&maxminstart);
 				avgstart = maxminstart;
+				break;
+			case 4:
+				range_control++;
+				if (range_control > 2)
+					range_control = 0;
 				break;
 			default:
 				break;
