@@ -831,7 +831,7 @@ static void monitor(struct options_setting* setting)
 		fprintf(fptr, "time(ms),");
 		while (board->mappings[i].name != NULL)
 		{
-			if (board->mappings[i].type == power)
+			if (board->mappings[i].type == power && board->mappings[i].initinfo != 0)
 			{
 				fprintf(fptr, "%s voltage(V),%s current(mA),", board->mappings[i].name, board->mappings[i].name);
 			}
@@ -921,7 +921,7 @@ static void monitor(struct options_setting* setting)
 	char pac193x_group_path[MAX_NUMBER_OF_POWER][MAX_PATH_LENGTH];
 	while (board->mappings[a].name != NULL)
 	{
-		if (board->mappings[a].type == power)
+		if (board->mappings[a].type == power && board->mappings[a].initinfo != 0) //-------------------------------------------------------------------------
 		{
 			end_point = build_device_linkedlist_smart(&head, board->mappings[a].path, head, previous_path);
 			strcpy(previous_path, board->mappings[a].path);
@@ -936,10 +936,12 @@ static void monitor(struct options_setting* setting)
 			}
 			struct power_device* pd = end_point;
 
-			if(last_pac_group != pd->power_get_group(pd))
+			int now_pac_group = pd->power_get_group(pd);
+			if(last_pac_group != now_pac_group)
 			{
-				strcpy(pac193x_group_path[pac_group_num++], board->mappings[a].path);
-				last_pac_group = pd->power_get_group(pd);
+				strcpy(pac193x_group_path[now_pac_group - 1], board->mappings[a].path);
+				pac_group_num++;
+				last_pac_group = now_pac_group;
 			}
 
 			pac_channel_num++;
@@ -963,8 +965,15 @@ static void monitor(struct options_setting* setting)
 			candisplay = 0;
 		}
 		//first refresh all pac1934's
-		for(a = 0; a < pac_group_num; a++)
+		int pac_group_count = pac_group_num;
+		for(a = 0; a < MAX_NUMBER_OF_POWER; a++)
 		{
+			if (strlen(pac193x_group_path[a]) < 10)
+			{
+				continue;
+			}
+			if (pac_group_count <= 0)
+				break;
 			end_point = build_device_linkedlist_smart(&head, pac193x_group_path[a], head, previous_path);
 			strcpy(previous_path, pac193x_group_path[a]);
 
@@ -979,10 +988,20 @@ static void monitor(struct options_setting* setting)
 			struct power_device* pd = end_point;
 
 			pd->power_set_snapshot(pd);
+			pac_group_count--;
 		}
-		// msleep(1);
-		for(a = 0; a < pac_group_num; a++)
+		if (pac_group_num < 3)
+			msleep(1);
+		int cannotacc = 0;
+		pac_group_count = pac_group_num;
+		for(a = 0; a < MAX_NUMBER_OF_POWER; a++)
 		{
+			if (strlen(pac193x_group_path[a]) < 10)
+			{
+				continue;
+			}
+			if (pac_group_count <= 0)
+				break;
 			end_point = build_device_linkedlist_smart(&head, pac193x_group_path[a], head, previous_path);
 			strcpy(previous_path, pac193x_group_path[a]);
 
@@ -1003,20 +1022,26 @@ static void monitor(struct options_setting* setting)
 				{
 					break;
 				}
+				else
+					cannotacc = 1;
 			}
 			if (b == 50)
 			{
 				printf("PAC1934 cannot access!\n");
 				return;
 			}
+			else if(cannotacc == 1)
+				break;
+			pac_group_count--;
 		}
-
+		if(cannotacc == 1)
+			continue;
 		//calculate the value and store them in array
 		int i = 0;//i is the index of all mappings
 		int j = 0;//j is the index of the power related mapping only
 		while (board->mappings[i].name != NULL)
 		{
-			if (board->mappings[i].type == power)
+			if (board->mappings[i].type == power && board->mappings[i].initinfo != 0)
 			{
 				name[j] = i;
 
@@ -1069,8 +1094,10 @@ static void monitor(struct options_setting* setting)
 				else
 					pd->switch_sensor(pd, 0);
 
-				voltage = pac_data[pd->power_get_group(pd) - 1].vbus[pd->power_get_sensor(pd) - 1] - (pac_data[pd->power_get_group(pd) - 1].vsense[pd->power_get_sensor(pd) - 1] / 1000000);
-				current = pac_data[pd->power_get_group(pd) - 1].vsense[pd->power_get_sensor(pd) - 1] / pd->power_get_res(pd);
+				int group = pd->power_get_group(pd) - 1;
+				int sensor = pd->power_get_sensor(pd) - 1;
+				voltage = pac_data[group].vbus[sensor] - (pac_data[group].vsense[sensor] / 1000000);
+				current = pac_data[group].vsense[sensor] / pd->power_get_res(pd);
 				cnow_fwrite[j] = current;
 
 				if (range_control == 1)
@@ -1146,6 +1173,8 @@ static void monitor(struct options_setting* setting)
 
 				j++;
 			}
+			else
+				j++;
 			i++;
 		}
 
@@ -1166,26 +1195,23 @@ static void monitor(struct options_setting* setting)
 			groups[k].avg = (groups[k].avg_data_size * groups[k].avg + groups[k].sum) / (groups[k].avg_data_size + 1);
 			groups[k].avg_data_size++;
 		}
-
 		//dump data to file
-		for (int k = 0; k < n; k++)
-		{
-			if (setting->dump == 1)
-			{
-				if ((k + 1) < n) {
-					if (k == 0) {
-						unsigned long now;
-						get_msecond(&now);
-						fprintf(fptr, "%ld,", (long)now - start);//add time before the first element
-					}
-					fprintf(fptr, "%lf,%lf,", vnow[k], cnow_fwrite[k]);
-				}
-				else
-					fprintf(fptr, "%lf,%lf\n", vnow[k], cnow_fwrite[k]);
-			}
-		}
 		if (setting->dump == 1)
+		{
+			unsigned long now;
+			get_msecond(&now);
+			fprintf(fptr, "%ld,", (long)now - start);//add time before the first element
+			for (int m = 0; m < n + 1; m++)
+			{
+				int k = get_power_index_by_showid(m, board);
+				if (k < 0)
+					continue;
+				if (board->mappings[k].initinfo != 0)
+					fprintf(fptr, "%lf,%lf,", vnow[k], cnow_fwrite[k]);
+			}
+			fprintf(fptr, "\n");
 			times++;
+		}
 
 		//then display
 		int max_length, location_length, available_width, available_height;
@@ -1345,11 +1371,15 @@ static void monitor(struct options_setting* setting)
 			printf("%s", g_vt_white);
 			printfpadding("-----------------------------------------------------------------------------------------------------------------------------------------------", available_width);
 
-			for (int k = 0; k < n; k++)
+			for (int m = 1; m < n + 1; m++)
 			{
+				int k = get_power_index_by_showid(m, board);
+				if (k < 0)
+					continue;
+
 				//printf("%-10s|",board->mappings[name[k]].name);
 				printf("%s", g_vt_white);
-				printf("%c ", 65 + k);//print corresponding letters, start with A
+				printf("%c ", 65 + m - 1);//print corresponding letters, start with A
 				if(range_level[k] == 0x01 || range_level[k] == 0x11)
 				{
 					printf("*");
@@ -1554,7 +1584,7 @@ static void monitor(struct options_setting* setting)
 		if (isalpha(ch))
 		{
 			ch = toupper(ch);
-			int sr_index = (int)ch - 'A';//is the ascii code for letter a
+			int sr_index = get_power_index_by_showid((int)ch - 64, board);//is the ascii code for letter a
 			if (sr_index < n && sr_index < MAX_NUMBER_OF_POWER && sr_index >= 0)
 			{
 				strcpy(sr_name, "SR_");
@@ -1578,8 +1608,8 @@ static void monitor(struct options_setting* setting)
 					else
 						gd->gpio_write(gd, 0x00);
 
+					msleep(2);
 					data = ~data;
-
 					sr_level[sr_index] = data == 0 ? 0 : 1;
 
 				}
@@ -1687,9 +1717,6 @@ int main(int argc, char** argv)
 #endif
 	print_version();
 
-	if (readConf() < 0)
-		writeConf();
-
 	if (enable_vt_mode())
 	{
 		printf("Your console don't support VT mode, fail back to verbose mode");
@@ -1722,6 +1749,12 @@ int main(int argc, char** argv)
 
 	if (parse_options(argc, argv, &setting) == -1) {
 		return 0;
+	}
+
+	if (readConf(setting.board) < 0)
+	{
+		writeConf();
+		readConf(setting.board);
 	}
 
 	if (strcmp(cmd, "lsgpio") == 0)

@@ -51,7 +51,7 @@ void writeConf(void)
 	char chip_specification[MAX_PATH_LENGTH];
 	int i = 0, j;
 
-	sprintf(text, "# show_id can set the display order of the rail.\n# If show_id: 0, it means that this rail will not be displayed.\n");
+	sprintf(text, "# show_id can set the display order of the rail. Start from 1.\n# If show_id: 0, it means that this rail will not be displayed.\n");
 	fputs(text, fp);
 
 	for(j = 0; j < get_board_numer(); j++)
@@ -119,7 +119,7 @@ int updateRsense(struct board_info* board, char* rail_name, char* rs1, char* rs2
 	return 0;
 }
 
-int readConf(void)
+int readConf(char* boardname)
 {
 	FILE* fh = fopen("config.yaml", "r");
 	if (fh == NULL)
@@ -168,6 +168,8 @@ int readConf(void)
 			{
 				if (!strcmp(tk, "boardname"))
 					now_status = STATUS_CHANGE_BOARD;
+				else if (now_status == STATUS_WAITING_WANTED_BOARD)
+					break;
 				else if (!strcmp(tk, "mappings"))
 					now_status = -1;
 				else if (!strcmp(tk, "rsense1"))
@@ -189,9 +191,15 @@ int readConf(void)
 			{
 				switch (now_status)
 				{
+				case STATUS_WAITING_WANTED_BOARD: break;
 				case STATUS_CHANGE_BOARD:
 				{
 					//printf("boardname: %s\n", tk);
+					if (strcmp(tk, boardname))
+					{
+						now_status = STATUS_WAITING_WANTED_BOARD;
+						break;
+					}
 					now_board = get_board(tk);
 					if (now_board == NULL)
 						return -1;

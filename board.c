@@ -483,6 +483,21 @@ int get_gpio_info_by_initid(char* gpio_name, char* path, int initid, struct boar
 	return -1;
 }
 
+int get_power_index_by_showid(int showid, struct board_info* board)
+{
+	int i = 0;
+	while (board->mappings[i].name != NULL)
+	{
+		if (board->mappings[i].type == power && board->mappings[i].initinfo == showid)
+		{
+			return i;
+		}
+		i++;
+	}
+
+	return -1;
+}
+
 /*
  * get the maximum length of the power related variable name
  */
