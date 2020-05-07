@@ -51,8 +51,9 @@ void writeConf(void)
 	char chip_specification[MAX_PATH_LENGTH];
 	int i = 0, j;
 
-	sprintf(text, "# show_id can set the display order of the rail. Start from 1.\n# If show_id: 0, it means that this rail will not be displayed.\n");
-	fputs(text, fp);
+	fputs("# show_id can set the display order of the rails.\n# show_id should start from 1.\n# If show_id: 0, it means that this rail will not be displayed and dumped.\n", fp);
+	fputs("#\n# Please DO NOT delete any line of a power rail!\n# If you don't want to show it, please just set its \"show_id\" as 0.\n", fp);
+	fputs("#\n# Unit of rsense1 and rsense2 is Milliohm\n", fp);
 
 	for(j = 0; j < get_board_numer(); j++)
 	{
