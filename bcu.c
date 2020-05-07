@@ -1259,7 +1259,7 @@ static void monitor(struct options_setting* setting)
 				printf("%s", g_vt_red);
 				printf("%-6s", "|Extra");
 				printf("\n");
-				printf("%s", g_vt_white);
+				printf("%s", g_vt_default);
 				printfpadding("location", location_length);
 				printf("%s", g_vt_green);
 				printf("|%-5s %-5s %-5s %-5s", "now", "avg", "max", "min");
@@ -1290,7 +1290,7 @@ static void monitor(struct options_setting* setting)
 				printf("%s", g_vt_red);
 				printf("%-6s", "|Extra");
 				printf("\n");
-				printf("%s", g_vt_white);
+				printf("%s", g_vt_default);
 				printfpadding("location", location_length);
 				printf("%s", g_vt_green);
 
@@ -1321,7 +1321,7 @@ static void monitor(struct options_setting* setting)
 				printf("%s", g_vt_red);
 				printf("%-6s", "|Extra");
 				printf("\n");
-				printf("%s", g_vt_white);
+				printf("%s", g_vt_default);
 				printfpadding("location", location_length);
 				printf("%s", g_vt_green);
 				printf("|%-4s %-4s", "now", "avg");
@@ -1353,7 +1353,7 @@ static void monitor(struct options_setting* setting)
 				printf("%s", g_vt_red);
 				printf("%-6s", "|Extra");
 				printf("\n");
-				printf("%s", g_vt_white);
+				printf("%s", g_vt_default);
 				printfpadding("location", location_length);
 				printf("%s", g_vt_green);
 				printf("|%-4s %-4s", "now", "avg");
@@ -1368,7 +1368,7 @@ static void monitor(struct options_setting* setting)
 			printf("%s", g_vt_red);
 			printf("%-6s", " |SR - Range(mA)");
 			printf("\n");
-			printf("%s", g_vt_white);
+			printf("%s", g_vt_default);
 			printfpadding("-----------------------------------------------------------------------------------------------------------------------------------------------", available_width);
 
 			for (int m = 1; m < n + 1; m++)
@@ -1378,7 +1378,7 @@ static void monitor(struct options_setting* setting)
 					continue;
 
 				//printf("%-10s|",board->mappings[name[k]].name);
-				printf("%s", g_vt_white);
+				printf("%s", g_vt_default);
 				printf("%c ", 65 + m - 1);//print corresponding letters, start with A
 				if(range_level[k] == 0x01 || range_level[k] == 0x11)
 				{
@@ -1446,20 +1446,20 @@ static void monitor(struct options_setting* setting)
 			if (num_of_groups > 0)
 			{
 				//display groups
-				printf("%s", g_vt_white);
+				printf("%s", g_vt_default);
 				// printf("\n\n");
 				printfpadding("-----------------------------------------------------------------------------------------------------------------------------------------------", available_width);
 				printfpadding(" ", max_group_length + 1);
 				printf("%s", g_vt_blue);
 				printf("|Power(mWatt)");
 				printf("\n");
-				printf("%s", g_vt_white);
+				printf("%s", g_vt_default);
 				printfpadding("group", max_group_length);
 				printf("%s", g_vt_blue);
 				printf(" |%-6s %-6s %-6s %-6s", "now", "avg", "max", "min");
-				printf("%s", g_vt_white);
+				printf("%s", g_vt_default);
 				printf("  group members\n");
-				printf("%s", g_vt_white);
+				printf("%s", g_vt_default);
 				printfpadding("-----------------------------------------------------------------------------------------------------------------------------------------------", available_width);
 			}
 			for (int k = 0; k < num_of_groups; k++)
@@ -1471,7 +1471,7 @@ static void monitor(struct options_setting* setting)
 				printf("%-6.1f ", groups[k].avg);
 				printf("%-6.1f ", groups[k].max);
 				printf("%-6.1f", groups[k].min);
-				printf("%s", g_vt_white);
+				printf("%s", g_vt_default);
 				//printf(" |");
 				printf("  ");
 				if (strlen(groups[k].member_list) < (size_t)(monitor_size(GET_COLUMN) - max_group_length - 30))
@@ -1485,7 +1485,7 @@ static void monitor(struct options_setting* setting)
 
 			//printf("width: %d \n",monitor_size(GET_COLUMN));
 			printf("\n");
-			printf("%s", g_vt_white);
+			printf("%s", g_vt_default);
 			unsigned long now;
 			get_msecond(&now);
 			int cap_interval;
