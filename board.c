@@ -238,7 +238,7 @@ struct mapping imx8mpevk_board[] = {
 
 #define IMX8MPVBD_POWER_SWITCH_PATH(channel, group, sensor1, addr, rsense1, sensor2, rsense2) "/ft4232h_i2c{channel="#channel";dir_bitmask=0xF0;val_bitmask=0x00}/pac1934{group="#group";sensor="#sensor1";addr="#addr";rsense1="#rsense1";sensor2="#sensor2";rsense2="#rsense2"}"
 #define IMX8MPVBD_POWER_PATH(channel, group, sensor, addr, rsense1, rsense2) "/ft4232h_i2c{channel="#channel";dir_bitmask=0xF0;val_bitmask=0x00}/pac1934{group="#group";sensor="#sensor";addr="#addr";rsense1="#rsense1";rsense2="#rsense2"}"
-#define IMX8MPVBD_GPIO_EXTENDER_PATH(channel, addr, port, pin_bitmask) "/ft4232h_i2c{channel="#channel";dir_bitmask=0xF0;val_bitmask=0x00}/pca6416a{addr="#addr";port="#port";pin_bitmask="#pin_bitmask";opendrain=0;}"
+#define IMX8MPVBD_GPIO_EXTENDER_PATH(channel, addr, port, pin_bitmask) "/ft4232h_i2c{channel="#channel";dir_bitmask=0xF0;val_bitmask=0x00}/pcal6524h{addr="#addr";port="#port";pin_bitmask="#pin_bitmask";opendrain=0;}"
 struct mapping imx8mpddr3l_board[] = {
 	{"vdd_avpll_1p8", power, IMX8MPVBD_POWER_PATH(1, 1, 1, 0x10, 1000, 1000), 0x00},
 	{"nvcc_dram_1v35", power, IMX8MPVBD_POWER_SWITCH_PATH(1, 1, 2, 0x10, 50, 3, 1050), 0x00},

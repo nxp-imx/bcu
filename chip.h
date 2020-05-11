@@ -175,4 +175,18 @@ void* pca6416a_create(char* chip_specification, void* parent);
 int pca6416a_set_direction(struct pca6416a* pca, unsigned char value);
 int pca6416a_set_output(struct pca6416a* pca, unsigned char value);
 int pca6416a_get_output(void* pca6416a, unsigned char* current_output);
+////////////////////////////////////////////////////////////////////////
+struct pcal6524h {
+	struct gpio_device gpio_device;
+	int addr;
+	int port;
+	unsigned char pin_bitmask; //specify which pin to use
+};
+int pcal6524h_read(void* pcal6524h, unsigned char* bit_value_buffer);
+int pcal6524h_write(void* pcal6524h, unsigned char bit_value);
+int pcal6524h_toggle(void* pcal6524h);
+void* pcal6524h_create(char* chip_specification, void* parent);
+int pcal6524h_set_direction(struct pcal6524h* pca, unsigned char value);
+int pcal6524h_set_output(struct pcal6524h* pca, unsigned char value);
+int pcal6524h_get_output(void* pcal6524h, unsigned char* current_output);
 #endif //CHIP_H
