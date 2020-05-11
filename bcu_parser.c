@@ -427,15 +427,18 @@ int parse_options(int argc, char** argv, struct options_setting* setting)
 				j++;
 			}
 			int k = 0;
-			while (board->boot_modes[k].name != NULL)
+			if (board->boot_modes != NULL)
 			{
-				if (strcmp(board->boot_modes[k].name, argv[i]) == 0)
+				while (board->boot_modes[k].name != NULL)
 				{
-					found = 1;
-					setting->boot_mode_hex = board->boot_modes[k].boot_mode_hex;
-					break;
+					if (strcmp(board->boot_modes[k].name, argv[i]) == 0)
+					{
+						found = 1;
+						setting->boot_mode_hex = board->boot_modes[k].boot_mode_hex;
+						break;
+					}
+					k++;
 				}
-				k++;
 			}
 			if (!found)
 			{
