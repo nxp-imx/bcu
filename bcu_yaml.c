@@ -61,6 +61,8 @@ void writeConf(void)
 
 		sprintf(text, "boardname: %s\n", board->name);
 		fputs(text, fp);
+		sprintf(text, "# \"israngefixed: false\": you can change sense resister by pressing the coresponding key when BCU runs\n# \"israngefixed: true\": you cannot change sense resister when BCU runs\nisrangefixed: true\n");
+		fputs(text, fp);
 		sprintf(text, "mappings:\n");
 		fputs(text, fp);
 		i = 0;
@@ -73,6 +75,7 @@ void writeConf(void)
 
 				int rs1, rs2;
 				char char_pac[7] = "pac1934";
+				char sr_name[100], sr_path[MAX_PATH_LENGTH];
 
 				get_chip_specification_by_chipname(board->mappings[i].path, chip_specification, "pac1934");
 				rs1 = extract_parameter_value(chip_specification, "rsense1");
@@ -86,11 +89,27 @@ void writeConf(void)
 				sprintf(text, "rsense2: %-8d, ", rs2);
 				fputs(text, fp);
 
-				sprintf(text, "show_id: %-2d", i + 1);
+				sprintf(text, "show_id: %-3d, ", i + 1);
 				fputs(text, fp);
 
-				sprintf(text, "}\n");
-				fputs(text, fp);
+				strcpy(sr_name, "SR_");
+				strcat(sr_name, board->mappings[i].name);
+				if (get_path(sr_path, sr_name, board) != -1)
+				{
+					sprintf(text, "extra_sr: 1   ");
+					fputs(text, fp);
+					sprintf(text, "} #Range: 1-%.1fmA, 0-%.1fmA\n", 100000.0 / rs1, 100000.0 / rs2);
+					fputs(text, fp);
+				}
+				else
+				{
+					sprintf(text, "extra_sr: N/A ");
+					fputs(text, fp);
+					// sprintf(text, "} #Range: don't have extra RS\n");
+					// fputs(text, fp);
+					sprintf(text, "}\n");
+					fputs(text, fp);
+				}
 			}
 			i++;
 		}
@@ -120,7 +139,7 @@ int updateRsense(struct board_info* board, char* rail_name, char* rs1, char* rs2
 	return 0;
 }
 
-int readConf(char* boardname)
+int readConf(char* boardname, struct options_setting* setting)
 {
 	FILE* fh = fopen("config.yaml", "r");
 	if (fh == NULL)
@@ -181,10 +200,14 @@ int readConf(char* boardname)
 					now_status = STATUS_CHANGE_SHOWID;
 				else if (!strcmp(tk, "show_sel"))
 					now_status = -1;
+				else if (!strcmp(tk, "israngefixed"))
+					now_status = STATUS_CHANGE_FIXEDRAIL;
+				else if (!strcmp(tk, "extra_sr"))
+					now_status = STATUS_CHANGE_DEFAULT_RS;
 				else
 				{
 					now_status = STATUS_CHANGE_RAIL;
-					//printf("railname: %s\n", tk);
+					// printf("railname: %s\n", tk);
 					strcpy(now_rail, tk);
 				}
 			}
@@ -195,7 +218,7 @@ int readConf(char* boardname)
 				case STATUS_WAITING_WANTED_BOARD: break;
 				case STATUS_CHANGE_BOARD:
 				{
-					//printf("boardname: %s\n", tk);
+					// printf("boardname: %s\n", tk);
 					if (strcmp(tk, boardname))
 					{
 						now_status = STATUS_WAITING_WANTED_BOARD;
@@ -207,26 +230,52 @@ int readConf(char* boardname)
 				}break;
 				case STATUS_CHANGE_RAIL:
 				{
-					//printf("railname: %s\n", tk);
+					// printf("railname: %s\n", tk);
+				}break;
+				case STATUS_CHANGE_FIXEDRAIL:
+				{
+					// printf("isfixedrange: %s\n", tk);
+					if (strcmp(tk, "true"))
+					{
+						setting->rangefixed = 0;
+					}
+					else
+					{
+						setting->rangefixed = 1;
+					}
 				}break;
 				case STATUS_CHANGE_RSENSE1:
 				{
-					//printf("rse1: %s\n", tk);
+					// printf("rse1: %s\n", tk);
 					strcpy(rs1, tk);
 				}break;
 				case STATUS_CHANGE_RSENSE2:
 				{
-					//printf("rse2: %s\n", tk);
+					// printf("rse2: %s\n", tk);
 					strcpy(rs2, tk);
 					updateRsense(now_board, now_rail, rs1, rs2);
 				}break;
 				case STATUS_CHANGE_SHOWID:
 				{
-					//printf("id: %s\n", tk);
+					// printf("id: %s\n", tk);
 					int item = get_item_location(now_rail, now_board);
 					if (item < 0)
 						return -1;
-					now_board->mappings[item].initinfo = atoi(tk);
+					now_board->mappings[item].initinfo = atoi(tk) << 2;
+				}break;
+				case STATUS_CHANGE_DEFAULT_RS:
+				{
+					// printf("now rs: %s\n", tk);
+					int item = get_item_location(now_rail, now_board);
+					if (item < 0)
+						return -1;
+					now_board->mappings[item].initinfo &= ~0x3;
+					if (!strcmp(tk, "N/A"))
+						now_board->mappings[item].initinfo |= 3;
+					else if (!strcmp(tk, "0"))
+						now_board->mappings[item].initinfo |= 0;
+					else if (!strcmp(tk, "1"))
+						now_board->mappings[item].initinfo |= 1;
 				}break;
 				default:
 					break;

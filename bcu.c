@@ -831,7 +831,7 @@ static void monitor(struct options_setting* setting)
 		fprintf(fptr, "time(ms),");
 		while (board->mappings[i].name != NULL)
 		{
-			if (board->mappings[i].type == power && board->mappings[i].initinfo != 0)
+			if (board->mappings[i].type == power && (board->mappings[i].initinfo >> 2) != 0)
 			{
 				fprintf(fptr, "%s voltage(V),%s current(mA),", board->mappings[i].name, board->mappings[i].name);
 			}
@@ -921,7 +921,7 @@ static void monitor(struct options_setting* setting)
 	char pac193x_group_path[MAX_NUMBER_OF_POWER][MAX_PATH_LENGTH];
 	while (board->mappings[a].name != NULL)
 	{
-		if (board->mappings[a].type == power && board->mappings[a].initinfo != 0) //-------------------------------------------------------------------------
+		if (board->mappings[a].type == power && (board->mappings[a].initinfo >> 2) != 0) //-------------------------------------------------------------------------
 		{
 			end_point = build_device_linkedlist_smart(&head, board->mappings[a].path, head, previous_path);
 			strcpy(previous_path, board->mappings[a].path);
@@ -945,9 +945,45 @@ static void monitor(struct options_setting* setting)
 			}
 
 			pac_channel_num++;
+
+			if (setting->rangefixed == 1)
+			{
+				strcpy(sr_name, "SR_");
+				strcat(sr_name, board->mappings[a].name);
+				if (get_path(sr_path, sr_name, board) != -1)
+				{
+					end_point = build_device_linkedlist_smart(&head, sr_path, head, previous_path);
+					strcpy(previous_path, sr_path);
+
+					if (end_point == NULL) {
+						printf("monitor:failed to build device linkedlist\n");
+						if (setting->dump == 1)
+						{
+							fclose(fptr);
+						}
+						return;
+					}
+					struct gpio_device* gd = end_point;
+					if ((board->mappings[a].initinfo & 0x3) == 0)
+					{
+						sr_level[a] = 0;
+						gd->gpio_write(gd, 0x00);
+					}
+					else if ((board->mappings[a].initinfo & 0x3) == 1)
+					{
+						sr_level[a] = 1;
+						gd->gpio_write(gd, 0xFF);
+					}
+				}
+				else
+				{
+					sr_level[a] = -1;
+				}
+			}
 		}
 		a++;
 	}
+
 #if 1
 	unsigned long last_display = 0, now_display;
 	while (!GV_MONITOR_TERMINATED)
@@ -990,18 +1026,19 @@ static void monitor(struct options_setting* setting)
 			pd->power_set_snapshot(pd);
 			pac_group_count--;
 		}
-		if (pac_group_num < 3)
+		if (pac_group_num < 4)
 			msleep(1);
 		int cannotacc = 0;
 		pac_group_count = pac_group_num;
 		for(a = 0; a < MAX_NUMBER_OF_POWER; a++)
 		{
+			if (pac_group_count <= 0)
+				break;
+
 			if (strlen(pac193x_group_path[a]) < 10)
 			{
 				continue;
 			}
-			if (pac_group_count <= 0)
-				break;
 			end_point = build_device_linkedlist_smart(&head, pac193x_group_path[a], head, previous_path);
 			strcpy(previous_path, pac193x_group_path[a]);
 
@@ -1041,39 +1078,41 @@ static void monitor(struct options_setting* setting)
 		int j = 0;//j is the index of the power related mapping only
 		while (board->mappings[i].name != NULL)
 		{
-			if (board->mappings[i].type == power && board->mappings[i].initinfo != 0)
+			if (board->mappings[i].type == power && (board->mappings[i].initinfo >> 2) != 0)
 			{
 				name[j] = i;
 
 				//get SR(sense resistor) switch logic level
-				strcpy(sr_name, "SR_");
-				strcat(sr_name, board->mappings[name[j]].name);
-				if (get_path(sr_path, sr_name, board) != -1)
+				if (setting->rangefixed == 0)
 				{
-					
-					end_point = build_device_linkedlist_smart(&head, sr_path, head, previous_path);
-					strcpy(previous_path, sr_path);
+					strcpy(sr_name, "SR_");
+					strcat(sr_name, board->mappings[name[j]].name);
+					if (get_path(sr_path, sr_name, board) != -1)
+					{
+						end_point = build_device_linkedlist_smart(&head, sr_path, head, previous_path);
+						strcpy(previous_path, sr_path);
 
-					if (end_point == NULL) {
-						printf("monitor:failed to build device linkedlist\n");
-						if (setting->dump == 1)
-						{
-							fclose(fptr);
+						if (end_point == NULL) {
+							printf("monitor:failed to build device linkedlist\n");
+							if (setting->dump == 1)
+							{
+								fclose(fptr);
+							}
+							return;
 						}
-						return;
-					}
-					struct gpio_device* gd = end_point;
-					unsigned char data;
-					gd->gpio_get_output(gd, &data);
+						struct gpio_device* gd = end_point;
+						unsigned char data;
+						gd->gpio_get_output(gd, &data);
 
-					if (data == 0)
-						sr_level[j] = 0;
+						if (data == 0)
+							sr_level[j] = 0;
+						else
+							sr_level[j] = 1;
+					}
 					else
-						sr_level[j] = 1;
-				}
-				else
-				{
-					sr_level[j] = -1;
+					{
+						sr_level[j] = -1;
+					}
 				}
 
 				end_point = build_device_linkedlist_smart(&head, board->mappings[i].path, head, previous_path);
@@ -1206,7 +1245,7 @@ static void monitor(struct options_setting* setting)
 				int k = get_power_index_by_showid(m, board);
 				if (k < 0)
 					continue;
-				if (board->mappings[k].initinfo != 0)
+				if ((board->mappings[k].initinfo >> 2) != 0)
 					fprintf(fptr, "%lf,%lf,", vnow[k], cnow_fwrite[k]);
 			}
 			fprintf(fptr, "\n");
@@ -1524,7 +1563,7 @@ static void monitor(struct options_setting* setting)
 			printf("press the letter on keyboard to control coresponding extra sense resistor(Extra SR)\n");
 			printf("pressed: %c\n", ch);
 		}
-		else if (available_height < 40)
+		else if (setting->nodisplay == 0 && candisplay == 1 && available_height < 40)
 		{
 			printf("press letter to switch sense resistor; Ctrl-C to exit...\n");
 		}
@@ -1581,7 +1620,7 @@ static void monitor(struct options_setting* setting)
 				break;
 			}
 		}
-		if (isalpha(ch))
+		if (isalpha(ch) && setting->rangefixed == 0)
 		{
 			ch = toupper(ch);
 			int sr_index = get_power_index_by_showid((int)ch - 64, board);//is the ascii code for letter a
@@ -1751,10 +1790,10 @@ int main(int argc, char** argv)
 		return 0;
 	}
 
-	if (readConf(setting.board) < 0)
+	if (readConf(setting.board, &setting) < 0)
 	{
 		writeConf();
-		readConf(setting.board);
+		readConf(setting.board, &setting);
 	}
 
 	if (strcmp(cmd, "lsgpio") == 0)

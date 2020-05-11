@@ -271,6 +271,7 @@ void set_options_default(struct options_setting* setting)
 	setting->dumpname[0] = '\0';
 	setting->refreshms = 0;
 	setting->use_rms = 0;
+	setting->rangefixed = 0;
 }
 
 

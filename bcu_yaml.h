@@ -38,13 +38,15 @@
 enum yaml_now_status_type {
 	STATUS_WAITING_WANTED_BOARD,
 	STATUS_CHANGE_BOARD,
+	STATUS_CHANGE_FIXEDRAIL,
 	STATUS_CHANGE_RAIL,
 	STATUS_CHANGE_RSENSE1,
 	STATUS_CHANGE_RSENSE2,
 	STATUS_CHANGE_SHOWID,
+	STATUS_CHANGE_DEFAULT_RS
 };
 
 void writeConf(void);
-int readConf(char* boardname);
+int readConf(char* boardname, struct options_setting* setting);
 
 #endif //BCU_YAML_H

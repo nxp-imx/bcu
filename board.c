@@ -363,6 +363,15 @@ struct board_links imx8mpevk_board_links[] = {
 	""
 };
 
+struct boot_mode null_boot_mode[] = {
+	{NULL, 0}
+};
+
+struct board_links null_board_links[] = {
+	"",
+	""
+};
+
 struct board_info board_list[] =
 {
 	{"imx8dxlevk", imx8xxl, imx8xxl_boot_modes,// NULL,
@@ -371,8 +380,8 @@ struct board_info board_list[] =
 	{"imx8dxl_ddr3_evk", imx8dxl_ddr3, imx8xxl_boot_modes, NULL, imx8xxlevk_board_links},
 	{"imx8mpevkpwr", imx8mpevkpwr_board, imx8mpevk_board_boot_modes, NULL, imx8mpevk_board_links},
 	{"imx8mpevk", imx8mpevk_board, imx8mpevk_board_boot_modes, NULL, imx8mpevk_board_links},
-	{"imx8mpddr3l", imx8mpddr3l_board, NULL, NULL, NULL},
-	{"imx8mpddr4", imx8mpddr4_board, NULL, NULL, NULL},
+	{"imx8mpddr3l", imx8mpddr3l_board, null_boot_mode, NULL, null_board_links},
+	{"imx8mpddr4", imx8mpddr4_board, null_boot_mode, NULL, null_board_links},
 	//"imx9xxl",&imx9xxl_pins,
 };
 int num_of_boards = sizeof(board_list) / sizeof(struct board_info);
@@ -488,7 +497,7 @@ int get_power_index_by_showid(int showid, struct board_info* board)
 	int i = 0;
 	while (board->mappings[i].name != NULL)
 	{
-		if (board->mappings[i].type == power && board->mappings[i].initinfo == showid)
+		if (board->mappings[i].type == power && (board->mappings[i].initinfo >> 2) == showid)
 		{
 			return i;
 		}
