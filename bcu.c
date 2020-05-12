@@ -1418,7 +1418,10 @@ static void monitor(struct options_setting* setting)
 
 				//printf("%-10s|",board->mappings[name[k]].name);
 				printf("%s", g_vt_default);
-				printf("%c ", 65 + m - 1);//print corresponding letters, start with A
+				if (m < 27)
+					printf("%c ", 65 + m - 1);//print corresponding letters, start with A
+				else
+					printf("%c ", 97 + m - 27);//print corresponding letters, start with a
 				if(range_level[k] == 0x01 || range_level[k] == 0x11)
 				{
 					printf("*");
@@ -1563,7 +1566,7 @@ static void monitor(struct options_setting* setting)
 			if (setting->rangefixed == 0)
 			{
 				printf("press the letter on keyboard to control coresponding extra sense resistor(Extra SR)\n");
-				printf("pressed: %c\n", ch);
+				printf("pressed %s(Please pay attention to letter case)%s: %c\n", g_vt_red, g_vt_default, ch);
 			}
 			else
 			{
@@ -1629,8 +1632,15 @@ static void monitor(struct options_setting* setting)
 		}
 		if (isalpha(ch) && setting->rangefixed == 0)
 		{
-			ch = toupper(ch);
-			int sr_index = get_power_index_by_showid((int)ch - 64, board);//is the ascii code for letter a
+			int sr_index;
+			// ch = toupper(ch);
+			ch = (int)ch - 64;
+			if (ch < 27)
+				sr_index = get_power_index_by_showid((int)ch, board);//is the ascii code for letter A
+			else
+			{
+				sr_index = get_power_index_by_showid((int)ch - 32 + 26, board);//is the ascii code for letter a
+			}
 			if (sr_index < n && sr_index < MAX_NUMBER_OF_POWER && sr_index >= 0)
 			{
 				strcpy(sr_name, "SR_");
