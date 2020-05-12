@@ -470,7 +470,7 @@ static void reset(struct options_setting* setting)
 				printf("reset: error building device linked list\n");
 				return;
 			}
-			status |= gpio->gpio_write(gpio, 0x00) << 2; //bootmode_sel low
+			status |= gpio->gpio_write(gpio, 0xFF) << 2; //bootmode_sel high to disable it.
 			free_gpio(gpio);
 
 			msleep(10);
