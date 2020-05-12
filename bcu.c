@@ -1560,10 +1560,17 @@ static void monitor(struct options_setting* setting)
 		{
 			printf("Hot-key: 1=reset %s; 2=reset MaxMin; 3=reset %s and MaxMin; 4=switch show auto/mA/uA; Ctrl-C to exit...\n",
 						setting->use_rms ? "RMS" : "Avg", setting->use_rms ? "RMS" : "Avg");
-			printf("press the letter on keyboard to control coresponding extra sense resistor(Extra SR)\n");
-			printf("pressed: %c\n", ch);
+			if (setting->rangefixed == 0)
+			{
+				printf("press the letter on keyboard to control coresponding extra sense resistor(Extra SR)\n");
+				printf("pressed: %c\n", ch);
+			}
+			else
+			{
+				printf("If you need switch sense resistor when BCU runs, please change \"israngefixed\" in config.yaml to \"false\".\n");
+			}
 		}
-		else if (setting->nodisplay == 0 && candisplay == 1 && available_height < 40)
+		else if (setting->nodisplay == 0 && candisplay == 1 && available_height < 40 && setting->rangefixed == 0)
 		{
 			printf("press letter to switch sense resistor; Ctrl-C to exit...\n");
 		}

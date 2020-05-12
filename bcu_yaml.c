@@ -54,14 +54,18 @@ void writeConf(void)
 	fputs("# show_id can set the display order of the rails.\n# show_id should start from 1.\n# If show_id: 0, it means that this rail will not be displayed and dumped.\n", fp);
 	fputs("#\n# Please DO NOT delete any line of a power rail!\n# If you don't want to show it, please just set its \"show_id\" as 0.\n", fp);
 	fputs("#\n# Unit of rsense1 and rsense2 is Milliohm\n", fp);
+	fputs("#\n# \"israngefixed: false\": you can change sense resister by pressing the coresponding key when BCU runs\n", fp);
+	fputs("# \"israngefixed: true\": you cannot change sense resister when BCU runs, but it makes BCU reading faster.\n", fp);
+	fputs("#                       you can also choose to use which sense resister through \"extra_sr\" in this file.\n", fp);
+
 
 	for(j = 0; j < get_board_numer(); j++)
 	{
 		struct board_info* board=get_board_by_id(j);
 
-		sprintf(text, "boardname: %s\n", board->name);
+		sprintf(text, "\n\nboardname: %s\n", board->name);
 		fputs(text, fp);
-		sprintf(text, "# \"israngefixed: false\": you can change sense resister by pressing the coresponding key when BCU runs\n# \"israngefixed: true\": you cannot change sense resister when BCU runs\nisrangefixed: true\n");
+		sprintf(text, "israngefixed: true\n");
 		fputs(text, fp);
 		sprintf(text, "mappings:\n");
 		fputs(text, fp);
@@ -98,7 +102,7 @@ void writeConf(void)
 				{
 					sprintf(text, "extra_sr: 1   ");
 					fputs(text, fp);
-					sprintf(text, "} #Range: 1-%.1fmA, 0-%.1fmA\n", 100000.0 / rs1, 100000.0 / rs2);
+					sprintf(text, "} #Range: 1=>%.1fmA, 0=>%.1fmA\n", 100000.0 / rs1, 100000.0 / rs2);
 					fputs(text, fp);
 				}
 				else
