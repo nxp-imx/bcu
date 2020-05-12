@@ -1749,8 +1749,14 @@ int find_board_by_eeprom(struct options_setting* setting)
 
 #include "bcu_yaml.h"
 
+void terminateBCU()
+{
+	ft4232h_i2c_remove_all();
+}
+
 int main(int argc, char** argv)
 {
+	atexit(terminateBCU);
 #ifdef _WIN32
 	SetThreadPriority(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
 #endif

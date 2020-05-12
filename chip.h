@@ -42,7 +42,7 @@ struct device {
 	int (*free)(void* p); // if there is any variable inside the device need to be free
 };
 
-
+#define MAX_FT_I2C_CHANNEL_NUMBER 2
 struct i2c_device {
 	struct device device;
 	int (*i2c_read)(void*, unsigned char*, int); //Read one byte, give ack/nack
@@ -121,6 +121,7 @@ struct ft4232h {
 	int channel;
 	unsigned char dir_bitmask;//define direction of the pins, 1 is outputm, 0 is input
 	unsigned char val_bitmask; //define the output value of the bitmask, the value of each bit is only valid when the coresponding direction bit is 1
+	int isinit;
 };
 int ft4232h_i2c_read(void* ft4232h, unsigned char* data_buffer, int is_nack);
 int ft4232h_i2c_write(void* ft4232h, unsigned char data);
@@ -129,6 +130,7 @@ int ft4232h_i2c_stop(void* ft4232h);
 void* ft4232h_i2c_create(char* chip_specification, void* parent);
 int ft4232h_i2c_init(struct ft4232h* ft);
 int ft4232h_i2c_free(void* ft4232h);
+void ft4232h_i2c_remove_all(void);
 ///////////////////////////////////////////////////////////////////////
 
 struct ft4232h_gpio {

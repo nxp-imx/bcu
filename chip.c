@@ -177,59 +177,79 @@ int pca9548_set_channel(struct pca9548* pca9548)
 	return 0;
 }
 
+struct ft4232h g_ft[MAX_FT_I2C_CHANNEL_NUMBER];
+
 ////////////////////////////////ft4232H///////////////////////////////////
 void* ft4232h_i2c_create(char* chip_specification, void* parent)
 {
-	struct ft4232h* ft = malloc(sizeof(struct ft4232h));
-	if (ft == NULL)
+	int channel = extract_parameter_value(chip_specification, "channel");
+	if (g_ft[channel].isinit == 0)
 	{
-		printf("malloc failed\n");
-		return NULL;
-	}
-	ft->i2c_device.device.parent = parent;
-	ft->i2c_device.i2c_read = ft4232h_i2c_read;
-	ft->i2c_device.i2c_write = ft4232h_i2c_write;
-	ft->i2c_device.i2c_start = ft4232h_i2c_start;
-	ft->i2c_device.i2c_stop = ft4232h_i2c_stop;
-	ft->i2c_device.device.free = ft4232h_i2c_free;
-	ft->channel = extract_parameter_value(chip_specification, "channel");
-	if (extract_parameter_value(chip_specification, "dir_bitmask") == -1)
-	{
-		printf("set dir_bitmask as default value 0x00\n");
-		ft->dir_bitmask = 0x00;//default should be zero if parameter is not entered;
-	}
-	else
-		ft->dir_bitmask = extract_parameter_value(chip_specification, "dir_bitmask");
-	if (extract_parameter_value(chip_specification, "val_bitmask") == -1)
-	{
-		printf("set val_bitmask as default value 0x00\n");
-		ft->val_bitmask = 0x00;//default should be zero if parameter is not entered;
-	}
-	else
-		ft->val_bitmask = extract_parameter_value(chip_specification, "val_bitmask");
+		// g_ft[channel] = malloc(sizeof(struct ft4232h));
+		// if (g_ft[channel] == NULL)
+		// {
+		// 	printf("malloc failed\n");
+		// 	return NULL;
+		// }
+		g_ft[channel].i2c_device.device.parent = parent;
+		g_ft[channel].i2c_device.i2c_read = ft4232h_i2c_read;
+		g_ft[channel].i2c_device.i2c_write = ft4232h_i2c_write;
+		g_ft[channel].i2c_device.i2c_start = ft4232h_i2c_start;
+		g_ft[channel].i2c_device.i2c_stop = ft4232h_i2c_stop;
+		g_ft[channel].i2c_device.device.free = ft4232h_i2c_free;
+		g_ft[channel].channel = channel;
+		if (extract_parameter_value(chip_specification, "dir_bitmask") == -1)
+		{
+			printf("set dir_bitmask as default value 0x00\n");
+			g_ft[channel].dir_bitmask = 0x00;//default should be zero if parameter is not entered;
+		}
+		else
+			g_ft[channel].dir_bitmask = extract_parameter_value(chip_specification, "dir_bitmask");
+		if (extract_parameter_value(chip_specification, "val_bitmask") == -1)
+		{
+			printf("set val_bitmask as default value 0x00\n");
+			g_ft[channel].val_bitmask = 0x00;//default should be zero if parameter is not entered;
+		}
+		else
+			g_ft[channel].val_bitmask = extract_parameter_value(chip_specification, "val_bitmask");
 
-	ft_init(&(ft->ftdi_info));
+		ft_init(&(g_ft[channel].ftdi_info));
 
-	int status;
-	if (strlen(GV_LOCATION_ID) == 0) {
-		status = ft_open_channel(&ft->ftdi_info, ft->channel);
-	}
-	else {
-		status = ft_open_channel_by_id(&ft->ftdi_info, ft->channel, GV_LOCATION_ID);
-	}
+		int status;
+		if (strlen(GV_LOCATION_ID) == 0) {
+			status = ft_open_channel(&g_ft[channel].ftdi_info, g_ft[channel].channel);
+		}
+		else {
+			status = ft_open_channel_by_id(&g_ft[channel].ftdi_info, g_ft[channel].channel, GV_LOCATION_ID);
+		}
 
-	if (status != 0)
-	{
-		printf("failed to open ftdi device!\n");
+		if (status != 0)
+		{
+			printf("failed to open ftdi device!\n");
 #ifdef __linux__
-		printf("***please make sure you run bcu with sudo\n");
+			printf("***please make sure you run bcu with sudo\n");
 #endif		
-		free(ft);
-		return NULL;
+			// free(g_ft[channel]);
+			return NULL;
+		}
+		status = ft4232h_i2c_init(&g_ft[channel]);
+		if (status)
+			return NULL;
+		g_ft[channel].isinit = 1;
 	}
-	ft4232h_i2c_init(ft);
 	//printf("ft4232h created!\n");
-	return ft;
+	return &g_ft[channel];
+}
+
+void ft4232h_i2c_remove_all(void)
+{
+	int i;
+	for (i = 0; i < MAX_FT_I2C_CHANNEL_NUMBER; i++)
+	{
+		if (g_ft[i].isinit == 1)
+			ft_close(&g_ft[i].ftdi_info);
+			// ft4232h_i2c_free(&g_ft[i]);
+	}
 }
 
 int ft4232h_i2c_read(void* ft4232h, unsigned char* data_buffer, int is_nack)
