@@ -178,6 +178,7 @@ int pca9548_set_channel(struct pca9548* pca9548)
 }
 
 struct ft4232h g_ft[MAX_FT_I2C_CHANNEL_NUMBER];
+struct ft4232h_gpio g_ft_io[MAX_FT_I2C_CHANNEL_NUMBER];
 
 ////////////////////////////////ft4232H///////////////////////////////////
 void* ft4232h_i2c_create(char* chip_specification, void* parent)
@@ -185,6 +186,12 @@ void* ft4232h_i2c_create(char* chip_specification, void* parent)
 	int channel = extract_parameter_value(chip_specification, "channel");
 	if (g_ft[channel].isinit == 0)
 	{
+		if (g_ft_io[channel].isinit)
+		{
+			ft_close(&g_ft_io[channel].ftdi_info);
+			g_ft_io[channel].isinit = 0;
+			msleep(10);
+		}
 		// g_ft[channel] = malloc(sizeof(struct ft4232h));
 		// if (g_ft[channel] == NULL)
 		// {
@@ -467,43 +474,57 @@ int ft4232h_i2c_free(void* ft4232h)
 
 void* ft4232h_gpio_create(char* chip_specification, void* parent)
 {
-
-	struct ft4232h_gpio* ft = malloc(sizeof(struct ft4232h_gpio));
-	if (ft == NULL)
+	int channel = extract_parameter_value(chip_specification, "channel");
+	if (g_ft_io[channel].isinit == 0)
 	{
-		printf("malloc failed\n");
-		return NULL;
-	}
-	ft->gpio_device.device.parent = parent;
-	//ft->gpio_device.gpio_read=ft4232h_gpio_read;
-	ft->gpio_device.gpio_write = ft4232h_gpio_write;
-	//ft->gpio_device.gpio_toggle=ft4232h_gpio_toggle;
-	ft->gpio_device.device.free = ft4232h_gpio_free;
-	ft->gpio_device.pin_bitmask = extract_parameter_value(chip_specification, "pin_bitmask");
-	ft->channel = extract_parameter_value(chip_specification, "channel");
+		if (g_ft[channel].isinit)
+		{
+			ft_close(&g_ft[channel].ftdi_info);
+			g_ft[channel].isinit = 0;
+			msleep(10);
+		}
+		//struct ft4232h_gpio* ft = malloc(sizeof(struct ft4232h_gpio));
+		//if (ft == NULL)
+		//{
+		//	printf("malloc failed\n");
+		//	return NULL;
+		//}
+		g_ft_io[channel].gpio_device.device.parent = parent;
+		//g_ft_io[channel].gpio_device.gpio_read=ft4232h_gpio_read;
+		g_ft_io[channel].gpio_device.gpio_write = ft4232h_gpio_write;
+		//ft->gpio_device.gpio_toggle=ft4232h_gpio_toggle;
+		g_ft_io[channel].gpio_device.device.free = ft4232h_gpio_free;
+		g_ft_io[channel].gpio_device.pin_bitmask = extract_parameter_value(chip_specification, "pin_bitmask");
+		g_ft_io[channel].channel = channel;
 
-	ft_init(&(ft->ftdi_info));
-	int status;
-	if (strlen(GV_LOCATION_ID) == 0) {
-		status = ft_open_channel(&ft->ftdi_info, ft->channel);
-	}
-	else {
-		status = ft_open_channel_by_id(&ft->ftdi_info, ft->channel, GV_LOCATION_ID);
-	}
+		ft_init(&(g_ft_io[channel].ftdi_info));
+		int status;
+		if (strlen(GV_LOCATION_ID) == 0) {
+			status = ft_open_channel(&g_ft_io[channel].ftdi_info, g_ft_io[channel].channel);
+		}
+		else {
+			status = ft_open_channel_by_id(&g_ft_io[channel].ftdi_info, g_ft_io[channel].channel, GV_LOCATION_ID);
+		}
 
 
-	if (status != 0)
-	{
-		printf("failed to open ftdi device!\n");
+		if (status != 0)
+		{
+			printf("failed to open ftdi device!\n");
 #ifdef __linux__
-		printf("***please make sure you run bcu with sudo\n");
+			printf("***please make sure you run bcu with sudo\n");
 #endif			
 
-		free(ft);
-		return NULL;
+			//free(g_ft_io[channel]);
+			return NULL;
+		}
+		g_ft_io[channel].isinit = 1;
+	}
+	else
+	{
+		g_ft_io[channel].gpio_device.pin_bitmask = extract_parameter_value(chip_specification, "pin_bitmask");
 	}
 
-	return ft;
+	return &g_ft_io[channel];
 }
 
 

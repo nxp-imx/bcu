@@ -138,6 +138,7 @@ struct ft4232h_gpio {
 	struct ftdi_info ftdi_info;
 	int channel;
 	unsigned char pin_bitmask;
+	int isinit;
 };
 int ft4232h_gpio_read(void* ft4232h, unsigned char* bit_value_buffer);
 int ft4232h_gpio_write(void* ft4232h, unsigned char bit_value);
