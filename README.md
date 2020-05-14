@@ -135,7 +135,15 @@ ________________________________________________________________________________
 
   Please make sure your imx8mp power CPU board has done this rework:
 
-  https://nxp1.sharepoint.com/:b:/r/sites/MCUlibrary/mscale865/03_Applications/Power%20Measurement/Rework%20Instructions%20For%20IMX8MPLUSLPD4-PWR%20RevA%20VER0.1.pdf?csf=1&web=1&e=U1q6sq
+- R208 from 1.0Ohm to 0.4Ohm
+
+- R76  from 0.4Ohm to 1.0Ohm
+
+- R225 from 2.0Ohm to 1.0Ohm
+
+- R227 from 2.0Ohm to 1.0Ohm
+
+- R129 from 0.1Ohm to 0.05Ohm
 
   If your board is not reworked, please use the 1.0.28 or older version of BCU.
 
