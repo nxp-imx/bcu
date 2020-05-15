@@ -31,7 +31,7 @@
 #ifndef BCU_YAML_H
 #define BCU_YAML_H
 
-#include "libyaml/include/yaml.h"
+#include "msvs/libyaml/yaml.h"
 #include "board.h"
 #include "bcu_parser.h"
 
