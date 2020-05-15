@@ -19,6 +19,7 @@ init:
 
 install:
 # - sh: sudo apt-get update
+- cmd: git submodule update --init
 - sh: sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libftdi1-dev
 - sh: sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libusb-1.0-0-dev
 
