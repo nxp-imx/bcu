@@ -54,6 +54,8 @@
 #include "chip.h"
 #include "board.h"
 #include "version.h"
+#include "bcu_yaml.h"
+#include "bcu_https.h"
 
 #define DONT_RESET	0
 #define RESET_NOW	1
@@ -110,6 +112,27 @@ static void print_version()
 	printf("version %s\n", GIT_VERSION);
 }
 
+static void upgrade_bcu()
+{
+	printf("now version %s\n", GIT_VERSION);
+
+	struct latest_git_info bcu_download_info;
+	strcpy(bcu_download_info.download_url_base, "https://github.com/NXPmicro/bcu/releases/download/");
+	strcpy(bcu_download_info.download_name, "bcu");
+#ifdef linux
+	strcpy(bcu_download_info.extension_name, "");
+#else
+	strcpy(bcu_download_info.extension_name, ".exe");
+#endif
+	if (https_get_by_url("https://api.github.com/repos/NXPmicro/bcu/releases", &bcu_download_info))
+	{
+		printf("Fail to get the latest BCU!\n");
+		return;
+	}
+	https_response_parse(&bcu_download_info);
+	https_download(&bcu_download_info);
+}
+
 static void print_help(char* cmd)
 {
 	if (cmd == NULL) {
@@ -134,6 +157,7 @@ static void print_help(char* cmd)
 		printf("	%s%-50s%s%s\n", g_vt_default, "lsgpio     [-board=]", g_vt_green, "show a list of available gpio pin of a board");
 		printf("\n");
 		printf("	%s%-50s%s%s%s\n", g_vt_default, "version", g_vt_green, "print version number", g_vt_default);
+		printf("	%s%-50s%s%s%s\n", g_vt_default, "upgrade", g_vt_green, "get the latest BCU release", g_vt_default);
 		printf("	%s%-50s%s%s%s\n", g_vt_default, "help", g_vt_green, "show command details", g_vt_default);
 		// printf("	%s%-50s%s%s%s\n", g_vt_default, "help [COMMAND_NAME]", g_vt_green, "show details and options of COMMAND_NAME", g_vt_default);
 
@@ -2027,9 +2051,7 @@ int find_board_by_eeprom(struct options_setting* setting)
 	return -1;
 }
 
-#include "bcu_yaml.h"
-
-void terminateBCU()
+void terminateBCU(void)
 {
 	ft4232h_i2c_remove_all();
 }
@@ -2176,6 +2198,10 @@ int main(int argc, char** argv)
 	else if (strcmp(cmd, "version") == 0)
 	{
 		print_version();
+	}
+	else if (strcmp(cmd, "upgrade") == 0)
+	{
+		upgrade_bcu();
 	}
 	else
 	{
