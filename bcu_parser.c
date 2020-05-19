@@ -306,6 +306,12 @@ int parse_board_id_options(int argc, char** argv, struct options_setting* settin
 			// printf("location_id is %s\n", GV_LOCATION_ID);
 		}
 	}
+
+	if (strcmp(argv[1], "update") == 0)
+	{
+		return 0;
+	}
+
 	if (argc_count == argc)
 		return 1; //Not provide -board, try auto find board then
 	else
