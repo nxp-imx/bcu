@@ -1139,7 +1139,7 @@ static void monitor(struct options_setting* setting)
 				current = pac_data[group].vsense[sensor] / pd->power_get_res(pd);
 				cnow_fwrite[j] = current;
 
-				if (range_control == 1)
+				if (range_control == 0)
 				{
 					range_level[j] = (char)(0 | range_level[j] << 4);  //mA
 				}
@@ -1604,7 +1604,7 @@ static void monitor(struct options_setting* setting)
 		ch = catch_input_char();
 		if (setting->nodisplay == 0 && candisplay == 1 && available_height >= 40)
 		{
-			printf("Hot-key: 1=reset %s; 2=reset MaxMin; 3=reset %s and MaxMin; 4=switch show auto/mA/uA; Ctrl-C to exit...\n",
+			printf("Hot-key: 1=reset %s; 2=reset MaxMin; 3=reset %s and MaxMin; 4=switch show mA/auto/uA; Ctrl-C to exit...\n",
 						setting->use_rms ? "RMS" : "Avg", setting->use_rms ? "RMS" : "Avg");
 			if (setting->rangefixed == 0)
 			{
