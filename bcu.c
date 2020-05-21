@@ -1265,6 +1265,10 @@ static void monitor(struct options_setting* setting)
 		{
 			printf("%s", g_vt_green); //set the word as green
 
+			max_length = (get_max_power_name_length(board) <= 25) ? get_max_power_name_length(board) : 25;
+			max_length = (max_length < 8) ? 8 : max_length; //the word "location" has a minimum of 8 letters
+			location_length = max_length + 3;//1 for letter, 1 for space between letter and location_name, 1 for space between location and '|''
+
 			if (available_width - max_length < 60 || (available_width - max_length <= 129 && range_control == 2))
 			{
 				printf("the command line window's width is too narrow\n");
@@ -1276,10 +1280,6 @@ static void monitor(struct options_setting* setting)
 				msleep(1000);
 				continue;
 			}
-
-			max_length = (get_max_power_name_length(board) <= 25) ? get_max_power_name_length(board) : 25;
-			max_length = (max_length < 8) ? 8 : max_length; //the word "location" has a minimum of 8 letters
-			location_length = max_length + 3;//1 for letter, 1 for space between letter and location_name, 1 for space between location and '|''
 
 			printfpadding(" ", location_length);
 			if (available_width - max_length > 103)
