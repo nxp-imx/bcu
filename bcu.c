@@ -177,18 +177,20 @@ static void lsboard(struct options_setting* setting)
 	return;
 }
 
-static void lsbootmode(struct options_setting* setting)
+static int lsbootmode(struct options_setting* setting)
 {
 	struct board_info* board = get_board(setting->board);
 	if (board == NULL)
-		return;
+		return -1;
 	int i = 0;
 	printf("\navailable boot mode:\n\n");
 	while (board->boot_modes[i].name != NULL)
 	{
-		printf("	%s\n", board->boot_modes[i].name);
+		printf("%d	%s\n", i, board->boot_modes[i].name);
 		i++;
 	}
+
+	return i;
 }
 
 struct gpio_device* get_gpio(char* gpio_name, struct board_info* board)
@@ -1604,8 +1606,9 @@ static void monitor(struct options_setting* setting)
 		ch = catch_input_char();
 		if (setting->nodisplay == 0 && candisplay == 1 && available_height >= 40)
 		{
-			printf("Hot-key: 1=reset %s; 2=reset MaxMin; 3=reset %s and MaxMin; 4=switch show mA/auto/uA; Ctrl-C to exit...\n",
+			printf("Hot-key: 1=reset %s; 2=reset MaxMin; 3=reset %s and MaxMin; 4=switch show mA/auto/uA;\n",
 						setting->use_rms ? "RMS" : "Avg", setting->use_rms ? "RMS" : "Avg");
+			printf("         5=reset board; Ctrl-C to exit...\n");
 			if (setting->rangefixed == 0)
 			{
 				printf("press the letter on keyboard to control coresponding extra sense resistor(Extra SR)\n");
@@ -1623,6 +1626,7 @@ static void monitor(struct options_setting* setting)
 		if (isxdigit(ch))
 		{
 			int hotkey_index = (int)ch - '0';
+			int bootmodenum = 0;
 			switch (hotkey_index)
 			{
 			case 1:
@@ -1668,6 +1672,39 @@ static void monitor(struct options_setting* setting)
 				range_control++;
 				if (range_control > 2)
 					range_control = 0;
+				break;
+			case 5:
+				bootmodenum = lsbootmode(setting);
+
+				printf("others  boot from BOOT SWITCH\n");
+				printf("\nPlease select the boot mode after reset: ");
+				scanf("%d", &setting->boot_mode_hex);
+				if (setting->boot_mode_hex >= bootmodenum || setting->boot_mode_hex < 0)
+					setting->boot_mode_hex = -1;
+
+				reset(setting);
+				ft4232h_i2c_remove_all();
+				strcpy(previous_path, "");
+
+				msleep(150); //wait PMIC power on
+
+				//reset AVG/MIN/MAX
+				for (int k = 0; k < n; k++)
+				{
+					cavg[k] = 0;
+					vavg[k] = 0;
+					pavg[k] = 0;
+					data_size[k] = 0;
+					cmin[k] = 99999;
+					vmin[k] = 99999;
+					pmin[k] = 99999;
+					cmax[k] = 0;
+					vmax[k] = 0;
+					pmax[k] = 0;
+				}
+				get_msecond(&maxminstart);
+				avgstart = maxminstart;
+
 				break;
 			default:
 				break;
