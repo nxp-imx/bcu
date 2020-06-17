@@ -1706,7 +1706,7 @@ static void monitor(struct options_setting* setting)
 		{
 			printf("Hot-key: 1=reset %s; 2=reset MaxMin; 3=reset %s and MaxMin; 4=switch show mA/auto/uA;\n",
 						setting->use_rms ? "RMS" : "Avg", setting->use_rms ? "RMS" : "Avg");
-			printf("         5=reset board; Ctrl-C to exit...\n");
+			printf("         5=reset board; 6=resume the board; Ctrl-C to exit...\n");
 			if (setting->rangefixed == 0)
 			{
 				printf("press the letter on keyboard to control coresponding extra sense resistor(Extra SR)\n");
@@ -1804,6 +1804,10 @@ static void monitor(struct options_setting* setting)
 				avgstart = maxminstart;
 				reset_flag = 1;
 
+				break;
+			case 6:
+				printf("\nSimulate pressing the ON/OFF button once shortly\n");
+				resume(setting);
 				break;
 			default:
 				break;
