@@ -839,6 +839,7 @@ static void monitor(struct options_setting* setting)
 	maxminstart = start;
 	unsigned long times = 1;
 	FILE* fptr = NULL;
+	int reset_flag = 0;
 
 	if (setting->dump == 1)
 	{
@@ -1137,6 +1138,38 @@ static void monitor(struct options_setting* setting)
 			{
 				name[j] = i;
 
+				if (reset_flag == 1)
+				{
+					strcpy(sr_name, "SR_");
+					strcat(sr_name, board->mappings[name[j]].name);
+					if (get_path(sr_path, sr_name, board) != -1)
+					{
+						end_point = build_device_linkedlist_smart(&head, sr_path, head, previous_path);
+						strcpy(previous_path, sr_path);
+
+						if (end_point == NULL) {
+							printf("monitor:failed to build device linkedlist\n");
+							if (setting->dump == 1)
+							{
+								fclose(fptr);
+							}
+							return;
+						}
+						struct gpio_device* gd = end_point;
+						unsigned char data;
+						gd->gpio_get_output(gd, &data);
+
+						if (data == 0)
+							sr_level[j] = 0;
+						else
+							sr_level[j] = 1;
+					}
+					else
+					{
+						sr_level[j] = -1;
+					}
+				}
+
 				end_point = build_device_linkedlist_smart(&head, board->mappings[i].path, head, previous_path);
 				strcpy(previous_path, board->mappings[i].path);
 
@@ -1238,6 +1271,9 @@ static void monitor(struct options_setting* setting)
 				j++;
 			i++;
 		}
+
+		if (reset_flag == 1)
+			reset_flag = 0;
 
 #if 1
 		//get groups data
@@ -1724,6 +1760,7 @@ static void monitor(struct options_setting* setting)
 				}
 				get_msecond(&maxminstart);
 				avgstart = maxminstart;
+				reset_flag = 1;
 
 				break;
 			default:
