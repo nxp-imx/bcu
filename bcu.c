@@ -361,9 +361,7 @@ static void initialize(struct options_setting* setting, int isreset)
 		output = get_gpio_info_by_initid(name, path, initid, board);
 		if (output < 0)
 		{
-			if (isreset)
-				printf("rebooting...\n");
-			else
+			if (!isreset)
 				printf("board initialization finished\n");
 			break;
 		}
@@ -446,6 +444,7 @@ static void reset(struct options_setting* setting)
 
 	initialize(setting, RESET_NOW);
 
+	printf("Set %sALL%s rails to %slarge range%s\n", g_vt_yellow, g_vt_default, g_vt_yellow, g_vt_default);
 	while (board->mappings[a].name != NULL)
 	{
 		if (board->mappings[a].type == power)
@@ -464,6 +463,8 @@ static void reset(struct options_setting* setting)
 		}
 		a++;
 	}
+
+	printf("rebooting...\n");
 
 	gpio = get_gpio("reset", board);
 	if (gpio == NULL)
