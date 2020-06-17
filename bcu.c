@@ -1003,6 +1003,38 @@ static void monitor(struct options_setting* setting)
 					sr_level[a] = -1;
 				}
 			}
+			//get SR(sense resistor) switch logic level
+			else
+			{
+				strcpy(sr_name, "SR_");
+				strcat(sr_name, board->mappings[a].name);
+				if (get_path(sr_path, sr_name, board) != -1)
+				{
+					end_point = build_device_linkedlist_smart(&head, sr_path, head, previous_path);
+					strcpy(previous_path, sr_path);
+
+					if (end_point == NULL) {
+						printf("monitor:failed to build device linkedlist\n");
+						if (setting->dump == 1)
+						{
+							fclose(fptr);
+						}
+						return;
+					}
+					struct gpio_device* gd = end_point;
+					unsigned char data;
+					gd->gpio_get_output(gd, &data);
+
+					if (data == 0)
+						sr_level[a] = 0;
+					else
+						sr_level[a] = 1;
+				}
+				else
+				{
+					sr_level[a] = -1;
+				}
+			}
 		}
 		a++;
 	}
@@ -1104,39 +1136,6 @@ static void monitor(struct options_setting* setting)
 			if (board->mappings[i].type == power && (board->mappings[i].initinfo >> 2) != 0)
 			{
 				name[j] = i;
-
-				//get SR(sense resistor) switch logic level
-				if (setting->rangefixed == 0)
-				{
-					strcpy(sr_name, "SR_");
-					strcat(sr_name, board->mappings[name[j]].name);
-					if (get_path(sr_path, sr_name, board) != -1)
-					{
-						end_point = build_device_linkedlist_smart(&head, sr_path, head, previous_path);
-						strcpy(previous_path, sr_path);
-
-						if (end_point == NULL) {
-							printf("monitor:failed to build device linkedlist\n");
-							if (setting->dump == 1)
-							{
-								fclose(fptr);
-							}
-							return;
-						}
-						struct gpio_device* gd = end_point;
-						unsigned char data;
-						gd->gpio_get_output(gd, &data);
-
-						if (data == 0)
-							sr_level[j] = 0;
-						else
-							sr_level[j] = 1;
-					}
-					else
-					{
-						sr_level[j] = -1;
-					}
-				}
 
 				end_point = build_device_linkedlist_smart(&head, board->mappings[i].path, head, previous_path);
 				strcpy(previous_path, board->mappings[i].path);
@@ -1766,9 +1765,7 @@ static void monitor(struct options_setting* setting)
 						gd->gpio_write(gd, 0x00);
 
 					msleep(2);
-					data = ~data;
-					sr_level[sr_index] = data == 0 ? 0 : 1;
-
+					sr_level[sr_index] = (!data == 0) ? 0 : 1;
 				}
 			}
 		}

@@ -245,7 +245,7 @@ int readConf(char* boardname, struct options_setting* setting)
 					}
 					else
 					{
-						setting->rangefixed = 1;
+						setting->rangefixed = 0;
 					}
 				}break;
 				case STATUS_CHANGE_RSENSE1:
