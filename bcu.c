@@ -441,8 +441,29 @@ static void reset(struct options_setting* setting)
 		return;
 	struct gpio_device* gpio = NULL;
 	int status = -1;
+	int a = 0;
+	char sr_name[100];
 
 	initialize(setting, RESET_NOW);
+
+	while (board->mappings[a].name != NULL)
+	{
+		if (board->mappings[a].type == power)
+		{
+			strcpy(sr_name, "SR_");
+			strcat(sr_name, board->mappings[a].name);
+
+			gpio = get_gpio(sr_name, board);
+			if (gpio == NULL)
+			{
+				a++;
+				continue;
+			}
+			status = gpio->gpio_write(gpio, 0xFF); //set it high.
+			free_gpio(gpio);
+		}
+		a++;
+	}
 
 	gpio = get_gpio("reset", board);
 	if (gpio == NULL)
