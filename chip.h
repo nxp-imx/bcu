@@ -34,6 +34,8 @@
 
 #include "port.h"
 
+#define MAX_FT_I2C_CHANNEL_NUMBER 2
+
 struct device {
 	char* name;
 	int type;
@@ -42,7 +44,6 @@ struct device {
 	int (*free)(void* p); // if there is any variable inside the device need to be free
 };
 
-#define MAX_FT_I2C_CHANNEL_NUMBER 2
 struct i2c_device {
 	struct device device;
 	int (*i2c_read)(void*, unsigned char*, int); //Read one byte, give ack/nack
@@ -117,7 +118,7 @@ int pca9548_set_channel(struct pca9548* pca9548);
 ///////////////////////////////////////////////////////////////////////
 struct ft4232h {
 	struct i2c_device i2c_device;
-	struct ftdi_info ftdi_info;
+	struct ftdi_info* ftdi_info;
 	int channel;
 	unsigned char dir_bitmask;//define direction of the pins, 1 is outputm, 0 is input
 	unsigned char val_bitmask; //define the output value of the bitmask, the value of each bit is only valid when the coresponding direction bit is 1
@@ -135,7 +136,7 @@ void ft4232h_i2c_remove_all(void);
 
 struct ft4232h_gpio {
 	struct gpio_device gpio_device;
-	struct ftdi_info ftdi_info;
+	struct ftdi_info* ftdi_info;
 	int channel;
 	unsigned char pin_bitmask;
 	int isinit;

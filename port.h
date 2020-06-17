@@ -69,6 +69,8 @@ struct ftdi_info {
 #else
 	struct ftdi_context* ftdi;
 #endif
+
+	int isinit;
 };
 
 enum BITMODE

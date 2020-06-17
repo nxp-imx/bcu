@@ -177,75 +177,77 @@ int pca9548_set_channel(struct pca9548* pca9548)
 	return 0;
 }
 
-struct ft4232h g_ft[MAX_FT_I2C_CHANNEL_NUMBER];
-struct ft4232h_gpio g_ft_io[MAX_FT_I2C_CHANNEL_NUMBER];
+struct ftdi_info g_ftdi_info[MAX_FT_I2C_CHANNEL_NUMBER];
 
 ////////////////////////////////ft4232H///////////////////////////////////
 void* ft4232h_i2c_create(char* chip_specification, void* parent)
 {
-	int channel = extract_parameter_value(chip_specification, "channel");
-	if (g_ft[channel].isinit == 0)
+	struct ft4232h* ft = malloc(sizeof(struct ft4232h));
+	if (ft == NULL)
 	{
-		if (g_ft_io[channel].isinit)
-		{
-			ft_close(&g_ft_io[channel].ftdi_info);
-			g_ft_io[channel].isinit = 0;
-			msleep(10);
-		}
-		// g_ft[channel] = malloc(sizeof(struct ft4232h));
-		// if (g_ft[channel] == NULL)
-		// {
-		// 	printf("malloc failed\n");
-		// 	return NULL;
-		// }
-		g_ft[channel].i2c_device.device.parent = parent;
-		g_ft[channel].i2c_device.i2c_read = ft4232h_i2c_read;
-		g_ft[channel].i2c_device.i2c_write = ft4232h_i2c_write;
-		g_ft[channel].i2c_device.i2c_start = ft4232h_i2c_start;
-		g_ft[channel].i2c_device.i2c_stop = ft4232h_i2c_stop;
-		g_ft[channel].i2c_device.device.free = ft4232h_i2c_free;
-		g_ft[channel].channel = channel;
-		if (extract_parameter_value(chip_specification, "dir_bitmask") == -1)
-		{
-			printf("set dir_bitmask as default value 0x00\n");
-			g_ft[channel].dir_bitmask = 0x00;//default should be zero if parameter is not entered;
-		}
-		else
-			g_ft[channel].dir_bitmask = extract_parameter_value(chip_specification, "dir_bitmask");
-		if (extract_parameter_value(chip_specification, "val_bitmask") == -1)
-		{
-			printf("set val_bitmask as default value 0x00\n");
-			g_ft[channel].val_bitmask = 0x00;//default should be zero if parameter is not entered;
-		}
-		else
-			g_ft[channel].val_bitmask = extract_parameter_value(chip_specification, "val_bitmask");
+		printf("malloc failed\n");
+		return NULL;
+	}
+	ft->i2c_device.device.parent = parent;
+	ft->i2c_device.i2c_read = ft4232h_i2c_read;
+	ft->i2c_device.i2c_write = ft4232h_i2c_write;
+	ft->i2c_device.i2c_start = ft4232h_i2c_start;
+	ft->i2c_device.i2c_stop = ft4232h_i2c_stop;
+	ft->i2c_device.device.free = ft4232h_i2c_free;
+	ft->channel = extract_parameter_value(chip_specification, "channel");
+	if (extract_parameter_value(chip_specification, "dir_bitmask") == -1)
+	{
+		printf("set dir_bitmask as default value 0x00\n");
+		ft->dir_bitmask = 0x00;//default should be zero if parameter is not entered;
+	}
+	else
+		ft->dir_bitmask = extract_parameter_value(chip_specification, "dir_bitmask");
+	if (extract_parameter_value(chip_specification, "val_bitmask") == -1)
+	{
+		printf("set val_bitmask as default value 0x00\n");
+		ft->val_bitmask = 0x00;//default should be zero if parameter is not entered;
+	}
+	else
+		ft->val_bitmask = extract_parameter_value(chip_specification, "val_bitmask");
 
-		ft_init(&(g_ft[channel].ftdi_info));
-
-		int status;
-		if (strlen(GV_LOCATION_ID) == 0) {
-			status = ft_open_channel(&g_ft[channel].ftdi_info, g_ft[channel].channel);
-		}
-		else {
-			status = ft_open_channel_by_id(&g_ft[channel].ftdi_info, g_ft[channel].channel, GV_LOCATION_ID);
-		}
-
-		if (status != 0)
+	ft->ftdi_info = &g_ftdi_info[ft->channel];
+	for (int i=0; i < MAX_FT_I2C_CHANNEL_NUMBER; i++)
+	{
+		if (g_ftdi_info[i].isinit & 0xF0)
 		{
-			printf("failed to open ftdi device!\n");
+			g_ftdi_info[i].isinit = 1;
+			ft->ftdi_info->isinit = 0x10;
+		}
+	}
+
+	if (!(ft->ftdi_info->isinit & 0xF))
+	{
+		if (!(ft->ftdi_info->isinit & 0xF0))
+		{
+			ft_init(ft->ftdi_info);
+			int status = 0;
+			if (strlen(GV_LOCATION_ID) == 0) {
+				status = ft_open_channel(ft->ftdi_info, ft->channel);
+			}
+			else {
+				status = ft_open_channel_by_id(ft->ftdi_info, ft->channel, GV_LOCATION_ID);
+			}
+
+			if (status != 0)
+			{
+				printf("failed to open ftdi device!\n");
 #ifdef __linux__
-			printf("***please make sure you run bcu with sudo\n");
+				printf("***please make sure you run bcu with sudo\n");
 #endif		
-			// free(g_ft[channel]);
-			return NULL;
+				free(ft);
+				return NULL;
+			}
 		}
-		status = ft4232h_i2c_init(&g_ft[channel]);
-		if (status)
-			return NULL;
-		g_ft[channel].isinit = 1;
+		ft4232h_i2c_init(ft);
+		ft->ftdi_info->isinit = 0x1;
 	}
 	//printf("ft4232h created!\n");
-	return &g_ft[channel];
+	return ft;
 }
 
 void ft4232h_i2c_remove_all(void)
@@ -253,8 +255,8 @@ void ft4232h_i2c_remove_all(void)
 	int i;
 	for (i = 0; i < MAX_FT_I2C_CHANNEL_NUMBER; i++)
 	{
-		if (g_ft[i].isinit == 1)
-			ft_close(&g_ft[i].ftdi_info);
+		if (g_ftdi_info[i].isinit == 1)
+			ft_close(&g_ftdi_info[i]);
 			// ft4232h_i2c_free(&g_ft[i]);
 	}
 }
@@ -266,7 +268,7 @@ int ft4232h_i2c_read(void* ft4232h, unsigned char* data_buffer, int is_nack)
 	unsigned char in_buffer[MAX_FTDI_BUFFER_SIZE];
 	int i = 0, ftStatus = 0;
 #ifdef __linux__
-	ft_clear_buffer(&ft->ftdi_info);
+	ft_clear_buffer(ft->ftdi_info);
 #endif
 
 	buffer[i++] = MPSSE_CMD_SET_DATA_BITS_LOWBYTE;
@@ -289,9 +291,9 @@ int ft4232h_i2c_read(void* ft4232h, unsigned char* data_buffer, int is_nack)
 		buffer[i++] = 0x80;// MSB zero means ACK
 	else
 		buffer[i++] = 0x00;// MSB zero means ACK
-	ftStatus = ft_write(&ft->ftdi_info, buffer, i); //Send off the commands
+	ftStatus = ft_write(ft->ftdi_info, buffer, i); //Send off the commands
 	if (ftStatus < 0) return ftStatus;
-	ftStatus = ft_read(&ft->ftdi_info, in_buffer, 1); //Read one byte
+	ftStatus = ft_read(ft->ftdi_info, in_buffer, 1); //Read one byte
 	if (ftStatus < 0) return ftStatus;
 	*data_buffer = in_buffer[0];
 
@@ -306,7 +308,7 @@ int ft4232h_i2c_write(void* ft4232h, unsigned char data)
 	unsigned char in_buffer[MAX_FTDI_BUFFER_SIZE];
 	int i = 0, ftStatus = 0;
 #ifdef __linux__ 
-	ft_clear_buffer(&ft->ftdi_info);
+	ft_clear_buffer(ft->ftdi_info);
 #endif
 
 	buffer[i++] = MPSSE_CMD_SET_DATA_BITS_LOWBYTE; //Command to set directions of lower 8 pins and force value on bits set as output
@@ -335,9 +337,9 @@ int ft4232h_i2c_write(void* ft4232h, unsigned char data)
 	buffer[i++] = MPSSE_CMD_SET_DATA_BITS_LOWBYTE;/* MPSSE command */
 	buffer[i++] = VALUE_SCLLOW_SDALOW | ft->val_bitmask; /*Value*/
 	buffer[i++] = DIRECTION_SCLOUT_SDAOUT | ft->dir_bitmask; /*Direction*/
-	ftStatus = ft_write(&ft->ftdi_info, buffer, i); //Send off the commands
+	ftStatus = ft_write(ft->ftdi_info, buffer, i); //Send off the commands
 	if (ftStatus < 0) return ftStatus;
-	ftStatus = ft_read(&ft->ftdi_info, in_buffer, 1);
+	ftStatus = ft_read(ft->ftdi_info, in_buffer, 1);
 	if (ftStatus < 0) return ftStatus;
 
 	if (((in_buffer[0] & 0x1) != 0)) //Check ACK bit 0 on data byte read out
@@ -372,7 +374,7 @@ int ft4232h_i2c_start(void* ft4232h)
 	buffer[i++] = VALUE_SCLLOW_SDALOW | ft->val_bitmask;
 	buffer[i++] = DIRECTION_SCLOUT_SDAOUT | ft->dir_bitmask;
 
-	ftStatus = ft_write(&ft->ftdi_info, buffer, i); //Send off the commands
+	ftStatus = ft_write(ft->ftdi_info, buffer, i); //Send off the commands
 	if (ftStatus < 0)
 		return ftStatus;
 
@@ -409,7 +411,7 @@ int ft4232h_i2c_stop(void* ft4232h)
 	//buffer[i++]=0x80;
 	//buffer[i++]=0x00;
 	//buffer[i++]=0x10; /* Tristate the SCL & SDA pins */
-	ftStatus = ft_write(&ft->ftdi_info, buffer, i); //Send off the commands
+	ftStatus = ft_write(ft->ftdi_info, buffer, i); //Send off the commands
 	if (ftStatus < 0)
 		return ftStatus;
 
@@ -421,13 +423,13 @@ int ft4232h_i2c_init(struct ft4232h* ft)
 	unsigned char buffer[MAX_FTDI_BUFFER_SIZE];
 	int i = 0, ftStatus = 0;
 
-	ft_set_bitmode(&ft->ftdi_info, 0, 0); //resetting the controller
-	ft_set_bitmode(&ft->ftdi_info, 0, BM_MPSSE);//set as MPSSE
+	ft_set_bitmode(ft->ftdi_info, 0, 0); //resetting the controller
+	ft_set_bitmode(ft->ftdi_info, 0, BM_MPSSE);//set as MPSSE
 
 	buffer[i++] = MPSSE_CMD_DISABLE_CLOCK_DIVIDE_BY_5; //Ensure disable clock divide by 5 for 60Mhz master clock
 	buffer[i++] = MPSSE_CMD_DISABLE_ADAPTIVE_CLOCKING; //Ensure turn off adaptive clocking
 	buffer[i++] = MPSSE_CMD_ENABLE_3PHASE_CLOCKING; //PAC 1934 need it. Enable 3 phase data clock, used by I2C to allow data on one clock edges
-	ftStatus = ft_write(&ft->ftdi_info, buffer, i);
+	ftStatus = ft_write(ft->ftdi_info, buffer, i);
 	if (ftStatus < 0)
 		return ftStatus;
 
@@ -441,14 +443,14 @@ int ft4232h_i2c_init(struct ft4232h* ft)
 	buffer[i++] = (unsigned char)(CLOCK_DIVISOR_400K & '\xFF'); //Set 0xValueL of clock divisor
 	buffer[i++] = (unsigned char)((CLOCK_DIVISOR_400K >> 8) & '\xFF'); //Set 0xValueH of clock divisor
 
-	ftStatus = ft_write(&ft->ftdi_info, buffer, i);
+	ftStatus = ft_write(ft->ftdi_info, buffer, i);
 	if (ftStatus < 0)
 		return ftStatus;
 	i = 0; //Clear output buffer
 	msleep(20); //Delay for a while
 	//Turn off loop back in case
 	buffer[i++] = MPSEE_CMD_DISABLE_LOOPBACK; //Command to turn off loop back of TDI/TDO connection
-	ftStatus = ft_write(&ft->ftdi_info, buffer, i);
+	ftStatus = ft_write(ft->ftdi_info, buffer, i);
 	if (ftStatus < 0)
 		return ftStatus;
 	msleep(30); //Delay for a while
@@ -460,11 +462,13 @@ int ft4232h_i2c_init(struct ft4232h* ft)
 int ft4232h_i2c_free(void* ft4232h)
 {
 	struct ft4232h* ft = ft4232h;
-	int ftStatus = 0;
+	// int ftStatus = 0;
 
-	ftStatus = ft_close(&ft->ftdi_info);
-	if (ftStatus < 0)
-		return ftStatus;
+	// ftStatus = ft_close(ft->ftdi_info);
+	// if (ftStatus < 0)
+	// 	return ftStatus;
+
+	ft->ftdi_info = NULL;
 
 	return 0;
 }
@@ -474,38 +478,32 @@ int ft4232h_i2c_free(void* ft4232h)
 
 void* ft4232h_gpio_create(char* chip_specification, void* parent)
 {
-	int channel = extract_parameter_value(chip_specification, "channel");
-	if (g_ft_io[channel].isinit == 0)
-	{
-		if (g_ft[channel].isinit)
-		{
-			ft_close(&g_ft[channel].ftdi_info);
-			g_ft[channel].isinit = 0;
-			msleep(10);
-		}
-		//struct ft4232h_gpio* ft = malloc(sizeof(struct ft4232h_gpio));
-		//if (ft == NULL)
-		//{
-		//	printf("malloc failed\n");
-		//	return NULL;
-		//}
-		g_ft_io[channel].gpio_device.device.parent = parent;
-		//g_ft_io[channel].gpio_device.gpio_read=ft4232h_gpio_read;
-		g_ft_io[channel].gpio_device.gpio_write = ft4232h_gpio_write;
-		//ft->gpio_device.gpio_toggle=ft4232h_gpio_toggle;
-		g_ft_io[channel].gpio_device.device.free = ft4232h_gpio_free;
-		g_ft_io[channel].gpio_device.pin_bitmask = extract_parameter_value(chip_specification, "pin_bitmask");
-		g_ft_io[channel].channel = channel;
 
-		ft_init(&(g_ft_io[channel].ftdi_info));
-		int status;
+	struct ft4232h_gpio* ft = malloc(sizeof(struct ft4232h_gpio));
+	if (ft == NULL)
+	{
+		printf("malloc failed\n");
+		return NULL;
+	}
+	ft->gpio_device.device.parent = parent;
+	//ft->gpio_device.gpio_read=ft4232h_gpio_read;
+	ft->gpio_device.gpio_write = ft4232h_gpio_write;
+	//ft->gpio_device.gpio_toggle=ft4232h_gpio_toggle;
+	ft->gpio_device.device.free = ft4232h_gpio_free;
+	ft->gpio_device.pin_bitmask = extract_parameter_value(chip_specification, "pin_bitmask");
+	ft->channel = extract_parameter_value(chip_specification, "channel");
+
+	ft->ftdi_info = &g_ftdi_info[ft->channel];
+	if (!ft->ftdi_info->isinit)
+	{
+		ft_init(ft->ftdi_info);
+		int status = 0;
 		if (strlen(GV_LOCATION_ID) == 0) {
-			status = ft_open_channel(&g_ft_io[channel].ftdi_info, g_ft_io[channel].channel);
+			status = ft_open_channel(ft->ftdi_info, ft->channel);
 		}
 		else {
-			status = ft_open_channel_by_id(&g_ft_io[channel].ftdi_info, g_ft_io[channel].channel, GV_LOCATION_ID);
+			status = ft_open_channel_by_id(ft->ftdi_info, ft->channel, GV_LOCATION_ID);
 		}
-
 
 		if (status != 0)
 		{
@@ -514,17 +512,13 @@ void* ft4232h_gpio_create(char* chip_specification, void* parent)
 			printf("***please make sure you run bcu with sudo\n");
 #endif			
 
-			//free(g_ft_io[channel]);
+			free(ft);
 			return NULL;
 		}
-		g_ft_io[channel].isinit = 1;
-	}
-	else
-	{
-		g_ft_io[channel].gpio_device.pin_bitmask = extract_parameter_value(chip_specification, "pin_bitmask");
+		ft->ftdi_info->isinit = ft->ftdi_info->isinit << 4;
 	}
 
-	return &g_ft_io[channel];
+	return ft;
 }
 
 
@@ -532,17 +526,17 @@ int ft4232h_gpio_write(void* ft4232h, unsigned char bit_value)
 {
 	struct ft4232h_gpio* ft = ft4232h;
 	int mask = 0xFF;
-	if (ft_set_bitmode(&ft->ftdi_info, mask, BM_BITBANG) < 0)
+	if (ft_set_bitmode(ft->ftdi_info, mask, BM_BITBANG) < 0)
 		printf("failed to set bitmode\n");
 
 	unsigned char current_output;
-	ft_read_pins(&ft->ftdi_info, &current_output);
+	ft_read_pins(ft->ftdi_info, &current_output);
 	//printf("previous output: %x\n", current_output);
 
 	unsigned char data;
 	data = (current_output & (~ft->gpio_device.pin_bitmask)) | (bit_value & ft->gpio_device.pin_bitmask);
 
-	if (ft_write(&ft->ftdi_info, &data, 1) < 0)
+	if (ft_write(ft->ftdi_info, &data, 1) < 0)
 		printf("failed to write\n");
 
 	return 0;
@@ -564,7 +558,8 @@ int ft4232h_gpio_toggle(void* ft4232h)
 int ft4232h_gpio_free(void* ft4232h)
 {
 	struct ft4232h_gpio* ft = ft4232h;
-	ft_close(&ft->ftdi_info);
+	// ft_close(ft->ftdi_info);
+	ft->ftdi_info = NULL;
 	return 0;
 }
 
