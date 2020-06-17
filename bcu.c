@@ -112,6 +112,7 @@ static void print_help(char* cmd)
 		printf("%s\n\n", "bcu command [-options]");
 		printf("%s\n", "list of available commands:");
 		printf("	%s%-50s%s%s\n", g_vt_default, "reset  [BOOTMODE_NAME] [-board=] [-id=]", g_vt_green, "reset the board (optional [BOOTMODE_NAME])");
+		printf("	%s%-50s%s%s\n", g_vt_default, "resume [-board=] [-id=]", g_vt_green, "Simulate pressing the ON/OFF button once shortly");
 		printf("	%s%-50s%s%s\n", g_vt_default, "init   [BOOTMODE_NAME] [-board=] [-id=]", g_vt_green, "enable the remote control with a boot mode");
 		printf("	%s%-50s%s%s\n", g_vt_default, "deinit [BOOTMODE_NAME] [-board=] [-id=]", g_vt_green, "disable the remote control");
 		printf("\n");
@@ -212,6 +213,16 @@ struct gpio_device* get_gpio(char* gpio_name, struct board_info* board)
 	gpio = end_point;
 
 	return gpio;
+}
+
+int get_gpio_id(char* gpio_name, struct board_info* board)
+{
+	int id = 0;
+	char path[MAX_PATH_LENGTH];
+
+	id = get_path(path, gpio_name, board);
+
+	return id;
 }
 
 void free_gpio(struct gpio_device* gpio)
@@ -533,6 +544,36 @@ static void reset(struct options_setting* setting)
 		printf("reset failed, error = 0x%x\n", status);
 	else
 		printf("reset successfully\n");
+}
+
+static void resume(struct options_setting* setting)
+{
+	struct board_info* board = get_board(setting->board);
+	if (board == NULL)
+		return;
+	struct gpio_device* gpio = NULL;
+	int status = -1;
+	int mask;
+
+	gpio = get_gpio("onoff", board);
+	if (gpio == NULL)
+	{
+		printf("resume: error building device linked list\n");
+		return;
+	}
+
+	mask = board->mappings[get_gpio_id("onoff", board)].initinfo & 0xF;
+
+	status = gpio->gpio_write(gpio, mask ? 0x00 : 0xFF); //set it off.
+	msleep(500);
+	status = gpio->gpio_write(gpio, mask ? 0xFF : 0x00); //set it on.
+
+	free_gpio(gpio);
+
+	if (status)
+		printf("resume failed, error = 0x%x\n", status);
+	else
+		printf("resume successfully\n");
 }
 
 #ifdef __linux__
@@ -2004,6 +2045,10 @@ int main(int argc, char** argv)
 	else if (strcmp(cmd, "reset") == 0)
 	{
 		reset(&setting);
+	}
+	else if (strcmp(cmd, "resume") == 0)
+	{
+		resume(&setting);
 	}
 	else if (strcmp(cmd, "init") == 0)
 	{

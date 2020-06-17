@@ -450,7 +450,7 @@ int get_path(char* path, char* item_name, struct board_info* board)
 		if (strcmp(item_name, board->mappings[i].name) == 0)
 		{
 			strcpy(path, board->mappings[i].path);
-			return 0;
+			return i;
 		}
 		i++;
 	}
