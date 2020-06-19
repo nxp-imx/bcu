@@ -1736,6 +1736,11 @@ static void monitor(struct options_setting* setting)
 					pavg[k] = 0;
 					data_size[k] = 0;
 				}
+				for (int k = 0; k < num_of_groups; k++)
+				{
+					groups[k].avg = 0;
+					groups[k].avg_data_size = 0;
+				}
 				get_msecond(&avgstart);
 				break;
 			case 2:
@@ -1747,6 +1752,11 @@ static void monitor(struct options_setting* setting)
 					cmax[k] = 0;
 					vmax[k] = 0;
 					pmax[k] = 0;
+				}
+				for (int k = 0; k < num_of_groups; k++)
+				{
+					groups[k].max = 0;
+					groups[k].min = 99999;
 				}
 				get_msecond(&maxminstart);
 				break;
@@ -1763,6 +1773,13 @@ static void monitor(struct options_setting* setting)
 					cmax[k] = 0;
 					vmax[k] = 0;
 					pmax[k] = 0;
+				}
+				for (int k = 0; k < num_of_groups; k++)
+				{
+					groups[k].avg = 0;
+					groups[k].avg_data_size = 0;
+					groups[k].max = 0;
+					groups[k].min = 99999;
 				}
 				get_msecond(&maxminstart);
 				avgstart = maxminstart;
