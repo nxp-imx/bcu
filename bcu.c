@@ -1349,8 +1349,9 @@ static void monitor(struct options_setting* setting)
 					fprintf(fptr, "%lf,%lf,", vnow[k], cnow_fwrite[k]);
 			}
 			fprintf(fptr, "\n");
-			times++;
 		}
+
+		times++;
 
 		//then display
 		int max_length, location_length, available_width, available_height;
@@ -1635,30 +1636,30 @@ static void monitor(struct options_setting* setting)
 				// printf("\n\n");
 				printfpadding("-----------------------------------------------------------------------------------------------------------------------------------------------", available_width);
 				printfpadding(" ", max_group_length + 1);
-				printf("%s", g_vt_blue);
+				printf("%s", g_vt_kcyn);
 				printf("|Power(mWatt)");
 				printf("\n");
 				printf("%s", g_vt_default);
 				printfpadding("group", max_group_length);
-				printf("%s", g_vt_blue);
+				printf("%s", g_vt_kcyn);
 				printf(" |%-6s %-6s %-6s %-6s", "now", "avg", "max", "min");
 				printf("%s", g_vt_default);
-				printf("  group members\n");
+				printf(" |group members\n");
 				printf("%s", g_vt_default);
 				printfpadding("-----------------------------------------------------------------------------------------------------------------------------------------------", available_width);
 			}
 			for (int k = 0; k < num_of_groups; k++)
 			{
 				printfpadding(groups[k].name, max_group_length);
-				printf("%s", g_vt_blue);
+				printf("%s", g_vt_kcyn);
 				printf(" |");
 				printf("%-6.1f ", groups[k].sum);
 				printf("%-6.1f ", groups[k].avg);
 				printf("%-6.1f ", groups[k].max);
 				printf("%-6.1f", groups[k].min);
 				printf("%s", g_vt_default);
-				//printf(" |");
-				printf("  ");
+				printf(" |");
+				// printf("  ");
 				if (strlen(groups[k].member_list) < (size_t)(monitor_size(GET_COLUMN) - max_group_length - 30))
 					printf("%s\n", groups[k].member_list);
 				else
@@ -1687,7 +1688,7 @@ static void monitor(struct options_setting* setting)
 				printf("MinMax:%dms        ", cap_interval);
 
 			if(last_display != 0)
-				printf("Display freq: %.1fHz\n", (1000.0 / interval));
+				printf("Display freq: %.1fHz      Sampling times: %ld\n", (1000.0 / interval), times);
 		}
 
 		if (candisplay == 1 && setting->dump == 1)
