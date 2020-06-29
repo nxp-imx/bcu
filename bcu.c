@@ -1792,18 +1792,23 @@ static void monitor(struct options_setting* setting)
 			case 5:
 				bootmodenum = lsbootmode(setting);
 
-				printf("others  boot from BOOT SWITCH\n");
+				printf("Enter   boot from BOOT SWITCH\n");
 				printf("\nPlease select the boot mode after reset: ");
-				scanf("%d", &setting->boot_mode_hex);
+				scanf("%lc", &setting->boot_mode_hex);
+				setting->boot_mode_hex -= '0';
 				if (setting->boot_mode_hex >= bootmodenum || setting->boot_mode_hex < 0)
+				{
+					printf("Will boot from BOOT SWITCH, input=%d\n", setting->boot_mode_hex);
 					setting->boot_mode_hex = -1;
+				}
 
 				reset(setting);
 				ft4232h_i2c_remove_all();
 				strcpy(previous_path, "");
 
-				msleep(150); //wait PMIC power on
+				msleep(200); //wait PMIC power on
 
+				printf("reset Avg/Max/Min values\n");
 				//reset AVG/MIN/MAX
 				for (int k = 0; k < n; k++)
 				{
