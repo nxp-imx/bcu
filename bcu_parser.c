@@ -338,11 +338,6 @@ int parse_options(int argc, char** argv, struct options_setting* setting)
 			setting->hold = atoi(input);
 			printf("hold is %d\n", setting->hold);
 		}
-		else if (strncmp(argv[i], "-group=", 7) == 0 && strlen(argv[i]) > 7)
-		{
-			strcpy(setting->groups, input);
-			printf("groups is %s\n", setting->groups);
-		}
 		else if (strcmp(argv[i], "high") == 0)
 		{
 			setting->output_state = 1;
@@ -599,30 +594,27 @@ void* build_device_linkedlist_smart(void** new_head, char* new_path, void* old_h
 	return current;
 }
 
-static int parse_group(char* input, struct group* group_ptr, struct board_info* board)
+static int parse_group(int id, struct group* group_ptr, struct board_info* board)
 {
-	//first find name;
-	char* brk = strchr(input, ':');
-	if (brk == NULL)
-		return -1;
-	int length = brk - input;
-	if (strlen(brk + 1) < (MAX_MAPPING_NAME_LENGTH * MAX_NUMBER_OF_POWER))
-		strcpy(group_ptr->member_list, brk + 1);
-	else {
-		printf("entered group string exceeded maximum buffer size\n");
-		return -1;
-	}
-	strncpy(group_ptr->name, input, length);
-	group_ptr->name[length] = '\0';//null terminated
+	strcpy(group_ptr->name, board->power_groups[id].group_name);
 	printf("group name: %s\n", group_ptr->name);
 
 	group_ptr->num_of_members = 0;
-	char group_member_string[1000];
-	strcpy(group_member_string, brk + 1);
+	if (strlen(board->power_groups[id].group_string) < (MAX_MAPPING_NAME_LENGTH * MAX_NUMBER_OF_POWER))
+		strcpy(group_ptr->member_list, board->power_groups[id].group_string);
+	else
+	{
+		printf("entered group string exceeded maximum buffer size\n");
+		return -1;
+	}
+	char group_member_string[MAX_MAPPING_NAME_LENGTH * MAX_NUMBER_OF_POWER];
+	strcpy(group_member_string, group_ptr->member_list);
+	printf("group string: %s\n", group_member_string);
 	char* group_member_name = strtok(group_member_string, ",");
+	// printf("group_member_name: %s\n", group_member_name);
 	while (group_member_name != NULL)
 	{
-		printf("member: %s\n", group_member_name);
+		// printf("member: %s\n", group_member_name);
 		int power_index = 0;
 		int mapping_index = 0;
 		int found = 0;
@@ -649,24 +641,20 @@ static int parse_group(char* input, struct group* group_ptr, struct board_info* 
 	return 0;
 }
 
-int parse_groups(char* input, struct group* groups, struct board_info* board)
+int parse_groups(struct group* groups, struct board_info* board)
 {
-	char groups_specification[MAX_NUMBER_OF_POWER][MAX_NUMBER_OF_POWER * MAX_MAPPING_NAME_LENGTH];
-	char* tok;
-	char remaining_input[MAX_NUMBER_OF_POWER * MAX_MAPPING_NAME_LENGTH];
-	strcpy(remaining_input, input);
-	tok = strtok(remaining_input, "]");
 	int num_of_groups = 0;
-	while (tok != NULL)
+
+	if (board->power_groups == NULL)
+		return num_of_groups;
+
+	while (board->power_groups[num_of_groups].group_name != NULL)
 	{
-		printf("group_specification: %s\n", tok + 1);//+1 because we need to ignore '['
-		strcpy(groups_specification[num_of_groups], tok + 1);
 		num_of_groups++;
-		tok = strtok(NULL, "]");
 	}
 
 	for (int i = 0; i < num_of_groups; i++) {
-		if (parse_group(groups_specification[i], &groups[i], board) == -1) {
+		if (parse_group(i, &groups[i], board) == -1) {
 			printf("failed to understand the power groups setting\n");
 			return -1;
 		}

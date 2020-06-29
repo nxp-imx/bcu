@@ -959,18 +959,9 @@ static void monitor(struct options_setting* setting)
 
 	//power groups
 	struct group groups[MAX_NUMBER_OF_POWER];
-	char group_string[MAX_NUMBER_OF_POWER * MAX_MAPPING_NAME_LENGTH];
 	groups_init(groups, MAX_NUMBER_OF_POWER);
-	//initialize string
-	strcpy(group_string, "");
 
-	int num_of_groups = 0;
-	if (board->power_groups != NULL)
-		strcat(group_string, board->power_groups);
-	if (strlen(setting->groups) > 0)
-		strcat(group_string, setting->groups);
-
-	num_of_groups = parse_groups(group_string, groups, board);
+	int num_of_groups = parse_groups(groups, board);
 	if (num_of_groups == -1)
 	{
 		free_device_linkedlist_backward(end_point);
@@ -1644,7 +1635,7 @@ static void monitor(struct options_setting* setting)
 				printf("%s", g_vt_kcyn);
 				printf(" |%-6s %-6s %-6s %-6s", "now", "avg", "max", "min");
 				printf("%s", g_vt_default);
-				printf(" |group members\n");
+				printf(" |Group members\n");
 				printf("%s", g_vt_default);
 				printfpadding("-----------------------------------------------------------------------------------------------------------------------------------------------", available_width);
 			}

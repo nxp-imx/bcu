@@ -64,11 +64,16 @@ struct board_links {
 	char* sdcard;
 };
 
+struct board_power_group {
+	char* group_name;
+	char* group_string;
+};
+
 struct board_info {
 	char* name;
 	struct mapping* mappings;
 	struct boot_mode* boot_modes;
-	char* power_groups;
+	struct board_power_group* power_groups;
 	struct board_links* links;
 };
 

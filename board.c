@@ -95,6 +95,14 @@ struct mapping imx8xxl[] = {
 	{NULL, 0, NULL, 0}//null terminated
 };
 
+struct board_power_group imx8xxl_power_groups[] = {
+	{"GROUP_SOC", "vdd_main,vdd_usb_3v3,3v3_enet,vdd_snvs_4p2,vdd_memc,vdd_ddr_vddq,vdd_ana,1v8_1,1v8_4,1v8_5"},
+	{"GROUP_SOC_FULL", "vdd_main,vdd_usb_3v3,3v3_enet,vdd_snvs_4p2,vdd_memc,vdd_ddr_vddq,vdd_ana,1v8_1,1v8_4,1v8_5,3v3_io,vdd_enet0_1p8_3p3,1v8_2,1v8_3"},
+	{"GROUP_DRAM", "ddr_vdd1,ddr_vdd2"},
+	{"GROUP_PLATFORM", "on_board_12v0"},
+	{NULL, 0}
+};
+
 struct mapping imx8dxl_ddr3[] = {
 	{"on_board_12v0",power,IMX8XXL_POWER_PATH(1,1,10,10), 0x00},
 	{"3v3_MICRO",power,IMX8XXL_POWER_PATH(1,2,10,10), 0x00},
@@ -205,6 +213,14 @@ struct mapping imx8mpevkpwr_board[] = {
 	{"at24cxx", bcu_eeprom, "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}/at24cxx{addr=0x50;}", 0x00},
 
 	{NULL, 0, NULL, 0}//null terminated
+};
+
+struct board_power_group imx8mpevkpwr_power_groups[] = {
+	{"GROUP_SOC", "vdd_arm,vdd_soc,nvcc_snvs_1v8,vdd_pll_ana_0v8,vdd_pll_ana_1v8,nvcc_dram_1v1,vdd_hdmi_0v8,vdd_hdmi_1v8,vdd_mipi_0v8,vdd_mipi_1v8,vdd_pci_0v8,vdd_pci_1v8,vdd_usb_0v8,vdd_usb_1v8,vdd_usb_3v3,vdd_lvds_1V8,vdd_earc_1v8"},
+	{"GROUP_SOC_FULL", "vdd_arm,vdd_soc,nvcc_snvs_1v8,vdd_pll_ana_0v8,vdd_pll_ana_1v8,nvcc_dram_1v1,vdd_hdmi_0v8,vdd_hdmi_1v8,vdd_mipi_0v8,vdd_mipi_1v8,vdd_pci_0v8,vdd_pci_1v8,vdd_usb_0v8,vdd_usb_1v8,vdd_usb_3v3,vdd_lvds_1V8,vdd_earc_1v8,cpu_vdd_1v8,nvcc_sd1,nvcc_sd2"},
+	{"GROUP_DRAM", "lpd4_vdd1,lpd4_vdd2,lpd4_vddq"},
+	{"GROUP_PLATFORM", "vsys_5v"},
+	{NULL, 0}
 };
 
 struct mapping imx8mpevk_board[] = {
@@ -374,18 +390,9 @@ struct board_links null_board_links[] = {
 
 struct board_info board_list[] =
 {
-	{"imx8dxlevk", imx8xxl, imx8xxl_boot_modes,// NULL,
-"[GROUP_SOC:vdd_main,vdd_usb_3v3,3v3_enet,vdd_snvs_4p2,vdd_memc,vdd_ddr_vddq,vdd_ana,1v8_1,1v8_4,1v8_5]\
-[GROUP_SOC_FULL:vdd_main,vdd_usb_3v3,3v3_enet,vdd_snvs_4p2,vdd_memc,vdd_ddr_vddq,vdd_ana,1v8_1,1v8_4,1v8_5,3v3_io,vdd_enet0_1p8_3p3,1v8_2,1v8_3]\
-[GROUP_DRAM:ddr_vdd1,ddr_vdd2]\
-[GROUP_PLATFORM:on_board_12v0]", 
-		imx8xxlevk_board_links},
+	{"imx8dxlevk", imx8xxl, imx8xxl_boot_modes, imx8xxl_power_groups, imx8xxlevk_board_links},
 	{"imx8dxl_ddr3_evk", imx8dxl_ddr3, imx8xxl_boot_modes, NULL, imx8xxlevk_board_links},
-	{"imx8mpevkpwr", imx8mpevkpwr_board, imx8mpevk_board_boot_modes,// NULL,
-"[GROUP_SOC:vdd_arm,vdd_soc,nvcc_snvs_1v8,vdd_pll_ana_0v8,vdd_pll_ana_1v8,nvcc_dram_1v1,vdd_hdmi_0v8,vdd_hdmi_1v8,vdd_mipi_0v8,vdd_mipi_1v8,vdd_pci_0v8,vdd_pci_1v8,vdd_usb_0v8,vdd_usb_1v8,vdd_usb_3v3,vdd_lvds_1V8,vdd_earc_1v8]\
-[GROUP_SOC_FULL:vdd_arm,vdd_soc,nvcc_snvs_1v8,vdd_pll_ana_0v8,vdd_pll_ana_1v8,nvcc_dram_1v1,vdd_hdmi_0v8,vdd_hdmi_1v8,vdd_mipi_0v8,vdd_mipi_1v8,vdd_pci_0v8,vdd_pci_1v8,vdd_usb_0v8,vdd_usb_1v8,vdd_usb_3v3,vdd_lvds_1V8,vdd_earc_1v8,cpu_vdd_1v8,nvcc_sd1,nvcc_sd2]\
-[GROUP_DRAM:lpd4_vdd1,lpd4_vdd2,lpd4_vddq]\
-[GROUP_PLATFORM:vsys_5v]", imx8mpevk_board_links},
+	{"imx8mpevkpwr", imx8mpevkpwr_board, imx8mpevk_board_boot_modes, imx8mpevkpwr_power_groups, imx8mpevk_board_links},
 	{"imx8mpevk", imx8mpevk_board, imx8mpevk_board_boot_modes, NULL, imx8mpevk_board_links},
 	{"imx8mpddr3l", imx8mpddr3l_board, null_boot_mode, NULL, null_board_links},
 	{"imx8mpddr4", imx8mpddr4_board, null_boot_mode, NULL, null_board_links},
