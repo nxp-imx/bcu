@@ -54,18 +54,12 @@ void writeConf(void)
 	fputs("# show_id can set the display order of the rails.\n# show_id should start from 1.\n# If show_id: 0, it means that this rail will not be displayed and dumped.\n", fp);
 	fputs("#\n# Please DO NOT delete any line of a power rail!\n# If you don't want to show it, please just set its \"show_id\" as 0.\n", fp);
 	fputs("#\n# Unit of rsense1 and rsense2 is Milliohm\n", fp);
-	fputs("#\n# \"israngefixed: false\": you can change sense resister by pressing the coresponding key when BCU runs\n", fp);
-	fputs("# \"israngefixed: true\": you cannot change sense resister when BCU runs, but it makes BCU reading faster.\n", fp);
-	fputs("#                       you can also choose to use which sense resister through \"extra_sr\" in this file.\n", fp);
-
 
 	for(j = 0; j < get_board_numer(); j++)
 	{
 		struct board_info* board=get_board_by_id(j);
 
 		sprintf(text, "\n\nboardname: %s\n", board->name);
-		fputs(text, fp);
-		sprintf(text, "israngefixed: true\n");
 		fputs(text, fp);
 		sprintf(text, "mappings:\n");
 		fputs(text, fp);
@@ -93,22 +87,18 @@ void writeConf(void)
 				sprintf(text, "rsense2: %-8d, ", rs2);
 				fputs(text, fp);
 
-				sprintf(text, "show_id: %-3d, ", i + 1);
+				sprintf(text, "show_id: %-3d ", i + 1);
 				fputs(text, fp);
 
 				strcpy(sr_name, "SR_");
 				strcat(sr_name, board->mappings[i].name);
 				if (get_path(sr_path, sr_name, board) != -1)
 				{
-					sprintf(text, "extra_sr: 1   ");
-					fputs(text, fp);
-					sprintf(text, "} #Range: 1=>%.1fmA, 0=>%.1fmA\n", 100000.0 / rs1, 100000.0 / rs2);
+					sprintf(text, "} #Range: rsense1=>%.1fmA, rsense2=>%.1fmA\n", 100000.0 / rs1, 100000.0 / rs2);
 					fputs(text, fp);
 				}
 				else
 				{
-					sprintf(text, "extra_sr: N/A ");
-					fputs(text, fp);
 					// sprintf(text, "} #Range: don't have extra RS\n");
 					// fputs(text, fp);
 					sprintf(text, "}\n");
@@ -238,15 +228,7 @@ int readConf(char* boardname, struct options_setting* setting)
 				}break;
 				case STATUS_CHANGE_FIXEDRAIL:
 				{
-					// printf("isfixedrange: %s\n", tk);
-					if (strcmp(tk, "true"))
-					{
-						setting->rangefixed = 0;
-					}
-					else
-					{
-						setting->rangefixed = 0;
-					}
+					setting->rangefixed = 0;
 				}break;
 				case STATUS_CHANGE_RSENSE1:
 				{
@@ -265,22 +247,10 @@ int readConf(char* boardname, struct options_setting* setting)
 					int item = get_item_location(now_rail, now_board);
 					if (item < 0)
 						return -1;
-					now_board->mappings[item].initinfo = atoi(tk) << 2;
+					now_board->mappings[item].initinfo = atoi(tk);
 				}break;
 				case STATUS_CHANGE_DEFAULT_RS:
-				{
-					// printf("now rs: %s\n", tk);
-					int item = get_item_location(now_rail, now_board);
-					if (item < 0)
-						return -1;
-					now_board->mappings[item].initinfo &= ~0x3;
-					if (!strcmp(tk, "N/A"))
-						now_board->mappings[item].initinfo |= 3;
-					else if (!strcmp(tk, "0"))
-						now_board->mappings[item].initinfo |= 0;
-					else if (!strcmp(tk, "1"))
-						now_board->mappings[item].initinfo |= 1;
-				}break;
+					break;
 				default:
 					break;
 				}

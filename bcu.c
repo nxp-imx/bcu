@@ -897,7 +897,7 @@ static void monitor(struct options_setting* setting)
 		fprintf(fptr, "time(ms),");
 		while (board->mappings[i].name != NULL)
 		{
-			if (board->mappings[i].type == power && (board->mappings[i].initinfo >> 2) != 0)
+			if (board->mappings[i].type == power && board->mappings[i].initinfo != 0)
 			{
 				fprintf(fptr, "%s voltage(V),%s current(mA),", board->mappings[i].name, board->mappings[i].name);
 			}
@@ -987,7 +987,7 @@ static void monitor(struct options_setting* setting)
 	char pac193x_group_path[MAX_NUMBER_OF_POWER][MAX_PATH_LENGTH];
 	while (board->mappings[a].name != NULL)
 	{
-		if (board->mappings[a].type == power && (board->mappings[a].initinfo >> 2) != 0) //-------------------------------------------------------------------------
+		if (board->mappings[a].type == power && board->mappings[a].initinfo != 0) //-------------------------------------------------------------------------
 		{
 			end_point = build_device_linkedlist_smart(&head, board->mappings[a].path, head, previous_path);
 			strcpy(previous_path, board->mappings[a].path);
@@ -1176,7 +1176,7 @@ static void monitor(struct options_setting* setting)
 		int j = 0;//j is the index of the power related mapping only
 		while (board->mappings[i].name != NULL)
 		{
-			if (board->mappings[i].type == power && (board->mappings[i].initinfo >> 2) != 0)
+			if (board->mappings[i].type == power && board->mappings[i].initinfo != 0)
 			{
 				name[j] = i;
 
@@ -1345,7 +1345,7 @@ static void monitor(struct options_setting* setting)
 				int k = get_power_index_by_showid(m, board);
 				if (k < 0)
 					continue;
-				if ((board->mappings[k].initinfo >> 2) != 0)
+				if (board->mappings[k].initinfo != 0)
 					fprintf(fptr, "%lf,%lf,", vnow[k], cnow_fwrite[k]);
 			}
 			fprintf(fptr, "\n");
@@ -1708,15 +1708,8 @@ static void monitor(struct options_setting* setting)
 			printf("Hot-key: 1=reset %s; 2=reset MaxMin; 3=reset %s and MaxMin; 4=switch show mA/auto/uA;\n",
 						setting->use_rms ? "RMS" : "Avg", setting->use_rms ? "RMS" : "Avg");
 			printf("         5=reset board; 6=resume the board; Ctrl-C to exit...\n");
-			if (setting->rangefixed == 0)
-			{
-				printf("press the letter on keyboard to control coresponding extra sense resistor(Extra SR)\n");
-				printf("pressed %s(Please pay attention to letter case)%s: %c\n", g_vt_red, g_vt_default, ch);
-			}
-			else
-			{
-				printf("If you need switch sense resistor when BCU runs, please change \"israngefixed\" in config.yaml to \"false\".\n");
-			}
+			printf("press the letter on keyboard to control coresponding extra sense resistor(Extra SR)\n");
+			printf("pressed %s(Please pay attention to letter case)%s: %c\n", g_vt_red, g_vt_default, ch);
 		}
 		else if (setting->nodisplay == 0 && candisplay == 1 && available_height < 40 && setting->rangefixed == 0)
 		{

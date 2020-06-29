@@ -504,7 +504,7 @@ int get_power_index_by_showid(int showid, struct board_info* board)
 	int i = 0;
 	while (board->mappings[i].name != NULL)
 	{
-		if (board->mappings[i].type == power && (board->mappings[i].initinfo >> 2) == showid)
+		if (board->mappings[i].type == power && board->mappings[i].initinfo == showid)
 		{
 			return i;
 		}
