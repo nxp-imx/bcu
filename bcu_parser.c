@@ -609,12 +609,11 @@ static int parse_group(int id, struct group* group_ptr, struct board_info* board
 	}
 	char group_member_string[MAX_MAPPING_NAME_LENGTH * MAX_NUMBER_OF_POWER];
 	strcpy(group_member_string, group_ptr->member_list);
-	printf("group string: %s\n", group_member_string);
+	// printf("group string: %s\n", group_member_string);
 	char* group_member_name = strtok(group_member_string, ",");
-	// printf("group_member_name: %s\n", group_member_name);
 	while (group_member_name != NULL)
 	{
-		// printf("member: %s\n", group_member_name);
+		printf("member: %s\n", group_member_name);
 		int power_index = 0;
 		int mapping_index = 0;
 		int found = 0;

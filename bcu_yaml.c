@@ -43,7 +43,7 @@ void writeConf(void)
 {
 	FILE *fp = fopen("config.yaml", "w+");
 	if (fp == NULL) {
-		printf("Failed to open file!\n");
+		printf("writeConf: Failed to open file!\n");
 		return;
 	}
 
@@ -53,7 +53,10 @@ void writeConf(void)
 
 	fputs("# show_id can set the display order of the rails.\n# show_id should start from 1.\n# If show_id: 0, it means that this rail will not be displayed and dumped.\n", fp);
 	fputs("#\n# Please DO NOT delete any line of a power rail!\n# If you don't want to show it, please just set its \"show_id\" as 0.\n", fp);
-	fputs("#\n# Unit of rsense1 and rsense2 is Milliohm\n", fp);
+	fputs("#\n# Unit of rsense1 and rsense2 is Milliohm.\n", fp);
+	sprintf(text, "#\n# Can add, modify or delete groups for each platform with power measurement.\n# Up to %d groups can be added to each platform.\n", MAX_NUMBER_OF_GROUP);
+	fputs(text, fp);
+	fputs("# Please follow the existing examples to add groups.\n", fp);
 
 	for(j = 0; j < get_board_numer(); j++)
 	{
@@ -72,7 +75,6 @@ void writeConf(void)
 				fputs(text, fp);
 
 				int rs1, rs2;
-				char char_pac[7] = "pac1934";
 				char sr_name[100], sr_path[MAX_PATH_LENGTH];
 
 				get_chip_specification_by_chipname(board->mappings[i].path, chip_specification, "pac1934");
@@ -107,6 +109,23 @@ void writeConf(void)
 			}
 			i++;
 		}
+
+		if (board->power_groups != NULL)
+		{
+			sprintf(text, "groups:\n");
+			fputs(text, fp);
+			i = 0;
+			while (board->power_groups[i].group_name != NULL)
+			{
+				sprintf(text, "    - %-20s: ", board->power_groups[i].group_name);
+				fputs(text, fp);
+
+				sprintf(text, "\"%s\"\n", board->power_groups[i].group_string);
+				fputs(text, fp);
+
+				i++;
+			}
+		}
 	}
 
 	fclose(fp);
@@ -138,19 +157,17 @@ int readConf(char* boardname, struct options_setting* setting)
 	FILE* fh = fopen("config.yaml", "r");
 	if (fh == NULL)
 	{
-		printf("Failed to open file!\n");
+		printf("readConf: Failed to open file!\n");
 		return -1;
 	}
 
 	yaml_parser_t parser;
 	yaml_token_t token;
 
-	struct board_info *yaml_board_power_list = malloc(sizeof(struct board_info));
-
 	if (!yaml_parser_initialize(&parser))
 	{
 		printf("Failed to initialize parser!\n");
-		return -1;
+		return -2;
 	}
 
 	yaml_parser_set_input_file(&parser, fh);
@@ -165,6 +182,7 @@ int readConf(char* boardname, struct options_setting* setting)
 	int now_status = -1;
 	struct board_info* now_board;
 	char now_rail[MAX_MAPPING_NAME_LENGTH];
+	int group_id = 0;
 	char rs1[10], rs2[10];
 
 	do
@@ -192,6 +210,11 @@ int readConf(char* boardname, struct options_setting* setting)
 					now_status = STATUS_CHANGE_RSENSE2;
 				else if (!strcmp(tk, "show_id"))
 					now_status = STATUS_CHANGE_SHOWID;
+				else if (!strcmp(tk, "groups"))
+				{
+					now_status = STATUS_GROUPS;
+					group_id = 0;
+				}
 				else if (!strcmp(tk, "show_sel"))
 					now_status = -1;
 				else if (!strcmp(tk, "israngefixed"))
@@ -200,9 +223,29 @@ int readConf(char* boardname, struct options_setting* setting)
 					now_status = STATUS_CHANGE_DEFAULT_RS;
 				else
 				{
-					now_status = STATUS_CHANGE_RAIL;
-					// printf("railname: %s\n", tk);
-					strcpy(now_rail, tk);
+					if (now_status == STATUS_GROUPS || now_status == STATUS_CHANGE_GROUPS)
+					{
+						if (now_status == STATUS_CHANGE_GROUPS)
+							group_id++;
+						else
+							now_board->power_groups = (struct board_power_group*)malloc(sizeof(struct board_power_group) * (MAX_NUMBER_OF_GROUP + 1));
+						if (group_id >= MAX_NUMBER_OF_GROUP)
+						{
+							printf("%s: Too much group! Please keep the number of groups NOT greater than %d\n", __func__, MAX_NUMBER_OF_GROUP);
+							return -2;
+						}
+						now_status = STATUS_CHANGE_GROUPS;
+						// printf("group name: %s\n", tk);
+						now_board->power_groups[group_id].group_name = malloc(sizeof(char) * MAX_MAPPING_NAME_LENGTH);
+						strcpy(now_board->power_groups[group_id].group_name, tk);
+						now_board->power_groups[group_id + 1].group_name = NULL;
+					}
+					else
+					{
+						now_status = STATUS_CHANGE_RAIL;
+						// printf("railname: %s\n", tk);
+						strcpy(now_rail, tk);
+					}
 				}
 			}
 			else
@@ -220,7 +263,7 @@ int readConf(char* boardname, struct options_setting* setting)
 					}
 					now_board = get_board(tk);
 					if (now_board == NULL)
-						return -1;
+						return -2;
 				}break;
 				case STATUS_CHANGE_RAIL:
 				{
@@ -246,8 +289,14 @@ int readConf(char* boardname, struct options_setting* setting)
 					// printf("id: %s\n", tk);
 					int item = get_item_location(now_rail, now_board);
 					if (item < 0)
-						return -1;
+						return -2;
 					now_board->mappings[item].initinfo = atoi(tk);
+				}break;
+				case STATUS_CHANGE_GROUPS:
+				{
+					// printf("group string: %s\n", tk);
+					now_board->power_groups[group_id].group_string = malloc(sizeof(char) * MAX_MAPPING_NAME_LENGTH * MAX_NUMBER_OF_POWER);
+					strcpy(now_board->power_groups[group_id].group_string, tk);
 				}break;
 				case STATUS_CHANGE_DEFAULT_RS:
 					break;

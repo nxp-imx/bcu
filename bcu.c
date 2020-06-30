@@ -1619,7 +1619,7 @@ static void monitor(struct options_setting* setting)
 			}
 
 			//then display group
-			int max_group_length = 15;
+			int max_group_length = 17;
 			if (num_of_groups > 0)
 			{
 				//display groups
@@ -2001,10 +2001,22 @@ int main(int argc, char** argv)
 		return 0;
 	}
 
-	if (readConf(setting.board, &setting) < 0)
+	switch (readConf(setting.board, &setting))
 	{
+	case 0:
+		break;
+	case -1:
+		printf("Trying to create new config.yaml file...\n");
 		writeConf();
-		readConf(setting.board, &setting);
+		if (readConf(setting.board, &setting) < 0)
+			return -1;
+		break;
+	case -2:
+		printf("config.yaml file read error, please check or delete config.yaml and try again.\n");
+		return -2;
+		break;
+	default:
+		break;
 	}
 
 	if (strcmp(cmd, "lsgpio") == 0)
