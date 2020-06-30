@@ -110,10 +110,10 @@ void writeConf(void)
 			i++;
 		}
 
+		sprintf(text, "groups: #Please do NOT delete this line.\n");
+		fputs(text, fp);
 		if (board->power_groups != NULL)
 		{
-			sprintf(text, "groups:\n");
-			fputs(text, fp);
 			i = 0;
 			while (board->power_groups[i].group_name != NULL)
 			{
@@ -214,6 +214,7 @@ int readConf(char* boardname, struct options_setting* setting)
 				{
 					now_status = STATUS_GROUPS;
 					group_id = 0;
+					now_board->power_groups = NULL;
 				}
 				else if (!strcmp(tk, "show_sel"))
 					now_status = -1;
