@@ -575,7 +575,8 @@ void* pac1934_create(char* chip_specification, void* parent)
 	pac->power_device.device.parent = parent;
 	pac->power_device.power_get_group = get_pac1934_group;
 	pac->power_device.power_get_sensor = get_pac1934_sensor;
-	pac->power_device.power_get_res = get_pac1934_res;
+	pac->power_device.power_get_cur_res = get_pac1934_cur_res;
+	pac->power_device.power_get_unused_res = get_pac1934_unused_res;
 	pac->power_device.power_set_snapshot = pac1934_snapshot;
 	pac->power_device.power_get_data = pac1934_get_data;
 	pac->power_device.switch_sensor = pac1934_switch;
@@ -626,11 +627,21 @@ int get_pac1934_sensor(void* pac1934)
 	return pac->cur_sensor;
 }
 
-int get_pac1934_res(void* pac1934)
+int get_pac1934_cur_res(void* pac1934)
 {
 	struct pac1934* pac = pac1934;
 
 	return pac->cur_rs;
+}
+
+int get_pac1934_unused_res(void* pac1934)
+{
+	struct pac1934* pac = pac1934;
+
+	if (pac->rs1 == pac->cur_rs)
+		return pac->rs2;
+	else
+		return pac->rs1;
 }
 
 int pac1934_snapshot(void* pac1934)
