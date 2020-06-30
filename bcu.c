@@ -738,7 +738,7 @@ static void printfpadding(char* str, size_t n)
 	}
 	else
 	{
-		char strcopy[200];
+		char strcopy[MAX_NUMBER_OF_POWER * MAX_MAPPING_NAME_LENGTH];
 		strncpy(strcopy, str, n);
 		strcopy[n] = '\0';
 		printf("%s", strcopy);
