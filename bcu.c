@@ -903,7 +903,6 @@ static void monitor(struct options_setting* setting)
 			}
 			i++;
 		}
-		fprintf(fptr, "\n");
 	}
 
 	int n = 0; //n is the number of variables need to be measured
@@ -970,6 +969,15 @@ static void monitor(struct options_setting* setting)
 			fclose(fptr);
 		}
 		return;
+	}
+
+	if (setting->dump == 1)
+	{
+		for (int i = 0; i < num_of_groups; i++)
+		{
+			fprintf(fptr, "%s Power(mW),", board->power_groups[i].group_name);
+		}
+		fprintf(fptr, "\n");
 	}
 
 	//get first channels of all groups of rails
@@ -1338,6 +1346,10 @@ static void monitor(struct options_setting* setting)
 					continue;
 				if (board->mappings[k].initinfo != 0)
 					fprintf(fptr, "%lf,%lf,", vnow[k], cnow_fwrite[k]);
+			}
+			for (int k = 0; k < num_of_groups; k++)
+			{
+				fprintf(fptr, "%lf,", groups[k].sum);
 			}
 			fprintf(fptr, "\n");
 		}
