@@ -128,7 +128,7 @@ static void print_help(char* cmd)
 		printf("	%s%-50s%s%s\n", g_vt_default, "lsgpio     [-board=]", g_vt_green, "show a list of available gpio pin of a board");
 		printf("\n");
 		printf("	%s%-50s%s%s%s\n", g_vt_default, "version", g_vt_green, "print version number", g_vt_default);
-		// printf("%s%-50s%s%s\n", g_vt_default, "help [COMMAND_NAME]", g_vt_green, "/*show details and options of COMMAND_NAME*/");
+		printf("	%s%-50s%s%s%s\n", g_vt_default, "help [COMMAND_NAME]", g_vt_green, "/*show details and options of COMMAND_NAME*/", g_vt_default);
 
 #ifdef __linux__
 		printf("\n	%s%-50s%s%s\n", g_vt_default, "flash [emmc or sd] [-board=]", g_vt_green, "flash flash.bin to EMMC or SD");
@@ -1961,22 +1961,41 @@ void terminateBCU()
 
 int main(int argc, char** argv)
 {
-	atexit(terminateBCU);
-#ifdef _WIN32
-	SetThreadPriority(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
-#endif
 	print_version();
 
 	if (enable_vt_mode())
 	{
-		printf("Your console don't support VT mode, fail back to verbose mode");
+		printf("Your console don't support VT mode, fall back to verbose mode");
 	}
 
-	if (argc == 1)
+	switch (argc)
 	{
+	case 1:
 		print_help(NULL);
 		return 0;
+	case 2: 
+		if (strcmp(argv[1], "help") == 0 || strcmp(argv[1], "-h") == 0)
+		{
+			print_help(NULL);
+			return 0;
+		}
+		break;
+	default:
+		break;
 	}
+
+#ifdef linux
+	if (geteuid() != 0)
+	{
+		printf("\nPlease run BCU with %ssudo%s or by %sroot%s.\n\n", g_vt_red, g_vt_default, g_vt_red, g_vt_default);
+		return -1;
+	}
+#endif
+
+	atexit(terminateBCU);
+#ifdef _WIN32
+	SetThreadPriority(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
+#endif
 
 	char* cmd = argv[1];
 	struct options_setting setting;
