@@ -855,6 +855,19 @@ static char catch_input_char()
 	return ch;
 }
 
+static char catch_input_char_block()
+{
+	char ch = ' ';
+
+#ifdef _WIN32
+		ch = _getch();
+#else
+		ch = (char)getchar();
+#endif
+
+	return ch;
+}
+
 static void monitor(struct options_setting* setting)
 {
 	signal(SIGINT, handle_sigint);
@@ -1790,7 +1803,7 @@ static void monitor(struct options_setting* setting)
 
 				printf("Enter   boot from BOOT SWITCH\n");
 				printf("\nPlease select the boot mode after reset: ");
-				scanf("%lc", &setting->boot_mode_hex);
+				setting->boot_mode_hex = catch_input_char_block();
 				setting->boot_mode_hex -= '0';
 				if (setting->boot_mode_hex >= bootmodenum || setting->boot_mode_hex < 0)
 				{
@@ -1802,7 +1815,7 @@ static void monitor(struct options_setting* setting)
 				ft4232h_i2c_remove_all();
 				strcpy(previous_path, "");
 
-				msleep(200); //wait PMIC power on
+				msleep(300); //wait PMIC power on
 
 				printf("reset Avg/Max/Min values\n");
 				//reset AVG/MIN/MAX
