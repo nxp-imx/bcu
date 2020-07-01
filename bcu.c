@@ -133,7 +133,8 @@ static void print_help(char* cmd)
 		printf("	%s%-50s%s%s\n", g_vt_default, "lsgpio     [-board=]", g_vt_green, "show a list of available gpio pin of a board");
 		printf("\n");
 		printf("	%s%-50s%s%s%s\n", g_vt_default, "version", g_vt_green, "print version number", g_vt_default);
-		printf("	%s%-50s%s%s%s\n", g_vt_default, "help [COMMAND_NAME]", g_vt_green, "/*show details and options of COMMAND_NAME*/", g_vt_default);
+		printf("	%s%-50s%s%s%s\n", g_vt_default, "help", g_vt_green, "show command details", g_vt_default);
+		// printf("	%s%-50s%s%s%s\n", g_vt_default, "help [COMMAND_NAME]", g_vt_green, "show details and options of COMMAND_NAME", g_vt_default);
 
 #ifdef __linux__
 		printf("\n	%s%-50s%s%s\n", g_vt_default, "flash [emmc or sd] [-board=]", g_vt_green, "flash flash.bin to EMMC or SD");
@@ -460,7 +461,7 @@ static void reset(struct options_setting* setting)
 
 	initialize(setting, RESET_NOW);
 
-	printf("Set %sALL%s rails to %slarge range%s\n", g_vt_yellow, g_vt_default, g_vt_yellow, g_vt_default);
+	printf("Set %sALL%s sense resistances to %ssmaller%s ones\n", g_vt_yellow, g_vt_default, g_vt_yellow, g_vt_default);
 	while (board->mappings[a].name != NULL)
 	{
 		if (board->mappings[a].type == power)
@@ -1701,17 +1702,20 @@ static void monitor(struct options_setting* setting)
 			printf("Capture time:");
 			cap_interval = now - avgstart;
 			if (cap_interval > 10000)
-				printf("   %s:%.3fs        ", setting->use_rms ? "RMS" : "Avg", cap_interval / 1000.0);
+				printf("   %s:%.3fs      ", setting->use_rms ? "RMS" : "Avg", cap_interval / 1000.0);
 			else
-				printf("   %s:%dms        ", setting->use_rms ? "RMS" : "Avg", cap_interval);
+				printf("   %s:%dms      ", setting->use_rms ? "RMS" : "Avg", cap_interval);
 			cap_interval = now - maxminstart;
 			if (cap_interval > 10000)
-				printf("MinMax:%.3fs        ", cap_interval / 1000.0);
+				printf("MinMax:%.3fs      ", cap_interval / 1000.0);
 			else
-				printf("MinMax:%dms        ", cap_interval);
+				printf("MinMax:%dms      ", cap_interval);
 
-			if(last_display != 0)
-				printf("Display freq: %.1fHz      Sampling times: %ld\n", (1000.0 / interval), times);
+			if (available_width < 106)
+				printf("\n                ");
+
+			if (last_display != 0)
+				printf("Display freq: %.1fHz      Total sampling times: %ld\n", (1000.0 / interval), times);
 		}
 
 		if (candisplay == 1 && setting->dump == 1)
@@ -1726,7 +1730,7 @@ static void monitor(struct options_setting* setting)
 		
 		//finally,switch the SR
 		ch = catch_input_char();
-		if (setting->nodisplay == 0 && candisplay == 1 && available_height >= 40)
+		if (setting->nodisplay == 0 && candisplay == 1 && available_height >= 43)
 		{
 			printf("Hot-key: 1=reset %s; 2=reset MaxMin; 3=reset %s and MaxMin; 4=switch show mA/auto/uA;\n",
 						setting->use_rms ? "RMS" : "Avg", setting->use_rms ? "RMS" : "Avg");
@@ -1734,7 +1738,7 @@ static void monitor(struct options_setting* setting)
 			printf("press the letter on keyboard to control coresponding extra sense resistor(Extra SR)\n");
 			printf("pressed %s(Please pay attention to letter case)%s: %c\n", g_vt_red, g_vt_default, ch);
 		}
-		else if (setting->nodisplay == 0 && candisplay == 1 && available_height < 40 && setting->rangefixed == 0)
+		else if (setting->nodisplay == 0 && candisplay == 1 && available_height < 43 && setting->rangefixed == 0)
 		{
 			printf("press letter to switch sense resistor; Ctrl-C to exit...\n");
 		}
