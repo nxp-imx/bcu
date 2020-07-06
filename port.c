@@ -113,7 +113,8 @@ int ft_open_channel(struct ftdi_info* fi, int channel)
 	}
 	fi->FT_set_timeouts(fi->ftdi, 300, 300);
 	//status = fi->FT_open_ex(0x192, FT_OPEN_BY_LOCATION, &fi->ftdi);
-	fi->isinit = 1;
+	if (!status)
+		fi->isinit = 1;
 	return status;
 
 	//return fi->FT_open(1, &(fi->ftdi));
@@ -127,7 +128,8 @@ int ft_open_channel(struct ftdi_info* fi, int channel)
 	//printf("ftdi open status:%d\n", status);
 	*/
 	int status = ft_open_channel_by_id(fi, channel, NULL);
-	fi->isinit = 1;
+	if (!status)
+		fi->isinit = 1;
 	return status;
 #endif
 }
@@ -510,6 +512,8 @@ int ft_open_channel_by_id(struct ftdi_info* fi, int channel, char* id)
 			}
 
 			//status = fi->FT_open_ex(0x192, FT_OPEN_BY_LOCATION, &fi->ftdi);
+			if (!status)
+				fi->isinit = 1;
 			return status;
 		}
 	}
@@ -591,8 +595,10 @@ int ft_open_channel_by_id(struct ftdi_info* fi, int channel, char* id)
 
 		return -1;
 	}
-	else
+	else {
+		fi->isinit = 1;
 		return 0;
+	}
 
 #endif
 }
