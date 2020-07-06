@@ -211,12 +211,13 @@ void* ft4232h_i2c_create(char* chip_specification, void* parent)
 		ft->val_bitmask = extract_parameter_value(chip_specification, "val_bitmask");
 
 	ft->ftdi_info = &g_ftdi_info[ft->channel];
-	for (int i=0; i < MAX_FT_I2C_CHANNEL_NUMBER; i++)
+	for (int i = 0; i < MAX_FT_I2C_CHANNEL_NUMBER; i++)
 	{
 		if (g_ftdi_info[i].isinit & 0xF0)
 		{
-			g_ftdi_info[i].isinit = 1;
-			ft->ftdi_info->isinit = 0x10;
+			g_ftdi_info[i].isinit = 0x1;
+			if (ft->ftdi_info->isinit & 0xF)
+				ft->ftdi_info->isinit = 0x10;
 		}
 	}
 
