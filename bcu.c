@@ -139,7 +139,7 @@ static void print_help(char* cmd)
 #ifdef __linux__
 		printf("\n	%s%-50s%s%s\n", g_vt_default, "flash [emmc or sd] [-board=]", g_vt_green, "flash flash.bin to EMMC or SD");
 		printf("%s", g_vt_kcyn);
-		printf("\n***please remember to run bcu with sudo%s\n\n\n", g_vt_default);
+		printf("\n***please remember to run BCU with sudo or config the udev rules%s\n\n\n", g_vt_default);
 #endif
 	}
 	else
@@ -2019,14 +2019,6 @@ int main(int argc, char** argv)
 	default:
 		break;
 	}
-
-#ifdef linux
-	if (geteuid() != 0)
-	{
-		printf("\nPlease run BCU with %ssudo%s or by %sroot%s.\n\n", g_vt_red, g_vt_default, g_vt_red, g_vt_default);
-		return -1;
-	}
-#endif
 
 	atexit(terminateBCU);
 #ifdef _WIN32
