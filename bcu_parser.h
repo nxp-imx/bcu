@@ -51,6 +51,7 @@ struct options_setting {
 	int refreshms;
 	int use_rms;
 	int rangefixed;
+	int use_hwfilter;
 	char groups[MAX_NUMBER_OF_POWER * MAX_MAPPING_NAME_LENGTH];
 };
 

@@ -578,6 +578,7 @@ void* pac1934_create(char* chip_specification, void* parent)
 	pac->power_device.power_get_sensor = get_pac1934_sensor;
 	pac->power_device.power_get_cur_res = get_pac1934_cur_res;
 	pac->power_device.power_get_unused_res = get_pac1934_unused_res;
+	pac->power_device.power_set_hwfilter = pac1934_set_hwfilter;
 	pac->power_device.power_set_snapshot = pac1934_snapshot;
 	pac->power_device.power_get_data = pac1934_get_data;
 	pac->power_device.switch_sensor = pac1934_switch;
@@ -645,6 +646,13 @@ int get_pac1934_unused_res(void* pac1934)
 		return pac->rs1;
 }
 
+void pac1934_set_hwfilter(void* pac1934, int onoff)
+{
+	struct pac1934* pac = pac1934;
+
+	pac->hwfilter = onoff;
+}
+
 int pac1934_snapshot(void* pac1934)
 {
 	struct pac1934* pac = pac1934;
@@ -675,14 +683,20 @@ int pac1934_get_data(void* pac1934, struct pac193x_reg_data* pac_reg)
 	int k;
 	#define DATA_LEN 17
 	unsigned char data[DATA_LEN];
+	unsigned char start_read_reg_base;
 
 	int status = 0;
+
+	if (pac->hwfilter)
+		start_read_reg_base = PAC1934_REG_VBUS1_AVG_ADDR;
+	else
+		start_read_reg_base = PAC1934_REG_VBUS1_ADDR;
 
 	parent->i2c_start(parent);
 	status = parent->i2c_write(parent, addr_plus_write);
 	if (status < 0)
 		return status;
-	parent->i2c_write(parent, 0x07); //start get data;
+	parent->i2c_write(parent, start_read_reg_base); //start get data;
 	parent->i2c_start(parent);
 	parent->i2c_write(parent, addr_plus_read);
 	for(k = 0; k < DATA_LEN - 1; k++)

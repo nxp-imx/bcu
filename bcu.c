@@ -122,7 +122,7 @@ static void print_help(char* cmd)
 		printf("	%s%-50s%s%s\n", g_vt_default, "deinit [BOOTMODE_NAME] [-board=] [-id=]", g_vt_green, "disable the remote control");
 		printf("\n");
 		printf("	%s%-50s%s%s\n", g_vt_default, "monitor [-board=] [-id=] [-dump/-dump=]", g_vt_green, "monitor power consumption");
-		printf("	%s%-50s%s%s\n", g_vt_default, "        [-nodisplay] [-hz=]", g_vt_green, "");
+		printf("	%s%-50s%s%s\n", g_vt_default, "        [-nodisplay] [-hz=] [-hwfilter]", g_vt_green, "");
 		printf("\n");
 		printf("	%s%-50s%s%s\n", g_vt_default, "set_gpio [GPIO_NAME] [1/0] [-board=] [-id=]", g_vt_green, "set pin GPIO_NAME to be high(1) or low(0)");
 		printf("	%s%-50s%s%s\n", g_vt_default, "set_boot_mode [BOOTMODE_NAME] [-board=] [-id=]", g_vt_green, "set BOOTMODE_NAME as boot mode");
@@ -1248,6 +1248,11 @@ static void monitor(struct options_setting* setting)
 					pd->switch_sensor(pd, 1);
 				else
 					pd->switch_sensor(pd, 0);
+
+				if (setting->use_hwfilter)
+					pd->power_set_hwfilter(pd, 1);
+				else
+					pd->power_set_hwfilter(pd, 0);
 
 				int group = pd->power_get_group(pd) - 1;
 				int sensor = pd->power_get_sensor(pd) - 1;
