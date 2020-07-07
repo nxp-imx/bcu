@@ -123,6 +123,7 @@ static void print_help(char* cmd)
 		printf("\n");
 		printf("	%s%-50s%s%s\n", g_vt_default, "monitor [-board=] [-id=] [-dump/-dump=]", g_vt_green, "monitor power consumption");
 		printf("	%s%-50s%s%s\n", g_vt_default, "        [-nodisplay] [-hz=] [-hwfilter]", g_vt_green, "");
+		printf("	%s%-50s%s%s\n", g_vt_default, "        [-bipolar]", g_vt_green, "");
 		printf("\n");
 		printf("	%s%-50s%s%s\n", g_vt_default, "set_gpio [GPIO_NAME] [1/0] [-board=] [-id=]", g_vt_green, "set pin GPIO_NAME to be high(1) or low(0)");
 		printf("	%s%-50s%s%s\n", g_vt_default, "set_boot_mode [BOOTMODE_NAME] [-board=] [-id=]", g_vt_green, "set BOOTMODE_NAME as boot mode");
@@ -1101,6 +1102,39 @@ static void monitor(struct options_setting* setting)
 		a++;
 	}
 
+	int pac_group_count = pac_group_num;
+	for(a = 0; a < MAX_NUMBER_OF_POWER; a++)
+	{
+		if (strlen(pac193x_group_path[a]) < 10)
+		{
+			continue;
+		}
+		if (pac_group_count <= 0)
+			break;
+		end_point = build_device_linkedlist_smart(&head, pac193x_group_path[a], head, previous_path);
+		strcpy(previous_path, pac193x_group_path[a]);
+
+		if (end_point == NULL) {
+			printf("monitor:failed to build device linkedlist\n");
+			if (setting->dump == 1)
+			{
+				fclose(fptr);
+			}
+			return;
+		}
+		struct power_device* pd = end_point;
+
+		if (setting->use_bipolar)
+			pd->power_set_bipolar(pd, 1);
+		else
+			pd->power_set_bipolar(pd, 0);
+
+		//snapshot once to skip the first data that may not match the polarity configuration
+		pd->power_set_snapshot(pd);
+
+		pac_group_count--;
+	}
+
 #if 1
 	unsigned long last_display = 0, now_display;
 	while (!GV_MONITOR_TERMINATED)
@@ -1118,7 +1152,7 @@ static void monitor(struct options_setting* setting)
 			candisplay = 0;
 		}
 		//first refresh all pac1934's
-		int pac_group_count = pac_group_num;
+		pac_group_count = pac_group_num;
 		for(a = 0; a < MAX_NUMBER_OF_POWER; a++)
 		{
 			if (strlen(pac193x_group_path[a]) < 10)

@@ -52,6 +52,7 @@ struct options_setting {
 	int use_rms;
 	int rangefixed;
 	int use_hwfilter;
+	int use_bipolar;
 	char groups[MAX_NUMBER_OF_POWER * MAX_MAPPING_NAME_LENGTH];
 };
 

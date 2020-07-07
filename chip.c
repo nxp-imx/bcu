@@ -579,6 +579,7 @@ void* pac1934_create(char* chip_specification, void* parent)
 	pac->power_device.power_get_cur_res = get_pac1934_cur_res;
 	pac->power_device.power_get_unused_res = get_pac1934_unused_res;
 	pac->power_device.power_set_hwfilter = pac1934_set_hwfilter;
+	pac->power_device.power_set_bipolar = pac1934_set_bipolar;
 	pac->power_device.power_set_snapshot = pac1934_snapshot;
 	pac->power_device.power_get_data = pac1934_get_data;
 	pac->power_device.switch_sensor = pac1934_switch;
@@ -653,6 +654,31 @@ void pac1934_set_hwfilter(void* pac1934, int onoff)
 	pac->hwfilter = onoff;
 }
 
+int pac1934_set_bipolar(void* pac1934, int value)
+{
+	struct pac1934* pac = pac1934;
+	struct i2c_device* parent = (void*)pac->power_device.device.parent;
+	char addr_plus_write = (pac->addr) << 1;
+	char addr_plus_read = (pac->addr << 1) + 1;
+
+	parent->i2c_start(parent);
+	if(parent->i2c_write(parent, addr_plus_write))
+	{
+		printf("pac 1934 failure get ack\n");
+		return -1;
+	};
+	parent->i2c_write(parent, PAC1934_REG_NEG_PWR_ADDR);
+	if (value)
+		parent->i2c_write(parent, 0xF0);
+	else
+		parent->i2c_write(parent, 0x00);
+	parent->i2c_stop(parent);
+
+	pac->bipolar = value;
+
+	return 0;
+}
+
 int pac1934_snapshot(void* pac1934)
 {
 	struct pac1934* pac = pac1934;
@@ -671,6 +697,20 @@ int pac1934_snapshot(void* pac1934)
 	parent->i2c_stop(parent);
 
 	return 0;
+}
+
+double pac1934_reg2current(unsigned int reg, unsigned char complement)
+{
+	if (complement) { /* 2 complement representing values between -100 mV and 100 mV */
+		if (reg >= 32768) {
+			return ((double)reg - 65536) / 32768 * 100000;
+		}
+		else {
+			return ((double)reg) / 32768 * 100000;
+		}
+	}
+	else
+		return ((double)reg) / 65535 * 100000;
 }
 
 int pac1934_get_data(void* pac1934, struct pac193x_reg_data* pac_reg)
@@ -721,10 +761,10 @@ int pac1934_get_data(void* pac1934, struct pac193x_reg_data* pac_reg)
 	// printf("current %d: %f\n", 2, (((double)(((data[10] << 8) + data[11]) * 1)) / (65535)) * 100000);
 	// printf("current %d: %f\n", 3, (((double)(((data[12] << 8) + data[13]) * 1)) / (65535)) * 100000);
 	// printf("current %d: %f\n", 4, (((double)(((data[14] << 8) + data[15]) * 1)) / (65535)) * 100000);
-	pac_reg->vsense[0] = (((double)(((data[8] << 8) + data[9]) * 1)) / (65535)) * 100000;
-	pac_reg->vsense[1] = (((double)(((data[10] << 8) + data[11]) * 1)) / (65535)) * 100000;
-	pac_reg->vsense[2] = (((double)(((data[12] << 8) + data[13]) * 1)) / (65535)) * 100000;
-	pac_reg->vsense[3] = (((double)(((data[14] << 8) + data[15]) * 1)) / (65535)) * 100000;
+	pac_reg->vsense[0] = pac1934_reg2current((data[8] << 8) + data[9], pac->bipolar);
+	pac_reg->vsense[1] = pac1934_reg2current((data[10] << 8) + data[11], pac->bipolar);
+	pac_reg->vsense[2] = pac1934_reg2current((data[12] << 8) + data[13], pac->bipolar);
+	pac_reg->vsense[3] = pac1934_reg2current((data[14] << 8) + data[15], pac->bipolar);
 
 	return 0;
 }

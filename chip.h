@@ -67,6 +67,7 @@ struct power_device {
 	int (*power_get_cur_res)(void*);
 	int (*power_get_unused_res)(void*);
 	void (*power_set_hwfilter)(void*, int);
+	int (*power_set_bipolar)(void*, int);
 	int (*power_set_snapshot)(void*);
 	int (*power_get_data)(void*, struct pac193x_reg_data*);
 	int (*switch_sensor)(void *, int i);
@@ -165,15 +166,17 @@ struct pac1934 {
 	int cur_sensor;
 	int cur_rs;
 	int hwfilter;
+	int bipolar;
 };
 int pac1934_switch(void *pac1934, int i);
 int get_pac1934_group(void* pac1934);
 int get_pac1934_sensor(void* pac1934);
 int get_pac1934_cur_res(void* pac1934);
 int get_pac1934_unused_res(void* pac1934);
+void pac1934_set_hwfilter(void* pac1934, int onoff);
+int pac1934_set_bipolar(void* pac1934, int value);
 int pac1934_snapshot(void* pac1934);
 int pac1934_get_data(void* pac1934, struct pac193x_reg_data* pac_reg);
-void pac1934_set_hwfilter(void* pac1934, int onoff);
 void* pac1934_create(char* chip_specification, void* parent);
 ////////////////////////////////////////////////////////////////////////
 struct pca6416a {
