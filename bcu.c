@@ -1305,7 +1305,7 @@ static void monitor(struct options_setting* setting)
 				}
 				else
 				{
-					if ( (!(range_level[j] & 0xf) && cavg[j] < 1 && cavg[j] > 0) || ((range_level[j] & 0xf) && cavg[j] < 1000 && cavg[j] > 0))
+					if ( (!(range_level[j] & 0xf) && cavg[j] < 1) || ((range_level[j] & 0xf) && cavg[j] < 1000))
 					{
 						current *= 1000;
 						range_level[j] = (char)(1 | range_level[j] << 4);  //uA
