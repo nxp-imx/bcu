@@ -1,0 +1,10 @@
+*.patch
+*.cmake
+*.yaml
+Makefile
+version.h
+CMakeFiles/
+CMakeCache.txt
+bcu_1.*
+bcu_2.*
+bcu_3.*
