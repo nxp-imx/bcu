@@ -2,7 +2,7 @@ image:
 #- switched to 2017 for now because VS 2019 imagines does not have coverity build tool
 #- Visual Studio 2019
 - Visual Studio 2017 
-- Ubuntu1804
+- Ubuntu1604
 
 platform:
 - x86
@@ -20,11 +20,12 @@ init:
 install:
 # - sh: sudo apt-get update
 - cmd: git submodule update --init
+- sh: git submodule update --init
 - sh: sudo DEBIAN_FRONTEND=noninteractive apt-get  update
 - sh: sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libftdi1-dev
 - sh: sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libyaml-dev
 - sh: sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libusb-1.0-0-dev
-- sh: sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libcurl4-openssl-dev
+- sh: sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install openssl
 
 build_script:
 - sh: cmake .
