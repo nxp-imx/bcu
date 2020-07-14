@@ -146,7 +146,7 @@ static void print_help(char* cmd)
 		printf("\n");
 		printf("	%s%-50s%s%s\n", g_vt_default, "monitor [-board=] [-id=] [-dump/-dump=]", g_vt_green, "monitor power consumption");
 		printf("	%s%-50s%s%s\n", g_vt_default, "        [-nodisplay] [-hz=] [-hwfilter]", g_vt_green, "");
-		printf("	%s%-50s%s%s\n", g_vt_default, "        [-bipolar]", g_vt_green, "");
+		printf("	%s%-50s%s%s\n", g_vt_default, "        [-unipolar]", g_vt_green, "");
 		printf("\n");
 		printf("	%s%-50s%s%s\n", g_vt_default, "set_gpio [GPIO_NAME] [1/0] [-board=] [-id=]", g_vt_green, "set pin GPIO_NAME to be high(1) or low(0)");
 		printf("	%s%-50s%s%s\n", g_vt_default, "set_boot_mode [BOOTMODE_NAME] [-board=] [-id=]", g_vt_green, "set BOOTMODE_NAME as boot mode");

@@ -275,7 +275,7 @@ void set_options_default(struct options_setting* setting)
 	setting->use_rms = 0;
 	setting->rangefixed = 0;
 	setting->use_hwfilter = 0;
-	setting->use_bipolar = 0;
+	setting->use_bipolar = 1;
 }
 
 
@@ -413,9 +413,9 @@ int parse_options(int argc, char** argv, struct options_setting* setting)
 		{
 			setting->use_hwfilter = 1;
 		}
-		else if (strcmp(argv[i], "-bipolar") == 0)
+		else if (strcmp(argv[i], "-unipolar") == 0)
 		{
-			setting->use_bipolar = 1;
+			setting->use_bipolar = 0;
 		}
 		else if (strncmp(argv[i], "-board=", 7) == 0 && strlen(argv[i]) > 7)
 		{
