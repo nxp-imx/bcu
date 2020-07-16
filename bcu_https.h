@@ -39,13 +39,18 @@
 #include <curl/curl.h>
 #endif
 
+#include "bcu_parser.h"
+
+#define HTTPS_GET_STRING_LEN 8192
+
 struct latest_git_info {
 	char download_url_base[256];
-	char http_get_string[2048];
+	char http_get_string[HTTPS_GET_STRING_LEN];
 	char download_url[256];
 	char tag_name[15];
 	char download_name[30];
 	char extension_name[10];
+	char release_note[2048];
 };
 
 void https_response_parse(struct latest_git_info* get_info);

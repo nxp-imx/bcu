@@ -175,7 +175,10 @@ static void upgrade_bcu()
 	strncpy(version, GIT_VERSION, 11);
 
 	if (compareVersion(&bcu_download_info.tag_name[4], &GIT_VERSION[4]) > 0)
+	{
+		printf("\nRelease Note for %s:\n%s\n\n", bcu_download_info.tag_name, bcu_download_info.release_note);
 		https_download(&bcu_download_info);
+	}
 	else
 	{
 		printf("Latest release version is %s, no need to upgrade\n", bcu_download_info.tag_name);

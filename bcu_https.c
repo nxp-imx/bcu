@@ -92,10 +92,10 @@ int _https_get_by_url(char* remote_url, struct latest_git_info* get_info)
 		else
 		{
 			// printf("response<%s>\n",response.memory);
-			if (response.size > 2048)
+			if (response.size > HTTPS_GET_STRING_LEN)
 			{
-				strncpy(get_info->http_get_string, response.memory, 2047);
-				get_info->http_get_string[2047] = 0;
+				strncpy(get_info->http_get_string, response.memory, HTTPS_GET_STRING_LEN - 1);
+				get_info->http_get_string[HTTPS_GET_STRING_LEN - 1] = 0;
 			}
 			else
 			{
@@ -238,13 +238,13 @@ int _https_get_by_url(char* remote_url, struct latest_git_info* get_info)
 				}
 				else
 				{
-					if (strsize < 2048)
+					if (strsize < HTTPS_GET_STRING_LEN)
 					{
-						if (dwSize > 2048 - strsize)
+						if (dwSize > HTTPS_GET_STRING_LEN - strsize)
 						{
-							strncat(get_info->http_get_string, pszOutBuffer, 2047 - strsize);
-							get_info->http_get_string[2047] = 0;
-							strsize = 2048;
+							strncat(get_info->http_get_string, pszOutBuffer, HTTPS_GET_STRING_LEN - 1 - strsize);
+							get_info->http_get_string[HTTPS_GET_STRING_LEN - 1] = 0;
+							strsize = HTTPS_GET_STRING_LEN;
 						}
 						else
 						{
@@ -403,6 +403,14 @@ void https_response_parse(struct latest_git_info* get_info)
 	remote_temp = strtok(remote_temp, "\"");
 	strcpy(get_info->tag_name, remote_temp);
 	// printf("tag_name: %s\n", get_info->tag_name);
+
+	remote_temp = strtok(NULL, "");
+	remote_temp = strstr(remote_temp, "body");
+	remote_temp += 7;
+	remote_temp = strtok(remote_temp, "\"");
+	strcpy(get_info->release_note, remote_temp);
+	str_replace(get_info->release_note, "\\r\\n", "\r\n");
+	str_replace(get_info->release_note, "\\t", "\t");
 
 	strcpy(get_info->download_url, get_info->download_url_base);
 	strcat(get_info->download_url, get_info->tag_name);

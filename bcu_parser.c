@@ -689,3 +689,52 @@ void groups_init(struct group* groups, int num)
 		groups[i].avg_data_size = 0;
 	}
 }
+
+void __str_replace(char * cp, int n, char * str)
+{
+	int lenofstr;
+	int i;
+	char * tmp;
+	lenofstr = strlen(str);
+	if(lenofstr < n)
+	{
+		tmp = cp+n;
+		while(*tmp)
+		{
+			*(tmp-(n-lenofstr)) = *tmp;
+			tmp++;
+		}
+		*(tmp-(n-lenofstr)) = *tmp;
+	}
+	else
+	{
+		if(lenofstr > n)
+		{
+			tmp = cp;
+			while(*tmp) tmp++;
+			while(tmp>=cp+n)
+			{
+				*(tmp+(lenofstr-n)) = *tmp;
+				tmp--;
+			}
+		}
+	}
+	strncpy(cp,str,lenofstr);
+}
+
+int str_replace(char *str, char *source, char *dest)
+{
+	int count = 0;
+	char *p;
+
+	p = strstr(str, source);
+	while(p)
+	{
+		count++;
+		__str_replace(p, strlen(source), dest);
+		p = p+strlen(dest);
+		p = strstr(p, source);
+	}
+
+	return count;
+}
