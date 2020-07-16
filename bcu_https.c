@@ -412,16 +412,16 @@ void https_response_parse(struct latest_git_info* get_info)
 	str_replace(get_info->release_note, "\\r\\n", "\r\n");
 	str_replace(get_info->release_note, "\\t", "\t");
 
+}
+
+void https_download(struct latest_git_info* get_info)
+{
 	strcpy(get_info->download_url, get_info->download_url_base);
 	strcat(get_info->download_url, get_info->tag_name);
 	strcat(get_info->download_url, "/");
 	strcat(get_info->download_url, get_info->download_name);
 	strcat(get_info->download_url, get_info->extension_name);
 
-}
-
-void https_download(struct latest_git_info* get_info)
-{
 	printf("Downloading %s%s from %s\n", get_info->tag_name,
 			get_info->extension_name, get_info->download_url);
 	if(_download(get_info->download_url, get_info->tag_name, get_info->extension_name))

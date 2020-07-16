@@ -152,19 +152,14 @@ int compareVersion(const char *v1, const char *v2)
 	return 0;
 }
 
-static void upgrade_bcu()
+static void upgrade_bcu(struct options_setting* setting)
 {
 	printf("now version %s\n", GIT_VERSION);
 
 	char version[15];
 	struct latest_git_info bcu_download_info;
 	strcpy(bcu_download_info.download_url_base, "https://github.com/NXPmicro/bcu/releases/download/");
-	strcpy(bcu_download_info.download_name, "bcu");
-#ifdef linux
-	strcpy(bcu_download_info.extension_name, "");
-#else
-	strcpy(bcu_download_info.extension_name, ".exe");
-#endif
+
 	if (https_get_by_url("https://api.github.com/repos/NXPmicro/bcu/releases", &bcu_download_info))
 	{
 		printf("Fail to get the latest BCU!\n");
@@ -172,8 +167,22 @@ static void upgrade_bcu()
 	}
 	https_response_parse(&bcu_download_info);
 
-	strncpy(version, GIT_VERSION, 11);
+	if (setting->download_doc)
+	{
+		strcpy(bcu_download_info.download_name, "BCU");
+		strcpy(bcu_download_info.extension_name, ".pdf");
+		https_download(&bcu_download_info);
+		return;
+	}
 
+	strcpy(bcu_download_info.download_name, "bcu");
+#ifdef linux
+	strcpy(bcu_download_info.extension_name, "");
+#else
+	strcpy(bcu_download_info.extension_name, ".exe");
+#endif
+
+	strncpy(version, GIT_VERSION, 11);
 	if (compareVersion(&bcu_download_info.tag_name[4], &GIT_VERSION[4]) > 0)
 	{
 		printf("\nRelease Note for %s:\n%s\n\n", bcu_download_info.tag_name, bcu_download_info.release_note);
@@ -208,8 +217,8 @@ static void print_help(char* cmd)
 		printf("	%s%-50s%s%s\n", g_vt_default, "lsbootmode [-board=]", g_vt_green, "show a list of available boot mode of a board");
 		printf("	%s%-50s%s%s\n", g_vt_default, "lsgpio     [-board=]", g_vt_green, "show a list of available gpio pin of a board");
 		printf("\n");
-		printf("	%s%-50s%s%s%s\n", g_vt_default, "version", g_vt_green, "print version number", g_vt_default);
-		printf("	%s%-50s%s%s%s\n", g_vt_default, "upgrade", g_vt_green, "get the latest BCU release", g_vt_default);
+		printf("	%s%-50s%s%s\n", g_vt_default, "version", g_vt_green, "print version number");
+		printf("	%s%-50s%s%s\n", g_vt_default, "upgrade    [-doc]", g_vt_green, "get the latest BCU release");
 		printf("	%s%-50s%s%s%s\n", g_vt_default, "help", g_vt_green, "show command details", g_vt_default);
 		// printf("	%s%-50s%s%s%s\n", g_vt_default, "help [COMMAND_NAME]", g_vt_green, "show details and options of COMMAND_NAME", g_vt_default);
 
@@ -2253,7 +2262,7 @@ int main(int argc, char** argv)
 	}
 	else if (strcmp(cmd, "upgrade") == 0)
 	{
-		upgrade_bcu();
+		upgrade_bcu(&setting);
 	}
 	else
 	{
