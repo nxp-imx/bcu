@@ -112,10 +112,51 @@ static void print_version()
 	printf("version %s\n", GIT_VERSION);
 }
 
+int compareVersion(const char *v1, const char *v2)
+{
+	const char *p_v1 = v1;
+	const char *p_v2 = v2;
+
+	while (*p_v1 && *p_v2) {
+		char buf_v1[32] = {0};
+		char buf_v2[32] = {0};
+
+		char *i_v1 = strchr(p_v1, '.');
+		char *i_v2 = strchr(p_v2, '.');
+
+		if (!i_v1 || !i_v2) break;
+
+		if (i_v1 != p_v1) {
+			strncpy(buf_v1, p_v1, i_v1 - p_v1);
+			p_v1 = i_v1;
+		}
+		else
+			p_v1++;
+
+		if (i_v2 != p_v2) {
+			strncpy(buf_v2, p_v2, i_v2 - p_v2);
+			p_v2 = i_v2;
+		}
+		else
+			p_v2++;
+
+		int order = atoi(buf_v1) - atoi(buf_v2);
+		if (order != 0)
+			return order < 0 ? -1 : 1;
+	}
+
+	double res = atof(p_v1) - atof(p_v2);
+
+	if (res < 0) return -1;
+	if (res > 0) return 1;
+	return 0;
+}
+
 static void upgrade_bcu()
 {
 	printf("now version %s\n", GIT_VERSION);
 
+	char version[15];
 	struct latest_git_info bcu_download_info;
 	strcpy(bcu_download_info.download_url_base, "https://github.com/NXPmicro/bcu/releases/download/");
 	strcpy(bcu_download_info.download_name, "bcu");
@@ -130,7 +171,15 @@ static void upgrade_bcu()
 		return;
 	}
 	https_response_parse(&bcu_download_info);
-	https_download(&bcu_download_info);
+
+	strncpy(version, GIT_VERSION, 11);
+
+	if (compareVersion(&bcu_download_info.tag_name[4], &GIT_VERSION[4]) > 0)
+		https_download(&bcu_download_info);
+	else
+	{
+		printf("Latest release version is %s, no need to upgrade\n", bcu_download_info.tag_name);
+	}
 }
 
 static void print_help(char* cmd)
