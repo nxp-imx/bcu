@@ -14,7 +14,9 @@ first we need to have FTDI D2XX library installed:
 
 then we can load and build bcu:  
 
-$ git clone https://github.com/NXPmicro/bcu.git  
+> git clone https://github.com/NXPmicro/bcu.git  
+
+> git submodule update --init  
 
 open Board_Control_Utilities.sln with windows visual studio  
 
@@ -40,6 +42,8 @@ $ git clone https://github.com/NXPmicro/bcu.git
 
 $ cd bcu  
 
+$ git submodule update --init  
+
 $ cmake .  
 
 $ make  
@@ -53,20 +57,20 @@ _____________________________________________________________________
 
 # list of available commands & their functions:  
 
-| commands                                       | descriptions                                                 |
-| ---------------------------------------------- | ------------------------------------------------------------ |
-| reset  [BOOTMODE_NAME] [-board=] [-id=]        | reset the board                                              |
-| init   [BOOTMODE_NAME] [-board=] [-id=]        | enable the remote control with a boot mode                   |
-| deinit [BOOTMODE_NAME] [-board=] [-id=]        | disable the remote control                                   |
-| monitor                                        | switch into a tui windows that monitors voltage, current and power consumption inside the board |
-| set_gpio [GPIO_NAME] [1/0] [-board=] [-id=]    | set pin GPIO_NAME to be high(1) or low(0)                    |
-| set_boot_mode [BOOTMODE_NAME] [-board=] [-id=] | set BOOTMODE_NAME as boot mode                               |
-| lsftdi                                         | show the list of connected boards and the their location IDs |
-| lsboard                                        | list all supported board models                              |
-| lsbootmode [-board=]                           | show a list of available boot mode of a board                |
-| lsgpio [-board=]                               | show a list of available gpio pin of a board                 |
-| help                                           | show list of available commands and their functions, as well as options |
-| version                                        | show version number                                          |
+| commands                                                     | descriptions                                                 |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| reset  [BOOTMODE_NAME] [-board=] [-id=]                      | reset the board                                              |
+| init   [BOOTMODE_NAME] [-board=] [-id=]                      | enable the remote control with a boot mode                   |
+| deinit [BOOTMODE_NAME] [-board=] [-id=]                      | disable the remote control                                   |
+| monitor [-board=] [-id=] [-dump/-dump=] [-nodisplay] [-hz=] [-rms] [-hwfilter] [-unipolar] | switch into a tui windows that monitors voltage, current and power consumption inside the board |
+| set_gpio [GPIO_NAME] [1/0] [-board=] [-id=]                  | set pin GPIO_NAME to be high(1) or low(0)                    |
+| set_boot_mode [BOOTMODE_NAME] [-board=] [-id=]               | set BOOTMODE_NAME as boot mode                               |
+| lsftdi                                                       | show the list of connected boards and the their location IDs |
+| lsboard                                                      | list all supported board models                              |
+| lsbootmode [-board=]                                         | show a list of available boot mode of a board                |
+| lsgpio [-board=]                                             | show a list of available gpio pin of a board                 |
+| help                                                         | show list of available commands and their functions, as well as options |
+| version                                                      | show version number                                          |
 
 ### typical usage of bcu:  
 
@@ -102,9 +106,16 @@ ________________________________________________________________________________
 | [BOOTMODE]        | setting BOOTMODE as the booting method |
 
 ### monitor:  
-| options | descriptions                                          |
-| ------- | ----------------------------------------------------- |
-| [-dump] | dump data into a file, which can be imported to excel |
+| options          | descriptions                                                 |
+| ---------------- | ------------------------------------------------------------ |
+| [-dump]          | dump data into a file, which can be imported to excel        |
+| [-dump=FILENAME] | dump data into a “FILENAME.csv” file, which can be imported to excel. |
+| [-nodisplay]     | Will not show data value in real time, just dump data to file in the background. This will help to improve sample speed.<br/>It will auto select -dump option. |
+| [-hz=]           | Unit: Hz, support float number.<br/>It can change the display refresh frequency on terminal. Low refresh frequency will help to improve sample speed on Windows.<br/>usage:<br/>•	Windows: > .\bcu.exe monitor [-board=xxx] -hz=”0.5”<br/>•	Linux: $ sudo ./bcu monitor [-board=xxx] -hz=0.5 |
+| [-rms]           | Show Root-Mean-Square instead of normal Average of all Current data. |
+| [-hwfilter]      | 8x Hardware Filter<br/>Voltage and current values will be read from avg register which contain a rolling average of the eight most recent VBUS/VSENSE results. |
+| [-unipolar]      | Change the current measurement range from (-100mA~100mA) to (0mA~100mA). |
+| HOT-KEYs         | Please refer to release note.                                |
 
 ### set_gpio: 
 | options           | descriptions                                                 |
@@ -135,17 +146,27 @@ ________________________________________________________________________________
 
   Please make sure your imx8mp power CPU board has done this rework:
 
-- R208 from 1.0Ohm to 0.4Ohm
+  - R208 from 1.0Ohm to 0.4Ohm
 
-- R76  from 0.4Ohm to 1.0Ohm
+  - R76  from 0.4Ohm to 1.0Ohm
 
-- R225 from 2.0Ohm to 1.0Ohm
+  - R225 from 2.0Ohm to 1.0Ohm
 
-- R227 from 2.0Ohm to 1.0Ohm
+  - R227 from 2.0Ohm to 1.0Ohm
 
-- R129 from 0.1Ohm to 0.05Ohm
+  - R129 from 0.1Ohm to 0.05Ohm
 
-  If your board is not reworked, please use the 1.0.28 or older version of BCU.
+  If your board is not reworked, **please modify rsense1/rsense2 to the old values in config.yaml file by yourself**.
+
+  - vdd_pll_ana_0v8 resense1/resense2 both set to 400(Milliohm)
+
+  - lpd4_vdd2 resense1/resense2 both set to 100
+
+  - vdd_usb_0v8 resense1/resense2 both set to 1000
+
+  - vdd_lvds_1V8 resense1/resense2 both set to 2000
+
+  - vdd_pci_1v8 resense1/resense2 both set to 2000
 
 
 - imx8mpddr3l: VDB
