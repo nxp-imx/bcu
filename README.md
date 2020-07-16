@@ -114,7 +114,7 @@ ________________________________________________________________________________
 | [-hz=]           | Unit: Hz, support float number.<br/>It can change the display refresh frequency on terminal. Low refresh frequency will help to improve sample speed on Windows.<br/>usage:<br/>•	Windows: > .\bcu.exe monitor [-board=xxx] -hz=”0.5”<br/>•	Linux: $ sudo ./bcu monitor [-board=xxx] -hz=0.5 |
 | [-rms]           | Show Root-Mean-Square instead of normal Average of all Current data. |
 | [-hwfilter]      | 8x Hardware Filter<br/>Voltage and current values will be read from avg register which contain a rolling average of the eight most recent VBUS/VSENSE results. |
-| [-unipolar]      | Change the current measurement range from (-100mA~100mA) to (0mA~100mA). |
+| [-unipolar]      | Change the current measurement range from (-100mA=>100mA) to (0mA=>100mA). |
 | HOT-KEYs         | Please refer to release note.                                |
 
 ### set_gpio: 
