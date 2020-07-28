@@ -1210,9 +1210,9 @@ static void monitor(struct options_setting* setting)
 		struct power_device* pd = end_point;
 
 		if (setting->use_bipolar)
-			pd->power_set_bipolar(pd, 1);
+			pd->power_write_bipolar(pd, 1);
 		else
-			pd->power_set_bipolar(pd, 0);
+			pd->power_write_bipolar(pd, 0);
 
 		//snapshot once to skip the first data that may not match the polarity configuration
 		pd->power_set_snapshot(pd);
@@ -1287,6 +1287,16 @@ static void monitor(struct options_setting* setting)
 				return;
 			}
 			struct power_device* pd = end_point;
+
+			if (setting->use_hwfilter)
+				pd->power_set_hwfilter(pd, 1);
+			else
+				pd->power_set_hwfilter(pd, 0);
+
+			if (setting->use_bipolar)
+				pd->power_set_bipolar(pd, 1);
+			else
+				pd->power_set_bipolar(pd, 0);
 
 			int b;
 			for (b = 0; b < 50; b++)
@@ -1367,11 +1377,6 @@ static void monitor(struct options_setting* setting)
 					pd->switch_sensor(pd, 1);
 				else
 					pd->switch_sensor(pd, 0);
-
-				if (setting->use_hwfilter)
-					pd->power_set_hwfilter(pd, 1);
-				else
-					pd->power_set_hwfilter(pd, 0);
 
 				int group = pd->power_get_group(pd) - 1;
 				int sensor = pd->power_get_sensor(pd) - 1;
