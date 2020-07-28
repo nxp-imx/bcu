@@ -580,6 +580,7 @@ void* pac1934_create(char* chip_specification, void* parent)
 	pac->power_device.power_get_unused_res = get_pac1934_unused_res;
 	pac->power_device.power_set_hwfilter = pac1934_set_hwfilter;
 	pac->power_device.power_set_bipolar = pac1934_set_bipolar;
+	pac->power_device.power_write_bipolar = pac1934_write_bipolar;
 	pac->power_device.power_set_snapshot = pac1934_snapshot;
 	pac->power_device.power_get_data = pac1934_get_data;
 	pac->power_device.switch_sensor = pac1934_switch;
@@ -654,7 +655,14 @@ void pac1934_set_hwfilter(void* pac1934, int onoff)
 	pac->hwfilter = onoff;
 }
 
-int pac1934_set_bipolar(void* pac1934, int value)
+void pac1934_set_bipolar(void* pac1934, int value)
+{
+	struct pac1934* pac = pac1934;
+
+	pac->bipolar = value;
+}
+
+int pac1934_write_bipolar(void* pac1934, int value)
 {
 	struct pac1934* pac = pac1934;
 	struct i2c_device* parent = (void*)pac->power_device.device.parent;
