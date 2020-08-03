@@ -39,8 +39,10 @@
 #endif
 #include "board.h"
 #include "bcu_parser.h"
+#include "version.h"
 
 enum yaml_now_status_type {
+	STATUS_CHECK_VERSION,
 	STATUS_WAITING_WANTED_BOARD,
 	STATUS_CHANGE_BOARD,
 	STATUS_CHANGE_FIXEDRAIL,
@@ -51,6 +53,11 @@ enum yaml_now_status_type {
 	STATUS_CHANGE_DEFAULT_RS,
 	STATUS_GROUPS,
 	STATUS_CHANGE_GROUPS
+};
+
+struct bcu_yaml_version
+{
+	char* version;
 };
 
 void writeConf(void);

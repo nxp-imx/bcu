@@ -112,46 +112,6 @@ static void print_version()
 	printf("version %s\n", GIT_VERSION);
 }
 
-int compareVersion(const char *v1, const char *v2)
-{
-	const char *p_v1 = v1;
-	const char *p_v2 = v2;
-
-	while (*p_v1 && *p_v2) {
-		char buf_v1[32] = {0};
-		char buf_v2[32] = {0};
-
-		char *i_v1 = strchr(p_v1, '.');
-		char *i_v2 = strchr(p_v2, '.');
-
-		if (!i_v1 || !i_v2) break;
-
-		if (i_v1 != p_v1) {
-			strncpy(buf_v1, p_v1, i_v1 - p_v1);
-			p_v1 = i_v1;
-		}
-		else
-			p_v1++;
-
-		if (i_v2 != p_v2) {
-			strncpy(buf_v2, p_v2, i_v2 - p_v2);
-			p_v2 = i_v2;
-		}
-		else
-			p_v2++;
-
-		int order = atoi(buf_v1) - atoi(buf_v2);
-		if (order != 0)
-			return order < 0 ? -1 : 1;
-	}
-
-	double res = atof(p_v1) - atof(p_v2);
-
-	if (res < 0) return -1;
-	if (res > 0) return 1;
-	return 0;
-}
-
 static void upgrade_bcu(struct options_setting* setting)
 {
 	printf("now version %s\n", GIT_VERSION);
@@ -183,7 +143,7 @@ static void upgrade_bcu(struct options_setting* setting)
 #endif
 
 	strncpy(version, GIT_VERSION, 11);
-	if (compareVersion(&bcu_download_info.tag_name[4], &GIT_VERSION[4]) > 0)
+	if (compare_version(&bcu_download_info.tag_name[4], &GIT_VERSION[4]) > 0)
 	{
 		printf("\nRelease Note for %s:\n%s\n\n", bcu_download_info.tag_name, bcu_download_info.release_note);
 		https_download(&bcu_download_info);
@@ -2179,6 +2139,9 @@ int main(int argc, char** argv)
 	case -2:
 		printf("config.yaml file read error, please check or delete config.yaml and try again.\n");
 		return -2;
+		break;
+	case -3:
+		return -3;
 		break;
 	default:
 		break;

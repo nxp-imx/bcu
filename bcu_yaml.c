@@ -51,6 +51,8 @@ void writeConf(void)
 	char chip_specification[MAX_PATH_LENGTH];
 	int i = 0, j;
 
+	sprintf(text, "config_version: %s\n", GIT_VERSION);
+	fputs(text, fp);
 	fputs("# show_id can set the display order of the rails.\n# show_id should start from 1.\n# If show_id: 0, it means that this rail will not be displayed and dumped.\n", fp);
 	fputs("#\n# Please DO NOT delete any line of a power rail!\n# If you don't want to show it, please just set its \"show_id\" as 0.\n", fp);
 	fputs("#\n# Unit of rsense1 and rsense2 is Milliohm.\n", fp);
@@ -152,6 +154,63 @@ int updateRsense(struct board_info* board, char* rail_name, char* rs1, char* rs2
 	return 0;
 }
 
+#define FILE_MAX_LENGTH 4096
+int replace_str(char* path, char* source, char* dest)
+{
+	char buffer[FILE_MAX_LENGTH];
+	int fp_start = 0;
+	int fp_end = 0;
+	int buffer_length = 0;
+	int move_length = 0;
+	FILE *fp = fopen(path, "r+");
+
+	if(fp == NULL)
+	{
+		printf("File open failed\n");
+		return 0;
+	}
+	while (1)
+	{
+		memset(buffer, 0, FILE_MAX_LENGTH);
+		if(fgets(buffer, FILE_MAX_LENGTH, fp) == NULL)
+		{
+			break;
+		}
+		else
+		{
+			buffer_length = strlen(buffer);
+			for(int j = 0; j < buffer_length; j++)
+			{
+				if(strncmp(source, &buffer[j], strlen(source)) == 0)
+				{
+					fp_end = ftell(fp);
+					move_length = buffer_length - j;
+					fseek(fp, -(move_length), SEEK_CUR);
+					fp_start = ftell(fp);
+					for(int i = 0; i < strlen(source); i++)
+					{
+						if(i < strlen(dest))
+							fputc(dest[i], fp);
+						else
+							fputc(' ', fp);
+					}
+					fseek(fp, fp_end, SEEK_SET);
+				}
+			}
+		}
+	}
+	printf("File update successfully!\n");
+	fclose(fp);
+	return 0;
+}
+
+struct bcu_yaml_version ver_before_big_ver[] =
+{
+	{"1.0.131"},
+	{"1.0.153"},
+	{NULL}
+};
+
 int readConf(char* boardname, struct options_setting* setting)
 {
 	FILE* fh = fopen("config.yaml", "r");
@@ -184,6 +243,7 @@ int readConf(char* boardname, struct options_setting* setting)
 	char now_rail[MAX_MAPPING_NAME_LENGTH];
 	int group_id = 0;
 	char rs1[10], rs2[10];
+	char version[30] = "";
 
 	do
 	{
@@ -198,7 +258,9 @@ int readConf(char* boardname, struct options_setting* setting)
 
 			if (state == 0)
 			{
-				if (!strcmp(tk, "boardname"))
+				if (!strcmp(tk, "config_version"))
+					now_status = STATUS_CHECK_VERSION;
+				else if (!strcmp(tk, "boardname"))
 					now_status = STATUS_CHANGE_BOARD;
 				else if (now_status == STATUS_WAITING_WANTED_BOARD)
 					break;
@@ -253,6 +315,33 @@ int readConf(char* boardname, struct options_setting* setting)
 			{
 				switch (now_status)
 				{
+				case STATUS_CHECK_VERSION:
+				{
+					if(now_status == STATUS_CHECK_VERSION)
+					{
+						if (compare_version(&GIT_VERSION[4], &tk[4]) != 0)
+						{
+							printf("\nConfig file version mismatch!\n");
+							int temp = 0;
+							while (ver_before_big_ver[temp].version)
+							{
+								if (compare_version(ver_before_big_ver[temp].version, &tk[4]) >= 0)
+								{
+									printf("        BCU version: %s\n", GIT_VERSION);
+									printf("Config file version: %s\n", tk);
+									printf("Config file version is too old!\nPlease delete the old config.yaml, then run BCU again!\n");
+									return -3;
+								}
+								temp++;
+							}
+							printf("No big change between these two version.\nWill update config.yaml automatically!\n");
+							replace_str("config.yaml", tk, GIT_VERSION);
+							strcpy(version, GIT_VERSION);
+						}
+						else
+							strcpy(version, tk);
+					}
+				}break;
 				case STATUS_WAITING_WANTED_BOARD: break;
 				case STATUS_CHANGE_BOARD:
 				{
@@ -316,6 +405,15 @@ int readConf(char* boardname, struct options_setting* setting)
 	yaml_parser_delete(&parser);
 
 	fclose(fh);
+
+	if (strcmp(version, GIT_VERSION))
+	{
+		if (compare_version(&GIT_VERSION[4], &version[4]) != 0)
+		{
+			printf("\nConfig file version is too old!\nPlease delete the old config.yaml, then run BCU again!\n");
+			return -3;
+		}
+	}
 
 	return 0;
 }

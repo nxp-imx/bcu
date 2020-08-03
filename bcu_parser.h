@@ -85,4 +85,7 @@ void set_options_default(struct options_setting* setting);
 int parse_groups(struct group* groups, struct board_info* board);
 void groups_init(struct group* groups, int num);
 int str_replace(char *str, char *source, char *dest);
+
+int compare_version(const char *v1, const char *v2);
+
 #endif //PARSER_H
