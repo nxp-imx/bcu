@@ -1450,7 +1450,10 @@ static void monitor(struct options_setting* setting)
 				}
 
 				if (setting->use_rms)
+				{
 					cavg[j] = sqrt((data_size[j] * cavg[j] * cavg[j] + current * current) / (double)(data_size[j] + 1));
+					pavg[j] = cavg[j] * vavg[j];
+				}
 				else
 					cavg[j] = (data_size[j] * cavg[j] + current) / (double)(data_size[j] + 1);
 
@@ -1560,12 +1563,9 @@ static void monitor(struct options_setting* setting)
 				printf("%s", g_vt_green);
 				printf("|%-5s %-5s %-5s %-5s", "now", "avg", "max", "min");
 				printf("%s", g_vt_yellow);
-				if (setting->use_rms)
-					printf(" |%-6s %-6s %-7s %-6s", "now", "rms", "max", "min");
-				else
-					printf(" |%-6s %-6s %-7s %-6s", "now", "avg", "max", "min");
+				printf(" |%-6s %-6s %-7s %-6s", "now", setting->use_rms ? "rms" : "avg", "max", "min");
 				printf("%s", g_vt_kcyn);
-				printf(" |%-6s %-6s %-7s %-6s", "now", "avg", "max", "min");
+				printf(" |%-6s %-6s %-7s %-6s", "now", setting->use_rms ? "rms" : "avg", "max", "min");
 				printf("%s", g_vt_red);
 				printf("%-s", " |Range1     |Range2");
 				printf("\n");
@@ -1596,13 +1596,10 @@ static void monitor(struct options_setting* setting)
 
 				printf("|%-5s %-5s", "now", "avg");
 				printf("%s", g_vt_yellow);
-				if (setting->use_rms)
-					printf(" |%-6s %-6s %-7s %-6s", "now", "rms", "max", "min");
-				else
-					printf(" |%-6s %-6s %-7s %-6s", "now", "avg", "max", "min");
+				printf(" |%-6s %-6s %-7s %-6s", "now", setting->use_rms ? "rms" : "avg", "max", "min");
 				printf("%s", g_vt_kcyn);
 
-				printf(" |%-6s %-6s %-7s %-6s", "now", "avg", "max", "min");
+				printf(" |%-6s %-6s %-7s %-6s", "now", setting->use_rms ? "rms" : "avg", "max", "min");
 				printf("%s", g_vt_red);
 				printf("%-s", " |Range1     |Range2");
 				printf("\n");
@@ -1631,12 +1628,9 @@ static void monitor(struct options_setting* setting)
 				printf("%s", g_vt_green);
 				printf("|%-5s %-5s", "now", "avg");
 				printf("%s", g_vt_yellow);
-				if (setting->use_rms)
-					printf(" |%-6s %-6s", "now", "rms");
-				else
-					printf(" |%-6s %-6s", "now", "avg");
+				printf(" |%-6s %-6s", "now", setting->use_rms ? "rms" : "avg");
 				printf("%s", g_vt_kcyn);
-				printf(" |%-6s %-6s %-7s %-6s", "now", "avg", "max", "min");
+				printf(" |%-6s %-6s %-7s %-6s", "now", setting->use_rms ? "rms" : "avg", "max", "min");
 				printf("%s", g_vt_red);
 				printf("%-s", " |Range1     |Range2");
 				printf("\n");
@@ -1667,12 +1661,9 @@ static void monitor(struct options_setting* setting)
 				printf("%s", g_vt_green);
 				printf("|%-5s %-5s", "now", "avg");
 				printf("%s", g_vt_yellow);
-				if (setting->use_rms)
-					printf(" |%-6s %-6s", "now", "rms");
-				else
-					printf(" |%-6s %-6s", "now", "avg");
+				printf(" |%-6s %-6s", "now", setting->use_rms ? "rms" : "avg");
 				printf("%s", g_vt_kcyn);
-				printf(" |%-6s %-6s", "now", "avg");
+				printf(" |%-6s %-6s", "now", setting->use_rms ? "rms" : "avg");
 				printf("%s", g_vt_red);
 				printf("%-s", " |Range1     |Range2");
 				printf("\n");
@@ -1795,7 +1786,7 @@ static void monitor(struct options_setting* setting)
 				printf("%s", g_vt_default);
 				printfpadding("group", max_group_length);
 				printf("%s", g_vt_kcyn);
-				printf(" |%-6s %-6s %-6s %-6s", "now", "avg", "max", "min");
+				printf(" |%-6s %-6s %-6s %-6s", "now", setting->use_rms ? "rms" : "avg", "max", "min");
 				printf("%s", g_vt_default);
 				printf(" |Group members\n");
 				printf("%s", g_vt_default);
