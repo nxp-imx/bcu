@@ -414,7 +414,7 @@ void https_response_parse(struct latest_git_info* get_info)
 
 }
 
-void https_download(struct latest_git_info* get_info)
+int https_download(struct latest_git_info* get_info)
 {
 	strcpy(get_info->download_url, get_info->download_url_base);
 	strcat(get_info->download_url, get_info->tag_name);
@@ -425,9 +425,14 @@ void https_download(struct latest_git_info* get_info)
 	printf("Downloading %s%s from %s\n", get_info->tag_name,
 			get_info->extension_name, get_info->download_url);
 	if(_download(get_info->download_url, get_info->tag_name, get_info->extension_name))
+	{
 		printf("Download Failed!\n");
+		return -1;
+	}
 	else
 		printf("Download successfully!\n");
+
+	return 0;
 }
 
 int https_get_by_url(char* remote_url, struct latest_git_info* get_info)

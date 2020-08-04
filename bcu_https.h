@@ -41,7 +41,7 @@
 
 #include "bcu_parser.h"
 
-#define HTTPS_GET_STRING_LEN 8192
+#define HTTPS_GET_STRING_LEN 15360
 
 struct latest_git_info {
 	char download_url_base[256];
@@ -55,6 +55,6 @@ struct latest_git_info {
 
 void https_response_parse(struct latest_git_info* get_info);
 int https_get_by_url(char* remote_url, struct latest_git_info* get_info);
-void https_download(struct latest_git_info* get_info);
+int https_download(struct latest_git_info* get_info);
 
 #endif //BCU_HTTPS_H

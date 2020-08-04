@@ -38,6 +38,8 @@
 #ifdef linux
 #include <unistd.h>
 #include <sys/ioctl.h>
+#include <stdlib.h>
+#include <curses.h>
 #include "ftdi.h"
 #endif
 
@@ -177,13 +179,14 @@ static void print_help(char* cmd)
 		printf("	%s%-50s%s%s\n", g_vt_default, "lsbootmode [-board=]", g_vt_green, "show a list of available boot mode of a board");
 		printf("	%s%-50s%s%s\n", g_vt_default, "lsgpio     [-board=]", g_vt_green, "show a list of available gpio pin of a board");
 		printf("\n");
-		printf("	%s%-50s%s%s\n", g_vt_default, "version", g_vt_green, "print version number");
 		printf("	%s%-50s%s%s\n", g_vt_default, "upgrade    [-doc]", g_vt_green, "get the latest BCU release");
+		printf("	%s%-50s%s%s\n", g_vt_default, "uuu        [-doc]", g_vt_green, "download the latest UUU");
+		printf("\n");
+		printf("	%s%-50s%s%s\n", g_vt_default, "version", g_vt_green, "print version number");
 		printf("	%s%-50s%s%s%s\n", g_vt_default, "help", g_vt_green, "show command details", g_vt_default);
 		// printf("	%s%-50s%s%s%s\n", g_vt_default, "help [COMMAND_NAME]", g_vt_green, "show details and options of COMMAND_NAME", g_vt_default);
 
 #ifdef __linux__
-		printf("\n	%s%-50s%s%s\n", g_vt_default, "flash [emmc or sd] [-board=]", g_vt_green, "flash flash.bin to EMMC or SD");
 		printf("%s", g_vt_kcyn);
 		printf("\n***please remember to run BCU with sudo or config the udev rules%s\n\n\n", g_vt_default);
 #endif
@@ -628,113 +631,45 @@ static void resume(struct options_setting* setting)
 		printf("resume successfully\n");
 }
 
-#ifdef __linux__
-#include <stdlib.h>
-#include <curses.h>
 static void uuu(struct options_setting* setting)
 {
-	struct board_info* board = get_board(setting->board);
-	if (board == NULL)
-		return;
-	if (strcmp(board->links->flashbin, "") == 0)
+	int res = 0;
+	char cmd[255];
+	struct latest_git_info uuu_download_info;
+	strcpy(uuu_download_info.download_url_base, "https://github.com/NXPmicro/mfgtools/releases/download/");
+
+	if (https_get_by_url("https://api.github.com/repos/NXPmicro/mfgtools/releases", &uuu_download_info))
 	{
-		printf("this board still does not support this function\n");
-		return;
-	}
-	if (setting->boot_mode_hex == -1)
-	{
-		printf("please provide the flashing destination: emmc or sd\n");
+		printf("Fail to get the latest UUU!\n");
 		return;
 	}
-	struct gpio_device* gpio = NULL;
-	int status = -1, i;
-	char buf[256], cmd[1024] = "sudo ./uuu -b ";
-	char *old_boot_mode_str;
-	char ch, cmdurl[1024] = "\0";
+	https_response_parse(&uuu_download_info);
 
-	i = 0;
-	while (board->boot_modes[i].name != NULL)
+	if (setting->download_doc)
 	{
-		if (setting->boot_mode_hex == board->boot_modes[i].boot_mode_hex)
-		{
-			old_boot_mode_str = board->boot_modes[i].name;
-			if (!strcmp(old_boot_mode_str, "sd") || !strcmp(old_boot_mode_str, "emmc"))
-				break;
-			else
-			{
-				printf("only support emmc or sd now\n");
-				return;
-			}
-		}
-		i++;
-	}
-
-	//get the path
-	getcwd(buf,sizeof(buf));
-	//find uuu
-	if (access(strcat(buf, "/uuu"), 0))
-	{
-		system("wget https://github.com/NXPmicro/mfgtools/releases/download/uuu_1.3.126/uuu");
-		system("chmod a+x uuu");
-	}
-
-	//reset to serial download
-	i = 0;
-	while (board->boot_modes[i].name != NULL)
-	{
-		if (strcmp(board->boot_modes[i].name, "usb") == 0)
-		{
-			setting->boot_mode_hex = board->boot_modes[i].boot_mode_hex;
-			break;
-		}
-		i++;
-	}
-	reset(setting);
-	printf("flash.bin is from %s\nburn this flash.bin to %s?(Y/n):", board->links->flashbin, old_boot_mode_str);
-	scanf("%c", &ch);
-	if (ch == 'n' || ch == 'N')
-	{
-		scanf("%c", &ch);
-		ch = 0;
-		i = 0;
-		printf("please enter the new flash.bin source:");
-		do
-		{
-			ch = getchar();
-			if (ch != '\n')
-				cmdurl[i] = ch;
-			i++;
-		}while(ch != '\n' && i < 1024);
-	}
-	else
-		strcpy(cmdurl, board->links->flashbin);
-
-	// printf("cmdurl=%s\n", cmdurl);
-	if(cmdurl[0] == '\n' || cmdurl[0] == '\0')
+		strcpy(uuu_download_info.download_name, "UUU");
+		strcpy(uuu_download_info.extension_name, ".pdf");
+		https_download(&uuu_download_info);
 		return;
-
-	msleep(100);
-
-	//flash by uuu to emmc/sd
-	strcat(cmd, old_boot_mode_str);
-	strcat(cmd, " ");
-	strcat(cmd, cmdurl);
-	system(cmd);
-
-	//reset to emmc/sd
-	i = 0;
-	while (board->boot_modes[i].name != NULL)
-	{
-		if (strcmp(board->boot_modes[i].name, old_boot_mode_str) == 0)
-		{
-			setting->boot_mode_hex = board->boot_modes[i].boot_mode_hex;
-			break;
-		}
-		i++;
 	}
-	reset(setting);
-}
+
+	strcpy(uuu_download_info.download_name, "uuu");
+#ifdef linux
+	strcpy(uuu_download_info.extension_name, "");
+#else
+	strcpy(uuu_download_info.extension_name, ".exe");
 #endif
+
+	printf("\nRelease Note for %s:\n%s\n\n", uuu_download_info.tag_name, uuu_download_info.release_note);
+	res = https_download(&uuu_download_info);
+#ifdef linux
+	if (!res)
+	{
+		sprintf(cmd, "chmod a+x %s", uuu_download_info.tag_name);
+		system(cmd);
+	}
+#endif
+}
 
 static int monitor_size(int columns_or_rows)
 {
@@ -2209,12 +2144,10 @@ int main(int argc, char** argv)
 	{
 		deinitialize(&setting);
 	}
-#ifdef __linux__
-	else if (strcmp(cmd, "flash") == 0)
+	else if (strcmp(cmd, "uuu") == 0)
 	{
 		uuu(&setting);
 	}
-#endif
 	else if (strcmp(cmd, "version") == 0)
 	{
 		print_version();
