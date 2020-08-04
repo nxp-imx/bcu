@@ -317,30 +317,34 @@ int readConf(char* boardname, struct options_setting* setting)
 				{
 				case STATUS_CHECK_VERSION:
 				{
-					if(now_status == STATUS_CHECK_VERSION)
+					if (compare_version(&GIT_VERSION[4], &tk[4]) != 0)
 					{
-						if (compare_version(&GIT_VERSION[4], &tk[4]) != 0)
+						printf("\nConfig file version mismatch!\n");
+						int temp = 0;
+						while (ver_before_big_ver[temp].version)
 						{
-							printf("\nConfig file version mismatch!\n");
-							int temp = 0;
-							while (ver_before_big_ver[temp].version)
+							if (compare_version(ver_before_big_ver[temp].version, &tk[4]) >= 0)
 							{
-								if (compare_version(ver_before_big_ver[temp].version, &tk[4]) >= 0)
-								{
-									printf("        BCU version: %s\n", GIT_VERSION);
-									printf("Config file version: %s\n", tk);
-									printf("Config file version is too old!\nPlease delete the old config.yaml, then run BCU again!\n");
-									return -3;
-								}
-								temp++;
+								printf("        BCU version: %s\n", GIT_VERSION);
+								printf("Config file version: %s\n", tk);
+								printf("Config file version is too old!\nPlease delete the old config.yaml, then run BCU again!\n");
+								return -3;
 							}
-							printf("No big change between these two version.\nWill update config.yaml automatically!\n");
-							replace_str("config.yaml", tk, GIT_VERSION);
-							strcpy(version, GIT_VERSION);
+							if (compare_version(ver_before_big_ver[temp].version, &GIT_VERSION[4]) >= 0)
+							{
+								printf("        BCU version: %s\n", GIT_VERSION);
+								printf("Config file version: %s\n", tk);
+								printf("BCU version is too old!\nPlease delete the old config.yaml, then run BCU again!\n");
+								return -3;
+							}
+							temp++;
 						}
-						else
-							strcpy(version, tk);
+						printf("No big change between these two version.\nWill update config.yaml automatically!\n");
+						replace_str("config.yaml", tk, GIT_VERSION);
+						strcpy(version, GIT_VERSION);
 					}
+					else
+						strcpy(version, tk);
 				}break;
 				case STATUS_WAITING_WANTED_BOARD: break;
 				case STATUS_CHANGE_BOARD:
