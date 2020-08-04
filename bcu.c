@@ -1981,7 +1981,7 @@ int find_board_by_eeprom(struct options_setting* setting)
 				if (end_point == NULL)
 				{
 					printf("set_gpio: error building device linked list\n");
-					return -1;
+					return -2;
 				}
 
 				struct eeprom_device* eeprom = end_point;
@@ -2045,16 +2045,28 @@ int main(int argc, char** argv)
 
 	if (parse_board_id_options(argc, argv, &setting) == 1)
 	{
-		if (find_board_by_eeprom(&setting))
+		switch (find_board_by_eeprom(&setting))
+		{
+		case 0:
+			printf("Auto recognized the board: %s\n", setting.board);
+			break;
+		case -1:
 		{
 			printf("Can't auto recognize the board...\n");
 			printf("For now, only 8MPLUSLPD4-CPU don't have eeprom. Assuming use \"imx8mpevk\"...\n");
 			printf("Please also notice if there is any other board connected to this host.\n");
 			printf("Try \"bcu lsftdi\" to find the right -id=...\n");
 			strcpy(setting.board, "imx8mpevk");
+		}break;
+		case -2:
+		{
+			printf("Can't open FTDI channel...Please try to add [-board=] option.\n");
+			return -2;
+		}break;
+		
+		default:
+			break;
 		}
-		else
-			printf("Auto recognized the board: %s\n", setting.board);
 	}
 
 	if (parse_options(argc, argv, &setting) == -1) {
