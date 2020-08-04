@@ -308,7 +308,9 @@ int parse_board_id_options(int argc, char** argv, struct options_setting* settin
 		}
 	}
 
-	if (strcmp(argv[1], "upgrade") == 0)
+	if (strcmp(argv[1], "upgrade") == 0 || strcmp(argv[1], "uuu") == 0 ||
+	    strcmp(argv[1], "lsftdi") == 0 || strcmp(argv[1], "lsboard") == 0 ||
+	    strcmp(argv[1], "version") == 0 || strcmp(argv[1], "help") == 0)
 	{
 		return 0;
 	}
