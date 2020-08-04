@@ -118,6 +118,8 @@ static void upgrade_bcu(struct options_setting* setting)
 {
 	printf("now version %s\n", GIT_VERSION);
 
+	int res = 0;
+	char cmd[255];
 	char version[15];
 	struct latest_git_info bcu_download_info;
 	strcpy(bcu_download_info.download_url_base, "https://github.com/NXPmicro/bcu/releases/download/");
@@ -148,7 +150,14 @@ static void upgrade_bcu(struct options_setting* setting)
 	if (compare_version(&bcu_download_info.tag_name[4], &GIT_VERSION[4]) > 0)
 	{
 		printf("\nRelease Note for %s:\n%s\n\n", bcu_download_info.tag_name, bcu_download_info.release_note);
-		https_download(&bcu_download_info);
+		res = https_download(&bcu_download_info);
+#ifdef linux
+		if (!res)
+		{
+			sprintf(cmd, "chmod a+x %s", bcu_download_info.tag_name);
+			system(cmd);
+		}
+#endif
 	}
 	else
 	{
