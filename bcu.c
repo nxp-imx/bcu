@@ -61,6 +61,8 @@
 
 #define DONT_RESET	0
 #define RESET_NOW	1
+#define LSBOOTMODE_NSHOWID	0
+#define LSBOOTMODE_SHOWID	1
 #define GET_COLUMN	0
 #define GET_ROW		1
 #define DISPLAY_WIDTH_MODE_1	70
@@ -242,7 +244,7 @@ static void lsboard(struct options_setting* setting)
 	return;
 }
 
-static int lsbootmode(struct options_setting* setting)
+static int lsbootmode(struct options_setting* setting, int show_id)
 {
 	struct board_info* board = get_board(setting->board);
 	if (board == NULL)
@@ -251,7 +253,10 @@ static int lsbootmode(struct options_setting* setting)
 	printf("\navailable boot mode:\n\n");
 	while (board->boot_modes[i].name != NULL)
 	{
-		printf("%d	%s\n", i, board->boot_modes[i].name);
+		if (show_id)
+			printf("%d	%s\n", i, board->boot_modes[i].name);
+		else
+			printf("	%s\n", board->boot_modes[i].name);
 		i++;
 	}
 
@@ -420,6 +425,8 @@ static void deinitialize(struct options_setting* setting)
 	free_gpio(gpio);
 }
 
+static char catch_input_char_block();
+
 static void initialize(struct options_setting* setting, int isreset)
 {
 	struct board_info* board = get_board(setting->board);
@@ -449,7 +456,19 @@ static void initialize(struct options_setting* setting, int isreset)
 			{
 				if (isreset == RESET_NOW)
 				{
-					printf("will boot by %sBOOT SWITCH%s\n", g_vt_yellow, g_vt_default);
+					// printf("will boot by %sBOOT SWITCH%s\n", g_vt_yellow, g_vt_default);
+					printf("\nDon't find BOOTMODE_NAME in the reset command. Please choose one...");
+					int bootmodenum = lsbootmode(setting, LSBOOTMODE_SHOWID);
+
+					printf("Enter   boot from BOOT SWITCH\n");
+					printf("\nPlease select the boot mode after reset by inputting the number: ");
+					setting->boot_mode_hex = catch_input_char_block();
+					setting->boot_mode_hex -= '0';
+					if (setting->boot_mode_hex >= bootmodenum || setting->boot_mode_hex < 0)
+					{
+						printf("Will boot from BOOT SWITCH, input=%d\n", setting->boot_mode_hex);
+						setting->boot_mode_hex = -1;
+					}
 				}
 				else
 				{
@@ -1834,18 +1853,6 @@ static void monitor(struct options_setting* setting)
 					range_control = 0;
 				break;
 			case 5:
-				bootmodenum = lsbootmode(setting);
-
-				printf("Enter   boot from BOOT SWITCH\n");
-				printf("\nPlease select the boot mode after reset: ");
-				setting->boot_mode_hex = catch_input_char_block();
-				setting->boot_mode_hex -= '0';
-				if (setting->boot_mode_hex >= bootmodenum || setting->boot_mode_hex < 0)
-				{
-					printf("Will boot from BOOT SWITCH, input=%d\n", setting->boot_mode_hex);
-					setting->boot_mode_hex = -1;
-				}
-
 				reset(setting);
 				ft4232h_i2c_remove_all();
 				strcpy(previous_path, "");
@@ -2147,7 +2154,7 @@ int main(int argc, char** argv)
 	}
 	else if (strcmp(cmd, "lsbootmode") == 0)
 	{
-		lsbootmode(&setting);
+		lsbootmode(&setting, LSBOOTMODE_NSHOWID);
 	}
 	else if (strcmp(cmd, "reset") == 0)
 	{
