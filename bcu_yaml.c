@@ -185,7 +185,11 @@ int replace_str(char* path, char* source, char* dest)
 				{
 					fp_end = ftell(fp);
 					move_length = buffer_length - j;
+#ifdef linux
 					fseek(fp, -(move_length), SEEK_CUR);
+#else
+					fseek(fp, -(move_length + 1), SEEK_CUR);
+#endif
 					fp_start = ftell(fp);
 					for(int i = 0; i < strlen(source); i++)
 					{
