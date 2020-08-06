@@ -61,6 +61,8 @@
 
 #define DONT_RESET	0
 #define RESET_NOW	1
+#define LSBOOTMODE_NSHOWID	0
+#define LSBOOTMODE_SHOWID	1
 #define GET_COLUMN	0
 #define GET_ROW		1
 #define DISPLAY_WIDTH_MODE_1	70
@@ -242,7 +244,7 @@ static void lsboard(struct options_setting* setting)
 	return;
 }
 
-static int lsbootmode(struct options_setting* setting)
+static int lsbootmode(struct options_setting* setting, int show_id)
 {
 	struct board_info* board = get_board(setting->board);
 	if (board == NULL)
@@ -251,7 +253,10 @@ static int lsbootmode(struct options_setting* setting)
 	printf("\navailable boot mode:\n\n");
 	while (board->boot_modes[i].name != NULL)
 	{
-		printf("%d	%s\n", i, board->boot_modes[i].name);
+		if (show_id)
+			printf("%d	%s\n", i, board->boot_modes[i].name);
+		else
+			printf("	%s\n", board->boot_modes[i].name);
 		i++;
 	}
 
@@ -1834,7 +1839,7 @@ static void monitor(struct options_setting* setting)
 					range_control = 0;
 				break;
 			case 5:
-				bootmodenum = lsbootmode(setting);
+				bootmodenum = lsbootmode(setting, LSBOOTMODE_SHOWID);
 
 				printf("Enter   boot from BOOT SWITCH\n");
 				printf("\nPlease select the boot mode after reset: ");
@@ -2147,7 +2152,7 @@ int main(int argc, char** argv)
 	}
 	else if (strcmp(cmd, "lsbootmode") == 0)
 	{
-		lsbootmode(&setting);
+		lsbootmode(&setting, LSBOOTMODE_NSHOWID);
 	}
 	else if (strcmp(cmd, "reset") == 0)
 	{
