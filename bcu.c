@@ -61,6 +61,9 @@
 
 #define DONT_RESET	0
 #define RESET_NOW	1
+#define INIT_WITHOUT_BOOTMODE	2
+#define DONT_INIT	0
+#define INIT_NOW	1
 #define LSBOOTMODE_NSHOWID	0
 #define LSBOOTMODE_SHOWID	1
 #define GET_COLUMN	0
@@ -174,7 +177,7 @@ static void print_help(char* cmd)
 		printf("%s\n\n", "bcu command [-options]");
 		printf("%s\n", "list of available commands:");
 		printf("	%s%-50s%s%s\n", g_vt_default, "reset  [BOOTMODE_NAME] [-board=] [-id=]", g_vt_green, "reset the board (optional [BOOTMODE_NAME])");
-		printf("	%s%-50s%s%s\n", g_vt_default, "resume [-board=] [-id=]", g_vt_green, "Simulate pressing the ON/OFF button once shortly");
+		printf("	%s%-50s%s%s\n", g_vt_default, "onoff  [-hold=] [-board=] [-id=]", g_vt_green, "press the ON/OFF button once for -hold= time(us)");
 		printf("	%s%-50s%s%s\n", g_vt_default, "init   [BOOTMODE_NAME] [-board=] [-id=]", g_vt_green, "enable the remote control with a boot mode");
 		printf("	%s%-50s%s%s\n", g_vt_default, "deinit [BOOTMODE_NAME] [-board=] [-id=]", g_vt_green, "disable the remote control");
 		printf("\n");
@@ -456,7 +459,7 @@ static void initialize(struct options_setting* setting, int isreset)
 				{
 					printf("will boot by %sBOOT SWITCH%s\n", g_vt_yellow, g_vt_default);
 				}
-				else
+				else if (isreset == DONT_RESET)
 				{
 					printf("please give boot_mode, assuming 'sd' this time\n");
 					while (board->boot_modes[k].name != NULL)
@@ -476,6 +479,10 @@ static void initialize(struct options_setting* setting, int isreset)
 						printf("initialization failed\n");
 						return;
 					}
+				}
+				else
+				{
+					printf("will not set boot mode\n");
 				}
 			}
 
@@ -615,7 +622,7 @@ static void reset(struct options_setting* setting)
 		printf("reset successfully\n");
 }
 
-static void resume(struct options_setting* setting)
+static void onoff(struct options_setting* setting, int delay_us, bool is_init)
 {
 	struct board_info* board = get_board(setting->board);
 	if (board == NULL)
@@ -624,25 +631,33 @@ static void resume(struct options_setting* setting)
 	int status = -1;
 	int mask;
 
+	if (is_init)
+		initialize(setting, INIT_WITHOUT_BOOTMODE);
+
+	if (delay_us == 0)
+		delay_us = 500;
+
 	gpio = get_gpio("onoff", board);
 	if (gpio == NULL)
 	{
-		printf("resume: error building device linked list\n");
+		printf("onoff: error building device linked list\n");
 		return;
 	}
+
+	printf("onoff button will be pressed for %dus\n", delay_us);
 
 	mask = board->mappings[get_gpio_id("onoff", board)].initinfo & 0xF;
 
 	status = gpio->gpio_write(gpio, mask ? 0x00 : 0xFF); //set it off.
-	msleep(500);
+	msleep(delay_us);
 	status = gpio->gpio_write(gpio, mask ? 0xFF : 0x00); //set it on.
 
 	free_gpio(gpio);
 
 	if (status)
-		printf("resume failed, error = 0x%x\n", status);
+		printf("onoff execute failed, error = 0x%x\n", status);
 	else
-		printf("resume successfully\n");
+		printf("onoff execute successfully\n");
 }
 
 static void uuu(struct options_setting* setting)
@@ -1879,7 +1894,7 @@ static void monitor(struct options_setting* setting)
 				break;
 			case 6:
 				printf("\nSimulate pressing the ON/OFF button once shortly\n");
-				resume(setting);
+				onoff(setting, 500, DONT_INIT);
 				break;
 			default:
 				break;
@@ -2158,9 +2173,9 @@ int main(int argc, char** argv)
 	{
 		reset(&setting);
 	}
-	else if (strcmp(cmd, "resume") == 0)
+	else if (strcmp(cmd, "onoff") == 0)
 	{
-		resume(&setting);
+		onoff(&setting, setting.hold, INIT_NOW);
 	}
 	else if (strcmp(cmd, "init") == 0)
 	{
