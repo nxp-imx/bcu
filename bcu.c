@@ -622,7 +622,7 @@ static void reset(struct options_setting* setting)
 		printf("reset successfully\n");
 }
 
-static void onoff(struct options_setting* setting, int delay_us, bool is_init)
+static void onoff(struct options_setting* setting, int delay_us, int is_init)
 {
 	struct board_info* board = get_board(setting->board);
 	if (board == NULL)
