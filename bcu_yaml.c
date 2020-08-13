@@ -39,6 +39,14 @@
 
 #include "bcu_yaml.h"
 
+struct bcu_yaml_version ver_before_big_ver[] =
+{
+	{"1.0.131"},
+	{"1.0.153"},
+	{"1.0.195"},
+	{NULL}
+};
+
 void writeConf(void)
 {
 	FILE *fp = fopen("config.yaml", "w+");
@@ -207,13 +215,6 @@ int replace_str(char* path, char* source, char* dest)
 	fclose(fp);
 	return 0;
 }
-
-struct bcu_yaml_version ver_before_big_ver[] =
-{
-	{"1.0.131"},
-	{"1.0.153"},
-	{NULL}
-};
 
 int readConf(char* boardname, struct options_setting* setting)
 {
