@@ -44,10 +44,15 @@ struct device {
 	int (*free)(void* p); // if there is any variable inside the device need to be free
 };
 
+#define I2C_TYPE_PAC1934	0
+#define I2C_TYPE_GPIO		1
+#define I2C_TYPE_PCA9548	2
+#define I2C_TYPE_AT24		3
+
 struct i2c_device {
 	struct device device;
-	int (*i2c_read)(void*, unsigned char*, int); //Read one byte, give ack/nack
-	int (*i2c_write)(void*, unsigned char); //Write one byte, check ack/nack
+	int (*i2c_read)(void*, unsigned char*, int, int); //Read one byte, give ack/nack
+	int (*i2c_write)(void*, unsigned char, int); //Write one byte, check ack/nack
 	int (*i2c_start)(void*);
 	int (*i2c_stop)(void*); //sending Start/Stop Condition
 };
@@ -112,8 +117,8 @@ struct pca9548 {
 	int channel; //indicate which i2c channel to choose
 	int addr;
 };
-int pca9548_read(void* pca9548, unsigned char* data_buffer, int is_nack);
-int pca9548_write(void* pca9548, unsigned char data);
+int pca9548_read(void* pca9548, unsigned char* data_buffer, int is_nack, int type);
+int pca9548_write(void* pca9548, unsigned char data, int type);
 int pca9548_start(void* pca9548);
 int pca9548_stop(void* pca9548);
 void* pca9548_create(char* chip_specification, void* parent);
@@ -128,8 +133,8 @@ struct ft4232h {
 	unsigned char val_bitmask; //define the output value of the bitmask, the value of each bit is only valid when the coresponding direction bit is 1
 	int isinit;
 };
-int ft4232h_i2c_read(void* ft4232h, unsigned char* data_buffer, int is_nack);
-int ft4232h_i2c_write(void* ft4232h, unsigned char data);
+int ft4232h_i2c_read(void* ft4232h, unsigned char* data_buffer, int is_nack, int type);
+int ft4232h_i2c_write(void* ft4232h, unsigned char data, int type);
 int ft4232h_i2c_start(void* f2232h);
 int ft4232h_i2c_stop(void* ft4232h);
 void* ft4232h_i2c_create(char* chip_specification, void* parent);

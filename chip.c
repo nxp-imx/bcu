@@ -90,7 +90,7 @@ int at24cxx_check_board(void* at24cxx)
 
 	//refresh the powerister
 	parent->i2c_start(parent);
-	if(parent->i2c_write(parent, addr_plus_write))
+	if(parent->i2c_write(parent, addr_plus_write, I2C_TYPE_AT24))
 	{
 		parent->i2c_stop(parent);
 		// printf("pac 1934 failure get ack\n");
@@ -124,19 +124,19 @@ void* pca9548_create(char* chip_specification, void* parent)
 	return pca;
 }
 
-int pca9548_read(void* pca9548, unsigned char* data_buffer, int is_nack)
+int pca9548_read(void* pca9548, unsigned char* data_buffer, int is_nack, int type)
 {
 	struct pca9548* pca = pca9548;
 	struct i2c_device* parent = (void*)pca->i2c_device.device.parent;
-	parent->i2c_read(parent, data_buffer, is_nack);
+	parent->i2c_read(parent, data_buffer, is_nack, type);
 	return 0;
 }
 
-int pca9548_write(void* pca9548, unsigned char data)
+int pca9548_write(void* pca9548, unsigned char data, int type)
 {
 	struct pca9548* pca = pca9548;
 	struct i2c_device* parent = (void*)pca->i2c_device.device.parent;
-	return 	parent->i2c_write(parent, data);
+	return 	parent->i2c_write(parent, data, type);
 }
 
 int pca9548_start(void* pca9548)
@@ -166,12 +166,12 @@ int pca9548_set_channel(struct pca9548* pca9548)
 
 	int status;
 	parent->i2c_start(parent);
-	status = parent->i2c_write(parent, addr_plus_write);
+	status = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_PCA9548);
 	if (status)
 	{
 		printf("oh no! no ack received!\n");
 	}
-	parent->i2c_write(parent, change_channel_cmd);
+	parent->i2c_write(parent, change_channel_cmd, I2C_TYPE_PCA9548);
 	parent->i2c_stop(parent);
 
 	return 0;
@@ -262,14 +262,17 @@ void ft4232h_i2c_remove_all(void)
 	}
 }
 
-int ft4232h_i2c_read(void* ft4232h, unsigned char* data_buffer, int is_nack)
+int ft4232h_i2c_read(void* ft4232h, unsigned char* data_buffer, int is_nack, int type)
 {
 	struct ft4232h* ft = ft4232h;
 	unsigned char buffer[MAX_FTDI_BUFFER_SIZE];
 	unsigned char in_buffer[MAX_FTDI_BUFFER_SIZE];
 	int i = 0, ftStatus = 0;
 
-	ft_clear_buffer(ft->ftdi_info);
+#ifdef _WIN32
+	if (type == I2C_TYPE_GPIO)
+#endif
+		ft_clear_buffer(ft->ftdi_info);
 
 	buffer[i++] = MPSSE_CMD_SET_DATA_BITS_LOWBYTE;
 	buffer[i++] = VALUE_SCLLOW_SDALOW | ft->val_bitmask;
@@ -301,14 +304,17 @@ int ft4232h_i2c_read(void* ft4232h, unsigned char* data_buffer, int is_nack)
 
 }
 
-int ft4232h_i2c_write(void* ft4232h, unsigned char data)
+int ft4232h_i2c_write(void* ft4232h, unsigned char data, int type)
 {
 	struct ft4232h* ft = ft4232h;
 	unsigned char buffer[MAX_FTDI_BUFFER_SIZE];
 	unsigned char in_buffer[MAX_FTDI_BUFFER_SIZE];
 	int i = 0, ftStatus = 0;
 
-	ft_clear_buffer(ft->ftdi_info);
+#ifdef _WIN32
+	if (type == I2C_TYPE_GPIO)
+#endif
+		ft_clear_buffer(ft->ftdi_info);
 
 	buffer[i++] = MPSSE_CMD_SET_DATA_BITS_LOWBYTE; //Command to set directions of lower 8 pins and force value on bits set as output
 	buffer[i++] = VALUE_SCLLOW_SDALOW | ft->val_bitmask;
@@ -674,16 +680,16 @@ int pac1934_write_bipolar(void* pac1934, int value)
 	char addr_plus_read = (pac->addr << 1) + 1;
 
 	parent->i2c_start(parent);
-	if(parent->i2c_write(parent, addr_plus_write))
+	if(parent->i2c_write(parent, addr_plus_write, I2C_TYPE_PAC1934))
 	{
 		printf("pac 1934 failure get ack\n");
 		return -1;
 	};
-	parent->i2c_write(parent, PAC1934_REG_NEG_PWR_ADDR);
+	parent->i2c_write(parent, PAC1934_REG_NEG_PWR_ADDR, I2C_TYPE_PAC1934);
 	if (value)
-		parent->i2c_write(parent, 0xF0);
+		parent->i2c_write(parent, 0xF0, I2C_TYPE_PAC1934);
 	else
-		parent->i2c_write(parent, 0x00);
+		parent->i2c_write(parent, 0x00, I2C_TYPE_PAC1934);
 	parent->i2c_stop(parent);
 
 	pac->bipolar = value;
@@ -700,12 +706,12 @@ int pac1934_snapshot(void* pac1934)
 
 	//refresh the powerister
 	parent->i2c_start(parent);
-	if(parent->i2c_write(parent, addr_plus_write))
+	if(parent->i2c_write(parent, addr_plus_write, I2C_TYPE_PAC1934))
 	{
 		printf("pac 1934 failure get ack\n");
 		return -1;
 	};
-	parent->i2c_write(parent, 0x00); //refresh;
+	parent->i2c_write(parent, 0x00, I2C_TYPE_PAC1934); //refresh;
 	parent->i2c_stop(parent);
 
 	return 0;
@@ -745,15 +751,15 @@ int pac1934_get_data(void* pac1934, struct pac193x_reg_data* pac_reg)
 		start_read_reg_base = PAC1934_REG_VBUS1_ADDR;
 
 	parent->i2c_start(parent);
-	status = parent->i2c_write(parent, addr_plus_write);
+	status = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_PAC1934);
 	if (status < 0)
 		return status;
-	parent->i2c_write(parent, start_read_reg_base); //start get data;
+	parent->i2c_write(parent, start_read_reg_base, I2C_TYPE_PAC1934); //start get data;
 	parent->i2c_start(parent);
-	parent->i2c_write(parent, addr_plus_read);
+	parent->i2c_write(parent, addr_plus_read, I2C_TYPE_PAC1934);
 	for(k = 0; k < DATA_LEN - 1; k++)
-		parent->i2c_read(parent, &data[k], 0);
-	parent->i2c_read(parent, &data[DATA_LEN - 1], 1);
+		parent->i2c_read(parent, &data[k], 0, I2C_TYPE_PAC1934);
+	parent->i2c_read(parent, &data[DATA_LEN - 1], 1, I2C_TYPE_PAC1934);
 
 	// for(k=0; k<12; k++)
 	// 	printf("ctrl[%d]=0x%x\n", k, ctrl[k]);
@@ -832,15 +838,15 @@ int pca6416a_set_output(struct pca6416a* pca6416a, unsigned char bit_value)
 	//read current output register
 	bSucceed = parent->i2c_start(parent);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, addr_plus_write);
+	bSucceed = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, output_cmd);
+	bSucceed = parent->i2c_write(parent, output_cmd, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
 	bSucceed = parent->i2c_start(parent);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, addr_plus_read);
+	bSucceed = parent->i2c_write(parent, addr_plus_read, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_read(parent, current_output, 1);
+	bSucceed = parent->i2c_read(parent, current_output, 1, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
 	bSucceed = parent->i2c_stop(parent);
 	if (bSucceed) return bSucceed;
@@ -849,11 +855,11 @@ int pca6416a_set_output(struct pca6416a* pca6416a, unsigned char bit_value)
 	//read current input register
 	bSucceed = parent->i2c_start(parent);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, addr_plus_write);
+	bSucceed = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, output_cmd);
+	bSucceed = parent->i2c_write(parent, output_cmd, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, output_data);
+	bSucceed = parent->i2c_write(parent, output_data, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
 	bSucceed = parent->i2c_stop(parent);
 	if (bSucceed) return bSucceed;
@@ -875,15 +881,15 @@ int pca6416a_read(void* pca6416a, unsigned char* bit_value_buffer)
 
 	bSucceed = parent->i2c_start(parent);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, addr_plus_write);
+	bSucceed = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, input_cmd);
+	bSucceed = parent->i2c_write(parent, input_cmd, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
 	bSucceed = parent->i2c_start(parent);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, addr_plus_read);
+	bSucceed = parent->i2c_write(parent, addr_plus_read, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_read(parent, bit_value_buffer, 1);
+	bSucceed = parent->i2c_read(parent, bit_value_buffer, 1, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
 	bSucceed = parent->i2c_stop(parent);
 	if (bSucceed) return bSucceed;
@@ -906,15 +912,15 @@ int pca6416a_set_direction(struct pca6416a* pca, unsigned char value)
 	//read current configuration register
 	bSucceed = parent->i2c_start(parent);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, addr_plus_write);
+	bSucceed = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, configure_cmd);
+	bSucceed = parent->i2c_write(parent, configure_cmd, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
 	bSucceed = parent->i2c_start(parent);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, addr_plus_read);
+	bSucceed = parent->i2c_write(parent, addr_plus_read, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_read(parent, current_config, 1);
+	bSucceed = parent->i2c_read(parent, current_config, 1, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
 	bSucceed = parent->i2c_stop(parent);
 	if (bSucceed) return bSucceed;
@@ -923,11 +929,11 @@ int pca6416a_set_direction(struct pca6416a* pca, unsigned char value)
 
 	bSucceed = parent->i2c_start(parent);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, addr_plus_write);
+	bSucceed = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, configure_cmd);
+	bSucceed = parent->i2c_write(parent, configure_cmd, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, input_bitmask);
+	bSucceed = parent->i2c_write(parent, input_bitmask, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
 	bSucceed = parent->i2c_stop(parent);
 	if (bSucceed) return bSucceed;
@@ -949,15 +955,15 @@ int pca6416a_toggle(void* pca6416a)
 	//read current output register
 	bSucceed = parent->i2c_start(parent);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, addr_plus_write);
+	bSucceed = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, output_cmd);
+	bSucceed = parent->i2c_write(parent, output_cmd, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
 	bSucceed = parent->i2c_start(parent);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, addr_plus_read);
+	bSucceed = parent->i2c_write(parent, addr_plus_read, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_read(parent, current_output, 1);
+	bSucceed = parent->i2c_read(parent, current_output, 1, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
 	bSucceed = parent->i2c_stop(parent);
 	if (bSucceed) return bSucceed;
@@ -966,11 +972,11 @@ int pca6416a_toggle(void* pca6416a)
 	//read current input register
 	bSucceed = parent->i2c_start(parent);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, addr_plus_write);
+	bSucceed = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, output_cmd);
+	bSucceed = parent->i2c_write(parent, output_cmd, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, output_data);
+	bSucceed = parent->i2c_write(parent, output_data, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
 	bSucceed = parent->i2c_stop(parent);
 	if (bSucceed) return bSucceed;
@@ -992,15 +998,15 @@ int pca6416a_get_output(void* pca6416a, unsigned char* current_output)
 
 	bSucceed = parent->i2c_start(parent);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, addr_plus_write);
+	bSucceed = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, output_cmd);
+	bSucceed = parent->i2c_write(parent, output_cmd, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
 	bSucceed = parent->i2c_start(parent);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, addr_plus_read);
+	bSucceed = parent->i2c_write(parent, addr_plus_read, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_read(parent, current_output, 1);
+	bSucceed = parent->i2c_read(parent, current_output, 1, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
 	bSucceed = parent->i2c_stop(parent);
 	if (bSucceed) return bSucceed;
@@ -1061,15 +1067,15 @@ int pcal6524h_set_output(struct pcal6524h* pcal6524h, unsigned char bit_value)
 	//read current output register
 	bSucceed = parent->i2c_start(parent);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, addr_plus_write);
+	bSucceed = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, output_cmd);
+	bSucceed = parent->i2c_write(parent, output_cmd, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
 	bSucceed = parent->i2c_start(parent);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, addr_plus_read);
+	bSucceed = parent->i2c_write(parent, addr_plus_read, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_read(parent, current_output, 1);
+	bSucceed = parent->i2c_read(parent, current_output, 1, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
 	bSucceed = parent->i2c_stop(parent);
 	if (bSucceed) return bSucceed;
@@ -1078,11 +1084,11 @@ int pcal6524h_set_output(struct pcal6524h* pcal6524h, unsigned char bit_value)
 	//read current input register
 	bSucceed = parent->i2c_start(parent);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, addr_plus_write);
+	bSucceed = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, output_cmd);
+	bSucceed = parent->i2c_write(parent, output_cmd, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, output_data);
+	bSucceed = parent->i2c_write(parent, output_data, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
 	bSucceed = parent->i2c_stop(parent);
 	if (bSucceed) return bSucceed;
@@ -1104,15 +1110,15 @@ int pcal6524h_read(void* pcal6524h, unsigned char* bit_value_buffer)
 
 	bSucceed = parent->i2c_start(parent);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, addr_plus_write);
+	bSucceed = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, input_cmd);
+	bSucceed = parent->i2c_write(parent, input_cmd, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
 	bSucceed = parent->i2c_start(parent);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, addr_plus_read);
+	bSucceed = parent->i2c_write(parent, addr_plus_read, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_read(parent, bit_value_buffer, 1);
+	bSucceed = parent->i2c_read(parent, bit_value_buffer, 1, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
 	bSucceed = parent->i2c_stop(parent);
 	if (bSucceed) return bSucceed;
@@ -1135,15 +1141,15 @@ int pcal6524h_set_direction(struct pcal6524h* pca, unsigned char value)
 	//read current configuration register
 	bSucceed = parent->i2c_start(parent);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, addr_plus_write);
+	bSucceed = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, configure_cmd);
+	bSucceed = parent->i2c_write(parent, configure_cmd, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
 	bSucceed = parent->i2c_start(parent);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, addr_plus_read);
+	bSucceed = parent->i2c_write(parent, addr_plus_read, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_read(parent, &current_config, 1);
+	bSucceed = parent->i2c_read(parent, &current_config, 1, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
 	bSucceed = parent->i2c_stop(parent);
 	if (bSucceed) return bSucceed;
@@ -1152,11 +1158,11 @@ int pcal6524h_set_direction(struct pcal6524h* pca, unsigned char value)
 
 	bSucceed = parent->i2c_start(parent);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, addr_plus_write);
+	bSucceed = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, configure_cmd);
+	bSucceed = parent->i2c_write(parent, configure_cmd, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, input_bitmask);
+	bSucceed = parent->i2c_write(parent, input_bitmask, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
 	bSucceed = parent->i2c_stop(parent);
 	if (bSucceed) return bSucceed;
@@ -1178,15 +1184,15 @@ int pcal6524h_toggle(void* pcal6524h)
 	//read current output register
 	bSucceed = parent->i2c_start(parent);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, addr_plus_write);
+	bSucceed = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, output_cmd);
+	bSucceed = parent->i2c_write(parent, output_cmd, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
 	bSucceed = parent->i2c_start(parent);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, addr_plus_read);
+	bSucceed = parent->i2c_write(parent, addr_plus_read, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_read(parent, current_output, 1);
+	bSucceed = parent->i2c_read(parent, current_output, 1, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
 	bSucceed = parent->i2c_stop(parent);
 	if (bSucceed) return bSucceed;
@@ -1195,11 +1201,11 @@ int pcal6524h_toggle(void* pcal6524h)
 	//read current input register
 	bSucceed = parent->i2c_start(parent);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, addr_plus_write);
+	bSucceed = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, output_cmd);
+	bSucceed = parent->i2c_write(parent, output_cmd, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, output_data);
+	bSucceed = parent->i2c_write(parent, output_data, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
 	bSucceed = parent->i2c_stop(parent);
 	if (bSucceed) return bSucceed;
@@ -1221,15 +1227,15 @@ int pcal6524h_get_output(void* pcal6524h, unsigned char* current_output)
 
 	bSucceed = parent->i2c_start(parent);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, addr_plus_write);
+	bSucceed = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, output_cmd);
+	bSucceed = parent->i2c_write(parent, output_cmd, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
 	bSucceed = parent->i2c_start(parent);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_write(parent, addr_plus_read);
+	bSucceed = parent->i2c_write(parent, addr_plus_read, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_read(parent, current_output, 1);
+	bSucceed = parent->i2c_read(parent, current_output, 1, I2C_TYPE_GPIO);
 	if (bSucceed) return bSucceed;
 	bSucceed = parent->i2c_stop(parent);
 	if (bSucceed) return bSucceed;
