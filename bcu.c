@@ -177,7 +177,7 @@ static void print_help(char* cmd)
 		printf("%s\n\n", "bcu command [-options]");
 		printf("%s\n", "list of available commands:");
 		printf("	%s%-50s%s%s\n", g_vt_default, "reset  [BOOTMODE_NAME] [-board=] [-id=]", g_vt_green, "reset the board (optional [BOOTMODE_NAME])");
-		printf("	%s%-50s%s%s\n", g_vt_default, "onoff  [-hold=] [-board=] [-id=]", g_vt_green, "press the ON/OFF button once for -hold= time(us)");
+		printf("	%s%-50s%s%s\n", g_vt_default, "onoff  [-hold=] [-board=] [-id=]", g_vt_green, "press the ON/OFF button once for -hold= time(ms)");
 		printf("	%s%-50s%s%s\n", g_vt_default, "init   [BOOTMODE_NAME] [-board=] [-id=]", g_vt_green, "enable the remote control with a boot mode");
 		printf("	%s%-50s%s%s\n", g_vt_default, "deinit [BOOTMODE_NAME] [-board=] [-id=]", g_vt_green, "disable the remote control");
 		printf("\n");
