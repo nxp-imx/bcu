@@ -47,6 +47,10 @@ typedef int(__stdcall* pFT_create_device_info_list)(LPDWORD);
 typedef int(__stdcall* pFT_get_bitmode)(FT_HANDLE, PUCHAR);
 typedef int(__stdcall* pFT_get_device_info_detail)(DWORD, LPDWORD, LPDWORD, LPDWORD, LPDWORD, PCHAR, PCHAR, FT_HANDLE*);
 typedef int(__stdcall* pFT_set_timeouts)(FT_HANDLE, DWORD, DWORD);
+typedef int(__stdcall* pFT_purge)(FT_HANDLE, DWORD);
+
+#define FT_PURGE_RX 1
+#define FT_PURGE_TX 2
 #endif
 
 /*is there any difference between ST_handle and fdti_context, does the difference matters?*/
@@ -65,6 +69,7 @@ struct ftdi_info {
 	pFT_get_bitmode FT_get_bitmode;
 	pFT_open_ex FT_open_ex;
 	pFT_set_timeouts FT_set_timeouts;
+	pFT_purge FT_purge;
 
 #else
 	struct ftdi_context* ftdi;

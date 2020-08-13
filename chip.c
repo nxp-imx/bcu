@@ -268,9 +268,8 @@ int ft4232h_i2c_read(void* ft4232h, unsigned char* data_buffer, int is_nack)
 	unsigned char buffer[MAX_FTDI_BUFFER_SIZE];
 	unsigned char in_buffer[MAX_FTDI_BUFFER_SIZE];
 	int i = 0, ftStatus = 0;
-#ifdef __linux__
+
 	ft_clear_buffer(ft->ftdi_info);
-#endif
 
 	buffer[i++] = MPSSE_CMD_SET_DATA_BITS_LOWBYTE;
 	buffer[i++] = VALUE_SCLLOW_SDALOW | ft->val_bitmask;
@@ -308,9 +307,8 @@ int ft4232h_i2c_write(void* ft4232h, unsigned char data)
 	unsigned char buffer[MAX_FTDI_BUFFER_SIZE];
 	unsigned char in_buffer[MAX_FTDI_BUFFER_SIZE];
 	int i = 0, ftStatus = 0;
-#ifdef __linux__ 
+
 	ft_clear_buffer(ft->ftdi_info);
-#endif
 
 	buffer[i++] = MPSSE_CMD_SET_DATA_BITS_LOWBYTE; //Command to set directions of lower 8 pins and force value on bits set as output
 	buffer[i++] = VALUE_SCLLOW_SDALOW | ft->val_bitmask;
@@ -516,6 +514,12 @@ void* ft4232h_gpio_create(char* chip_specification, void* parent)
 			free(ft);
 			return NULL;
 		}
+		ft->ftdi_info->isinit = ft->ftdi_info->isinit << 4;
+	}
+
+	if (ft->ftdi_info->isinit & 0xF)
+	{
+		ft_set_bitmode(ft->ftdi_info, 0, 0);
 		ft->ftdi_info->isinit = ft->ftdi_info->isinit << 4;
 	}
 
@@ -896,7 +900,7 @@ int pca6416a_set_direction(struct pca6416a* pca, unsigned char value)
 	unsigned char addr_plus_read = (pca->addr << 1) + 1;
 
 	unsigned char configure_cmd = (pca->port) + 0x06; //x06h is the io configuration command
-	unsigned char current_config;
+	unsigned char current_config[1];
 	int bSucceed = 0;
 
 	//read current configuration register
@@ -910,12 +914,12 @@ int pca6416a_set_direction(struct pca6416a* pca, unsigned char value)
 	if (bSucceed) return bSucceed;
 	bSucceed = parent->i2c_write(parent, addr_plus_read);
 	if (bSucceed) return bSucceed;
-	bSucceed = parent->i2c_read(parent, &current_config, 1);
+	bSucceed = parent->i2c_read(parent, current_config, 1);
 	if (bSucceed) return bSucceed;
 	bSucceed = parent->i2c_stop(parent);
 	if (bSucceed) return bSucceed;
 
-	unsigned char input_bitmask = (value | (~pca->gpio_device.pin_bitmask)) & (current_config | pca->gpio_device.pin_bitmask);
+	unsigned char input_bitmask = (value | (~pca->gpio_device.pin_bitmask)) & (current_config[0] | pca->gpio_device.pin_bitmask);
 
 	bSucceed = parent->i2c_start(parent);
 	if (bSucceed) return bSucceed;

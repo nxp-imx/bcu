@@ -74,6 +74,7 @@ int ft_init(struct ftdi_info* ftdi)
 	ftdi->FT_get_device_info_detail = (pFT_get_device_info_detail)GetProcAddress(hGetProcIDDLL, "FT_GetDeviceInfoDetail");
 	ftdi->FT_get_bitmode = (pFT_get_bitmode)GetProcAddress(hGetProcIDDLL, "FT_GetBitMode");
 	ftdi->FT_set_timeouts = (pFT_set_timeouts)GetProcAddress(hGetProcIDDLL, "FT_SetTimeouts");
+	ftdi->FT_purge = (pFT_purge)GetProcAddress(hGetProcIDDLL, "FT_Purge");
 
 #endif
 	return 0;
@@ -204,8 +205,11 @@ int ft_read(struct ftdi_info* ftdi, unsigned char* buffer, int size)
 int ft_clear_buffer(struct ftdi_info* ftdi)
 {
 #ifdef _WIN32
-	printf("clear buffer is not yet implemented at Windows\n");
-	return -1;
+	if (ftdi->FT_purge(ftdi->ftdi, FT_PURGE_RX | FT_PURGE_TX))
+	{
+		printf("clear buffer failed!\n");
+	}
+	return 0;
 #else
 	int num1 = 0;
 	int num2 = 0;
