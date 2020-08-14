@@ -96,6 +96,8 @@ char* g_vt_back_default = (char*)"\x1B[49m";
 #endif
 char* g_vt_default = (char*)"\x1B[0m";
 char* g_vt_clear = (char*)"\x1B[2J";
+char* g_vt_clear_remain = (char*)"\x1B[0J";
+char* g_vt_clear_line = (char*)"\x1B[K";
 char* g_vt_home = (char*)"\x1B[H";
 
 void clean_vt_color()
@@ -111,6 +113,8 @@ void clean_vt_color()
 	g_vt_back_default = g_vt_red;
 	g_vt_default = g_vt_red;
 	g_vt_clear = (char*)"\n";
+	g_vt_clear_remain = (char*)"\n";
+	g_vt_clear_line = (char*)"\n";
 	g_vt_home = (char*)"\n";
 }
 
@@ -1144,6 +1148,8 @@ static void monitor(struct options_setting* setting)
 		pac_group_count--;
 	}
 
+	printf("%s", g_vt_clear);
+
 #if 1
 	unsigned long last_display = 0, now_display;
 	while (!GV_MONITOR_TERMINATED)
@@ -1439,8 +1445,9 @@ static void monitor(struct options_setting* setting)
 		available_height = monitor_size(GET_ROW);
 		if (candisplay == 1)
 		{
-			printf("%s", g_vt_clear);
 			printf("%s", g_vt_home); //move cursor to the 0,0
+			printf("%s", g_vt_clear_line);
+
 		}
 		if (setting->nodisplay == 0 && candisplay == 1)
 		{
@@ -1452,6 +1459,7 @@ static void monitor(struct options_setting* setting)
 
 			if (available_width - max_length < DISPLAY_WIDTH_MODE_1 || (available_width - max_length <= DISPLAY_WIDTH_MODE_5 && range_control == 2))
 			{
+				printf("%s", g_vt_clear);
 				printf("the command line window's width is too narrow\n");
 				printf("current width: %d\n", available_width);
 				if (range_control == 2)
@@ -1481,7 +1489,7 @@ static void monitor(struct options_setting* setting)
 				printf("%9s", " ");
 				printf("%s", g_vt_red);
 				printf("%-s", "|Max Range Select(mA)");
-				printf("\n");
+				printf("%s\n", g_vt_clear_line);
 				printf("%s", g_vt_default);
 				printfpadding("location", location_length);
 				printf("%s", g_vt_green);
@@ -1492,7 +1500,7 @@ static void monitor(struct options_setting* setting)
 				printf(" |%-6s %-6s %-7s %-6s", "now", setting->use_rms ? "rms" : "avg", "max", "min");
 				printf("%s", g_vt_red);
 				printf("%-s", " |Range1     |Range2");
-				printf("\n");
+				printf("%s\n", g_vt_clear_line);
 				printf("%s", g_vt_default);
 			}
 			else if (available_width - max_length > DISPLAY_WIDTH_MODE_3)
@@ -1513,7 +1521,7 @@ static void monitor(struct options_setting* setting)
 				printf("%9s", " ");
 				printf("%s", g_vt_red);
 				printf("%-6s", "|Max Range Sel(mA)");
-				printf("\n");
+				printf("%s\n", g_vt_clear_line);
 				printf("%s", g_vt_default);
 				printfpadding("location", location_length);
 				printf("%s", g_vt_green);
@@ -1526,7 +1534,7 @@ static void monitor(struct options_setting* setting)
 				printf(" |%-6s %-6s %-7s %-6s", "now", setting->use_rms ? "rms" : "avg", "max", "min");
 				printf("%s", g_vt_red);
 				printf("%-s", " |Range1     |Range2");
-				printf("\n");
+				printf("%s\n", g_vt_clear_line);
 				printf("%s", g_vt_default);
 			}
 			else if (available_width - max_length > DISPLAY_WIDTH_MODE_2)
@@ -1546,7 +1554,7 @@ static void monitor(struct options_setting* setting)
 				printf("%s", "         ");
 				printf("%s", g_vt_red);
 				printf("%-6s", "|Max Range Sel(mA)");
-				printf("\n");
+				printf("%s\n", g_vt_clear_line);
 				printf("%s", g_vt_default);
 				printfpadding("location", location_length);
 				printf("%s", g_vt_green);
@@ -1557,7 +1565,7 @@ static void monitor(struct options_setting* setting)
 				printf(" |%-6s %-6s %-7s %-6s", "now", setting->use_rms ? "rms" : "avg", "max", "min");
 				printf("%s", g_vt_red);
 				printf("%-s", " |Range1     |Range2");
-				printf("\n");
+				printf("%s\n", g_vt_clear_line);
 				printf("%s", g_vt_default);
 			}
 			else
@@ -1579,7 +1587,7 @@ static void monitor(struct options_setting* setting)
 				printf("%s", g_vt_back_default);
 				printf("%s", g_vt_red);
 				printf("%-6s", "|Max Range Sel(mA)");
-				printf("\n");
+				printf("%s\n", g_vt_clear_line);
 				printf("%s", g_vt_default);
 				printfpadding("location", location_length);
 				printf("%s", g_vt_green);
@@ -1590,7 +1598,7 @@ static void monitor(struct options_setting* setting)
 				printf(" |%-6s %-6s", "now", setting->use_rms ? "rms" : "avg");
 				printf("%s", g_vt_red);
 				printf("%-s", " |Range1     |Range2");
-				printf("\n");
+				printf("%s\n", g_vt_clear_line);
 				printf("%s", g_vt_default);
 			}
 			printfpadding("---------------------------------------------------------------------------------------------------------------------------------------------------------", available_width);
@@ -1692,7 +1700,7 @@ static void monitor(struct options_setting* setting)
 					printf("|[%s]%-8.1f [%s]%-8.1f", sr_level[k] ? "*" : " ", sr_level[k] ? cur_range[k] : unused_range[k], sr_level[k] ? " " : "*", sr_level[k] ? unused_range[k] : cur_range[k]);
 				}
 
-				printf("\n");
+				printf("%s\n", g_vt_clear_line);
 			}
 
 			//then display group
@@ -1706,13 +1714,13 @@ static void monitor(struct options_setting* setting)
 				printfpadding(" ", max_group_length + 1);
 				printf("%s", g_vt_kcyn);
 				printf("|Power(mWatt)");
-				printf("\n");
+				printf("%s\n", g_vt_clear_line);
 				printf("%s", g_vt_default);
 				printfpadding("group", max_group_length);
 				printf("%s", g_vt_kcyn);
 				printf(" |%-6s %-6s %-6s %-6s", "now", setting->use_rms ? "rms" : "avg", "max", "min");
 				printf("%s", g_vt_default);
-				printf(" |Group members\n");
+				printf(" |Group members%s\n", g_vt_clear_line);
 				printf("%s", g_vt_default);
 				printfpadding("---------------------------------------------------------------------------------------------------------------------------------------------------------", available_width);
 			}
@@ -1729,16 +1737,16 @@ static void monitor(struct options_setting* setting)
 				printf(" |");
 				// printf("  ");
 				if (strlen(groups[k].member_list) < (size_t)(monitor_size(GET_COLUMN) - max_group_length - 30))
-					printf("%s\n", groups[k].member_list);
+					printf("%s%s\n", groups[k].member_list, g_vt_clear_line);
 				else
 				{
 					printfpadding(groups[k].member_list, monitor_size(GET_COLUMN) - max_group_length - 30 - 10);
-					printf("...\n");
+					printf("...%s\n", g_vt_clear_line);
 				}
 			}
 
 			//printf("width: %d \n",monitor_size(GET_COLUMN));
-			printf("\n");
+			printf("%s\n", g_vt_clear_line);
 			printf("%s", g_vt_default);
 			unsigned long now;
 			get_msecond(&now);
@@ -1759,32 +1767,32 @@ static void monitor(struct options_setting* setting)
 				printf("\n                ");
 
 			if (last_display != 0)
-				printf("Display freq: %.1fHz      Total sampling times: %ld\n", (1000.0 / interval), times);
+				printf("Display freq: %.1fHz      Total sampling times: %ld%s\n", (1000.0 / interval), times, g_vt_clear_line);
 		}
 
 		if (candisplay == 1 && setting->dump == 1)
 		{
 			unsigned long now;
 			get_msecond(&now);
-			printf("Dump data to \"%s\" for %ldms, %ld times, %ld times/sec\n", setting->dumpname, now - start, times, 1000 / ((now - start) / times));
+			printf("Dump data to \"%s\" for %ldms, %ld times, %ld times/sec%s\n", setting->dumpname, now - start, times, 1000 / ((now - start) / times), g_vt_clear_line);
 			if (setting->nodisplay == 1)
-				printf("Ctrl-C to exit...\n");
-			printf("\n");
+				printf("Ctrl-C to exit...%s\n", g_vt_clear_line);
+			printf("%s\n", g_vt_clear_line);
 		}
 		
 		//finally,switch the SR
 		ch = catch_input_char();
 		if (setting->nodisplay == 0 && candisplay == 1 && available_height >= 43)
 		{
-			printf("Hot-key: 1=reset %s; 2=reset MaxMin; 3=reset %s and MaxMin; 4=switch show mA/auto/uA;\n",
-						setting->use_rms ? "RMS" : "Avg", setting->use_rms ? "RMS" : "Avg");
-			printf("         5=reset board; 6=resume the board; Ctrl-C to exit...\n");
-			printf("press the letter on keyboard to control coresponding extra sense resistor(Extra SR)\n");
-			printf("pressed %s(Please pay attention to letter case)%s: %c\n", g_vt_red, g_vt_default, ch);
+			printf("Hot-key: 1=reset %s; 2=reset MaxMin; 3=reset %s and MaxMin; 4=switch show mA/auto/uA;%s\n",
+						setting->use_rms ? "RMS" : "Avg", setting->use_rms ? "RMS" : "Avg", g_vt_clear_line);
+			printf("         5=reset board; 6=resume the board; Ctrl-C to exit...%s\n", g_vt_clear_line);
+			printf("press the letter on keyboard to control coresponding extra sense resistor(Extra SR)%s\n", g_vt_clear_line);
+			printf("pressed %s(Please pay attention to letter case)%s: %c%s\n", g_vt_red, g_vt_default, ch, g_vt_clear_line);
 		}
 		else if (setting->nodisplay == 0 && candisplay == 1 && available_height < 43 && setting->rangefixed == 0)
 		{
-			printf("press letter to switch sense resistor; Ctrl-C to exit...\n");
+			printf("press letter to switch sense resistor%s(Please pay attention to letter case)%s; Ctrl-C to exit...%s\n", g_vt_red, g_vt_default, g_vt_clear_line);
 		}
 		if (isxdigit(ch))
 		{
@@ -1856,13 +1864,13 @@ static void monitor(struct options_setting* setting)
 			case 5:
 				bootmodenum = lsbootmode(setting, LSBOOTMODE_SHOWID);
 
-				printf("Enter   boot from BOOT SWITCH\n");
+				printf("Enter   boot from BOOT SWITCH%s\n", g_vt_clear_line);
 				printf("\nPlease select the boot mode after reset: ");
 				setting->boot_mode_hex = catch_input_char_block();
 				setting->boot_mode_hex -= '0';
 				if (setting->boot_mode_hex >= bootmodenum || setting->boot_mode_hex < 0)
 				{
-					printf("Will boot from BOOT SWITCH, input=%d\n", setting->boot_mode_hex);
+					printf("Will boot from BOOT SWITCH, input=%d%s\n", setting->boot_mode_hex, g_vt_clear_line);
 					setting->boot_mode_hex = -1;
 				}
 
@@ -1872,7 +1880,7 @@ static void monitor(struct options_setting* setting)
 
 				msleep(300); //wait PMIC power on
 
-				printf("reset Avg/Max/Min values\n");
+				printf("reset Avg/Max/Min values%s\n", g_vt_clear_line);
 				//reset AVG/MIN/MAX
 				for (int k = 0; k < n; k++)
 				{
@@ -1893,7 +1901,7 @@ static void monitor(struct options_setting* setting)
 
 				break;
 			case 6:
-				printf("\nSimulate pressing the ON/OFF button once shortly\n");
+				printf("\nSimulate pressing the ON/OFF button once shortly%s\n", g_vt_clear_line);
 				onoff(setting, 500, DONT_INIT);
 				break;
 			default:
@@ -1941,6 +1949,7 @@ static void monitor(struct options_setting* setting)
 		}
 		// if (!isalpha(ch))
 		// 	msleep(100);
+		printf("%s", g_vt_clear_remain);
 #endif
 	}
 
@@ -1950,7 +1959,7 @@ static void monitor(struct options_setting* setting)
 		fclose(fptr);
 	}
 	printf("%s", g_vt_clear);
-	printf("%s", g_vt_home); //move cursor to the 0,0
+	printf("%s", g_vt_home);
 #endif
 	return;
 }
