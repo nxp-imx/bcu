@@ -1814,6 +1814,8 @@ static void monitor(struct options_setting* setting)
 					groups[k].avg_data_size = 0;
 				}
 				get_msecond(&avgstart);
+				if (setting->dump == 1)
+					fprintf(fptr, "HOT-KEY %d PRESSED: Reset AVG value,\n", hotkey_index);
 				break;
 			case 2:
 				for (int k = 0; k < n; k++)
@@ -1831,6 +1833,8 @@ static void monitor(struct options_setting* setting)
 					groups[k].min = 99999;
 				}
 				get_msecond(&maxminstart);
+				if (setting->dump == 1)
+					fprintf(fptr, "HOT-KEY %d PRESSED: Reset MAXMIN value,\n", hotkey_index);
 				break;
 			case 3:
 				for (int k = 0; k < n; k++)
@@ -1854,6 +1858,8 @@ static void monitor(struct options_setting* setting)
 					groups[k].min = 99999;
 				}
 				get_msecond(&maxminstart);
+				if (setting->dump == 1)
+					fprintf(fptr, "HOT-KEY %d PRESSED: Reset AVG and MAXMIN value,\n", hotkey_index);
 				avgstart = maxminstart;
 				break;
 			case 4:
@@ -1872,6 +1878,13 @@ static void monitor(struct options_setting* setting)
 				{
 					printf("Will boot from BOOT SWITCH, input=%d%s\n", setting->boot_mode_hex, g_vt_clear_line);
 					setting->boot_mode_hex = -1;
+					if (setting->dump == 1)
+						fprintf(fptr, "HOT-KEY %d PRESSED: Reset the board from BOOT SWITCH,\n", hotkey_index);
+				}
+				else
+				{
+					if (setting->dump == 1)
+						fprintf(fptr, "HOT-KEY %d PRESSED: Reset the board from %s,\n", hotkey_index, board->boot_modes[setting->boot_mode_hex].name);
 				}
 
 				reset(setting);
@@ -1903,6 +1916,8 @@ static void monitor(struct options_setting* setting)
 			case 6:
 				printf("\nSimulate pressing the ON/OFF button once shortly%s\n", g_vt_clear_line);
 				onoff(setting, 500, DONT_INIT);
+				if (setting->dump == 1)
+					fprintf(fptr, "HOT-KEY %d PRESSED: Resume the board,\n", hotkey_index);
 				break;
 			default:
 				break;
