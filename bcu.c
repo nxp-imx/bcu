@@ -418,6 +418,7 @@ static void deinitialize(struct options_setting* setting)
 		return;
 	struct gpio_device* gpio = NULL;
 	int status = -1;
+	int mask;
 
 	gpio = get_gpio("remote_en", board);
 	if (gpio == NULL)
@@ -426,7 +427,10 @@ static void deinitialize(struct options_setting* setting)
 		return;
 	}
 
-	status = gpio->gpio_write(gpio, 0x00); //low
+	mask = board->mappings[get_gpio_id("remote_en", board)].initinfo & 0xF;
+
+	status = gpio->gpio_write(gpio, mask ? 0x00 : 0xFF); //set it off.
+
 	if (!status)
 		printf("%sDISABLE%s remote control\n", g_vt_red, g_vt_default);
 	free_gpio(gpio);
