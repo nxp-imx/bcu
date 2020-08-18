@@ -373,6 +373,55 @@ static void set_gpio(struct options_setting* setting)
 	free_device_linkedlist_backward(end_point);
 }
 
+static void get_gpio_level(struct options_setting* setting)
+{
+	struct board_info* board = get_board(setting->board);
+	if (board == NULL)
+		return;
+	void* head = NULL;
+	void* end_point;
+	char path[MAX_PATH_LENGTH];
+	int status = -1;
+	unsigned char buff = 0;
+
+	if (strlen(setting->path) == 0)
+	{
+		if (strlen(setting->gpio_name) == 0)
+		{
+			printf("could not detect a valid gpio name entered\n");
+			printf("please enter the name of the gpio pin,\n");
+			printf("to see a list of available gpio pin, please use command lsgpio\n");
+			return;
+
+		}
+		if (get_path(path, setting->gpio_name, board) == -1) {
+			printf("failed to find gpio path\n"); return;
+		}
+		end_point = build_device_linkedlist_forward(&head, path);
+	}
+	else
+	{
+		end_point = build_device_linkedlist_forward(&head, setting->path);
+	}
+
+	if (end_point == NULL)
+	{
+		printf("set_gpio: error building device linked list\n");
+		return;
+	}
+
+	struct gpio_device* gpio = end_point;
+
+	status = gpio->gpio_read(gpio, &buff);
+
+	if (status)
+		printf("get gpio failed, error = 0x%x\n", status);
+	else
+		printf("get %s level=%s\n", setting->gpio_name, buff ? "HIGH" : "LOW");
+
+	free_device_linkedlist_backward(end_point);
+}
+
 static void set_boot_mode(struct options_setting* setting)
 {
 	if (setting->boot_mode_hex == -1)
@@ -2158,6 +2207,10 @@ int main(int argc, char** argv)
 	else if (strcmp(cmd, "set_gpio") == 0)
 	{
 		set_gpio(&setting);
+	}
+	else if (strcmp(cmd, "get_level") == 0)
+	{
+		get_gpio_level(&setting);
 	}
 	else if (strcmp(cmd, "set_boot_mode") == 0)
 	{

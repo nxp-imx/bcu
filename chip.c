@@ -491,7 +491,7 @@ void* ft4232h_gpio_create(char* chip_specification, void* parent)
 		return NULL;
 	}
 	ft->gpio_device.device.parent = parent;
-	//ft->gpio_device.gpio_read=ft4232h_gpio_read;
+	ft->gpio_device.gpio_read=ft4232h_gpio_read;
 	ft->gpio_device.gpio_write = ft4232h_gpio_write;
 	//ft->gpio_device.gpio_toggle=ft4232h_gpio_toggle;
 	ft->gpio_device.device.free = ft4232h_gpio_free;
@@ -556,7 +556,13 @@ int ft4232h_gpio_write(void* ft4232h, unsigned char bit_value)
 
 int ft4232h_gpio_read(void* ft4232h, unsigned char* bit_value_buffer)
 {
-	printf("read is not yet implemented!\n");
+	struct ft4232h_gpio* ft = ft4232h;
+	unsigned char current_output;
+
+	ft_read_pins(ft->ftdi_info, &current_output);
+
+	bit_value_buffer[0] = current_output & ft->gpio_device.pin_bitmask;
+
 	return 0;
 }
 
