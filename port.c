@@ -137,13 +137,13 @@ int ft_open_channel(struct ftdi_info* fi, int channel)
 
 int ft_close(struct ftdi_info* fi)
 {
+	ft_set_bitmode(fi, 0, 0); //resetting the controller
 #ifdef _WIN32
 	int num = fi->FT_close(fi->ftdi);
 	//printf("%d\n",num);
 	fi->isinit = 0;
 	return num;
 #else
-	ft_set_bitmode(fi, 0, 0); //resetting the controller
 
 	if (fi->ftdi->usb_dev != NULL)
 		if (libusb_release_interface(fi->ftdi->usb_dev, fi->ftdi->interface) < 0)
