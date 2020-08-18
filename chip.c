@@ -882,9 +882,6 @@ int pca6416a_read(void* pca6416a, unsigned char* bit_value_buffer)
 	unsigned char input_cmd = (pca->port) + 0x00; //x00h is the input command
 	int bSucceed = 0;
 
-	if(pca->gpio_device.opendrain > 0)
-		input_cmd = (pca->port) + 0x6;
-
 	bSucceed = parent->i2c_start(parent);
 	if (bSucceed) return bSucceed;
 	bSucceed = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_GPIO);
@@ -901,7 +898,7 @@ int pca6416a_read(void* pca6416a, unsigned char* bit_value_buffer)
 	if (bSucceed) return bSucceed;
 
 	//mask away unwanted value;
-	*bit_value_buffer = (*bit_value_buffer) & (~pca->gpio_device.pin_bitmask);
+	*bit_value_buffer = (*bit_value_buffer) & (pca->gpio_device.pin_bitmask);
 	return 0;
 }
 
@@ -1110,9 +1107,6 @@ int pcal6524h_read(void* pcal6524h, unsigned char* bit_value_buffer)
 	unsigned char addr_plus_read = (pca->addr << 1) + 1;
 	unsigned char input_cmd = (pca->port) + 0x00; //x00h is the input command
 	int bSucceed = 0;
-
-	if (pca->gpio_device.opendrain > 0)
-		input_cmd = (pca->port) + 0x6;
 
 	bSucceed = parent->i2c_start(parent);
 	if (bSucceed) return bSucceed;
