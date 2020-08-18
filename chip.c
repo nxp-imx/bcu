@@ -256,7 +256,7 @@ void ft4232h_i2c_remove_all(void)
 	int i;
 	for (i = 0; i < MAX_FT_I2C_CHANNEL_NUMBER; i++)
 	{
-		if (g_ftdi_info[i].isinit == 1)
+		if (g_ftdi_info[i].isinit)
 			ft_close(&g_ftdi_info[i]);
 			// ft4232h_i2c_free(&g_ft[i]);
 	}

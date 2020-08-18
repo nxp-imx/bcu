@@ -34,7 +34,7 @@
 
 #include "port.h"
 
-#define MAX_FT_I2C_CHANNEL_NUMBER 2
+#define MAX_FT_I2C_CHANNEL_NUMBER 4
 
 struct device {
 	char* name;
