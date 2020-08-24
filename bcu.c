@@ -980,15 +980,17 @@ static void monitor(struct options_setting* setting)
 		}
 
 		/*print first row*/
-		int i = 0;
+		int i = 0, index_n;
 		fprintf(fptr, "time(ms),");
-		while (board->mappings[i].name != NULL)
+		index_n = get_power_index_by_showid(i, board);
+		while (index_n != -1)
 		{
-			if (board->mappings[i].type == power && board->mappings[i].initinfo != 0)
+			if (board->mappings[index_n].type == power && board->mappings[index_n].initinfo != 0)
 			{
-				fprintf(fptr, "%s voltage(V),%s current(mA),", board->mappings[i].name, board->mappings[i].name);
+				fprintf(fptr, "%s voltage(V),%s current(mA),", board->mappings[index_n].name, board->mappings[index_n].name);
 			}
 			i++;
+			index_n = get_power_index_by_showid(i, board);
 		}
 	}
 
