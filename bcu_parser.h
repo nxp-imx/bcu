@@ -59,10 +59,10 @@ struct options_setting {
 
 struct group {
 	char name[MAX_MAPPING_NAME_LENGTH];
-	float sum;
-	float max;
-	float min;
-	float avg;
+	double sum;
+	double max;
+	double min;
+	double avg;
 	int avg_data_size;
 	int member_index[MAX_NUMBER_OF_POWER];
 	char member_list[MAX_MAPPING_NAME_LENGTH * MAX_NUMBER_OF_POWER];
