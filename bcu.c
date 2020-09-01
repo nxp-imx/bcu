@@ -983,7 +983,7 @@ static void monitor(struct options_setting* setting)
 		}
 
 		/*print first row*/
-		int i = 0, index_n;
+		int i = 1, index_n;
 		fprintf(fptr, "time(ms),");
 		index_n = get_power_index_by_showid(i, board);
 		while (index_n != -1)
