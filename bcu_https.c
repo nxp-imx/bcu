@@ -85,6 +85,7 @@ int _https_get_by_url(char* remote_url, struct latest_git_info* get_info)
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeMemoryCallback);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)&response);
 		curl_easy_setopt(curl, CURLOPT_CRLF, 0L);
+		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
 		curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
 		res = curl_easy_perform(curl);
 		if (res != CURLE_OK)
@@ -135,7 +136,7 @@ int _download(char* url, char* out, char* extname)
 
 		curl_easy_setopt(curl, CURLOPT_URL, url);
 		curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
-
+		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
 		curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
