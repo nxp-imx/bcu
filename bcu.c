@@ -539,16 +539,25 @@ static void deinitialize(struct options_setting* setting)
 	gpio = get_gpio("remote_en", board);
 	if (gpio == NULL)
 	{
-		printf("set_boot_mode: No boot_mode configuration!\n");
+		printf("deinitialize: Cannot find gpio remote_en!\n");
 		return;
 	}
-
 	mask = board->mappings[get_gpio_id("remote_en", board)].initinfo & 0xF;
-
 	status = gpio->gpio_write(gpio, mask ? 0x00 : 0xFF); //set it off.
-
 	if (!status)
-		printf("%sDISABLE%s remote control\n", g_vt_red, g_vt_default);
+		printf("%sDISABLE%s remote control: remote_en\n", g_vt_red, g_vt_default);
+	free_gpio(gpio);
+
+	gpio = get_gpio("bootmode_sel", board);
+	if (gpio == NULL)
+	{
+		// printf("deinitialize: Cannot find gpio bootmode_sel!\n");
+		return;
+	}
+	mask = board->mappings[get_gpio_id("bootmode_sel", board)].initinfo & 0xF;
+	status = gpio->gpio_write(gpio, mask ? 0x00 : 0xFF); //set it off.
+	if (!status)
+		printf("%sDISABLE%s remote control: bootmode_sel\n", g_vt_red, g_vt_default);
 	free_gpio(gpio);
 }
 
