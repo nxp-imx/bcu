@@ -522,7 +522,9 @@ static void get_boot_mode(struct options_setting* setting)
 	if (status)
 		printf("get_boot_mode failed, error = 0x%x\n", status);
 	else
-		printf("get_boot_mode: %s\n", get_boot_mode_name_from_hex(board, read_buf));
+		printf("get_boot_mode: %s\n", get_boot_mode_name_from_hex(board, read_buf) == NULL ?
+			"Cannot find the boot mode!" :
+			get_boot_mode_name_from_hex(board, read_buf));
 
 	free_gpio(gpio);
 }

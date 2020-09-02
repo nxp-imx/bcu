@@ -814,20 +814,19 @@ void* pca6416a_create(char* chip_specification, void* parent)
 	pca->addr = extract_parameter_value(chip_specification, "addr");
 	pca->port = extract_parameter_value(chip_specification, "port");
 
-	if (pca->gpio_device.opendrain <= 0)
-		pca6416a_set_direction(pca, ~pca->gpio_device.pin_bitmask);
-	else
-		pca6416a_set_output(pca, ~pca->gpio_device.pin_bitmask);
-
 	return pca;
 }
 
 int pca6416a_write(void* pca6416a, unsigned char bit_value)
 {
 	struct pca6416a* pca = pca6416a;
-	if (pca->gpio_device.opendrain > 0)
-		return pca6416a_set_direction(pca, bit_value);
 
+	if (pca->gpio_device.opendrain > 0) {
+		pca6416a_set_output(pca, ~pca->gpio_device.pin_bitmask);
+		return pca6416a_set_direction(pca, bit_value);
+	}
+
+	pca6416a_set_direction(pca, ~pca->gpio_device.pin_bitmask);
 	return pca6416a_set_output(pca, bit_value);
 }
 int pca6416a_set_output(struct pca6416a* pca6416a, unsigned char bit_value)
@@ -896,6 +895,9 @@ int pca6416a_get_direction(void* pca6416a, unsigned char* bit_value_buffer)
 	if (bSucceed) return bSucceed;
 	bSucceed = parent->i2c_stop(parent);
 	if (bSucceed) return bSucceed;
+
+	if (pca->gpio_device.opendrain <= 0)
+		(*bit_value_buffer) = ~(*bit_value_buffer);
 
 	//mask away unwanted value;
 	*bit_value_buffer = (*bit_value_buffer) & (pca->gpio_device.pin_bitmask);
@@ -979,6 +981,9 @@ int pca6416a_toggle(void* pca6416a)
 {
 	struct pca6416a* pca = pca6416a;
 	struct i2c_device* parent = (void*)pca->gpio_device.device.parent;
+
+	//TODO: NEED SET DIRECTIONS FOR THE PINS FIRST HERE
+
 	unsigned char addr_plus_write = (pca->addr << 1) + 0;
 	unsigned char addr_plus_read = (pca->addr << 1) + 1;
 
