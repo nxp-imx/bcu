@@ -557,3 +557,18 @@ int get_boot_mode_offset(unsigned char boot_mode_pin_bitmask)
 	//printf("offset is %d\n", offset);
 	return offset;
 }
+
+char* get_boot_mode_name_from_hex(struct board_info* board, int boot_mode_hex)
+{
+	int i = 0;
+
+	while (board->boot_modes[i].name != NULL)
+	{
+		if (board->boot_modes[i].boot_mode_hex == boot_mode_hex)
+		{
+			return board->boot_modes[i].name;
+		}
+		i++;
+	}
+	return NULL;
+}

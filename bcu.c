@@ -192,6 +192,7 @@ static void print_help(char* cmd)
 		printf("	%s%-50s%s%s\n", g_vt_default, "get_level [GPIO_NAME] [-board=] [-id=]", g_vt_green, "get level state of pin GPIO_NAME");
 		printf("	%s%-50s%s%s\n", g_vt_default, "set_gpio [GPIO_NAME] [1/0] [-board=] [-id=]", g_vt_green, "set pin GPIO_NAME to be high(1) or low(0)");
 		printf("	%s%-50s%s%s\n", g_vt_default, "set_boot_mode [BOOTMODE_NAME] [-board=] [-id=]", g_vt_green, "set BOOTMODE_NAME as boot mode");
+		printf("	%s%-50s%s%s\n", g_vt_default, "get_boot_mode [-board=] [-id=]", g_vt_green, "read the boot mode set by BCU before");
 		printf("\n");
 		printf("	%s%-50s%s%s\n", g_vt_default, "lsftdi", g_vt_green, "list all boards connected by ftdi device");
 		printf("	%s%-50s%s%s\n", g_vt_default, "lsboard", g_vt_green, "list all supported board models");
@@ -457,6 +458,71 @@ static void set_boot_mode(struct options_setting* setting)
 		printf("set boot mode failed, error = 0x%x\n", status);
 	else
 		printf("set boot mode successfully\n");
+
+	free_gpio(gpio);
+}
+
+static void get_boot_mode(struct options_setting* setting)
+{
+	struct board_info* board = get_board(setting->board);
+	if (board == NULL)
+		return;
+	struct gpio_device* gpio = NULL;
+	int status = -1;
+	unsigned char read_buf;
+
+	gpio = get_gpio("bootmode_sel", board);
+	if (gpio != NULL)
+	{
+		status = gpio->gpio_read(gpio, &read_buf);
+		if (status)
+			printf("get_boot_mode failed, error = 0x%x\n", status);
+		if (read_buf != (board->mappings[get_gpio_id("bootmode_sel", board)].initinfo & 0xF))
+		{
+			printf("get_boot_mode: bootmode_sel is disabled, boot from BOOT SWITCH!\n");
+			free_gpio(gpio);
+			return;
+		}
+		free_gpio(gpio);
+	}
+	else
+	{
+		gpio = get_gpio("remote_en", board);
+		if (gpio == NULL)
+		{
+			printf("get_boot_mode: Cannot find gpio remote_en!\n");
+			free_gpio(gpio);
+			return;
+		}
+		status = gpio->gpio_read(gpio, &read_buf);
+		if (status)
+			printf("get_boot_mode failed, error = 0x%x\n", status);
+		if (read_buf != (board->mappings[get_gpio_id("remote_en", board)].initinfo & 0xF))
+		{
+			printf("get_boot_mode: remote_en is disabled, boot from BOOT SWITCH!\n");
+			free_gpio(gpio);
+			return;
+		}
+		free_gpio(gpio);
+	}
+
+	gpio = get_gpio("boot_mode", board);
+	if (gpio == NULL)
+	{
+		printf("get_boot_mode: No boot_mode configuration!\n");
+		free_gpio(gpio);
+		return;
+	}
+	if (get_boot_mode_offset(gpio->pin_bitmask) < 0)
+	{
+		free_gpio(gpio);
+		return;
+	}
+	status = gpio->gpio_read(gpio, &read_buf);
+	if (status)
+		printf("get_boot_mode failed, error = 0x%x\n", status);
+	else
+		printf("get_boot_mode: %s\n", get_boot_mode_name_from_hex(board, read_buf));
 
 	free_gpio(gpio);
 }
@@ -2221,6 +2287,10 @@ int main(int argc, char** argv)
 	else if (strcmp(cmd, "set_boot_mode") == 0)
 	{
 		set_boot_mode(&setting);
+	}
+	else if (strcmp(cmd, "get_boot_mode") == 0)
+	{
+		get_boot_mode(&setting);
 	}
 	else if (strcmp(cmd, "help") == 0)
 	{

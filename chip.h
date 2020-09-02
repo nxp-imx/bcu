@@ -197,6 +197,7 @@ int pca6416a_write(void* pca6416a, unsigned char bit_value);
 int pca6416a_toggle(void* pca6416a);
 void* pca6416a_create(char* chip_specification, void* parent);
 int pca6416a_set_direction(struct pca6416a* pca, unsigned char value);
+int pca6416a_get_direction(void* pca6416a, unsigned char* bit_value_buffer);
 int pca6416a_set_output(struct pca6416a* pca, unsigned char value);
 int pca6416a_get_output(void* pca6416a, unsigned char* current_output);
 ////////////////////////////////////////////////////////////////////////

@@ -873,9 +873,40 @@ int pca6416a_set_output(struct pca6416a* pca6416a, unsigned char bit_value)
 	return 0;
 }
 
+int pca6416a_get_direction(void* pca6416a, unsigned char* bit_value_buffer)
+{
+	struct pca6416a* pca = pca6416a;
+	struct i2c_device* parent = (void*)pca->gpio_device.device.parent;
+	unsigned char addr_plus_write = (pca->addr << 1) + 0;
+	unsigned char addr_plus_read = (pca->addr << 1) + 1;
+	unsigned char input_cmd = (pca->port) + 0x06; //x06h is the io configuration command
+	int bSucceed = 0;
+
+	bSucceed = parent->i2c_start(parent);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_GPIO);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_write(parent, input_cmd, I2C_TYPE_GPIO);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_start(parent);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_write(parent, addr_plus_read, I2C_TYPE_GPIO);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_read(parent, bit_value_buffer, 1, I2C_TYPE_GPIO);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_stop(parent);
+	if (bSucceed) return bSucceed;
+
+	//mask away unwanted value;
+	*bit_value_buffer = (*bit_value_buffer) & (pca->gpio_device.pin_bitmask);
+	return 0;
+}
+
 int pca6416a_read(void* pca6416a, unsigned char* bit_value_buffer)
 {
 	struct pca6416a* pca = pca6416a;
+	if (pca->gpio_device.opendrain > 0)
+		return pca6416a_get_direction(pca, bit_value_buffer);
 	struct i2c_device* parent = (void*)pca->gpio_device.device.parent;
 	unsigned char addr_plus_write = (pca->addr << 1) + 0;
 	unsigned char addr_plus_read = (pca->addr << 1) + 1;
