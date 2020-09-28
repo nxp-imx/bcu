@@ -117,6 +117,20 @@ size_t write_data(void* ptr, size_t size, size_t nmemb, FILE* stream)
 	return written;
 }
 
+int progress_callback(void *clientp, double dltotal, double dlnow, double ultotal, double ulnow)
+{
+	static int i=0;
+	i++;
+
+	if (dltotal != 0 && dltotal > 10000)
+		printf("\rDownloading progress: %.1fKB/%.1fKB\x1B[K", dlnow / 1024, dltotal / 1024);
+	else
+		printf("\rDownloading progress: prepare to download...\x1B[K");
+	fflush(stdout);
+
+	return 0;
+}
+
 int _download(char* url, char* out, char* extname)
 {
 	CURL* curl = NULL;
@@ -141,11 +155,16 @@ int _download(char* url, char* out, char* extname)
 		curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
 
+		curl_easy_setopt(curl, CURLOPT_PROGRESSFUNCTION, progress_callback);
+		curl_easy_setopt(curl, CURLOPT_PROGRESSDATA, NULL);
+		curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
+
 		res = curl_easy_perform(curl);
 
 		curl_easy_cleanup(curl);
 
 		fclose(fp);
+		printf("\n");
 		return res;
 	}
 	else
@@ -279,6 +298,59 @@ int _https_get_by_url(char* remote_url, struct latest_git_info* get_info)
 	return res;
 }
 
+char* wchar2char(const wchar_t* wchar)
+{
+	char* m_char;
+	int len = WideCharToMultiByte(CP_ACP, 0, wchar, wcslen(wchar), NULL, 0, NULL, NULL);
+	m_char = malloc(len * sizeof(char) + 5);
+	WideCharToMultiByte(CP_ACP, 0, wchar, wcslen(wchar), m_char, len, NULL, NULL);
+	m_char[len] = '\0';
+	return m_char;
+}
+
+unsigned int fileSize = 0;
+
+void CALLBACK winHttpSslStatusCallback(HINTERNET hInternet,
+	DWORD_PTR context,
+	DWORD code,
+	void* pInfo,
+	DWORD infoLength)
+{
+	char* buffer;
+	char* temp;
+	unsigned int len;
+
+	if (code == WINHTTP_CALLBACK_STATUS_RESPONSE_RECEIVED)
+	{
+		DWORD headerBufferLength = 0;
+		LPVOID tempHeaderBuffer = NULL;
+		WinHttpQueryHeaders(hInternet,
+			WINHTTP_QUERY_RAW_HEADERS_CRLF,
+			WINHTTP_HEADER_NAME_BY_INDEX,
+			NULL,
+			&headerBufferLength,
+			WINHTTP_NO_HEADER_INDEX);
+
+		tempHeaderBuffer = (LPWSTR)malloc(headerBufferLength * sizeof(LPWSTR) + 5);
+		WinHttpQueryHeaders(hInternet,
+			WINHTTP_QUERY_RAW_HEADERS_CRLF,
+			WINHTTP_HEADER_NAME_BY_INDEX,
+			tempHeaderBuffer,
+			&headerBufferLength,
+			WINHTTP_NO_HEADER_INDEX);
+
+		buffer = wchar2char(tempHeaderBuffer);
+		//printf("GetHTTPResponse : Header Request Contents : \n\n%s", buffer);
+
+		temp = strstr(buffer, "Content-Length:");
+		temp += 16;
+		temp = strtok(temp, "\r");
+		fileSize = atoi(temp);
+		if (fileSize < 50000)
+			fileSize = 0;
+	}
+}
+
 int _download(char* url, char* out, char* extname)
 {
 	int res = 0;
@@ -307,6 +379,8 @@ int _download(char* url, char* out, char* extname)
 	swprintf(wobjname, 256, L"%hs", objname);
 	swprintf(wout, 50, L"%hs", outputname);
 
+	printf("\rDownloading progress: prepare to download...\x1B[K");
+
 	// Use WinHttpOpen to obtain a session handle.
 	hSession = WinHttpOpen(L"WinHTTP Example/1.0",
 		WINHTTP_ACCESS_TYPE_DEFAULT_PROXY,
@@ -327,11 +401,14 @@ int _download(char* url, char* out, char* extname)
 
 	// Send a request.
 	if (hRequest)
+	{
+		WinHttpSetStatusCallback(hRequest,
+			winHttpSslStatusCallback, WINHTTP_CALLBACK_FLAG_ALL_NOTIFICATIONS, 0);
 		bResults = WinHttpSendRequest(hRequest,
 			WINHTTP_NO_ADDITIONAL_HEADERS, 0,
 			WINHTTP_NO_REQUEST_DATA, 0,
 			0, 0);
-
+	}
 
 	// End the request.
 	if (bResults)
@@ -340,6 +417,7 @@ int _download(char* url, char* out, char* extname)
 	// Keep checking for data until there is nothing left.
 	if (bResults)
 	{
+		unsigned int sizeDownloaded = 0;
 		HANDLE hFile = CreateFileW(wout, GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 		do
 		{
@@ -369,6 +447,8 @@ int _download(char* url, char* out, char* extname)
 				}
 				else
 				{
+					sizeDownloaded += dwSize;
+					printf("\rDownloading progress: %.1fKB/%.1fKB\x1B[K", (float)sizeDownloaded / 1024.0, (float)fileSize / 1024.0);
 					WriteFile(hFile, pszOutBuffer, dwSize, &dwDownloaded, NULL);
 				}
 
@@ -376,6 +456,8 @@ int _download(char* url, char* out, char* extname)
 				free(pszOutBuffer);
 			}
 		} while (dwSize > 0);
+		printf("\n");
+
 		CloseHandle(hFile);
 	}
 
