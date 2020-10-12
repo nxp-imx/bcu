@@ -185,9 +185,10 @@ static void print_help(char* cmd)
 		printf("	%s%-50s%s%s\n", g_vt_default, "init   [BOOTMODE_NAME] [-board=] [-id=]", g_vt_green, "enable the remote control with a boot mode");
 		printf("	%s%-50s%s%s\n", g_vt_default, "deinit [BOOTMODE_NAME] [-board=] [-id=]", g_vt_green, "disable the remote control");
 		printf("\n");
-		printf("	%s%-50s%s%s\n", g_vt_default, "monitor [-board=] [-id=] [-dump/-dump=]", g_vt_green, "monitor power consumption");
-		printf("	%s%-50s%s%s\n", g_vt_default, "        [-nodisplay] [-hz=] [-hwfilter]", g_vt_green, "");
-		printf("	%s%-50s%s%s\n", g_vt_default, "        [-unipolar]", g_vt_green, "");
+		printf("	%s%-50s%s%s\n", g_vt_default, "monitor [-board=] [-id=]", g_vt_green, "monitor power consumption");
+		printf("	%s%-50s%s%s\n", g_vt_default, "        [-dump/-dump=] [-nodisplay] [-pmt]", g_vt_green, "");
+		printf("	%s%-50s%s%s\n", g_vt_default, "        [-hz=]", g_vt_green, "");
+		printf("	%s%-50s%s%s\n", g_vt_default, "        [-hwfilter] [-unipolar]", g_vt_green, "");
 		printf("\n");
 		printf("	%s%-50s%s%s\n", g_vt_default, "get_level [GPIO_NAME] [-board=] [-id=]", g_vt_green, "get level state of pin GPIO_NAME");
 		printf("	%s%-50s%s%s\n", g_vt_default, "set_gpio [GPIO_NAME] [1/0] [-board=] [-id=]", g_vt_green, "set pin GPIO_NAME to be high(1) or low(0)");
@@ -1067,7 +1068,10 @@ static void monitor(struct options_setting* setting)
 		{
 			if (board->mappings[index_n].type == power && board->mappings[index_n].initinfo != 0)
 			{
-				fprintf(fptr, "%s voltage(V),%s current(mA),", board->mappings[index_n].name, board->mappings[index_n].name);
+				if (!setting->pmt)
+					fprintf(fptr, "%s voltage(V),%s current(mA),", board->mappings[index_n].name, board->mappings[index_n].name);
+				else
+					fprintf(fptr, "%s voltage(V),%s current(mA),%s power(mW),", board->mappings[index_n].name, board->mappings[index_n].name, board->mappings[index_n].name);
 			}
 			i++;
 			index_n = get_power_index_by_showid(i, board);
@@ -1090,6 +1094,7 @@ static void monitor(struct options_setting* setting)
 	double pnow[MAX_NUMBER_OF_POWER]; double pavg[MAX_NUMBER_OF_POWER]; double pmax[MAX_NUMBER_OF_POWER]; double pmin[MAX_NUMBER_OF_POWER];
 	double data_size[MAX_NUMBER_OF_POWER];
 	double cnow_fwrite[MAX_NUMBER_OF_POWER];
+	double pnow_fwrite[MAX_NUMBER_OF_POWER];
 	int sr_level[MAX_NUMBER_OF_POWER];
 	int range_control = 0;
 	int range_level[MAX_NUMBER_OF_POWER] = {0};
@@ -1449,6 +1454,7 @@ static void monitor(struct options_setting* setting)
 				voltage = pac_data[group].vbus[sensor] - (pac_data[group].vsense[sensor] / 1000000);
 				current = pac_data[group].vsense[sensor] / pd->power_get_cur_res(pd);
 				cnow_fwrite[j] = current;
+				pnow_fwrite[j] = current * voltage;
 
 				if (range_control == 0)
 				{
@@ -1564,7 +1570,12 @@ static void monitor(struct options_setting* setting)
 				if (k < 0)
 					continue;
 				if (board->mappings[k].initinfo != 0)
-					fprintf(fptr, "%lf,%lf,", vnow[k], cnow_fwrite[k]);
+				{
+					if (!setting->pmt)
+						fprintf(fptr, "%lf,%lf,", vnow[k], cnow_fwrite[k]);
+					else
+						fprintf(fptr, "%lf,%lf,%lf,", vnow[k], cnow_fwrite[k], pnow_fwrite[k]);
+				}
 			}
 			for (int k = 0; k < num_of_groups; k++)
 			{

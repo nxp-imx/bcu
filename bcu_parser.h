@@ -47,6 +47,7 @@ struct options_setting {
 	int location_id;
 	int dump;
 	char dumpname[50];
+	int pmt;
 	int nodisplay;
 	int refreshms;
 	int use_rms;

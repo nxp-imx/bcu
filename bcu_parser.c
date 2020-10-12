@@ -269,6 +269,7 @@ void set_options_default(struct options_setting* setting)
 	setting->boot_mode_hex = -1;
 	setting->gpio_name[0] = '\0';
 	setting->dump = 0;
+	setting->pmt = 0;
 	setting->nodisplay = 0;
 	setting->dumpname[0] = '\0';
 	setting->refreshms = 0;
@@ -395,6 +396,10 @@ int parse_options(int argc, char** argv, struct options_setting* setting)
 			setting->dump = 1;
 			strcpy(setting->dumpname, "monitor_record.csv");
 			printf("dump data into %s file\n", setting->dumpname);
+		}
+		else if (strcmp(argv[i], "-pmt") == 0)
+		{
+			setting->pmt = 1;
 		}
 		else if (strcmp(argv[i], "-nodisplay") == 0)
 		{
