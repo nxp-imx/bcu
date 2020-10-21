@@ -2315,6 +2315,7 @@ int main(int argc, char** argv)
 
 	int board_num = 0;
 	char location_id_str[MAX_NUMBER_OF_USB_DEVICES][MAX_LOCATION_ID_LENGTH];
+	int find_id = -1;
 	char origin_board_name[100];
 	unsigned int find_board_count = 0;
 
@@ -2417,6 +2418,7 @@ int main(int argc, char** argv)
 					{
 						printf("Auto recognized the board %s is on location_id=%s\n", setting.board, GV_LOCATION_ID);
 						find_board_count++;
+						find_id = j;
 					}
 					// printf("Auto recognized the board: %s\n", setting.board);
 					break;
@@ -2439,6 +2441,11 @@ int main(int argc, char** argv)
 			{
 				printf("There are %d boards named %s. Please add [-id=] option.\n", find_board_count, origin_board_name);
 				return -1;
+			}
+			else
+			{
+				if (find_id >= 0)
+					strcpy(GV_LOCATION_ID, location_id_str[find_id]);
 			}
 			strcpy(setting.board, origin_board_name);
 		}
