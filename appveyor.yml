@@ -2,7 +2,7 @@ image:
 #- switched to 2017 for now because VS 2019 imagines does not have coverity build tool
 #- Visual Studio 2019
 - Visual Studio 2017 
-- Ubuntu1604
+- Ubuntu1804
 
 platform:
 - x86
