@@ -932,6 +932,8 @@ static int eeprom(struct options_setting* setting)
 	int j = 0;
 
 	struct board_info* board=get_board(setting->board);
+	if (board == NULL)
+		return -1;
 
 	while(board->mappings[j].name != NULL)
 	{
@@ -983,7 +985,6 @@ static int eeprom(struct options_setting* setting)
 	}
 
 	return 0;
-
 }
 
 /*
