@@ -47,6 +47,7 @@ struct name_and_init_func chip_list[] =
 	"pca9548", pca9548_create,
 	"ft4232h_i2c", ft4232h_i2c_create,
 	"ft4232h_gpio", ft4232h_gpio_create,
+	"ft4232h_eeprom", ft4232h_eeprom_create,
 	"pac1934", pac1934_create,
 	"pca6416a", pca6416a_create,
 	"pcal6524h", pcal6524h_create,
@@ -64,6 +65,7 @@ void* at24cxx_create(char* chip_specification, void* parent)
 		return NULL;
 	}
 	at24->eeprom_device.device.parent = parent;
+	at24->eeprom_device.eeprom_erase = at24cxx_erase;
 	at24->eeprom_device.eeprom_read = at24cxx_read;
 	at24->eeprom_device.eeprom_write = at24cxx_write;
 	at24->eeprom_device.eeprom_check_board = at24cxx_check_board;
@@ -71,13 +73,77 @@ void* at24cxx_create(char* chip_specification, void* parent)
 	//printf("AT24CXX created!\n");
 	return at24;
 }
-int at24cxx_read(void* at24cxx, unsigned char* data_buffer)
+
+int at24cxx_erase(void* at24cxx)
 {
+	unsigned char buf[256];
+
+	for (int i = 0; i < 256; i++)
+		buf[i] = 0xFF;
+
+	return at24cxx_write(at24cxx, buf, 0, 64, NULL);
+}
+
+int at24cxx_read(void* at24cxx, unsigned char* data_buffer, unsigned int startaddr, int size, unsigned char* sn_buf)
+{
+	struct at24cxx* at24 = at24cxx;
+	struct i2c_device* parent = (void*)at24->eeprom_device.device.parent;
+	char addr_plus_write = (at24->addr) << 1;
+	char addr_plus_read = (at24->addr << 1) + 1;
+	int status, i = 0;
+
+	parent->i2c_start(parent);
+	status = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_AT24);
+	if (status)
+	{
+		printf("oh no! no ack received!\n");
+		return -1;
+	}
+	parent->i2c_write(parent, startaddr, I2C_TYPE_AT24);
+	parent->i2c_start(parent);
+	parent->i2c_write(parent, addr_plus_read, I2C_TYPE_AT24);
+	for (i = 0; i < size - 1; i++)
+		parent->i2c_read(parent, &data_buffer[i], 0, I2C_TYPE_AT24);
+	parent->i2c_read(parent, &data_buffer[i], 1, I2C_TYPE_AT24);
+	parent->i2c_stop(parent);
+
+	msleep(10);
+
 	return 0;
 }
 
-int at24cxx_write(void* at24cxx, unsigned char* data_buffer)
+int at24cxx_write(void* at24cxx, unsigned char* data_buffer, unsigned int startaddr, int size, unsigned char* sn_buf)
 {
+	struct at24cxx* at24 = at24cxx;
+	struct i2c_device* parent = (void*)at24->eeprom_device.device.parent;
+	char addr_plus_write = (at24->addr) << 1;
+	char addr_plus_read = (at24->addr << 1) + 1;
+	int status, i = 0;
+
+	parent->i2c_start(parent);
+	status = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_AT24);
+	if (status)
+	{
+		printf("oh no! no ack received!\n");
+		return -1;
+	}
+	parent->i2c_write(parent, startaddr, I2C_TYPE_AT24);
+	for (i = 0; i < size; i++)
+	{
+		if (i != 0 && (startaddr + i) % 8 == 0)//AT24C02每8字节换页
+		{
+			parent->i2c_stop(parent);
+			msleep(10);
+			parent->i2c_start(parent);
+			parent->i2c_write(parent, addr_plus_write, I2C_TYPE_AT24);
+			parent->i2c_write(parent, startaddr + i, I2C_TYPE_AT24);
+		}
+		parent->i2c_write(parent, data_buffer[i], I2C_TYPE_AT24);
+	}
+	parent->i2c_stop(parent);
+
+	msleep(10);
+
 	return 0;
 }
 
@@ -177,7 +243,71 @@ int pca9548_set_channel(struct pca9548* pca9548)
 	return 0;
 }
 
+////////////////////////////////ft4232h_eeprom///////////////////////////////////
 struct ftdi_info g_ftdi_info[MAX_FT_I2C_CHANNEL_NUMBER];
+
+void* ft4232h_eeprom_create(char* chip_specification, void* parent)
+{
+	int status = 0;
+	struct ft4232h_eeprom* ftee = malloc(sizeof(struct ft4232h_eeprom));
+	if (ftee == NULL)
+	{
+		printf("malloc failed\n");
+		return NULL;
+	}
+	ftee->ftdi_info = &g_ftdi_info[0];
+	ftee->eeprom_device.device.parent = parent;
+	ftee->eeprom_device.eeprom_read = ft4232h_eeprom_read;
+	ftee->eeprom_device.eeprom_write = ft4232h_eeprom_write;
+	ftee->eeprom_device.eeprom_erase = ft4232h_eeprom_erase;
+	ft_init(ftee->ftdi_info);
+	
+	if (!ftee->ftdi_info->isinit)
+	{
+		if (strlen(GV_LOCATION_ID) == 0) {
+			status = ft_open_channel(ftee->ftdi_info, 0);
+		}
+		else {
+			status = ft_open_channel_by_id(ftee->ftdi_info, 0, GV_LOCATION_ID);
+		}
+	}
+
+	if (status != 0)
+	{
+		printf("failed to open ftdi device, err = %d\n", status);
+#ifdef __linux__
+		printf("***please make sure you run bcu with sudo\n");
+#endif		
+		free(ftee);
+		return NULL;
+	}
+
+	return ftee;
+}
+
+int ft4232h_eeprom_read(void* ft_eeprom, unsigned char* data_buffer, unsigned int startaddr, int size, unsigned char* sn_buf)
+{
+	struct ft4232h_eeprom* eeprom = ft_eeprom;
+	struct ftdi_info *ftdi = eeprom->ftdi_info;
+
+	return ft_read_eeprom(ftdi, startaddr, data_buffer, size, sn_buf);
+}
+
+int ft4232h_eeprom_write(void* ft_eeprom, unsigned char* data_buffer, unsigned int startaddr, int size, unsigned char* sn_buf)
+{
+	struct ft4232h_eeprom* eeprom = ft_eeprom;
+	struct ftdi_info *ftdi = eeprom->ftdi_info;
+
+	return ft_write_eeprom(ftdi, startaddr, data_buffer, size, sn_buf);
+}
+
+int ft4232h_eeprom_erase(void* ft_eeprom)
+{
+	struct ft4232h_eeprom* eeprom = ft_eeprom;
+	struct ftdi_info *ftdi = eeprom->ftdi_info;
+
+	return ft_erase_eeprom(ftdi);
+}
 
 ////////////////////////////////ft4232H///////////////////////////////////
 void* ft4232h_i2c_create(char* chip_specification, void* parent)
@@ -228,10 +358,10 @@ void* ft4232h_i2c_create(char* chip_specification, void* parent)
 			ft_init(ft->ftdi_info);
 			int status = 0;
 			if (strlen(GV_LOCATION_ID) == 0) {
-				status = ft_open_channel(ft->ftdi_info, ft->channel);
+				status = ft_open_channel(ft->ftdi_info, ft->channel + 1);
 			}
 			else {
-				status = ft_open_channel_by_id(ft->ftdi_info, ft->channel, GV_LOCATION_ID);
+				status = ft_open_channel_by_id(ft->ftdi_info, ft->channel + 1, GV_LOCATION_ID);
 			}
 
 			if (status != 0)
@@ -504,10 +634,10 @@ void* ft4232h_gpio_create(char* chip_specification, void* parent)
 		ft_init(ft->ftdi_info);
 		int status = 0;
 		if (strlen(GV_LOCATION_ID) == 0) {
-			status = ft_open_channel(ft->ftdi_info, ft->channel);
+			status = ft_open_channel(ft->ftdi_info, ft->channel + 1);
 		}
 		else {
-			status = ft_open_channel_by_id(ft->ftdi_info, ft->channel, GV_LOCATION_ID);
+			status = ft_open_channel_by_id(ft->ftdi_info, ft->channel + 1, GV_LOCATION_ID);
 		}
 
 		if (status != 0)

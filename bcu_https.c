@@ -33,9 +33,9 @@
 #include <windows.h>
 #endif
 
-#include<stdio.h>
-#include<stdlib.h>
-#include<string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "bcu_https.h"
 #include "version.h"
@@ -304,7 +304,8 @@ char* wchar2char(const wchar_t* wchar)
 	int len = WideCharToMultiByte(CP_ACP, 0, wchar, wcslen(wchar), NULL, 0, NULL, NULL);
 	m_char = malloc(len * sizeof(char) + 5);
 	WideCharToMultiByte(CP_ACP, 0, wchar, wcslen(wchar), m_char, len, NULL, NULL);
-	m_char[len] = '\0';
+	if (m_char != NULL)
+		m_char[len] = '\0';
 	return m_char;
 }
 
@@ -318,7 +319,6 @@ void CALLBACK winHttpSslStatusCallback(HINTERNET hInternet,
 {
 	char* buffer;
 	char* temp;
-	unsigned int len;
 
 	if (code == WINHTTP_CALLBACK_STATUS_RESPONSE_RECEIVED)
 	{

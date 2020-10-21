@@ -50,6 +50,10 @@
 #define MAX_USB_LAYERS 7
 char GV_LOCATION_ID[MAX_LOCATION_ID_LENGTH] = "";
 
+#ifdef _WIN32
+FT_PROGRAM_DATA def_ftData = { 0 };
+#endif
+
 int ft_init(struct ftdi_info* ftdi)
 {
 #ifdef _WIN32
@@ -75,17 +79,35 @@ int ft_init(struct ftdi_info* ftdi)
 	ftdi->FT_get_bitmode = (pFT_get_bitmode)GetProcAddress(hGetProcIDDLL, "FT_GetBitMode");
 	ftdi->FT_set_timeouts = (pFT_set_timeouts)GetProcAddress(hGetProcIDDLL, "FT_SetTimeouts");
 	ftdi->FT_purge = (pFT_purge)GetProcAddress(hGetProcIDDLL, "FT_Purge");
+	ftdi->FT_EEPROM_erase = (pFT_EEPROM_erase)GetProcAddress(hGetProcIDDLL, "FT_EraseEE");
+	ftdi->FT_EEPROM_read = (pFT_EEPROM_read)GetProcAddress(hGetProcIDDLL, "FT_EE_Read");
+	ftdi->FT_EEPROM_program = (pFT_EEPROM_program)GetProcAddress(hGetProcIDDLL, "FT_EE_Program");
+	ftdi->FT_EE_uasize = (pFT_EE_uasize)GetProcAddress(hGetProcIDDLL, "FT_EE_UASize");
+	ftdi->FT_EE_uaread = (pFT_EE_uaread)GetProcAddress(hGetProcIDDLL, "FT_EE_UARead");
+	ftdi->FT_EE_uawrite = (pFT_EE_uawrite)GetProcAddress(hGetProcIDDLL, "FT_EE_UAWrite");
+
+	def_ftData.Signature1 = 0x00000000;
+	def_ftData.Signature2 = 0xffffffff;
+	def_ftData.Version = 0x4; // EEPROM structure with FT4232H extensions
+	def_ftData.VendorId = 0x0403;
+	def_ftData.ProductId = 0x6011;
+	def_ftData.Manufacturer = "";
+	def_ftData.ManufacturerId = "";
+	def_ftData.Description = "FT4232H";
+	def_ftData.SerialNumber = "123456";
+	def_ftData.MaxPower = 100;
+	def_ftData.PnP = 1;
+	def_ftData.RemoteWakeup = 0;
+	def_ftData.Rev4 = 0;
+	def_ftData.SerNumEnable8 = 1;
+	def_ftData.AIsVCP8 = 1;
+	def_ftData.BIsVCP8 = 1;
+	def_ftData.CIsVCP8 = 1;
+	def_ftData.DIsVCP8 = 1;
 
 #endif
 	return 0;
 }
-
-enum d2xx_open_method
-{
-	FT_OPEN_BY_SERIAL_NUMBER = 1,
-	FT_OPEN_BY_DESCRIPTION = 2,
-	FT_OPEN_BY_LOCATION = 4
-};
 
 /*issue: need to consider index  number, vender id, and product id*/
 int ft_open_channel(struct ftdi_info* fi, int channel)
@@ -95,21 +117,38 @@ int ft_open_channel(struct ftdi_info* fi, int channel)
 	//if(channel==0)
 	//	ftdi-FT_open_ex();
 
-	int status;
+	int status = 0;
 	//printf("opening channel %d",channel);
 
+	FT_PROGRAM_DATA ftData;
+	char temp[64];
+	char sn[64] = { 0 };
+	ftData.Signature1 = 0x00000000;
+	ftData.Signature2 = 0xffffffff;
+	ftData.Version = 0x00000004; // EEPROM structure with FT4232H extensions
+	ftData.Manufacturer = temp;
+	ftData.ManufacturerId = temp;
+	ftData.Description = temp;
+	ftData.SerialNumber = sn;
+
+	fi->FT_open(0, &fi->ftdi);
+	fi->FT_EEPROM_read(fi->ftdi, &ftData);
+	fi->FT_close(fi->ftdi);
+
 	if (channel == 0)
-		status = fi->FT_open_ex("A", FT_OPEN_BY_SERIAL_NUMBER, &fi->ftdi);
+		status = fi->FT_open_ex(strcat(sn, "A"), FT_OPEN_BY_SERIAL_NUMBER, &fi->ftdi);
 	else if (channel == 1)
-		status = fi->FT_open_ex("B", FT_OPEN_BY_SERIAL_NUMBER, &fi->ftdi);
+		status = fi->FT_open_ex(strcat(sn, "A"), FT_OPEN_BY_SERIAL_NUMBER, &fi->ftdi);
 	else if (channel == 2)
-		status = fi->FT_open_ex("C", FT_OPEN_BY_SERIAL_NUMBER, &fi->ftdi);
+		status = fi->FT_open_ex(strcat(sn, "B"), FT_OPEN_BY_SERIAL_NUMBER, &fi->ftdi);
 	else if (channel == 3)
-		status = fi->FT_open_ex("D", FT_OPEN_BY_SERIAL_NUMBER, &fi->ftdi);
+		status = fi->FT_open_ex(strcat(sn, "C"), FT_OPEN_BY_SERIAL_NUMBER, &fi->ftdi);
+	else if (channel == 4)
+		status = fi->FT_open_ex(strcat(sn, "D"), FT_OPEN_BY_SERIAL_NUMBER, &fi->ftdi);
 	else
 	{
 		status = -1;
-		printf("open channel can only range from 0 to 3");
+		printf("open channel can only range from 0 to 4");
 
 	}
 	fi->FT_set_timeouts(fi->ftdi, 300, 300);
@@ -285,15 +324,15 @@ void ft_list_devices()
 				if (abs(loc_id - board_table[k][4]) < 4)
 				{
 					found = 1;
-					if (strcmp("A", SerialNumber) == 0) {
+					if (strcmp("A", &Description[strlen(Description) - 1]) == 0) {
 						board_table[k][0] = loc_id;
 						sprintf(location_id_str[k], "%x", loc_id);
 					}
-					else if (strcmp("B", SerialNumber) == 0)
+					else if (strcmp("B", &Description[strlen(Description) - 1]) == 0)
 						board_table[k][1] = loc_id;
-					else if (strcmp("C", SerialNumber) == 0)
+					else if (strcmp("C", &Description[strlen(Description) - 1]) == 0)
 						board_table[k][2] = loc_id;
-					else if (strcmp("D", SerialNumber) == 0)
+					else if (strcmp("D", &Description[strlen(Description) - 1]) == 0)
 						board_table[k][3] = loc_id;
 					else
 						printf("detected channel information are not found!\n");
@@ -303,15 +342,15 @@ void ft_list_devices()
 			{
 				//printf("new board!\n");
 				board_table[detected_boards][4] = loc_id;
-				if (strcmp("A", SerialNumber) == 0) {
+				if (strcmp("A", &Description[strlen(Description) - 1]) == 0) {
 					board_table[detected_boards][0] = loc_id;
 					sprintf(location_id_str[detected_boards], "%x", loc_id);
 				}
-				else if (strcmp("B", SerialNumber) == 0)
+				else if (strcmp("B", &Description[strlen(Description) - 1]) == 0)
 					board_table[detected_boards][1] = loc_id;
-				else if (strcmp("C", SerialNumber) == 0)
+				else if (strcmp("C", &Description[strlen(Description) - 1]) == 0)
 					board_table[detected_boards][2] = loc_id;
-				else if (strcmp("D", SerialNumber) == 0)
+				else if (strcmp("D", &Description[strlen(Description) - 1]) == 0)
 					board_table[detected_boards][3] = loc_id;
 				else
 					printf("detected channel information are not found!\n");
@@ -459,16 +498,15 @@ int ft_open_channel_by_id(struct ftdi_info* fi, int channel, char* id)
 				if (abs(loc_id - (int)board_table[k][4]) < 4)
 				{
 					found = 1;
-					if (strcmp("A", SerialNumber) == 0) {
+					if (strcmp("A", &Description[strlen(Description) - 1]) == 0) {
 						board_table[k][0] = loc_id;
 						sprintf(location_id_str[k], "%x", loc_id);
 					}
-
-					else if (strcmp("B", SerialNumber) == 0)
+					else if (strcmp("B", &Description[strlen(Description) - 1]) == 0)
 						board_table[k][1] = loc_id;
-					else if (strcmp("C", SerialNumber) == 0)
+					else if (strcmp("C", &Description[strlen(Description) - 1]) == 0)
 						board_table[k][2] = loc_id;
-					else if (strcmp("D", SerialNumber) == 0)
+					else if (strcmp("D", &Description[strlen(Description) - 1]) == 0)
 						board_table[k][3] = loc_id;
 					else
 						printf("detected channel information are not found!\n");
@@ -477,16 +515,16 @@ int ft_open_channel_by_id(struct ftdi_info* fi, int channel, char* id)
 			if (!found)
 			{
 				board_table[detected_boards][4] = loc_id;
-				if (strcmp("A", SerialNumber) == 0)
+				if (strcmp("A", &Description[strlen(Description) - 1]) == 0)
 				{
 					sprintf(location_id_str[detected_boards], "%x", loc_id);
 					board_table[detected_boards][0] = loc_id;
 				}
-				else if (strcmp("B", SerialNumber) == 0)
+				else if (strcmp("B", &Description[strlen(Description) - 1]) == 0)
 					board_table[detected_boards][1] = loc_id;
-				else if (strcmp("C", SerialNumber) == 0)
+				else if (strcmp("C", &Description[strlen(Description) - 1]) == 0)
 					board_table[detected_boards][2] = loc_id;
-				else if (strcmp("D", SerialNumber) == 0)
+				else if (strcmp("D", &Description[strlen(Description) - 1]) == 0)
 					board_table[detected_boards][3] = loc_id;
 				else
 					printf("detected channel information are not found!\n");
@@ -504,15 +542,17 @@ int ft_open_channel_by_id(struct ftdi_info* fi, int channel, char* id)
 			if (channel == 0)
 				status = fi->FT_open_ex((PVOID)board_table[j][0], FT_OPEN_BY_LOCATION, &fi->ftdi);
 			else if (channel == 1)
-				status = fi->FT_open_ex((PVOID)board_table[j][1], FT_OPEN_BY_LOCATION, &fi->ftdi);
+				status = fi->FT_open_ex((PVOID)board_table[j][0], FT_OPEN_BY_LOCATION, &fi->ftdi);
 			else if (channel == 2)
-				status = fi->FT_open_ex((PVOID)board_table[j][2], FT_OPEN_BY_LOCATION, &fi->ftdi);
+				status = fi->FT_open_ex((PVOID)board_table[j][1], FT_OPEN_BY_LOCATION, &fi->ftdi);
 			else if (channel == 3)
+				status = fi->FT_open_ex((PVOID)board_table[j][2], FT_OPEN_BY_LOCATION, &fi->ftdi);
+			else if (channel == 4)
 				status = fi->FT_open_ex((PVOID)board_table[j][3], FT_OPEN_BY_LOCATION, &fi->ftdi);
 			else
 			{
 				status = -1;
-				printf("open channel can only range from 0 to 3\n");
+				printf("open channel can only range from 0 to 4\n");
 			}
 
 			//status = fi->FT_open_ex(0x192, FT_OPEN_BY_LOCATION, &fi->ftdi);
@@ -583,7 +623,7 @@ int ft_open_channel_by_id(struct ftdi_info* fi, int channel, char* id)
 		{
 			// printf("found device specified\n");
 			found = 1;
-			int status = ftdi_set_interface(fi->ftdi, channel + 1);
+			int status = ftdi_set_interface(fi->ftdi, channel);
 			status = ftdi_usb_open_dev(fi->ftdi, curdev->dev);
 			break;
 		}
@@ -606,3 +646,265 @@ int ft_open_channel_by_id(struct ftdi_info* fi, int channel, char* id)
 
 #endif
 }
+
+int ft_erase_eeprom(struct ftdi_info* ftdi)
+{
+#ifdef _WIN32
+	int status = 0;
+
+	status = ftdi->FT_EEPROM_erase(ftdi->ftdi);
+	return 0;
+#else
+	struct ftdi_context* ftdic = ftdi->ftdi;
+
+	return ftdi_erase_eeprom(ftdic);
+#endif
+}
+
+/*write 'size' byte of data store in 'buffer' to the ftdi chip*/
+int ft_write_eeprom(struct ftdi_info* ftdi, unsigned int startaddr, unsigned char* buffer, int size, unsigned char* sn_buf)
+{
+#ifdef _WIN32
+
+	FT_PROGRAM_DATA ftData;
+	int status = 0;
+	char temp[64];
+	char sn[64];
+	ftData.Signature1 = 0x00000000;
+	ftData.Signature2 = 0xffffffff;
+	ftData.Version = 0x00000004; // EEPROM structure with FT4232H extensions
+	ftData.Manufacturer = temp;
+	ftData.ManufacturerId = temp;
+	ftData.Description = temp;
+	ftData.SerialNumber = sn;
+
+	status = ftdi->FT_EEPROM_read(ftdi->ftdi, &ftData);
+	if (!status)
+	{
+		strcpy(ftData.SerialNumber, sn_buf);
+		status = ftdi->FT_EEPROM_program(ftdi->ftdi, &ftData);
+		status = ftdi->FT_EE_uawrite(ftdi->ftdi, buffer, size);
+	}
+	else
+	{
+		def_ftData.SerialNumber = sn_buf;
+		status = ftdi->FT_EEPROM_program(ftdi->ftdi, &def_ftData);
+		status = ftdi->FT_EE_uawrite(ftdi->ftdi, buffer, size);
+	}
+
+	 return status;
+#else
+	int f;
+	int value;
+	int retval = 0;
+	struct ftdi_context* ftdic = ftdi->ftdi;
+
+	ftdic->type = TYPE_4232H;
+
+	ftdi_eeprom_initdefaults(ftdic, NULL, NULL, sn_buf);//--------------------------------------------------
+	f = ftdi_erase_eeprom(ftdic);
+	if (ftdi_set_eeprom_value(ftdic, MAX_POWER, 100) < 0)
+	{
+		fprintf(stdout, "ftdi_set_eeprom_value: %d (%s)\n",
+			f, ftdi_get_error_string(ftdic));
+	}
+
+	f = ftdi_erase_eeprom(ftdic);/* needed to determine EEPROM chip type */
+	if (ftdi_get_eeprom_value(ftdic, CHIP_TYPE, &value) < 0)
+	{
+		fprintf(stdout, "ftdi_get_eeprom_value: %d (%s)\n",
+			f, ftdi_get_error_string(ftdic));
+	}
+	if (value == -1)
+		fprintf(stdout, "No EEPROM\n");
+
+	if (ftdi_set_eeprom_value(ftdic, USER_DATA_ADDR, startaddr) < 0)
+	{
+		fprintf(stdout, "ftdi_set_eeprom_value: %d (%s)\n",
+			f, ftdi_get_error_string(ftdic));
+	}
+
+	if (ftdi_set_eeprom_value(ftdic, CHANNEL_A_DRIVER, DRIVER_VCP) < 0)
+	{
+		fprintf(stdout, "ftdi_set_eeprom_value: %d (%s)\n",
+			f, ftdi_get_error_string(ftdic));
+	}
+	
+	if (ftdi_set_eeprom_value(ftdic, CHANNEL_B_DRIVER, DRIVER_VCP) < 0)
+	{
+		fprintf(stdout, "ftdi_set_eeprom_value: %d (%s)\n",
+			f, ftdi_get_error_string(ftdic));
+	}
+
+	if (ftdi_set_eeprom_value(ftdic, CHANNEL_C_DRIVER, DRIVER_VCP) < 0)
+	{
+		fprintf(stdout, "ftdi_set_eeprom_value: %d (%s)\n",
+			f, ftdi_get_error_string(ftdic));
+	}
+
+	if (ftdi_set_eeprom_value(ftdic, CHANNEL_D_DRIVER, DRIVER_VCP) < 0)
+	{
+		fprintf(stdout, "ftdi_set_eeprom_value: %d (%s)\n",
+			f, ftdi_get_error_string(ftdic));
+	}
+
+	if (ftdi_set_eeprom_user_data(ftdic, buffer, size) < 0)
+	{
+		fprintf(stdout, "ftdi_get_eeprom_value: %d (%s)\n",
+			f, ftdi_get_error_string(ftdic));
+	}
+
+	f = ftdi_eeprom_build(ftdic);
+	if (f < 0)
+	{
+		fprintf(stdout, "Erase failed: %s",
+			ftdi_get_error_string(ftdic));
+		retval = -2;
+		return retval;
+	}
+
+	f = ftdi_write_eeprom(ftdic);
+	if (f < 0)
+	{
+		fprintf(stdout, "ftdi_eeprom_decode: %d (%s)\n",
+			f, ftdi_get_error_string(ftdic));
+		retval = 1;
+		return retval;
+	}
+
+	return 0;
+#endif
+}
+
+int ft_read_eeprom(struct ftdi_info* ftdi, unsigned int startaddr, unsigned char* data_buf, int data_size, unsigned char* sn_buf)
+{
+#ifdef _WIN32
+	FT_PROGRAM_DATA ftData;
+	int status = 0;
+	char temp[64];
+	ftData.Signature1 = 0x00000000;
+	ftData.Signature2 = 0xffffffff;
+	ftData.Version = 0x00000004; // EEPROM structure with FT4232H extensions
+	ftData.Manufacturer = temp;
+	ftData.ManufacturerId = temp;
+	ftData.Description = temp;
+	ftData.SerialNumber = sn_buf;
+
+	status = ftdi->FT_EEPROM_read(ftdi->ftdi, &ftData);
+
+	if (!status)
+	{
+		DWORD EEUA_Size;
+		status = ftdi->FT_EE_uasize(ftdi->ftdi, &EEUA_Size);
+
+		unsigned char buf[256] = { 0 };
+		DWORD BytesRead = 0;
+		status = ftdi->FT_EE_uaread(ftdi->ftdi, buf, EEUA_Size, &BytesRead);
+
+		memcpy(data_buf, buf, data_size);
+	}
+
+	return status;
+#else
+	int f;
+	int value;
+	int eeprom_size;
+	unsigned char buf[256];
+	struct ftdi_context* ftdic = ftdi->ftdi;
+
+	f = ftdi_read_eeprom(ftdic);
+	if (f < 0)
+	{
+		fprintf(stderr, "ftdi_read_eeprom: %d (%s)\n",
+				f, ftdi_get_error_string(ftdic));
+		return -1;
+	}
+
+	f = ftdi_eeprom_decode(ftdic, 0);
+	if (f < 0)
+	{
+		fprintf(stderr, "ftdi_eeprom_decode: %d (%s)\n",
+				f, ftdi_get_error_string(ftdic));
+		return -1;
+	}
+
+	ftdi_get_eeprom_value(ftdic, CHIP_SIZE, &value);
+	if (value < 0)
+	{
+		fprintf(stderr, "No EEPROM found or EEPROM empty\n");
+		fprintf(stderr, "On empty EEPROM, use -w option to write default values\n");
+		return -1;
+	}
+
+	ftdi_eeprom_get_strings(ftdic, NULL, 0, NULL, 0, sn_buf, 7);
+	if (sn_buf[0] == 0)
+	{
+		fprintf(stderr, "Invalid Serial Number\n");
+		fprintf(stderr, "Please use -w option to write default values\n");
+		return -1;
+	}
+
+	// fprintf(stderr, "Chip type %d ftdi_eeprom_size: %d\n", ftdic->type, value);
+	if (ftdic->type == TYPE_R)
+		eeprom_size = 0xa0;
+	else
+		eeprom_size = value;
+	ftdi_get_eeprom_buf(ftdic, buf, eeprom_size);
+
+	memcpy(data_buf, &buf[startaddr], data_size);
+
+	return 0;
+#endif
+}
+
+// int ft_read_decode_eeprom(struct ftdi_context *ftdic)
+// {
+// 	int i, j, f;
+// 	int value;
+// 	int size;
+// 	unsigned char buf[256];
+// 	f = ftdi_read_eeprom(ftdic);
+// 	if (f < 0)
+// 	{
+// 		fprintf(stderr, "ftdi_read_eeprom: %d (%s)\n",
+// 				f, ftdi_get_error_string(ftdic));
+// 		return -1;
+// 	}
+// 	ftdi_get_eeprom_value(ftdic, CHIP_SIZE, & value);
+// 	if (value <0)
+// 	{
+// 		fprintf(stderr, "No EEPROM found or EEPROM empty\n");
+// 		fprintf(stderr, "On empty EEPROM, use -w option to write default values\n");
+// 		return -1;
+// 	}
+// 	fprintf(stderr, "Chip type %d ftdi_eeprom_size: %d\n", ftdic->type, value);
+// 	if (ftdic->type == TYPE_R)
+// 		size = 0xa0;
+// 	else
+// 		size = value;
+// 	ftdi_get_eeprom_buf(ftdic, buf, size);
+// 	for (i=0; i < size; i += 16)
+// 	{
+// 		fprintf(stdout,"0x%03x:", i);
+// 		for (j = 0; j< 8; j++)
+// 			fprintf(stdout," %02x", buf[i+j]);
+// 		fprintf(stdout," ");
+// 		for (; j< 16; j++)
+// 			fprintf(stdout," %02x", buf[i+j]);
+// 		fprintf(stdout," ");
+// 		for (j = 0; j< 8; j++)
+// 			fprintf(stdout,"%c", isprint(buf[i+j])?buf[i+j]:'.');
+// 		fprintf(stdout," ");
+// 		for (; j< 16; j++)
+// 			fprintf(stdout,"%c", isprint(buf[i+j])?buf[i+j]:'.');
+// 		fprintf(stdout,"\n");
+// 	}
+// 	f = ftdi_eeprom_decode(ftdic, 1);
+// 	if (f < 0)
+// 	{
+// 		fprintf(stderr, "ftdi_eeprom_decode: %d (%s)\n",
+// 				f, ftdi_get_error_string(ftdic));
+// 		return -1;
+// 	}
+// 	return 0;
+// }

@@ -33,6 +33,7 @@
 
 #ifdef _WIN32
 #include <windows.h>
+#include "ftd2xx.h"
 #endif
 
 #ifdef _WIN32
@@ -48,6 +49,12 @@ typedef int(__stdcall* pFT_get_bitmode)(FT_HANDLE, PUCHAR);
 typedef int(__stdcall* pFT_get_device_info_detail)(DWORD, LPDWORD, LPDWORD, LPDWORD, LPDWORD, PCHAR, PCHAR, FT_HANDLE*);
 typedef int(__stdcall* pFT_set_timeouts)(FT_HANDLE, DWORD, DWORD);
 typedef int(__stdcall* pFT_purge)(FT_HANDLE, DWORD);
+typedef int(__stdcall* pFT_EEPROM_erase)(FT_HANDLE);
+typedef int(__stdcall* pFT_EEPROM_read)(FT_HANDLE, PFT_PROGRAM_DATA);
+typedef int(__stdcall* pFT_EEPROM_program)(FT_HANDLE, PFT_PROGRAM_DATA);
+typedef int(__stdcall* pFT_EE_uasize)(FT_HANDLE, LPDWORD);
+typedef int(__stdcall* pFT_EE_uaread)(FT_HANDLE, PUCHAR, DWORD, LPDWORD);
+typedef int(__stdcall* pFT_EE_uawrite)(FT_HANDLE, PUCHAR, DWORD);
 
 #define FT_PURGE_RX 1
 #define FT_PURGE_TX 2
@@ -70,6 +77,12 @@ struct ftdi_info {
 	pFT_open_ex FT_open_ex;
 	pFT_set_timeouts FT_set_timeouts;
 	pFT_purge FT_purge;
+	pFT_EEPROM_erase FT_EEPROM_erase;
+	pFT_EEPROM_read FT_EEPROM_read;
+	pFT_EEPROM_program FT_EEPROM_program;
+	pFT_EE_uasize FT_EE_uasize;
+	pFT_EE_uaread FT_EE_uaread;
+	pFT_EE_uawrite FT_EE_uawrite;
 
 #else
 	struct ftdi_context* ftdi;
@@ -100,5 +113,8 @@ int ft_read_pins(struct ftdi_info* ftdi, unsigned char* pins);
 int ft_clear_buffer(struct ftdi_info* ftdi);
 void ft_list_devices();
 void msleep(int duration);
+int ft_erase_eeprom(struct ftdi_info* ftdi);
+int ft_write_eeprom(struct ftdi_info* ftdi, unsigned int startaddr, unsigned char* buffer, int size, unsigned char* sn_buf);
+int ft_read_eeprom(struct ftdi_info* ftdi, unsigned int startaddr, unsigned char* data_buf, int data_size, unsigned char* sn_buf);
 
 #endif

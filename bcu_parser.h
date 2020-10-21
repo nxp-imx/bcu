@@ -34,6 +34,13 @@
 #include "chip.h"
 #include "board.h"
 
+#define PARSER_EEPROM_READ_AND_PRINT	1
+#define PARSER_EEPROM_READ_TO_FILE	2
+#define PARSER_EEPROM_WRITE_DEFAULT	3
+#define PARSER_EEPROM_WRITE_FROM_FILE	4
+#define PARSER_EEPROM_UPDATE_USER_SN	5
+#define PARSER_EEPROM_ERASE		6
+
 /*used for storing options specified by user*/
 struct options_setting {
 	char board[100]; //indicating the model of the board, i.e. i.MX8QMEVK
@@ -54,6 +61,10 @@ struct options_setting {
 	int rangefixed;
 	int use_hwfilter;
 	int use_bipolar;
+	int eeprom_function;
+	short eeprom_usr_sn;
+	unsigned char eeprom_board_rev[3];
+	unsigned char eeprom_soc_rev[3];
 	int download_doc;
 	char groups[MAX_NUMBER_OF_POWER * MAX_MAPPING_NAME_LENGTH];
 };

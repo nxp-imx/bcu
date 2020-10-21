@@ -58,6 +58,7 @@
 #include "version.h"
 #include "bcu_yaml.h"
 #include "bcu_https.h"
+#include "bcu_ftdi_eeprom.h"
 
 #define DONT_RESET	0
 #define RESET_NOW	1
@@ -128,7 +129,6 @@ static void upgrade_bcu(struct options_setting* setting)
 	printf("now version %s\n", GIT_VERSION);
 
 	int res = 0;
-	char cmd[255];
 	char version[15];
 	struct latest_git_info bcu_download_info;
 	strcpy(bcu_download_info.download_url_base, "https://github.com/NXPmicro/bcu/releases/download/");
@@ -163,6 +163,7 @@ static void upgrade_bcu(struct options_setting* setting)
 #ifdef linux
 		if (!res)
 		{
+			char cmd[30];
 			sprintf(cmd, "chmod a+x %s", bcu_download_info.tag_name);
 			system(cmd);
 		}
@@ -189,6 +190,9 @@ static void print_help(char* cmd)
 		printf("	%s%-50s%s%s\n", g_vt_default, "        [-dump/-dump=] [-nodisplay] [-pmt]", g_vt_green, "");
 		printf("	%s%-50s%s%s\n", g_vt_default, "        [-hz=]", g_vt_green, "");
 		printf("	%s%-50s%s%s\n", g_vt_default, "        [-hwfilter] [-unipolar]", g_vt_green, "");
+		printf("\n");
+		printf("	%s%-50s%s%s\n", g_vt_default, "eeprom  [-w] [-r] [-erase]", g_vt_green, "EEPROM read and program");
+		printf("	%s%-50s%s%s\n", g_vt_default, "        [-wsn=] [-brev=] [-srev=]", g_vt_green, "");
 		printf("\n");
 		printf("	%s%-50s%s%s\n", g_vt_default, "get_level [GPIO_NAME] [-board=] [-id=]", g_vt_green, "get level state of pin GPIO_NAME");
 		printf("	%s%-50s%s%s\n", g_vt_default, "set_gpio [GPIO_NAME] [1/0] [-board=] [-id=]", g_vt_green, "set pin GPIO_NAME to be high(1) or low(0)");
@@ -409,7 +413,7 @@ static void get_gpio_level(struct options_setting* setting)
 
 	if (end_point == NULL)
 	{
-		printf("set_gpio: error building device linked list\n");
+		printf("get_gpio_level: error building device linked list\n");
 		return;
 	}
 
@@ -802,7 +806,6 @@ static void onoff(struct options_setting* setting, int delay_us, int is_init)
 static void uuu(struct options_setting* setting)
 {
 	int res = 0;
-	char cmd[255];
 	struct latest_git_info uuu_download_info;
 	strcpy(uuu_download_info.download_url_base, "https://github.com/NXPmicro/mfgtools/releases/download/");
 
@@ -833,6 +836,7 @@ static void uuu(struct options_setting* setting)
 #ifdef linux
 	if (!res)
 	{
+		char cmd[30];
 		sprintf(cmd, "chmod a+x %s", uuu_download_info.tag_name);
 		system(cmd);
 	}
@@ -920,6 +924,73 @@ static int get_msecond(unsigned long* current_time)
 #endif
 
 }
+
+static int eeprom(struct options_setting* setting)
+{
+	void* head = NULL;
+	void* end_point;
+	int j;
+
+	struct board_info* board=get_board(setting->board);
+	// char *buf;
+	unsigned char buf[10] = { 0x11, 0x22, 0x33, 0x44, 0x55, 
+			0x66, 0x77, 0x88, 0x99, 0xAB};
+	unsigned char rbuf[10] = {0};
+
+	j = 0;
+	while(board->mappings[j].name != NULL)
+	{
+		if(board->mappings[j].type == ftdi_eeprom || board->mappings[j].type == bcu_eeprom)
+		{
+			printf("\n>>>>>> Registered %s EEPROM on board >>>>>>\n", board->mappings[j].type == ftdi_eeprom ? "FTDI" : "AT24Cxx");
+			end_point = build_device_linkedlist_forward(&head, board->mappings[j].path);
+			if (end_point == NULL)
+			{
+				printf("eeprom: error building device linked list\n");
+				return -2;
+			}
+
+			struct eeprom_device* eeprom = end_point;
+			switch (setting->eeprom_function)
+			{
+			case PARSER_EEPROM_READ_AND_PRINT:
+				bcu_ftdi_eeprom_print(eeprom);
+				break;
+			case PARSER_EEPROM_READ_TO_FILE:
+				break;
+			case PARSER_EEPROM_WRITE_DEFAULT:
+				if (!bcu_ftdi_eeprom_write_default(eeprom, board->eeprom_data))
+					printf("Write %s default values to FTDI EEPROM successfully\n", setting->board);
+				if (setting->eeprom_usr_sn)
+					if (bcu_ftdi_eeprom_update_usr_sn(eeprom, setting->eeprom_usr_sn))
+						return -1;
+				if (setting->eeprom_board_rev[0] != 0)
+					if (bcu_ftdi_eeprom_update_board_rev(eeprom, setting->eeprom_board_rev))
+						return -1;
+				if (setting->eeprom_soc_rev[0] != 0)
+					if (bcu_ftdi_eeprom_update_soc_rev(eeprom, setting->eeprom_soc_rev))
+						return -1;
+				bcu_ftdi_eeprom_print(eeprom);
+				break;
+			case PARSER_EEPROM_WRITE_FROM_FILE:
+				break;
+			case PARSER_EEPROM_UPDATE_USER_SN:
+				bcu_ftdi_eeprom_update_usr_sn(eeprom, setting->eeprom_usr_sn);
+				bcu_ftdi_eeprom_print(eeprom);
+				break;
+			case PARSER_EEPROM_ERASE:
+				bcu_ftdi_eeprom_erase(eeprom);
+			default:
+				break;
+			}
+		}
+		j++;
+	}
+
+	return 0;
+
+}
+
 /*
 test code for testing monitor
 void monitor_test(struct options_setting* setting)
@@ -2180,7 +2251,7 @@ int find_board_by_eeprom(struct options_setting* setting)
 				end_point = build_device_linkedlist_forward(&head, board->mappings[j].path);
 				if (end_point == NULL)
 				{
-					printf("set_gpio: error building device linked list\n");
+					printf("find_board_by_eeprom: error building device linked list\n");
 					return -2;
 				}
 
@@ -2320,6 +2391,10 @@ int main(int argc, char** argv)
 			print_help(NULL);
 		if (argc == 3)
 			print_help(argv[2]);
+	}
+	else if (strcmp(cmd, "eeprom") == 0)
+	{
+		eeprom(&setting);
 	}
 	else if (strcmp(cmd, "monitor") == 0)
 	{

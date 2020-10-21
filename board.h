@@ -31,6 +31,8 @@
 #ifndef BOARD_H
 #define BOARD_H
 
+#include "bcu_ftdi_eeprom.h"
+
 #define MAX_PATH_LENGTH 800     //maximum path length allowed
 #define MAX_NUMBER_OF_POWER 100 //maximum number of power types
 #define MAX_NUMBER_OF_GROUP 10 //maximum number of power groups
@@ -39,7 +41,8 @@
 enum mapping_type {
 	power,
 	gpio,
-	bcu_eeprom
+	bcu_eeprom,
+	ftdi_eeprom
 };
 
 /*
@@ -76,6 +79,7 @@ struct board_info {
 	struct boot_mode* boot_modes;
 	struct board_power_group* power_groups;
 	struct board_links* links;
+	struct ftdi_eeprom_user_area* eeprom_data;
 };
 
 /*find if there is the gpio_name on the board*/

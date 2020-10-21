@@ -36,6 +36,9 @@
     <ClCompile Include="bcu_https.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="bcu_ftdi_eeprom.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="port.h">
@@ -60,6 +63,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="bcu_https.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bcu_ftdi_eeprom.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ftd2xx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

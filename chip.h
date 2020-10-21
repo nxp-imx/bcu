@@ -91,8 +91,9 @@ struct gpio_device {
 
 struct eeprom_device {
 	struct device device;
-	int (*eeprom_read)(void*, unsigned char*);
-	int (*eeprom_write)(void*, unsigned char*);
+	int (*eeprom_read)(void*, unsigned char*, unsigned int, int, unsigned char*);
+	int (*eeprom_write)(void*, unsigned char*, unsigned int, int, unsigned char*);
+	int (*eeprom_erase)(void*);
 	int (*eeprom_check_board)(void*);//you dont have to implement unless it is used in monitor
 };
 
@@ -107,8 +108,9 @@ struct at24cxx {
 	// int channel; //indicate which i2c channel to choose
 	int addr;
 };
-int at24cxx_read(void* at24cxx, unsigned char* data_buffer);
-int at24cxx_write(void* at24cxx, unsigned char* data_buffer);
+int at24cxx_erase(void* at24cxx);
+int at24cxx_read(void* at24cxx, unsigned char* data_buffer, unsigned int startaddr, int size, unsigned char* sn_buf);
+int at24cxx_write(void* at24cxx, unsigned char* data_buffer, unsigned int startaddr, int size, unsigned char* sn_buf);
 int at24cxx_check_board(void* at24cxx);
 void* at24cxx_create(char* chip_specification, void* parent);
 ///////////////////////////////////////////////////////////////////////
@@ -124,6 +126,17 @@ int pca9548_stop(void* pca9548);
 void* pca9548_create(char* chip_specification, void* parent);
 
 int pca9548_set_channel(struct pca9548* pca9548);
+
+///////////////////////////////////////////////////////////////////////
+struct ft4232h_eeprom {
+	struct eeprom_device eeprom_device;
+	struct ftdi_info* ftdi_info;
+	int uasize;
+};
+int ft4232h_eeprom_read(void* ft_eeprom, unsigned char* data_buffer, unsigned int startaddr, int size, unsigned char* sn_buf);
+int ft4232h_eeprom_write(void* ft_eeprom, unsigned char* data_buffer, unsigned int startaddr, int size, unsigned char* sn_buf);
+int ft4232h_eeprom_erase(void* ft_eeprom);
+void* ft4232h_eeprom_create(char* chip_specification, void* parent);
 ///////////////////////////////////////////////////////////////////////
 struct ft4232h {
 	struct i2c_device i2c_device;

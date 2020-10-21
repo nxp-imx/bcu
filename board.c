@@ -93,6 +93,8 @@ struct mapping imx8xxl[] = {
 	{"pmic_stby", gpio, "/ft4232h_gpio{channel=3;pin_bitmask=0x20}", 0x00},
 
 	{"at24cxx", bcu_eeprom, "/ft4232h_i2c{channel=1;dir_bitmask=0x60;val_bitmask=0x40}/at24cxx{addr=0x57;}", 0x00},
+	// {"93lcx6", ftdi_eeprom , "/ft4232h_eeprom{uasize=0xFF}", 0x00},
+
 	{NULL, 0, NULL, 0}//null terminated
 };
 
@@ -391,12 +393,12 @@ struct board_links null_board_links[] = {
 
 struct board_info board_list[] =
 {
-	{"imx8dxlevk", imx8xxl, imx8xxl_boot_modes, imx8xxl_power_groups, imx8xxlevk_board_links},
-	{"imx8dxl_ddr3_evk", imx8dxl_ddr3, imx8xxl_boot_modes, NULL, imx8xxlevk_board_links},
-	{"imx8mpevkpwr", imx8mpevkpwr_board, imx8mpevk_board_boot_modes, imx8mpevkpwr_power_groups, imx8mpevk_board_links},
-	{"imx8mpevk", imx8mpevk_board, imx8mpevk_board_boot_modes, NULL, imx8mpevk_board_links},
-	{"imx8mpddr3l", imx8mpddr3l_board, null_boot_mode, NULL, null_board_links},
-	{"imx8mpddr4", imx8mpddr4_board, null_boot_mode, NULL, null_board_links},
+	{"imx8dxlevk", imx8xxl, imx8xxl_boot_modes, imx8xxl_power_groups, imx8xxlevk_board_links, &imx8dxlevk_ftdi_eeprom_user_area_info},
+	{"imx8dxl_ddr3_evk", imx8dxl_ddr3, imx8xxl_boot_modes, NULL, imx8xxlevk_board_links, NULL},
+	{"imx8mpevkpwr", imx8mpevkpwr_board, imx8mpevk_board_boot_modes, imx8mpevkpwr_power_groups, imx8mpevk_board_links, &imx8mpevkpwr_ftdi_eeprom_user_area_info},
+	{"imx8mpevk", imx8mpevk_board, imx8mpevk_board_boot_modes, NULL, imx8mpevk_board_links, NULL},
+	{"imx8mpddr3l", imx8mpddr3l_board, null_boot_mode, NULL, null_board_links, NULL},
+	{"imx8mpddr4", imx8mpddr4_board, null_boot_mode, NULL, null_board_links, NULL},
 	//"imx9xxl",&imx9xxl_pins,
 };
 int num_of_boards = sizeof(board_list) / sizeof(struct board_info);

@@ -277,6 +277,7 @@ void set_options_default(struct options_setting* setting)
 	setting->rangefixed = 0;
 	setting->use_hwfilter = 0;
 	setting->use_bipolar = 1;
+	setting->eeprom_function = 0;
 	setting->download_doc = 0;
 }
 
@@ -424,6 +425,48 @@ int parse_options(int argc, char** argv, struct options_setting* setting)
 		else if (strcmp(argv[i], "-unipolar") == 0)
 		{
 			setting->use_bipolar = 0;
+		}
+		else if (strcmp(argv[i], "-erase") == 0)
+		{
+			setting->eeprom_function = PARSER_EEPROM_ERASE;
+		}
+		else if (strcmp(argv[i], "-w") == 0)
+		{
+			setting->eeprom_function = PARSER_EEPROM_WRITE_DEFAULT;
+		}
+		else if (strcmp(argv[i], "-r") == 0)
+		{
+			setting->eeprom_function = PARSER_EEPROM_READ_AND_PRINT;
+		}
+		else if (strcmp(argv[i], "-wf") == 0)
+		{
+			setting->eeprom_function = PARSER_EEPROM_WRITE_FROM_FILE;
+		}
+		else if (strcmp(argv[i], "-rf") == 0)
+		{
+			setting->eeprom_function = PARSER_EEPROM_READ_TO_FILE;
+		}
+		else if (strncmp(argv[i], "-wsn=", 5) == 0 && strlen(argv[i]) > 5)
+		{
+			setting->eeprom_function = PARSER_EEPROM_UPDATE_USER_SN;
+
+			setting->eeprom_usr_sn = atoi(input);
+			printf("eeprom user SN will be set to %d\n", setting->eeprom_usr_sn);
+		}
+		else if (strncmp(argv[i], "-sn=", 4) == 0 && strlen(argv[i]) > 4)
+		{
+			setting->eeprom_usr_sn = atoi(input);
+			printf("eeprom user SN will be set to %d\n", setting->eeprom_usr_sn);
+		}
+		else if (strncmp(argv[i], "-brev=", 6) == 0 && strlen(argv[i]) > 6)
+		{
+			strcpy(setting->eeprom_board_rev, input);
+			printf("eeprom user board revision will be set to %s\n", setting->eeprom_board_rev);
+		}
+		else if (strncmp(argv[i], "-srev=", 6) == 0 && strlen(argv[i]) > 6)
+		{
+			strcpy(setting->eeprom_soc_rev, input);
+			printf("eeprom user soc revision will be set to %s\n", setting->eeprom_soc_rev);
 		}
 		else if (strcmp(argv[i], "-doc") == 0)
 		{
@@ -705,7 +748,6 @@ void groups_init(struct group* groups, int num)
 void __str_replace(char * cp, int n, char * str)
 {
 	int lenofstr;
-	int i;
 	char * tmp;
 	lenofstr = strlen(str);
 	if(lenofstr < n)
