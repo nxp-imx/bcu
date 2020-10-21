@@ -185,6 +185,69 @@ int bcu_ftdi_eeprom_read(struct eeprom_device* eeprom, unsigned int read_idx, vo
 	return ret;
 }
 
+int bcu_ftdi_eeprom_read_code(struct eeprom_device* eeprom, unsigned int read_idx, void* read_buf)
+{
+	struct ftdi_eeprom_data eeprom_data;
+	struct ftdi_eeprom_user_area* eeprom_ua_data = (struct ftdi_eeprom_user_area*)eeprom_data.ua_data;
+	int ret = 0, temp = 0;
+
+	((char *)read_buf)[0] = 0;
+
+	ret = eeprom->eeprom_read(eeprom, eeprom_data.ua_data, BCU_FTDI_EEPROM_UAREA_SADDR, BCU_FTDI_EEPROM_USE_LEN, eeprom_data.ftdi_sn);
+	if (ret < 0)
+		return ret;
+
+	if (eeprom_ua_data->config_flag == 0x0 || eeprom_ua_data->config_flag == 0x3)
+	{
+		printf("Invalid EEPROM context, use -w option to write the default values.\n");
+		return -1;
+	}
+
+	switch (read_idx)
+	{
+	case ftdi_eeprom_config_flag:
+		temp = eeprom_ua_data->config_flag;
+		memcpy(read_buf, &temp, sizeof(char));
+		break;
+	case ftdi_eeprom_board_id:
+		temp = eeprom_ua_data->board_id;
+		memcpy(read_buf, &temp, sizeof(short));
+		break;
+	case ftdi_eeprom_board_rev:
+		((char *)read_buf)[0] = eeprom_ua_data->board_rev_c;
+		((char *)read_buf)[1] = eeprom_ua_data->board_rev_n;
+		break;
+	case ftdi_eeprom_soc_id:
+		temp = eeprom_ua_data->soc_id;
+		memcpy(read_buf, &temp, sizeof(char));
+		break;
+	case ftdi_eeprom_soc_rev:
+		((char *)read_buf)[0] = eeprom_ua_data->soc_rev_c;
+		((char *)read_buf)[1] = eeprom_ua_data->soc_rev_n;
+		break;
+	case ftdi_eeprom_pmic_id:
+		temp = eeprom_ua_data->pmic_id;
+		memcpy(read_buf, &temp, sizeof(char));
+		break;
+	case ftdi_eeprom_pmic_rev:
+		((char *)read_buf)[0] = eeprom_ua_data->pmic_rev_c;
+		((char *)read_buf)[1] = eeprom_ua_data->pmic_rev_n;
+		break;
+	case ftdi_eeprom_nbr_pwr_rails:
+		temp = eeprom_ua_data->nbr_pwr_rails;
+		memcpy(read_buf, &temp, sizeof(char));
+		break;
+	case ftdi_eeprom_sn:
+		temp = eeprom_ua_data->sn;
+		memcpy(read_buf, &temp, sizeof(short));
+		break;
+	default:
+		break;
+	}
+
+	return ret;
+}
+
 int bcu_ftdi_eeprom_print(struct eeprom_device* eeprom)
 {
 	struct ftdi_eeprom_data eeprom_data;
@@ -336,4 +399,28 @@ int bcu_ftdi_eeprom_update_soc_rev(struct eeprom_device* eeprom, unsigned char* 
 int bcu_ftdi_eeprom_update_pmic_rev(struct eeprom_device* eeprom, unsigned char* ua_sn)
 {
 	return bcu_ftdi_eeprom_write(eeprom, ftdi_eeprom_pmic_rev, ua_sn);
+}
+
+int bcu_eeprom_checkboard(struct eeprom_device* eeprom, struct ftdi_eeprom_user_area* eeprom_data)
+{
+	unsigned short board_id;
+	unsigned char board_rev[3];
+	int status = 0;
+
+	status = bcu_ftdi_eeprom_read_code(eeprom, ftdi_eeprom_board_id, &board_id);
+	if (status)
+		return status;
+
+	if (board_id != eeprom_data->board_id)
+		return -1;
+
+	status = bcu_ftdi_eeprom_read_code(eeprom, ftdi_eeprom_board_rev, board_rev);
+	if (status)
+		return status;
+
+	if (board_rev[0] != eeprom_data->board_rev_c ||
+	    board_rev[1] != eeprom_data->board_rev_n)
+		return -1;
+
+	return 0;
 }

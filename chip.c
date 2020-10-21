@@ -387,7 +387,10 @@ void ft4232h_i2c_remove_all(void)
 	for (i = 0; i < MAX_FT_I2C_CHANNEL_NUMBER; i++)
 	{
 		if (g_ftdi_info[i].isinit)
+		{
 			ft_close(&g_ftdi_info[i]);
+			g_ftdi_info[i].isinit = 0;
+		}
 			// ft4232h_i2c_free(&g_ft[i]);
 	}
 }
@@ -479,7 +482,7 @@ int ft4232h_i2c_write(void* ft4232h, unsigned char data, int type)
 
 	if (((in_buffer[0] & 0x1) != 0)) //Check ACK bit 0 on data byte read out
 	{
-		printf("can't get the ACK bit after write\n");
+		// printf("can't get the ACK bit after write\n");
 		return -1; /*Error, can't get the ACK bit */
 	}
 

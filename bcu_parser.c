@@ -261,7 +261,7 @@ void* build_device_linkedlist_forward(void** head, char* path)
 
 void set_options_default(struct options_setting* setting)
 {
-	strcpy(setting->board, "imx8mpevk");
+	strcpy(setting->board, "");
 	setting->path[0] = '\0';
 	setting->location_id = -1;
 	setting->output_state = -1;
@@ -300,7 +300,7 @@ int parse_board_id_options(int argc, char** argv, struct options_setting* settin
 		{
 			strcpy(setting->board, input);
 			printf("board model is %s\n", setting->board);
-			break;
+			// break;
 		}
 
 		if (strncmp(argv[argc_count], "-id=", 4) == 0 && strlen(argv[argc_count]) > 4)
@@ -317,10 +317,14 @@ int parse_board_id_options(int argc, char** argv, struct options_setting* settin
 		return 0;
 	}
 
-	if (argc_count == argc)
-		return 1; //Not provide -board, try auto find board then
-	else
-		return 0; //Provide -board, no need to auto find board
+	if (strlen(setting->board) == 0 && strlen(GV_LOCATION_ID) == 0)
+		return NO_BOARD_AND_ID; //Not provide -board and -id, try auto find board then
+	if (strlen(setting->board) == 0)
+		return NO_BOARD; //Not provide -board
+	if (strlen(GV_LOCATION_ID) == 0)
+		return NO_ID; //Not provide -id
+
+	return 0;
 }
 
 int parse_options(int argc, char** argv, struct options_setting* setting)
@@ -478,6 +482,8 @@ int parse_options(int argc, char** argv, struct options_setting* setting)
 		}
 		else
 		{
+			if (strlen(setting->board) == 0)
+				return -1;
 			struct board_info* board = get_board(setting->board);
 			if (board == NULL)
 			{

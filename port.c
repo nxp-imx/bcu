@@ -45,9 +45,6 @@
 #include <string.h>
 #include "port.h"
 
-#define MAX_NUMBER_OF_USB_DEVICES 127
-#define MAX_LOCATION_ID_LENGTH 21
-#define MAX_USB_LAYERS 7
 char GV_LOCATION_ID[MAX_LOCATION_ID_LENGTH] = "";
 
 #ifdef _WIN32
@@ -275,7 +272,7 @@ void msleep(int duration)
 #endif
 }
 
-void ft_list_devices()
+void ft_list_devices(char location_str[][MAX_LOCATION_ID_LENGTH], int *board_num, int mode)
 {
 #ifdef _WIN32
 	struct ftdi_info ft;
@@ -357,11 +354,17 @@ void ft_list_devices()
 				detected_boards++;
 			}
 		}
-		printf("number of boards connected through FTDI device found: %d\n", detected_boards);
+		if (mode == LIST_DEVICE_MODE_PRINT)
+			printf("number of boards connected through FTDI device found: %d\n", detected_boards);
+		else
+			*board_num = detected_boards;
 
 		for (int j = 0; j < detected_boards; j++)
 		{
-			printf("board [%d] location_id=%s\n", j, location_id_str[j]);
+			if (mode == LIST_DEVICE_MODE_PRINT)
+				printf("board [%d] location_id=%s\n", j, location_id_str[j]);
+			else
+				strcpy(location_str[j], location_id_str[j]);
 			//printf("id: %s\n", location_id_str[j]);
 			//printf("A: %x\n", board_table[j][0]);
 			//printf("B: %x\n", board_table[j][1]);
@@ -391,7 +394,10 @@ void ft_list_devices()
 		goto do_deinit;
 	}
 
-	printf("number of boards connected through FTDI device found: %d\n", ret);
+	if (mode == LIST_DEVICE_MODE_PRINT)
+		printf("number of boards connected through FTDI device found: %d\n", ret);
+	else
+		*board_num = ret;
 
 	char location_id[MAX_NUMBER_OF_USB_DEVICES][MAX_LOCATION_ID_LENGTH];
 	struct libusb_device* dev_ptrs[MAX_NUMBER_OF_USB_DEVICES];
@@ -426,7 +432,10 @@ void ft_list_devices()
 				strcat(location_id[i], ".");
 			}
 		}
-		printf("board[%d] location_id=%s\n", i, location_id[i]);
+		if (mode == LIST_DEVICE_MODE_PRINT)
+			printf("board[%d] location_id=%s\n", i, location_id[i]);
+		else
+			strcpy(location_str[i], location_id[i]);
 
 		/*
 		if ((ret = ftdi_usb_get_strings(ftdi, curdev->dev, manufacturer, 128, description, 128, NULL, 0)) < 0)
@@ -856,55 +865,3 @@ int ft_read_eeprom(struct ftdi_info* ftdi, unsigned int startaddr, unsigned char
 	return 0;
 #endif
 }
-
-// int ft_read_decode_eeprom(struct ftdi_context *ftdic)
-// {
-// 	int i, j, f;
-// 	int value;
-// 	int size;
-// 	unsigned char buf[256];
-// 	f = ftdi_read_eeprom(ftdic);
-// 	if (f < 0)
-// 	{
-// 		fprintf(stderr, "ftdi_read_eeprom: %d (%s)\n",
-// 				f, ftdi_get_error_string(ftdic));
-// 		return -1;
-// 	}
-// 	ftdi_get_eeprom_value(ftdic, CHIP_SIZE, & value);
-// 	if (value <0)
-// 	{
-// 		fprintf(stderr, "No EEPROM found or EEPROM empty\n");
-// 		fprintf(stderr, "On empty EEPROM, use -w option to write default values\n");
-// 		return -1;
-// 	}
-// 	fprintf(stderr, "Chip type %d ftdi_eeprom_size: %d\n", ftdic->type, value);
-// 	if (ftdic->type == TYPE_R)
-// 		size = 0xa0;
-// 	else
-// 		size = value;
-// 	ftdi_get_eeprom_buf(ftdic, buf, size);
-// 	for (i=0; i < size; i += 16)
-// 	{
-// 		fprintf(stdout,"0x%03x:", i);
-// 		for (j = 0; j< 8; j++)
-// 			fprintf(stdout," %02x", buf[i+j]);
-// 		fprintf(stdout," ");
-// 		for (; j< 16; j++)
-// 			fprintf(stdout," %02x", buf[i+j]);
-// 		fprintf(stdout," ");
-// 		for (j = 0; j< 8; j++)
-// 			fprintf(stdout,"%c", isprint(buf[i+j])?buf[i+j]:'.');
-// 		fprintf(stdout," ");
-// 		for (; j< 16; j++)
-// 			fprintf(stdout,"%c", isprint(buf[i+j])?buf[i+j]:'.');
-// 		fprintf(stdout,"\n");
-// 	}
-// 	f = ftdi_eeprom_decode(ftdic, 1);
-// 	if (f < 0)
-// 	{
-// 		fprintf(stderr, "ftdi_eeprom_decode: %d (%s)\n",
-// 				f, ftdi_get_error_string(ftdic));
-// 		return -1;
-// 	}
-// 	return 0;
-// }

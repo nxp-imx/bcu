@@ -102,6 +102,12 @@ enum BITMODE
 	BM_SYNCFF = 0x40,
 };
 
+#define MAX_NUMBER_OF_USB_DEVICES 127
+#define MAX_LOCATION_ID_LENGTH 21
+#define MAX_USB_LAYERS 7
+#define LIST_DEVICE_MODE_PRINT		0
+#define LIST_DEVICE_MODE_OUTPUT		1
+
 int ft_init(struct ftdi_info* ftdi);
 int ft_open_channel(struct ftdi_info* fi, int channel);
 int ft_open_channel_by_id(struct ftdi_info* fi, int channel, char* id);
@@ -111,10 +117,12 @@ int ft_write(struct ftdi_info* ftdi, unsigned char* buffer, int size);
 int ft_read(struct ftdi_info* ftdi, unsigned char* buffer, int size);
 int ft_read_pins(struct ftdi_info* ftdi, unsigned char* pins);
 int ft_clear_buffer(struct ftdi_info* ftdi);
-void ft_list_devices();
+void ft_list_devices(char location_str[][MAX_LOCATION_ID_LENGTH], int *board_num, int mode);
 void msleep(int duration);
 int ft_erase_eeprom(struct ftdi_info* ftdi);
 int ft_write_eeprom(struct ftdi_info* ftdi, unsigned int startaddr, unsigned char* buffer, int size, unsigned char* sn_buf);
 int ft_read_eeprom(struct ftdi_info* ftdi, unsigned int startaddr, unsigned char* data_buf, int data_size, unsigned char* sn_buf);
+
+extern char GV_LOCATION_ID[MAX_LOCATION_ID_LENGTH];
 
 #endif

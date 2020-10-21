@@ -41,6 +41,10 @@
 #define PARSER_EEPROM_UPDATE_USER_SN	5
 #define PARSER_EEPROM_ERASE		6
 
+#define NO_BOARD_AND_ID	1
+#define NO_BOARD	2
+#define NO_ID		3
+
 /*used for storing options specified by user*/
 struct options_setting {
 	char board[100]; //indicating the model of the board, i.e. i.MX8QMEVK

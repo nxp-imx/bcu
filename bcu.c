@@ -929,15 +929,10 @@ static int eeprom(struct options_setting* setting)
 {
 	void* head = NULL;
 	void* end_point;
-	int j;
+	int j = 0;
 
 	struct board_info* board=get_board(setting->board);
-	// char *buf;
-	unsigned char buf[10] = { 0x11, 0x22, 0x33, 0x44, 0x55, 
-			0x66, 0x77, 0x88, 0x99, 0xAB};
-	unsigned char rbuf[10] = {0};
 
-	j = 0;
 	while(board->mappings[j].name != NULL)
 	{
 		if(board->mappings[j].type == ftdi_eeprom || board->mappings[j].type == bcu_eeprom)
@@ -2199,7 +2194,8 @@ static void monitor(struct options_setting* setting)
 
 static void lsftdi()
 {
-	ft_list_devices();
+	int temp = 0;
+	ft_list_devices(NULL, &temp, LIST_DEVICE_MODE_PRINT);
 	return;
 }
 
@@ -2246,7 +2242,7 @@ int find_board_by_eeprom(struct options_setting* setting)
 		j = 0;
 		while(board->mappings[j].name!=NULL)
 		{
-			if(board->mappings[j].type == bcu_eeprom)
+			if(board->mappings[j].type == bcu_eeprom || board->mappings[j].type == ftdi_eeprom)
 			{
 				end_point = build_device_linkedlist_forward(&head, board->mappings[j].path);
 				if (end_point == NULL)
@@ -2256,16 +2252,19 @@ int find_board_by_eeprom(struct options_setting* setting)
 				}
 
 				struct eeprom_device* eeprom = end_point;
-				status = eeprom->eeprom_check_board(eeprom);
+				status = bcu_eeprom_checkboard(eeprom, board->eeprom_data);
+				if (board->mappings[j].type == bcu_eeprom)
+					free_device_linkedlist_backward(end_point);
+				ft4232h_i2c_remove_all();
+
 				if (status == 0)
 				{
-					free_device_linkedlist_backward(end_point);
 					return 0;
 				}
 				else
 				{
-					free_device_linkedlist_backward(end_point);
-					break;
+					j++;
+					continue;
 				}
 			}
 			j++;
@@ -2314,30 +2313,138 @@ int main(int argc, char** argv)
 	memset(&setting, 0, sizeof(struct options_setting));//initialized to zero
 	set_options_default(&setting);
 
-	if (parse_board_id_options(argc, argv, &setting) == 1)
+	int board_num = 0;
+	char location_id_str[MAX_NUMBER_OF_USB_DEVICES][MAX_LOCATION_ID_LENGTH];
+	char origin_board_name[100];
+	unsigned int find_board_count = 0;
+
+	switch (parse_board_id_options(argc, argv, &setting))
 	{
+	case NO_BOARD_AND_ID:
+		ft_list_devices(location_id_str, &board_num, LIST_DEVICE_MODE_OUTPUT);
+
+		if (board_num > 1)
+		{
+			printf("There are %d boards on this host. Please add [-board=] or [-id=] option.\n", board_num);
+			for (int j = 0; j < board_num; j++)
+			{
+				strcpy(GV_LOCATION_ID, location_id_str[j]);
+				switch (find_board_by_eeprom(&setting))
+				{
+				case 0:
+					printf("Auto recognized the board %s is on location_id=%s\n", setting.board, GV_LOCATION_ID);
+					break;
+				case -1:
+				{
+					printf("Can't auto recognize the board on location_id=%s...\n", GV_LOCATION_ID);
+					// strcpy(setting.board, "");
+				}break;
+				case -2:
+				{
+					printf("Can't open FTDI channel on location_id=%s...\n", GV_LOCATION_ID);
+					return -2;
+				}break;
+				
+				default:
+					break;
+				}
+			}
+
+			return -1;
+		}
+		else
+		{
+			switch (find_board_by_eeprom(&setting))
+			{
+			case 0:
+				printf("Auto recognized the board: %s\n", setting.board);
+				break;
+			case -1:
+			{
+				printf("Can't auto recognize the board...Please try to add [-board=] option.\n");
+				return -2;
+				// printf("For now, only 8MPLUSLPD4-CPU don't have eeprom. Assuming use \"imx8mpevk\"...\n");
+				// printf("Please also notice if there is any other board connected to this host.\n");
+				// printf("Try \"bcu lsftdi\" to find the right -id=...\n");
+				// strcpy(setting.board, "imx8mpevk");
+			}break;
+			case -2:
+			{
+				printf("Can't open FTDI channel...Please try to add [-board=] option.\n");
+				return -2;
+			}break;
+			
+			default:
+				break;
+			}
+		}
+		break;
+	case NO_BOARD:
 		switch (find_board_by_eeprom(&setting))
 		{
 		case 0:
-			printf("Auto recognized the board: %s\n", setting.board);
+			printf("Auto recognized the board %s is on location_id=%s\n", setting.board, GV_LOCATION_ID);
 			break;
 		case -1:
 		{
-			printf("Can't auto recognize the board...\n");
-			printf("For now, only 8MPLUSLPD4-CPU don't have eeprom. Assuming use \"imx8mpevk\"...\n");
-			printf("Please also notice if there is any other board connected to this host.\n");
-			printf("Try \"bcu lsftdi\" to find the right -id=...\n");
-			strcpy(setting.board, "imx8mpevk");
+			printf("Can't auto recognize the board on location_id=%s...\n", GV_LOCATION_ID);
+			// strcpy(setting.board, "");
 		}break;
 		case -2:
 		{
-			printf("Can't open FTDI channel...Please try to add [-board=] option.\n");
+			printf("Can't open FTDI channel on location_id=%s...\n", GV_LOCATION_ID);
 			return -2;
 		}break;
 		
 		default:
 			break;
 		}
+		break;
+	case NO_ID:
+		strcpy(origin_board_name, setting.board);
+
+		ft_list_devices(location_id_str, &board_num, LIST_DEVICE_MODE_OUTPUT);
+
+		if (board_num > 1 && strcmp(origin_board_name, "imx8mpevk"))
+		{
+			for (int j = 0; j < board_num; j++)
+			{
+				strcpy(GV_LOCATION_ID, location_id_str[j]);
+				switch (find_board_by_eeprom(&setting))
+				{
+				case 0:
+					if (strcmp(origin_board_name, setting.board) == 0)
+					{
+						printf("Auto recognized the board %s is on location_id=%s\n", setting.board, GV_LOCATION_ID);
+						find_board_count++;
+					}
+					// printf("Auto recognized the board: %s\n", setting.board);
+					break;
+				case -1:
+				{
+					printf("Can't auto recognize the board on location_id=%s...\n", GV_LOCATION_ID);
+					// strcpy(setting.board, "");
+				}break;
+				case -2:
+				{
+					printf("Can't open FTDI channel...Please try to add [-board=] option.\n");
+					return -2;
+				}break;
+				
+				default:
+					break;
+				}
+			}
+			if (find_board_count > 1)
+			{
+				printf("There are %d boards named %s. Please add [-id=] option.\n", find_board_count, origin_board_name);
+				return -1;
+			}
+			strcpy(setting.board, origin_board_name);
+		}
+		break;
+	default:
+		break;
 	}
 
 	if (parse_options(argc, argv, &setting) == -1) {

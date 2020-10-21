@@ -86,6 +86,7 @@ int bcu_ftdi_eeprom_update_usr_sn(struct eeprom_device* eeprom, unsigned short u
 int bcu_ftdi_eeprom_update_board_rev(struct eeprom_device* eeprom, unsigned char* ua_sn);
 int bcu_ftdi_eeprom_update_soc_rev(struct eeprom_device* eeprom, unsigned char* ua_sn);
 int bcu_ftdi_eeprom_update_pmic_rev(struct eeprom_device* eeprom, unsigned char* ua_sn);
+int bcu_eeprom_checkboard(struct eeprom_device* eeprom, struct ftdi_eeprom_user_area* eeprom_data);
 
 extern struct ftdi_eeprom_user_area imx8ulp_ftdi_eeprom_user_area_info;
 extern struct ftdi_eeprom_user_area imx8dxlevk_ftdi_eeprom_user_area_info;
