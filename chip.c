@@ -70,6 +70,7 @@ void* at24cxx_create(char* chip_specification, void* parent)
 	at24->eeprom_device.eeprom_write = at24cxx_write;
 	at24->eeprom_device.eeprom_check_board = at24cxx_check_board;
 	at24->addr = extract_parameter_value(chip_specification, "addr");
+	at24->type = extract_parameter_value(chip_specification, "type");
 	//printf("AT24CXX created!\n");
 	return at24;
 }
@@ -99,6 +100,8 @@ int at24cxx_read(void* at24cxx, unsigned char* data_buffer, unsigned int startad
 		printf("oh no! no ack received!\n");
 		return -1;
 	}
+	if (at24->type == EEPROM_TYPE_AT24C32)
+		parent->i2c_write(parent, 0, I2C_TYPE_AT24);
 	parent->i2c_write(parent, startaddr, I2C_TYPE_AT24);
 	parent->i2c_start(parent);
 	parent->i2c_write(parent, addr_plus_read, I2C_TYPE_AT24);
@@ -127,6 +130,8 @@ int at24cxx_write(void* at24cxx, unsigned char* data_buffer, unsigned int starta
 		printf("oh no! no ack received!\n");
 		return -1;
 	}
+	if (at24->type == EEPROM_TYPE_AT24C32)
+		parent->i2c_write(parent, 0, I2C_TYPE_AT24);
 	parent->i2c_write(parent, startaddr, I2C_TYPE_AT24);
 	for (i = 0; i < size; i++)
 	{
@@ -136,6 +141,8 @@ int at24cxx_write(void* at24cxx, unsigned char* data_buffer, unsigned int starta
 			msleep(10);
 			parent->i2c_start(parent);
 			parent->i2c_write(parent, addr_plus_write, I2C_TYPE_AT24);
+			if (at24->type == EEPROM_TYPE_AT24C32)
+				parent->i2c_write(parent, 0, I2C_TYPE_AT24);
 			parent->i2c_write(parent, startaddr + i, I2C_TYPE_AT24);
 		}
 		parent->i2c_write(parent, data_buffer[i], I2C_TYPE_AT24);

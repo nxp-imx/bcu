@@ -103,10 +103,16 @@ struct name_and_init_func {
 };
 
 ///////////////////////////////////////////////////////////////////////
+enum eeprom_type {
+	EEPROM_TYPE_AT24C02,
+	EEPROM_TYPE_AT24C32,
+};
+
 struct at24cxx {
 	struct eeprom_device eeprom_device;
 	// int channel; //indicate which i2c channel to choose
 	int addr;
+	int type;
 };
 int at24cxx_erase(void* at24cxx);
 int at24cxx_read(void* at24cxx, unsigned char* data_buffer, unsigned int startaddr, int size, unsigned char* sn_buf);

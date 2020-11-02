@@ -259,6 +259,10 @@ int bcu_ftdi_eeprom_print(struct eeprom_device* eeprom)
 	if (ret < 0)
 		return ret;
 
+	// for (int i = 0; i <10; i++)
+	// 	printf("0x%x ", eeprom_data.ua_data[i]);
+	// printf("\n");
+
 	if (eeprom_ua_data->config_flag == 0x0 || eeprom_ua_data->config_flag == 0x3)
 	{
 		printf("Invalid EEPROM context, use -w option to write the default values.\n");
