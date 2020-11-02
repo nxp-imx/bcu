@@ -97,7 +97,7 @@ int at24cxx_read(void* at24cxx, unsigned char* data_buffer, unsigned int startad
 	status = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_AT24);
 	if (status)
 	{
-		printf("oh no! no ack received!\n");
+		// printf("oh no! no ack received!\n");
 		return -1;
 	}
 	if (at24->type == EEPROM_TYPE_AT24C32)
@@ -127,7 +127,7 @@ int at24cxx_write(void* at24cxx, unsigned char* data_buffer, unsigned int starta
 	status = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_AT24);
 	if (status)
 	{
-		printf("oh no! no ack received!\n");
+		// printf("oh no! no ack received!\n");
 		return -1;
 	}
 	if (at24->type == EEPROM_TYPE_AT24C32)
