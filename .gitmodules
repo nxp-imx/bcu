@@ -4,3 +4,6 @@
 [submodule "libcurl"]
 	path = libcurl
 	url = https://github.com/curl/curl.git
+[submodule "libftdi"]
+	path = libftdi
+	url = git://developer.intra2net.com/libftdi
