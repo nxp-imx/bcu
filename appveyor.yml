@@ -22,7 +22,7 @@ install:
 - cmd: git submodule update --init
 - sh: git submodule update --init
 - sh: sudo DEBIAN_FRONTEND=noninteractive apt-get  update
-- sh: sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libftdi1-dev
+- sh: sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libconfuse-dev swig python-dev libboost-all-dev
 - sh: sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libyaml-dev
 - sh: sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libusb-1.0-0-dev
 - sh: sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install openssl
