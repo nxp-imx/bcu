@@ -250,7 +250,7 @@ int ft_clear_buffer(struct ftdi_info* ftdi)
 	int num1 = 0;
 	int num2 = 0;
 	//num1=ftdi_usb_purge_rx_buffer(ftdi->ftdi);
-	num2 = ftdi_usb_purge_tx_buffer(ftdi->ftdi);
+	num2 = ftdi_tciflush(ftdi->ftdi);
 	if (num1 != 0 || num2 != 0)
 	{
 		printf("clear buffer failed!\n");
