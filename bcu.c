@@ -2345,61 +2345,113 @@ int main(int argc, char** argv)
 	char origin_board_name[100];
 	unsigned int find_board_count = 0;
 
-	if (parse_options(argc, argv, &setting) == -1) {
-		return 0;
-	}
-
-	if (setting.auto_find_board)
+	switch (parse_board_id_options(argc, argv, &setting))
 	{
-		switch (parse_board_id_options(argc, argv, &setting))
+	case NO_BOARD_AND_ID:
+		ft_list_devices(location_id_str, &board_num, LIST_DEVICE_MODE_OUTPUT);
+
+		if (board_num > 1)
 		{
-		case NO_BOARD_AND_ID:
-			ft_list_devices(location_id_str, &board_num, LIST_DEVICE_MODE_OUTPUT);
-
-			if (board_num > 1)
+			printf("There are %d boards on this host. Please add [-board=] or [-id=] option.\n", board_num);
+			for (int j = 0; j < board_num; j++)
 			{
-				printf("There are %d boards on this host. Please add [-board=] or [-id=] option.\n", board_num);
-				for (int j = 0; j < board_num; j++)
-				{
-					strcpy(GV_LOCATION_ID, location_id_str[j]);
-					switch (find_board_by_eeprom(&setting))
-					{
-					case 0:
-						printf("Auto recognized the board %s is on location_id=%s\n", setting.board, GV_LOCATION_ID);
-						break;
-					case -1:
-					{
-						printf("Can't auto recognize the board on location_id=%s...\n", GV_LOCATION_ID);
-						// strcpy(setting.board, "");
-					}break;
-					case -2:
-					{
-						printf("Can't open FTDI channel on location_id=%s...\n", GV_LOCATION_ID);
-						return -2;
-					}break;
-					
-					default:
-						break;
-					}
-				}
-
-				return -1;
-			}
-			else
-			{
+				strcpy(GV_LOCATION_ID, location_id_str[j]);
 				switch (find_board_by_eeprom(&setting))
 				{
 				case 0:
-					printf("Auto recognized the board: %s\n", setting.board);
+					printf("Auto recognized the board %s is on location_id=%s\n", setting.board, GV_LOCATION_ID);
 					break;
 				case -1:
 				{
-					printf("Can't auto recognize the board...Please try to add [-board=] option.\n");
+					printf("Can't auto recognize the board on location_id=%s...\n", GV_LOCATION_ID);
+					// strcpy(setting.board, "");
+				}break;
+				case -2:
+				{
+					printf("Can't open FTDI channel on location_id=%s...\n", GV_LOCATION_ID);
 					return -2;
-					// printf("For now, only 8MPLUSLPD4-CPU don't have eeprom. Assuming use \"imx8mpevk\"...\n");
-					// printf("Please also notice if there is any other board connected to this host.\n");
-					// printf("Try \"bcu lsftdi\" to find the right -id=...\n");
-					// strcpy(setting.board, "imx8mpevk");
+				}break;
+				
+				default:
+					break;
+				}
+			}
+
+			return -1;
+		}
+		else
+		{
+			switch (find_board_by_eeprom(&setting))
+			{
+			case 0:
+				printf("Auto recognized the board: %s\n", setting.board);
+				break;
+			case -1:
+			{
+				printf("Can't auto recognize the board...Please try to add [-board=] option.\n");
+				return -2;
+				// printf("For now, only 8MPLUSLPD4-CPU don't have eeprom. Assuming use \"imx8mpevk\"...\n");
+				// printf("Please also notice if there is any other board connected to this host.\n");
+				// printf("Try \"bcu lsftdi\" to find the right -id=...\n");
+				// strcpy(setting.board, "imx8mpevk");
+			}break;
+			case -2:
+			{
+				printf("Can't open FTDI channel...Please try to add [-board=] option.\n");
+				return -2;
+			}break;
+			
+			default:
+				break;
+			}
+		}
+		break;
+	case NO_BOARD:
+		switch (find_board_by_eeprom(&setting))
+		{
+		case 0:
+			printf("Auto recognized the board %s is on location_id=%s\n", setting.board, GV_LOCATION_ID);
+			break;
+		case -1:
+		{
+			printf("Can't auto recognize the board on location_id=%s...\n", GV_LOCATION_ID);
+			// strcpy(setting.board, "");
+		}break;
+		case -2:
+		{
+			printf("Can't open FTDI channel on location_id=%s...\n", GV_LOCATION_ID);
+			return -2;
+		}break;
+		
+		default:
+			break;
+		}
+		break;
+	case NO_ID:
+		strcpy(origin_board_name, setting.board);
+
+		ft_list_devices(location_id_str, &board_num, LIST_DEVICE_MODE_OUTPUT);
+
+		if (board_num > 1 && strcmp(origin_board_name, "imx8mpevk"))
+		{
+			for (int j = 0; j < board_num; j++)
+			{
+				strcpy(GV_LOCATION_ID, location_id_str[j]);
+				switch (find_board_by_eeprom(&setting))
+				{
+				case 0:
+					if (strcmp(origin_board_name, setting.board) == 0)
+					{
+						printf("Auto recognized the board %s is on location_id=%s\n", setting.board, GV_LOCATION_ID);
+						find_board_count++;
+						find_id = j;
+					}
+					// printf("Auto recognized the board: %s\n", setting.board);
+					break;
+				case -1:
+				{
+					printf("Can't auto recognize the board on location_id=%s...\n", GV_LOCATION_ID);
+					// strcpy(setting.board, "");
 				}break;
 				case -2:
 				{
@@ -2411,80 +2463,26 @@ int main(int argc, char** argv)
 					break;
 				}
 			}
-			break;
-		case NO_BOARD:
-			switch (find_board_by_eeprom(&setting))
+			if (find_board_count > 1)
 			{
-			case 0:
-				printf("Auto recognized the board %s is on location_id=%s\n", setting.board, GV_LOCATION_ID);
-				break;
-			case -1:
-			{
-				printf("Can't auto recognize the board on location_id=%s...\n", GV_LOCATION_ID);
-				// strcpy(setting.board, "");
-			}break;
-			case -2:
-			{
-				printf("Can't open FTDI channel on location_id=%s...\n", GV_LOCATION_ID);
-				return -2;
-			}break;
-			
-			default:
-				break;
+				printf("There are %d boards named %s. Please add [-id=] option.\n", find_board_count, origin_board_name);
+				return -1;
 			}
-			break;
-		case NO_ID:
-			strcpy(origin_board_name, setting.board);
-
-			ft_list_devices(location_id_str, &board_num, LIST_DEVICE_MODE_OUTPUT);
-
-			if (board_num > 1 && strcmp(origin_board_name, "imx8mpevk"))
+			else
 			{
-				for (int j = 0; j < board_num; j++)
-				{
-					strcpy(GV_LOCATION_ID, location_id_str[j]);
-					switch (find_board_by_eeprom(&setting))
-					{
-					case 0:
-						if (strcmp(origin_board_name, setting.board) == 0)
-						{
-							printf("Auto recognized the board %s is on location_id=%s\n", setting.board, GV_LOCATION_ID);
-							find_board_count++;
-							find_id = j;
-						}
-						// printf("Auto recognized the board: %s\n", setting.board);
-						break;
-					case -1:
-					{
-						printf("Can't auto recognize the board on location_id=%s...\n", GV_LOCATION_ID);
-						// strcpy(setting.board, "");
-					}break;
-					case -2:
-					{
-						printf("Can't open FTDI channel...Please try to add [-board=] option.\n");
-						return -2;
-					}break;
-					
-					default:
-						break;
-					}
-				}
-				if (find_board_count > 1)
-				{
-					printf("There are %d boards named %s. Please add [-id=] option.\n", find_board_count, origin_board_name);
-					return -1;
-				}
-				else
-				{
-					if (find_id >= 0)
-						strcpy(GV_LOCATION_ID, location_id_str[find_id]);
-				}
-				strcpy(setting.board, origin_board_name);
+				if (find_id >= 0)
+					strcpy(GV_LOCATION_ID, location_id_str[find_id]);
 			}
-			break;
-		default:
-			break;
+			strcpy(setting.board, origin_board_name);
 		}
+		break;
+	case NO_USE_AUTO_FIND:
+	default:
+		break;
+	}
+
+	if (parse_options(argc, argv, &setting) == -1) {
+		return 0;
 	}
 
 	switch (readConf(setting.board, &setting))

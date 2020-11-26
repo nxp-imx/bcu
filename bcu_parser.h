@@ -44,6 +44,7 @@
 #define NO_BOARD_AND_ID	1
 #define NO_BOARD	2
 #define NO_ID		3
+#define NO_USE_AUTO_FIND	4
 
 /*used for storing options specified by user*/
 struct options_setting {

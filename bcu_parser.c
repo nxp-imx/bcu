@@ -319,12 +319,19 @@ int parse_board_id_options(int argc, char** argv, struct options_setting* settin
 		return 0;
 	}
 
-	if (strlen(setting->board) == 0 && strlen(GV_LOCATION_ID) == 0)
-		return NO_BOARD_AND_ID; //Not provide -board and -id, try auto find board then
-	if (strlen(setting->board) == 0)
-		return NO_BOARD; //Not provide -board
-	if (strlen(GV_LOCATION_ID) == 0)
-		return NO_ID; //Not provide -id
+	if (!setting->auto_find_board)
+	{
+		return NO_USE_AUTO_FIND;
+	}
+	else
+	{
+		if (strlen(setting->board) == 0 && strlen(GV_LOCATION_ID) == 0)
+			return NO_BOARD_AND_ID; //Not provide -board and -id, try auto find board then
+		if (strlen(setting->board) == 0)
+			return NO_BOARD; //Not provide -board
+		if (strlen(GV_LOCATION_ID) == 0)
+			return NO_ID; //Not provide -id
+	}
 
 	return 0;
 }
