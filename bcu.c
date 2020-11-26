@@ -187,8 +187,8 @@ static void print_help(char* cmd)
 		printf("	%s%-50s%s%s\n", g_vt_default, "deinit [BOOTMODE_NAME] [-board=] [-id=]", g_vt_green, "disable the remote control");
 		printf("\n");
 		printf("	%s%-50s%s%s\n", g_vt_default, "monitor [-board=] [-id=]", g_vt_green, "monitor power consumption");
-		printf("	%s%-50s%s%s\n", g_vt_default, "        [-dump/-dump=] [-nodisplay] [-pmt]", g_vt_green, "");
-		printf("	%s%-50s%s%s\n", g_vt_default, "        [-hz=]", g_vt_green, "");
+		printf("	%s%-50s%s%s\n", g_vt_default, "        [-dump/-dump=] [-nodisplay] [-pmt] [-avg]", g_vt_green, "");
+		printf("	%s%-50s%s%s\n", g_vt_default, "        [-hz=] [-rms]", g_vt_green, "");
 		printf("	%s%-50s%s%s\n", g_vt_default, "        [-hwfilter] [-unipolar]", g_vt_green, "");
 		printf("\n");
 		printf("	%s%-50s%s%s\n", g_vt_default, "eeprom  [-w] [-r] [-erase]", g_vt_green, "EEPROM read and program");
@@ -2077,9 +2077,12 @@ static void monitor(struct options_setting* setting)
 				avgstart = maxminstart;
 				break;
 			case 4:
-				range_control++;
-				if (range_control > 2)
-					range_control = 0;
+				if (!setting->dump_avg)
+				{
+					range_control++;
+					if (range_control > 2)
+						range_control = 0;
+				}
 				break;
 			case 5:
 				bootmodenum = lsbootmode(setting, LSBOOTMODE_SHOWID);
@@ -2185,6 +2188,28 @@ static void monitor(struct options_setting* setting)
 	free_device_linkedlist_backward(end_point);
 	if (setting->dump == 1)
 	{
+		if (GV_MONITOR_TERMINATED && setting->dump_avg)
+		{
+			fprintf(fptr, "AVG,");
+			for (int m = 0; m < n + 1; m++)
+			{
+				int k = get_power_index_by_showid(m, board);
+				if (k < 0)
+					continue;
+				if (board->mappings[k].initinfo != 0)
+				{
+					if (!setting->pmt)
+						fprintf(fptr, "%lf,%lf,", vavg[k], cavg[k]);
+					else
+						fprintf(fptr, "%lf,%lf,%lf,", vavg[k], cavg[k], pavg[k]);
+				}
+			}
+			for (int k = 0; k < num_of_groups; k++)
+			{
+				fprintf(fptr, "%lf,", groups[k].avg);
+			}
+			fprintf(fptr, "\n");
+		}
 		fclose(fptr);
 	}
 	printf("%s", g_vt_clear);
