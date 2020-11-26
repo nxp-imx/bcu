@@ -48,6 +48,7 @@
 /*used for storing options specified by user*/
 struct options_setting {
 	char board[100]; //indicating the model of the board, i.e. i.MX8QMEVK
+	int auto_find_board;
 	int delay;
 	int hold;
 	int output_state;

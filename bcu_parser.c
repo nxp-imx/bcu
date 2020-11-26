@@ -262,6 +262,7 @@ void* build_device_linkedlist_forward(void** head, char* path)
 void set_options_default(struct options_setting* setting)
 {
 	strcpy(setting->board, "");
+	setting->auto_find_board = 0;
 	setting->path[0] = '\0';
 	setting->location_id = -1;
 	setting->output_state = -1;
@@ -345,6 +346,11 @@ int parse_options(int argc, char** argv, struct options_setting* setting)
 		{
 			strcpy(GV_LOCATION_ID, input);
 			printf("location_id is %s\n", GV_LOCATION_ID);
+		}
+		else if (strcmp(argv[i], "-auto") == 0)
+		{
+			setting->auto_find_board = 1;
+			printf("will auto find the board...\n");
 		}
 		else if (strncmp(argv[i], "-delay=", 7) == 0 && strlen(argv[i]) > 7)
 		{

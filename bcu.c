@@ -181,35 +181,35 @@ static void print_help(char* cmd)
 		printf("%s\n", "Usage:");
 		printf("%s\n\n", "bcu command [-options]");
 		printf("%s\n", "list of available commands:");
-		printf("	%s%-50s%s%s\n", g_vt_default, "reset  [BOOTMODE_NAME] [-hold=] [-board=] [-id=]", g_vt_green, "reset the board (optional [BOOTMODE_NAME])");
-		printf("	%s%-50s%s%s\n", g_vt_default, "onoff  [-hold=] [-board=] [-id=]", g_vt_green, "press the ON/OFF button once for -hold= time(ms)");
-		printf("	%s%-50s%s%s\n", g_vt_default, "init   [BOOTMODE_NAME] [-board=] [-id=]", g_vt_green, "enable the remote control with a boot mode");
-		printf("	%s%-50s%s%s\n", g_vt_default, "deinit [BOOTMODE_NAME] [-board=] [-id=]", g_vt_green, "disable the remote control");
+		printf("	%s%-60s%s%s\n", g_vt_default, "reset  [BOOTMODE_NAME] [-hold=] [-board=/-auto] [-id=]", g_vt_green, "reset the board (optional [BOOTMODE_NAME])");
+		printf("	%s%-60s%s%s\n", g_vt_default, "onoff  [-hold=] [-board=/-auto] [-id=]", g_vt_green, "press the ON/OFF button once for -hold= time(ms)");
+		printf("	%s%-60s%s%s\n", g_vt_default, "init   [BOOTMODE_NAME] [-board=/-auto] [-id=]", g_vt_green, "enable the remote control with a boot mode");
+		printf("	%s%-60s%s%s\n", g_vt_default, "deinit [BOOTMODE_NAME] [-board=/-auto] [-id=]", g_vt_green, "disable the remote control");
 		printf("\n");
-		printf("	%s%-50s%s%s\n", g_vt_default, "monitor [-board=] [-id=]", g_vt_green, "monitor power consumption");
-		printf("	%s%-50s%s%s\n", g_vt_default, "        [-dump/-dump=] [-nodisplay] [-pmt] [-avg]", g_vt_green, "");
-		printf("	%s%-50s%s%s\n", g_vt_default, "        [-hz=] [-rms]", g_vt_green, "");
-		printf("	%s%-50s%s%s\n", g_vt_default, "        [-hwfilter] [-unipolar]", g_vt_green, "");
+		printf("	%s%-60s%s%s\n", g_vt_default, "monitor [-board=/-auto] [-id=]", g_vt_green, "monitor power consumption");
+		printf("	%s%-60s%s%s\n", g_vt_default, "        [-dump/-dump=] [-nodisplay] [-pmt] [-avg]", g_vt_green, "");
+		printf("	%s%-60s%s%s\n", g_vt_default, "        [-hz=] [-rms]", g_vt_green, "");
+		printf("	%s%-60s%s%s\n", g_vt_default, "        [-hwfilter] [-unipolar]", g_vt_green, "");
 		printf("\n");
-		printf("	%s%-50s%s%s\n", g_vt_default, "eeprom  [-w] [-r] [-erase]", g_vt_green, "EEPROM read and program");
-		printf("	%s%-50s%s%s\n", g_vt_default, "        [-wsn=] [-brev=] [-srev=]", g_vt_green, "");
+		printf("	%s%-60s%s%s\n", g_vt_default, "eeprom  [-w] [-r] [-erase]", g_vt_green, "EEPROM read and program");
+		printf("	%s%-60s%s%s\n", g_vt_default, "        [-wsn=] [-brev=] [-srev=]", g_vt_green, "");
 		printf("\n");
-		printf("	%s%-50s%s%s\n", g_vt_default, "get_level [GPIO_NAME] [-board=] [-id=]", g_vt_green, "get level state of pin GPIO_NAME");
-		printf("	%s%-50s%s%s\n", g_vt_default, "set_gpio [GPIO_NAME] [1/0] [-board=] [-id=]", g_vt_green, "set pin GPIO_NAME to be high(1) or low(0)");
-		printf("	%s%-50s%s%s\n", g_vt_default, "set_boot_mode [BOOTMODE_NAME] [-board=] [-id=]", g_vt_green, "set BOOTMODE_NAME as boot mode");
-		printf("	%s%-50s%s%s\n", g_vt_default, "get_boot_mode [-board=] [-id=]", g_vt_green, "read the boot mode set by BCU before");
+		printf("	%s%-60s%s%s\n", g_vt_default, "get_level [GPIO_NAME] [-board=/-auto] [-id=]", g_vt_green, "get level state of pin GPIO_NAME");
+		printf("	%s%-60s%s%s\n", g_vt_default, "set_gpio [GPIO_NAME] [1/0] [-board=/-auto] [-id=]", g_vt_green, "set pin GPIO_NAME to be high(1) or low(0)");
+		printf("	%s%-60s%s%s\n", g_vt_default, "set_boot_mode [BOOTMODE_NAME] [-board=/-auto] [-id=]", g_vt_green, "set BOOTMODE_NAME as boot mode");
+		printf("	%s%-60s%s%s\n", g_vt_default, "get_boot_mode [-board=/-auto] [-id=]", g_vt_green, "read the boot mode set by BCU before");
 		printf("\n");
-		printf("	%s%-50s%s%s\n", g_vt_default, "lsftdi", g_vt_green, "list all boards connected by ftdi device");
-		printf("	%s%-50s%s%s\n", g_vt_default, "lsboard", g_vt_green, "list all supported board models");
-		printf("	%s%-50s%s%s\n", g_vt_default, "lsbootmode [-board=]", g_vt_green, "show a list of available boot mode of a board");
-		printf("	%s%-50s%s%s\n", g_vt_default, "lsgpio     [-board=]", g_vt_green, "show a list of available gpio pin of a board");
+		printf("	%s%-60s%s%s\n", g_vt_default, "lsftdi", g_vt_green, "list all boards connected by ftdi device");
+		printf("	%s%-60s%s%s\n", g_vt_default, "lsboard", g_vt_green, "list all supported board models");
+		printf("	%s%-60s%s%s\n", g_vt_default, "lsbootmode [-board=/-auto]", g_vt_green, "show a list of available boot mode of a board");
+		printf("	%s%-60s%s%s\n", g_vt_default, "lsgpio     [-board=/-auto]", g_vt_green, "show a list of available gpio pin of a board");
 		printf("\n");
-		printf("	%s%-50s%s%s\n", g_vt_default, "upgrade    [-doc]", g_vt_green, "get the latest BCU release");
-		printf("	%s%-50s%s%s\n", g_vt_default, "uuu        [-doc]", g_vt_green, "download the latest UUU");
+		printf("	%s%-60s%s%s\n", g_vt_default, "upgrade    [-doc]", g_vt_green, "get the latest BCU release");
+		printf("	%s%-60s%s%s\n", g_vt_default, "uuu        [-doc]", g_vt_green, "download the latest UUU");
 		printf("\n");
-		printf("	%s%-50s%s%s\n", g_vt_default, "version", g_vt_green, "print version number");
-		printf("	%s%-50s%s%s%s\n", g_vt_default, "help", g_vt_green, "show command details", g_vt_default);
-		// printf("	%s%-50s%s%s%s\n", g_vt_default, "help [COMMAND_NAME]", g_vt_green, "show details and options of COMMAND_NAME", g_vt_default);
+		printf("	%s%-60s%s%s\n", g_vt_default, "version", g_vt_green, "print version number");
+		printf("	%s%-60s%s%s%s\n", g_vt_default, "help", g_vt_green, "show command details", g_vt_default);
+		// printf("	%s%-60s%s%s%s\n", g_vt_default, "help [COMMAND_NAME]", g_vt_green, "show details and options of COMMAND_NAME", g_vt_default);
 
 #ifdef __linux__
 		printf("%s", g_vt_kcyn);
@@ -2345,113 +2345,61 @@ int main(int argc, char** argv)
 	char origin_board_name[100];
 	unsigned int find_board_count = 0;
 
-	switch (parse_board_id_options(argc, argv, &setting))
+	if (parse_options(argc, argv, &setting) == -1) {
+		return 0;
+	}
+
+	if (setting.auto_find_board)
 	{
-	case NO_BOARD_AND_ID:
-		ft_list_devices(location_id_str, &board_num, LIST_DEVICE_MODE_OUTPUT);
+		switch (parse_board_id_options(argc, argv, &setting))
+		{
+		case NO_BOARD_AND_ID:
+			ft_list_devices(location_id_str, &board_num, LIST_DEVICE_MODE_OUTPUT);
 
-		if (board_num > 1)
-		{
-			printf("There are %d boards on this host. Please add [-board=] or [-id=] option.\n", board_num);
-			for (int j = 0; j < board_num; j++)
+			if (board_num > 1)
 			{
-				strcpy(GV_LOCATION_ID, location_id_str[j]);
-				switch (find_board_by_eeprom(&setting))
+				printf("There are %d boards on this host. Please add [-board=] or [-id=] option.\n", board_num);
+				for (int j = 0; j < board_num; j++)
 				{
-				case 0:
-					printf("Auto recognized the board %s is on location_id=%s\n", setting.board, GV_LOCATION_ID);
-					break;
-				case -1:
-				{
-					printf("Can't auto recognize the board on location_id=%s...\n", GV_LOCATION_ID);
-					// strcpy(setting.board, "");
-				}break;
-				case -2:
-				{
-					printf("Can't open FTDI channel on location_id=%s...\n", GV_LOCATION_ID);
-					return -2;
-				}break;
-				
-				default:
-					break;
-				}
-			}
-
-			return -1;
-		}
-		else
-		{
-			switch (find_board_by_eeprom(&setting))
-			{
-			case 0:
-				printf("Auto recognized the board: %s\n", setting.board);
-				break;
-			case -1:
-			{
-				printf("Can't auto recognize the board...Please try to add [-board=] option.\n");
-				return -2;
-				// printf("For now, only 8MPLUSLPD4-CPU don't have eeprom. Assuming use \"imx8mpevk\"...\n");
-				// printf("Please also notice if there is any other board connected to this host.\n");
-				// printf("Try \"bcu lsftdi\" to find the right -id=...\n");
-				// strcpy(setting.board, "imx8mpevk");
-			}break;
-			case -2:
-			{
-				printf("Can't open FTDI channel...Please try to add [-board=] option.\n");
-				return -2;
-			}break;
-			
-			default:
-				break;
-			}
-		}
-		break;
-	case NO_BOARD:
-		switch (find_board_by_eeprom(&setting))
-		{
-		case 0:
-			printf("Auto recognized the board %s is on location_id=%s\n", setting.board, GV_LOCATION_ID);
-			break;
-		case -1:
-		{
-			printf("Can't auto recognize the board on location_id=%s...\n", GV_LOCATION_ID);
-			// strcpy(setting.board, "");
-		}break;
-		case -2:
-		{
-			printf("Can't open FTDI channel on location_id=%s...\n", GV_LOCATION_ID);
-			return -2;
-		}break;
-		
-		default:
-			break;
-		}
-		break;
-	case NO_ID:
-		strcpy(origin_board_name, setting.board);
-
-		ft_list_devices(location_id_str, &board_num, LIST_DEVICE_MODE_OUTPUT);
-
-		if (board_num > 1 && strcmp(origin_board_name, "imx8mpevk"))
-		{
-			for (int j = 0; j < board_num; j++)
-			{
-				strcpy(GV_LOCATION_ID, location_id_str[j]);
-				switch (find_board_by_eeprom(&setting))
-				{
-				case 0:
-					if (strcmp(origin_board_name, setting.board) == 0)
+					strcpy(GV_LOCATION_ID, location_id_str[j]);
+					switch (find_board_by_eeprom(&setting))
 					{
+					case 0:
 						printf("Auto recognized the board %s is on location_id=%s\n", setting.board, GV_LOCATION_ID);
-						find_board_count++;
-						find_id = j;
+						break;
+					case -1:
+					{
+						printf("Can't auto recognize the board on location_id=%s...\n", GV_LOCATION_ID);
+						// strcpy(setting.board, "");
+					}break;
+					case -2:
+					{
+						printf("Can't open FTDI channel on location_id=%s...\n", GV_LOCATION_ID);
+						return -2;
+					}break;
+					
+					default:
+						break;
 					}
-					// printf("Auto recognized the board: %s\n", setting.board);
+				}
+
+				return -1;
+			}
+			else
+			{
+				switch (find_board_by_eeprom(&setting))
+				{
+				case 0:
+					printf("Auto recognized the board: %s\n", setting.board);
 					break;
 				case -1:
 				{
-					printf("Can't auto recognize the board on location_id=%s...\n", GV_LOCATION_ID);
-					// strcpy(setting.board, "");
+					printf("Can't auto recognize the board...Please try to add [-board=] option.\n");
+					return -2;
+					// printf("For now, only 8MPLUSLPD4-CPU don't have eeprom. Assuming use \"imx8mpevk\"...\n");
+					// printf("Please also notice if there is any other board connected to this host.\n");
+					// printf("Try \"bcu lsftdi\" to find the right -id=...\n");
+					// strcpy(setting.board, "imx8mpevk");
 				}break;
 				case -2:
 				{
@@ -2463,25 +2411,80 @@ int main(int argc, char** argv)
 					break;
 				}
 			}
-			if (find_board_count > 1)
+			break;
+		case NO_BOARD:
+			switch (find_board_by_eeprom(&setting))
 			{
-				printf("There are %d boards named %s. Please add [-id=] option.\n", find_board_count, origin_board_name);
-				return -1;
-			}
-			else
+			case 0:
+				printf("Auto recognized the board %s is on location_id=%s\n", setting.board, GV_LOCATION_ID);
+				break;
+			case -1:
 			{
-				if (find_id >= 0)
-					strcpy(GV_LOCATION_ID, location_id_str[find_id]);
+				printf("Can't auto recognize the board on location_id=%s...\n", GV_LOCATION_ID);
+				// strcpy(setting.board, "");
+			}break;
+			case -2:
+			{
+				printf("Can't open FTDI channel on location_id=%s...\n", GV_LOCATION_ID);
+				return -2;
+			}break;
+			
+			default:
+				break;
 			}
-			strcpy(setting.board, origin_board_name);
-		}
-		break;
-	default:
-		break;
-	}
+			break;
+		case NO_ID:
+			strcpy(origin_board_name, setting.board);
 
-	if (parse_options(argc, argv, &setting) == -1) {
-		return 0;
+			ft_list_devices(location_id_str, &board_num, LIST_DEVICE_MODE_OUTPUT);
+
+			if (board_num > 1 && strcmp(origin_board_name, "imx8mpevk"))
+			{
+				for (int j = 0; j < board_num; j++)
+				{
+					strcpy(GV_LOCATION_ID, location_id_str[j]);
+					switch (find_board_by_eeprom(&setting))
+					{
+					case 0:
+						if (strcmp(origin_board_name, setting.board) == 0)
+						{
+							printf("Auto recognized the board %s is on location_id=%s\n", setting.board, GV_LOCATION_ID);
+							find_board_count++;
+							find_id = j;
+						}
+						// printf("Auto recognized the board: %s\n", setting.board);
+						break;
+					case -1:
+					{
+						printf("Can't auto recognize the board on location_id=%s...\n", GV_LOCATION_ID);
+						// strcpy(setting.board, "");
+					}break;
+					case -2:
+					{
+						printf("Can't open FTDI channel...Please try to add [-board=] option.\n");
+						return -2;
+					}break;
+					
+					default:
+						break;
+					}
+				}
+				if (find_board_count > 1)
+				{
+					printf("There are %d boards named %s. Please add [-id=] option.\n", find_board_count, origin_board_name);
+					return -1;
+				}
+				else
+				{
+					if (find_id >= 0)
+						strcpy(GV_LOCATION_ID, location_id_str[find_id]);
+				}
+				strcpy(setting.board, origin_board_name);
+			}
+			break;
+		default:
+			break;
+		}
 	}
 
 	switch (readConf(setting.board, &setting))
