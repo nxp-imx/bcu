@@ -382,6 +382,68 @@ struct board_links imx8mpevk_board_links[] = {
 	""
 };
 
+#define IMX8ULPEVK_POWER_SWITCH_PATH(group, sensor1, addr, rsense1, sensor2, rsense2) "/ft4232h_i2c{channel=1;dir_bitmask=0xF8;val_bitmask=0x00}/pac1934{group="#group";sensor="#sensor1";addr="#addr";rsense1="#rsense1";sensor2="#sensor2";rsense2="#rsense2"}"
+#define IMX8ULPEVK_POWER_PATH(group, sensor, addr, rsense1, rsense2) "/ft4232h_i2c{channel=1;dir_bitmask=0xF8;val_bitmask=0x00}/pac1934{group="#group";sensor="#sensor";addr="#addr";rsense1="#rsense1";rsense2="#rsense2"}"
+#define IMX8ULPEVK_GPIO_EXTENDER_PATH "/ft4232h_i2c{channel=1;dir_bitmask=0xF8;val_bitmask=0x00}"
+struct mapping imx8ulpevk_board[] = {
+	{"buck4_cpu_1v1", power, IMX8ULPEVK_POWER_SWITCH_PATH(1, 1, 0x10, 400, 2, 400), 0x00},
+	{"buck1_cpu_1v8", power, IMX8ULPEVK_POWER_SWITCH_PATH(1, 3, 0x10, 100, 4, 10000), 0x00},
+	{"buck2_cpu_1v0", power, IMX8ULPEVK_POWER_SWITCH_PATH(2, 1, 0x11, 50, 2, 10000), 0x00},
+	{"buck3_cpu_1v0", power, IMX8ULPEVK_POWER_SWITCH_PATH(2, 3, 0x11, 20, 4, 10000), 0x00},
+	{"ldo5_cpu_3v0", power, IMX8ULPEVK_POWER_PATH(3, 1, 0x12, 250000, 250000), 0x00},
+	{"ldo1_cpu_1v1", power, IMX8ULPEVK_POWER_PATH(3, 2, 0x12, 100, 100), 0x00},
+	{"buck1_lsw1_cpu_1v8", power, IMX8ULPEVK_POWER_PATH(3, 3, 0x12, 100, 100), 0x00},
+	{"buck1_lsw4_cpu_1v8", power, IMX8ULPEVK_POWER_PATH(3, 4, 0x12, 100, 100), 0x00},
+	{"buck1_lsw2_cpu_1v8", power, IMX8ULPEVK_POWER_PATH(4, 1, 0x13, 250000, 250000), 0x00},
+	{"buck1_lsw3_cpu_1v8", power, IMX8ULPEVK_POWER_PATH(4, 2, 0x13, 100, 100), 0x00},
+	{"ldo4_cpu_1v8", power, IMX8ULPEVK_POWER_PATH(4, 3, 0x13, 100, 100), 0x00},
+	{"ldo2_cpu_3v3", power, IMX8ULPEVK_POWER_PATH(4, 4, 0x13, 100, 100), 0x00},
+	{"vsys_5v0", power, IMX8ULPEVK_POWER_SWITCH_PATH(5, 1, 0x14, 20, 2, 10000), 0x00},
+	{"ldo1_cpu_1v1_0v6", power, IMX8ULPEVK_POWER_PATH(5, 3, 0x14, 50, 50), 0x00},
+	{"buck4_dram_1v1", power, IMX8ULPEVK_POWER_PATH(5, 4, 0x14, 50, 50), 0x00},
+
+	{"boot_mode", gpio, IMX8ULPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=0;pin_bitmask=0xFF;opendrain=0;}", 0x00},
+	{"remote_en", gpio, IMX8ULPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=1;pin_bitmask=0x01;opendrain=0;}", 0x00},
+	{"reset", gpio, IMX8ULPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=1;pin_bitmask=0x02;opendrain=0;}", 0x00},
+	{"onoff", gpio, IMX8ULPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=1;pin_bitmask=0x04;opendrain=0;}", 0x00},
+	{"reset0_b", gpio, IMX8ULPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=1;pin_bitmask=0x08;opendrain=0;}", 0x00},
+	{"reset1_b", gpio, IMX8ULPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=1;pin_bitmask=0x10;opendrain=0;}", 0x00},
+	{"cpu_power_mode0", gpio, IMX8ULPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=1;pin_bitmask=0x20;opendrain=0;}", 0x00},
+	{"cpu_power_mode1", gpio, IMX8ULPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=1;pin_bitmask=0x40;opendrain=0;}", 0x00},
+	{"cpu_power_mode2", gpio, IMX8ULPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=1;pin_bitmask=0x80;opendrain=0;}", 0x00},
+
+	{"SR_buck1_cpu_1v8", gpio, IMX8ULPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x21;port=0;pin_bitmask=0x01;opendrain=0;}", 0x00},
+	{"SR_buck4_cpu_1v1", gpio, IMX8ULPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x21;port=0;pin_bitmask=0x02;opendrain=0;}", 0x00},
+	{"SR_buck2_cpu_1v0", gpio, IMX8ULPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x21;port=0;pin_bitmask=0x04;opendrain=0;}", 0x00},
+	{"SR_buck3_cpu_1v0", gpio, IMX8ULPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x21;port=0;pin_bitmask=0x08;opendrain=0;}", 0x00},
+	{"SR_vsys_5v0", gpio, IMX8ULPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x21;port=0;pin_bitmask=0x10;opendrain=0;}", 0x00},
+
+	{"ft_int_b",gpio,"/ft4232h_gpio{channel=1;pin_bitmask=0x08}", 0x00},
+	{"ft_reset_b",gpio,"/ft4232h_gpio{channel=1;pin_bitmask=0x10}", 0x00},
+
+	// {"at24cxx", bcu_eeprom, "/ft4232h_i2c{channel=1;dir_bitmask=0xF8;val_bitmask=0x00}/at24cxx{addr=0x53;type=0x1;}", 0x00},
+	{"93lcx6", ftdi_eeprom , "/ft4232h_eeprom{uasize=0xFF}", 0x00},
+
+	{NULL, 0, NULL, 0}//null terminated
+};
+
+struct boot_mode imx8ulpevk_board_boot_modes[] = {
+	{"fuse", 0x00},
+	{"usb", 0x40},
+	{"emmc", 0x82},
+	{"nand", 0x92},
+	{"nor", 0xa2},
+	{NULL, 0}
+};
+
+struct board_power_group imx8ulpevkpwr_power_groups[] = {
+	// {"GROUP_SOC", "vdd_arm,vdd_soc"},
+	// {"GROUP_SOC_FULL", "vdd_arm,vdd_soc"},
+	// {"GROUP_DRAM", "lpd4_vdd1,lpd4_vdd2"},
+	// {"GROUP_PLATFORM", "vsys_5v"},
+	{NULL, 0}
+};
+
 struct boot_mode null_boot_mode[] = {
 	{NULL, 0}
 };
@@ -399,6 +461,7 @@ struct board_info board_list[] =
 	{"imx8mpevk", imx8mpevk_board, imx8mpevk_board_boot_modes, NULL, imx8mpevk_board_links, NULL},
 	{"imx8mpddr3l", imx8mpddr3l_board, null_boot_mode, NULL, null_board_links, NULL},
 	{"imx8mpddr4", imx8mpddr4_board, null_boot_mode, NULL, null_board_links, NULL},
+	{"imx8ulpevk", imx8ulpevk_board, imx8ulpevk_board_boot_modes, imx8ulpevkpwr_power_groups, null_board_links, &imx8ulpevk_ftdi_eeprom_user_area_info},
 	//"imx9xxl",&imx9xxl_pins,
 };
 int num_of_boards = sizeof(board_list) / sizeof(struct board_info);

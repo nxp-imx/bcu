@@ -88,6 +88,15 @@ struct ftdi_eeprom_user_area imx8mpevkpwr_ftdi_eeprom_user_area_info = {
 	1
 };
 
+struct ftdi_eeprom_user_area imx8ulpevk_ftdi_eeprom_user_area_info = {
+	0x1,
+	0x7, 0x1, 0x1,
+	0x3, 0x1, 0x1,
+	0x4, 0xF, 0xF,
+	27,
+	1
+};
+
 char* get_code_definition(int field, int code_idx)
 {
 	int i = 0;
