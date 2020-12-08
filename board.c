@@ -542,9 +542,16 @@ int have_gpio(char* gpio_name, struct board_info* board)
 
 struct board_info* get_board(char* board_name)
 {
+	if (strlen(board_name) == 0)
+	{
+		printf("\nmissing option <-board=>\n");
+		printf("\nOr use option <-auto> to find the board automatically\n");
+		printf("NOTE: if other boards are also connected to the same host, <-auto> may break its ttyUSB function temporarily.\n\n");
+		return NULL;
+	}
+
 	for (int i = 0; i < num_of_boards; i++)
 	{
-
 		if (strcmp(board_name, board_list[i].name) == 0)//board found
 		{
 			return &board_list[i];

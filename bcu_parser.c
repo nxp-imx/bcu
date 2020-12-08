@@ -344,6 +344,12 @@ int parse_board_id_options(int argc, char** argv, struct options_setting* settin
 
 int parse_options(int argc, char** argv, struct options_setting* setting)
 {
+	struct board_info* board = get_board(setting->board);
+	if (board == NULL)
+	{
+		return -1;
+	}
+
 	for (int i = 2; i < argc; i++)
 	{
 		//printf("parsing %s\n", argv[i]);
@@ -363,7 +369,7 @@ int parse_options(int argc, char** argv, struct options_setting* setting)
 		else if (strcmp(argv[i], "-auto") == 0)
 		{
 			setting->auto_find_board = 1;
-			printf("will auto find the board...\n");
+			// printf("will auto find the board...\n");
 		}
 		else if (strncmp(argv[i], "-delay=", 7) == 0 && strlen(argv[i]) > 7)
 		{
@@ -506,13 +512,8 @@ int parse_options(int argc, char** argv, struct options_setting* setting)
 		}
 		else
 		{
-			if (strlen(setting->board) == 0)
-				return -1;
-			struct board_info* board = get_board(setting->board);
-			if (board == NULL)
-			{
-				return-1;
-			}
+			// if (strlen(setting->board) == 0)
+			// 	return -1;
 			int j = 0;
 			int found = 0;
 			while (board->mappings[j].name != NULL)

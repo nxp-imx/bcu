@@ -1095,7 +1095,7 @@ static void monitor(struct options_setting* setting)
 	signal(SIGINT, handle_sigint);
 	struct board_info* board = get_board(setting->board);
 	if (board == NULL) {
-		printf("entered board model are not supported.\n");
+		// printf("entered board model are not supported.\n");
 		return;
 	}
 
@@ -2255,47 +2255,60 @@ static int enable_vt_mode()
 #endif
 }
 
-int find_board_by_eeprom(struct options_setting* setting)
+int check_board_eeprom(struct board_info* board)
 {
 	void* head = NULL;
 	void* end_point;
-	int status, i, j;
+	int status, j;
+
+	j = 0;
+	while(board->mappings[j].name!=NULL)
+	{
+		if(board->mappings[j].type == bcu_eeprom || board->mappings[j].type == ftdi_eeprom)
+		{
+			end_point = build_device_linkedlist_forward(&head, board->mappings[j].path);
+			if (end_point == NULL)
+			{
+				printf("find_board_by_eeprom: error building device linked list\n");
+				return -2;
+			}
+
+			struct eeprom_device* eeprom = end_point;
+			status = bcu_eeprom_checkboard(eeprom, board->eeprom_data);
+			if (board->mappings[j].type == bcu_eeprom)
+				free_device_linkedlist_backward(end_point);
+			ft4232h_i2c_remove_all();
+
+			if (status == 0)
+			{
+				return 0;
+			}
+			else
+			{
+				j++;
+				continue;
+			}
+		}
+		j++;
+	}
+
+	return -1;
+}
+
+int find_board_by_eeprom(struct options_setting* setting)
+{
+	int status, i;
 
 	for (i = 0; i < num_of_boards; i++)
 	{
 		strcpy(setting->board, board_list[i].name);
-		struct board_info* board=get_board(setting->board);
-		j = 0;
-		while(board->mappings[j].name!=NULL)
-		{
-			if(board->mappings[j].type == bcu_eeprom || board->mappings[j].type == ftdi_eeprom)
-			{
-				end_point = build_device_linkedlist_forward(&head, board->mappings[j].path);
-				if (end_point == NULL)
-				{
-					printf("find_board_by_eeprom: error building device linked list\n");
-					return -2;
-				}
-
-				struct eeprom_device* eeprom = end_point;
-				status = bcu_eeprom_checkboard(eeprom, board->eeprom_data);
-				if (board->mappings[j].type == bcu_eeprom)
-					free_device_linkedlist_backward(end_point);
-				ft4232h_i2c_remove_all();
-
-				if (status == 0)
-				{
-					return 0;
-				}
-				else
-				{
-					j++;
-					continue;
-				}
-			}
-			j++;
-		}
+		// struct board_info* board=get_board(setting->board);
+		struct board_info* board = get_board_by_id(i);
+		status = check_board_eeprom(board);
+		if (status != -1)
+			return status;
 	}
+
 	return -1;
 }
 
@@ -2483,6 +2496,23 @@ int main(int argc, char** argv)
 
 	if (parse_options(argc, argv, &setting) == -1) {
 		return 0;
+	}
+
+	//check board eeprom
+	if (strcmp(setting.board, "imx8mpevk") &&
+	    strcmp(setting.board, "imx8dxl_ddr3_evk") &&
+	    strcmp(setting.board, "imx8mpddr3l") &&
+	    strcmp(setting.board, "imx8mpddr4"))
+	{
+		struct board_info* board=get_board(setting.board);
+
+		if (check_board_eeprom(board) < 0)
+		{
+			printf("%sThis board support EEPROM but it is EMPTY.\nPlease use below command to program the EEPROM.%s\n", g_vt_yellow, g_vt_default);
+			printf("\n%s# ./bcu eeprom -w -board=%s%s\n", g_vt_red, setting.board, g_vt_default);
+			printf("%s\nThen you can choose to replace option <-board=> with <-auto>.%s\n", g_vt_yellow, g_vt_default);
+			printf("%sNOTE:%s If other boards are also connected to the same host, <-auto> may break its ttyUSB function temporarily.%s\n", g_vt_red, g_vt_yellow, g_vt_default);
+		}
 	}
 
 	switch (readConf(setting.board, &setting))
