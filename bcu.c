@@ -2266,7 +2266,7 @@ static int enable_vt_mode()
 #endif
 }
 
-int check_board_eeprom(struct board_info* board)
+int check_board_eeprom(struct board_info* board, int retmode)
 {
 	void* head = NULL;
 	void* end_point;
@@ -2303,7 +2303,9 @@ int check_board_eeprom(struct board_info* board)
 		j++;
 	}
 
-	return status;
+	if (retmode)
+		return status;
+	return -1;
 }
 
 int find_board_by_eeprom(struct options_setting* setting)
@@ -2315,7 +2317,7 @@ int find_board_by_eeprom(struct options_setting* setting)
 		strcpy(setting->board, board_list[i].name);
 		// struct board_info* board=get_board(setting->board);
 		struct board_info* board = get_board_by_id(i);
-		status = check_board_eeprom(board);
+		status = check_board_eeprom(board, 0);
 		if (status != -1)
 			return status;
 	}
@@ -2505,7 +2507,7 @@ int main(int argc, char** argv)
 		break;
 	}
 
-	if (parse_options(argc, argv, &setting) == -1) {
+	if (parse_options(cmd, argc, argv, &setting) == -1) {
 		return 0;
 	}
 
@@ -2513,10 +2515,26 @@ int main(int argc, char** argv)
 	if (strcmp(setting.board, "imx8mpevk") &&
 	    strcmp(setting.board, "imx8dxl_ddr3_evk") &&
 	    strcmp(setting.board, "imx8mpddr3l") &&
-	    strcmp(setting.board, "imx8mpddr4"))
+	    strcmp(setting.board, "imx8mpddr4") &&
+	    strcmp(cmd, "eeprom") &&
+	    strcmp(cmd, "lsbootmode") &&
+	    strcmp(cmd, "lsgpio") &&
+	    strcmp(cmd, "upgrade") &&
+	    strcmp(cmd, "uuu") &&
+	    strcmp(cmd, "lsftdi") &&
+	    strcmp(cmd, "lsboard") &&
+	    strcmp(cmd, "version") &&
+	    strcmp(cmd, "help"))
 	{
 		struct board_info* board=get_board(setting.board);
-		int val = check_board_eeprom(board);
+		int val = check_board_eeprom(board, 1);
+		if (val == -11)
+		{
+			printf("%sboard rev in EEPROM and provided <-board=> MISMATCH!%s\n", g_vt_red, g_vt_default);
+			printf("%sIf the board has been reworked to a new revision, please use the below command to update the value in EEPROM:%s\n", g_vt_yellow, g_vt_default);
+			printf("\n%s# ./bcu eeprom -w -board=[new BOARDNAME showed in cmd lsboard]%s\n", g_vt_red, g_vt_default);
+			return -1;
+		}
 		if (val < 0 && val != -10)
 		{
 			printf("%sThis board support EEPROM but it is EMPTY.\nPlease use below command to program the EEPROM.%s\n", g_vt_yellow, g_vt_default);

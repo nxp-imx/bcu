@@ -99,7 +99,7 @@ void* build_device_linkedlist_forward(void** head, char* path);
 void* build_device_linkedlist_smart(void** new_head, char* new_path, void* old_head, char* old_path);
 
 int parse_board_id_options(int argc, char** argv, struct options_setting* setting);
-int parse_options(int argc, char** argv, struct options_setting* setting);
+int parse_options(char* cmd, int argc, char** argv, struct options_setting* setting);
 void set_options_default(struct options_setting* setting);
 int parse_groups(struct group* groups, struct board_info* board);
 void groups_init(struct group* groups, int num);

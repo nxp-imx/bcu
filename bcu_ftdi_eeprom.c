@@ -442,7 +442,7 @@ int bcu_eeprom_checkboard(struct eeprom_device* eeprom, struct ftdi_eeprom_user_
 
 	if (board_rev[0] != eeprom_data->board_rev_c ||
 	    board_rev[1] != eeprom_data->board_rev_n)
-		return -1;
+		return -11;
 
 	return 0;
 }

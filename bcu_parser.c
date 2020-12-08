@@ -342,12 +342,19 @@ int parse_board_id_options(int argc, char** argv, struct options_setting* settin
 	return 0;
 }
 
-int parse_options(int argc, char** argv, struct options_setting* setting)
+int parse_options(char* cmd, int argc, char** argv, struct options_setting* setting)
 {
-	struct board_info* board = get_board(setting->board);
-	if (board == NULL)
+	struct board_info* board = NULL;
+	if (strcmp(cmd, "upgrade") &&
+	    strcmp(cmd, "uuu") &&
+	    strcmp(cmd, "lsftdi") &&
+	    strcmp(cmd, "lsboard") &&
+	    strcmp(cmd, "version") &&
+	    strcmp(cmd, "help"))
 	{
-		return -1;
+		board = get_board(setting->board);
+		if (board == NULL)
+			return -1;
 	}
 
 	for (int i = 2; i < argc; i++)
@@ -512,8 +519,8 @@ int parse_options(int argc, char** argv, struct options_setting* setting)
 		}
 		else
 		{
-			// if (strlen(setting->board) == 0)
-			// 	return -1;
+			if (board == NULL)
+				return -1;
 			int j = 0;
 			int found = 0;
 			while (board->mappings[j].name != NULL)
