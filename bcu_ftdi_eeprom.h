@@ -90,7 +90,8 @@ int bcu_eeprom_checkboard(struct eeprom_device* eeprom, struct ftdi_eeprom_user_
 
 extern struct ftdi_eeprom_user_area imx8ulp_ftdi_eeprom_user_area_info;
 extern struct ftdi_eeprom_user_area imx8dxlevk_ftdi_eeprom_user_area_info;
-extern struct ftdi_eeprom_user_area imx8mpevkpwr_ftdi_eeprom_user_area_info;
+extern struct ftdi_eeprom_user_area imx8mpevkpwr_a0_ftdi_eeprom_user_area_info;
+extern struct ftdi_eeprom_user_area imx8mpevkpwr_a1_ftdi_eeprom_user_area_info;
 extern struct ftdi_eeprom_user_area imx8ulpevk_ftdi_eeprom_user_area_info;
 extern struct ftdi_eeprom_field_code_tb ftdi_eeprom_field[];
 
