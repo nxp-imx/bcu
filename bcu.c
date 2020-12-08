@@ -568,11 +568,11 @@ static void deinitialize(struct options_setting* setting)
 	free_gpio(gpio);
 }
 
-static void initialize(struct options_setting* setting, int isreset)
+static int initialize(struct options_setting* setting, int isreset)
 {
 	struct board_info* board = get_board(setting->board);
 	if (board == NULL)
-		return;
+		return -1;
 	void* head = NULL;
 	void* end_point;
 	char path[MAX_PATH_LENGTH];
@@ -617,7 +617,7 @@ static void initialize(struct options_setting* setting, int isreset)
 					{
 						printf("could not recognize boot mode: sd, please give boot_mode\n");
 						printf("initialization failed\n");
-						return;
+						return -1;
 					}
 				}
 				else
@@ -644,7 +644,11 @@ static void initialize(struct options_setting* setting, int isreset)
 			status = gpio->gpio_write(gpio, 0x00);
 
 		if (status)
+		{
 			printf("set %s %s failed, error = 0x%x\n", name, output ? "high" : "low", status);
+			printf("%sboard initialization failed!%s\n", g_vt_red, g_vt_default);
+			return -1;
+		}
 		else
 		{
 			if (strcmp(name, "remote_en") == 0)
@@ -657,6 +661,8 @@ static void initialize(struct options_setting* setting, int isreset)
 
 		free_device_linkedlist_backward(end_point);
 	}
+
+	return 0;
 }
 
 static void reset(struct options_setting* setting)
@@ -669,7 +675,12 @@ static void reset(struct options_setting* setting)
 	int a = 0;
 	char sr_name[100];
 
-	initialize(setting, RESET_NOW);
+	status = initialize(setting, RESET_NOW);
+	if (status < 0)
+	{
+		printf("%sboard reset failed!%s\n", g_vt_red, g_vt_default);
+		return;
+	}
 
 	printf("Set %sALL%s sense resistances to %ssmaller%s ones\n", g_vt_yellow, g_vt_default, g_vt_yellow, g_vt_default);
 	while (board->mappings[a].name != NULL)
@@ -2292,7 +2303,7 @@ int check_board_eeprom(struct board_info* board)
 		j++;
 	}
 
-	return -1;
+	return status;
 }
 
 int find_board_by_eeprom(struct options_setting* setting)
@@ -2505,8 +2516,8 @@ int main(int argc, char** argv)
 	    strcmp(setting.board, "imx8mpddr4"))
 	{
 		struct board_info* board=get_board(setting.board);
-
-		if (check_board_eeprom(board) < 0)
+		int val = check_board_eeprom(board);
+		if (val < 0 && val != -10)
 		{
 			printf("%sThis board support EEPROM but it is EMPTY.\nPlease use below command to program the EEPROM.%s\n", g_vt_yellow, g_vt_default);
 			printf("\n%s# ./bcu eeprom -w -board=%s%s\n", g_vt_red, setting.board, g_vt_default);

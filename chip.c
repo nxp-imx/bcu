@@ -98,7 +98,7 @@ int at24cxx_read(void* at24cxx, unsigned char* data_buffer, unsigned int startad
 	if (status)
 	{
 		// printf("oh no! no ack received!\n");
-		return -1;
+		return -10;
 	}
 	if (at24->type == EEPROM_TYPE_AT24C32)
 		parent->i2c_write(parent, 0, I2C_TYPE_AT24);
@@ -128,7 +128,7 @@ int at24cxx_write(void* at24cxx, unsigned char* data_buffer, unsigned int starta
 	if (status)
 	{
 		// printf("oh no! no ack received!\n");
-		return -1;
+		return -10;
 	}
 	if (at24->type == EEPROM_TYPE_AT24C32)
 		parent->i2c_write(parent, 0, I2C_TYPE_AT24);
@@ -688,7 +688,10 @@ int ft4232h_gpio_write(void* ft4232h, unsigned char bit_value)
 	data = (current_output & (~ft->gpio_device.pin_bitmask)) | (bit_value & ft->gpio_device.pin_bitmask);
 
 	if (ft_write(ft->ftdi_info, &data, 1) < 0)
+	{
 		printf("failed to write\n");
+		return -1;
+	}
 
 	return 0;
 }
