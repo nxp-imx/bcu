@@ -2229,43 +2229,6 @@ static void monitor(struct options_setting* setting)
 	return;
 }
 
-static void lsftdi()
-{
-	int temp = 0;
-	ft_list_devices(NULL, &temp, LIST_DEVICE_MODE_PRINT);
-	return;
-}
-
-static int enable_vt_mode()
-{
-#ifdef _WIN32
-	// Set output mode to handle virtual terminal sequences
-	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
-	if (hOut == INVALID_HANDLE_VALUE)
-	{
-		clean_vt_color();
-		return -1;
-	}
-
-	DWORD dwMode = 0;
-	if (!GetConsoleMode(hOut, &dwMode))
-	{
-		clean_vt_color();
-		return -1;
-	}
-
-	dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-	if (!SetConsoleMode(hOut, dwMode))
-	{
-		clean_vt_color();
-		return -1;
-	}
-	return 0;
-#else
-	return 0;
-#endif
-}
-
 int check_board_eeprom(struct board_info* board, int retmode)
 {
 	void* head = NULL;
@@ -2323,6 +2286,109 @@ int find_board_by_eeprom(struct options_setting* setting)
 	}
 
 	return -1;
+}
+
+static int lsftdi(struct options_setting* setting)
+{
+	// int temp = 0;
+	// ft_list_devices(NULL, &temp, LIST_DEVICE_MODE_PRINT);
+
+
+	int board_num = 0;
+	char location_id_str[MAX_NUMBER_OF_USB_DEVICES][MAX_LOCATION_ID_LENGTH];
+	if (!setting->auto_find_board)
+		ft_list_devices(location_id_str, &board_num, LIST_DEVICE_MODE_PRINT);
+	else
+	{	ft_list_devices(location_id_str, &board_num, LIST_DEVICE_MODE_OUTPUT);
+
+		if (board_num > 1)
+		{
+			printf("There are %d boards on this host. Please add [-board=] and [-id=] option.\n", board_num);
+			for (int j = 0; j < board_num; j++)
+			{
+				strcpy(GV_LOCATION_ID, location_id_str[j]);
+				switch (find_board_by_eeprom(setting))
+				{
+				case 0:
+					printf("Auto recognized the board %s is on location_id=%s\n", setting->board, GV_LOCATION_ID);
+					break;
+				case -1:
+				{
+					printf("Can't auto recognize the board on location_id=%s...\n", GV_LOCATION_ID);
+					// strcpy(setting.board, "");
+				}break;
+				case -2:
+				{
+					printf("Can't open FTDI channel on location_id=%s...\n", GV_LOCATION_ID);
+					return -2;
+				}break;
+				
+				default:
+					break;
+				}
+			}
+
+			return -1;
+		}
+		else
+		{
+			switch (find_board_by_eeprom(setting))
+			{
+			case 0:
+				printf("Auto recognized the board: %s\n", setting->board);
+				break;
+			case -1:
+			{
+				printf("Can't auto recognize the board...Please try to add [-board=] option.\n");
+				return -2;
+				// printf("For now, only 8MPLUSLPD4-CPU don't have eeprom. Assuming use \"imx8mpevk\"...\n");
+				// printf("Please also notice if there is any other board connected to this host.\n");
+				// printf("Try \"bcu lsftdi\" to find the right -id=...\n");
+				// strcpy(setting.board, "imx8mpevk");
+			}break;
+			case -2:
+			{
+				printf("Can't open FTDI channel...Please try to add [-board=] option.\n");
+				return -2;
+			}break;
+			
+			default:
+				break;
+			}
+		}
+	}
+
+	return 0;
+}
+
+static int enable_vt_mode()
+{
+#ifdef _WIN32
+	// Set output mode to handle virtual terminal sequences
+	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+	if (hOut == INVALID_HANDLE_VALUE)
+	{
+		clean_vt_color();
+		return -1;
+	}
+
+	DWORD dwMode = 0;
+	if (!GetConsoleMode(hOut, &dwMode))
+	{
+		clean_vt_color();
+		return -1;
+	}
+
+	dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+	if (!SetConsoleMode(hOut, dwMode))
+	{
+		clean_vt_color();
+		return -1;
+	}
+	return 0;
+#else
+	return 0;
+#endif
 }
 
 void terminateBCU(void)
@@ -2613,7 +2679,7 @@ int main(int argc, char** argv)
 	*/
 	else if (strcmp(cmd, "lsftdi") == 0)
 	{
-		lsftdi();
+		lsftdi(&setting);
 	}
 	else if (strcmp(cmd, "lsboard") == 0)
 	{
