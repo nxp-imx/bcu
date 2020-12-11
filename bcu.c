@@ -2006,7 +2006,10 @@ static void monitor(struct options_setting* setting)
 		}
 		
 		//finally,switch the SR
-		ch = catch_input_char();
+		if (!setting->nodisplay)
+			ch = catch_input_char();
+		else
+			ch = 0;
 		if (setting->nodisplay == 0 && candisplay == 1 && available_height >= 43)
 		{
 			printf("Hot-key: 1=reset %s; 2=reset MaxMin; 3=reset %s and MaxMin; 4=switch show mA/auto/uA;%s\n",
@@ -2100,7 +2103,10 @@ static void monitor(struct options_setting* setting)
 
 				printf("Enter   boot from BOOT SWITCH%s\n", g_vt_clear_line);
 				printf("\nPlease select the boot mode after reset: ");
-				setting->boot_mode_hex = catch_input_char_block();
+				if (!setting->nodisplay)
+					setting->boot_mode_hex = catch_input_char_block();
+				else
+					setting->boot_mode_hex = 0;
 				setting->boot_mode_hex -= '0';
 				if (setting->boot_mode_hex >= bootmodenum || setting->boot_mode_hex < 0)
 				{
