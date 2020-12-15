@@ -542,6 +542,9 @@ int have_gpio(char* gpio_name, struct board_info* board)
 
 struct board_info* get_board(char* board_name)
 {
+	int findflag = 0;
+	char board_tmp[30] = "";
+
 	if (strlen(board_name) == 0)
 	{
 		printf("\nmissing option <-board=>\n");
@@ -557,7 +560,29 @@ struct board_info* get_board(char* board_name)
 			return &board_list[i];
 		}
 	}
-	printf("board model %s is not supported\n", board_name);
+	printf("board model %s is not supported", board_name);
+
+	strcpy(board_tmp, board_name);
+	for (int j = 0; j < strlen(board_name); j++)
+	{
+		board_tmp[strlen(board_tmp) - j] = 0;
+		for (int i = 0; i < num_of_boards; i++)
+		{
+			if (strstr(board_list[i].name, board_tmp) != NULL)
+			{
+				if (!findflag)
+				{
+					findflag = 1;
+					printf(", do you mean:\n\n\t");
+				}
+				printf("%s ", board_list[i].name);
+			}
+		}
+		if (findflag)
+			break;
+	}
+	printf("\n");
+
 	return NULL;
 }
 
