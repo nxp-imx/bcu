@@ -278,7 +278,7 @@ void set_options_default(struct options_setting* setting)
 	setting->rangefixed = 0;
 	setting->use_hwfilter = 0;
 	setting->use_bipolar = 1;
-	setting->dump_avg = 0;
+	setting->dump_statistics = 0;
 	setting->eeprom_function = 0;
 	setting->download_doc = 0;
 }
@@ -463,9 +463,9 @@ int parse_options(char* cmd, int argc, char** argv, struct options_setting* sett
 		{
 			setting->use_bipolar = 0;
 		}
-		else if (strcmp(argv[i], "-avg") == 0)
+		else if (strcmp(argv[i], "-stats") == 0)
 		{
-			setting->dump_avg = 1;
+			setting->dump_statistics = 1;
 		}
 		else if (strcmp(argv[i], "-erase") == 0)
 		{

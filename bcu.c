@@ -187,7 +187,7 @@ static void print_help(char* cmd)
 		printf("	%s%-60s%s%s\n", g_vt_default, "deinit [BOOTMODE_NAME] [-board=/-auto] [-id=]", g_vt_green, "disable the remote control");
 		printf("\n");
 		printf("	%s%-60s%s%s\n", g_vt_default, "monitor [-board=/-auto] [-id=]", g_vt_green, "monitor power consumption");
-		printf("	%s%-60s%s%s\n", g_vt_default, "        [-dump/-dump=] [-nodisplay] [-pmt] [-avg]", g_vt_green, "");
+		printf("	%s%-60s%s%s\n", g_vt_default, "        [-dump/-dump=] [-nodisplay] [-pmt] [-stats]", g_vt_green, "");
 		printf("	%s%-60s%s%s\n", g_vt_default, "        [-hz=] [-rms]", g_vt_green, "");
 		printf("	%s%-60s%s%s\n", g_vt_default, "        [-hwfilter] [-unipolar]", g_vt_green, "");
 		printf("\n");
@@ -2091,7 +2091,7 @@ static void monitor(struct options_setting* setting)
 				avgstart = maxminstart;
 				break;
 			case 4:
-				if (!setting->dump_avg)
+				if (!setting->dump_statistics)
 				{
 					range_control++;
 					if (range_control > 2)
@@ -2205,7 +2205,7 @@ static void monitor(struct options_setting* setting)
 	free_device_linkedlist_backward(end_point);
 	if (setting->dump == 1)
 	{
-		if (GV_MONITOR_TERMINATED && setting->dump_avg)
+		if (GV_MONITOR_TERMINATED && setting->dump_statistics)
 		{
 			fprintf(fptr, "AVG,");
 			for (int m = 0; m < n + 1; m++)
@@ -2224,6 +2224,46 @@ static void monitor(struct options_setting* setting)
 			for (int k = 0; k < num_of_groups; k++)
 			{
 				fprintf(fptr, "%lf,", groups[k].avg);
+			}
+			fprintf(fptr, "\n");
+
+			fprintf(fptr, "MAX,");
+			for (int m = 0; m < n + 1; m++)
+			{
+				int k = get_power_index_by_showid(m, board);
+				if (k < 0)
+					continue;
+				if (board->mappings[k].initinfo != 0)
+				{
+					if (!setting->pmt)
+						fprintf(fptr, "%lf,%lf,", vmax[k], cmax[k]);
+					else
+						fprintf(fptr, "%lf,%lf,%lf,", vmax[k], cmax[k], pmax[k]);
+				}
+			}
+			for (int k = 0; k < num_of_groups; k++)
+			{
+				fprintf(fptr, "%lf,", groups[k].max);
+			}
+			fprintf(fptr, "\n");
+
+			fprintf(fptr, "MIN,");
+			for (int m = 0; m < n + 1; m++)
+			{
+				int k = get_power_index_by_showid(m, board);
+				if (k < 0)
+					continue;
+				if (board->mappings[k].initinfo != 0)
+				{
+					if (!setting->pmt)
+						fprintf(fptr, "%lf,%lf,", vmin[k], cmin[k]);
+					else
+						fprintf(fptr, "%lf,%lf,%lf,", vmin[k], cmin[k], pmin[k]);
+				}
+			}
+			for (int k = 0; k < num_of_groups; k++)
+			{
+				fprintf(fptr, "%lf,", groups[k].min);
 			}
 			fprintf(fptr, "\n");
 		}
