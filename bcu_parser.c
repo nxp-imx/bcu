@@ -270,6 +270,7 @@ void set_options_default(struct options_setting* setting)
 	setting->boot_mode_hex = -1;
 	setting->gpio_name[0] = '\0';
 	setting->dump = 0;
+	setting->force = 0;
 	setting->pmt = 0;
 	setting->nodisplay = 0;
 	setting->dumpname[0] = '\0';
@@ -470,6 +471,10 @@ int parse_options(char* cmd, int argc, char** argv, struct options_setting* sett
 		else if (strcmp(argv[i], "-erase") == 0)
 		{
 			setting->eeprom_function = PARSER_EEPROM_ERASE;
+		}
+		else if (strcmp(argv[i], "-f") == 0)
+		{
+			setting->force = 1;
 		}
 		else if (strcmp(argv[i], "-w") == 0)
 		{

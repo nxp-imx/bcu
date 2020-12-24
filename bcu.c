@@ -156,7 +156,7 @@ static void upgrade_bcu(struct options_setting* setting)
 #endif
 
 	strncpy(version, GIT_VERSION, 11);
-	if (compare_version(&bcu_download_info.tag_name[4], &GIT_VERSION[4]) > 0)
+	if (compare_version(&bcu_download_info.tag_name[4], &GIT_VERSION[4]) > 0 || setting->force)
 	{
 		printf("\nRelease Note for %s:\n%s\n\n", bcu_download_info.tag_name, bcu_download_info.release_note);
 		res = https_download(&bcu_download_info);
@@ -204,7 +204,7 @@ static void print_help(char* cmd)
 		printf("	%s%-60s%s%s\n", g_vt_default, "lsbootmode [-board=/-auto]", g_vt_green, "show a list of available boot mode of a board");
 		printf("	%s%-60s%s%s\n", g_vt_default, "lsgpio     [-board=/-auto]", g_vt_green, "show a list of available gpio pin of a board");
 		printf("\n");
-		printf("	%s%-60s%s%s\n", g_vt_default, "upgrade    [-doc]", g_vt_green, "get the latest BCU release");
+		printf("	%s%-60s%s%s\n", g_vt_default, "upgrade    [-doc] [-f]", g_vt_green, "get the latest BCU release");
 		printf("	%s%-60s%s%s\n", g_vt_default, "uuu        [-doc]", g_vt_green, "download the latest UUU");
 		printf("\n");
 		printf("	%s%-60s%s%s\n", g_vt_default, "version", g_vt_green, "print version number");
