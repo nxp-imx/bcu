@@ -443,9 +443,12 @@ int parse_options(char* cmd, int argc, char** argv, struct options_setting* sett
 		else if (strcmp(argv[i], "-nodisplay") == 0)
 		{
 			setting->nodisplay = 1;
-			setting->dump = 1;
-			strcpy(setting->dumpname, "monitor_record.csv");
-			printf("dump data into %s file\n", setting->dumpname);
+			if (!setting->dump)
+			{
+				setting->dump = 1;
+				strcpy(setting->dumpname, "monitor_record.csv");
+				printf("dump data into %s file\n", setting->dumpname);
+			}
 		}
 		else if (strncmp(argv[i], "-hz=", 4) == 0 && strlen(argv[i]) > 4)
 		{
