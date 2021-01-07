@@ -33,7 +33,7 @@
 #include <windows.h>
 #endif
 
-#ifdef linux
+#if defined(linux) || defined(__APPLE__)
 #include <unistd.h>
 #include <ftdi.h>
 #include <libusb.h>
@@ -185,9 +185,11 @@ int ft_close(struct ftdi_info* fi)
 		if (libusb_release_interface(fi->ftdi->usb_dev, fi->ftdi->interface) < 0)
 			printf("release interface failure\n");
 
+#ifndef __APPLE__
 	if (fi->ftdi->usb_dev != NULL)
 		if (libusb_attach_kernel_driver(fi->ftdi->usb_dev, fi->ftdi->interface) < 0)
 			printf("failure attach kernel driver again\n");
+#endif
 
 	if (fi->ftdi->usb_dev != NULL)
                 if (libusb_kernel_driver_active(fi->ftdi->usb_dev, fi->ftdi->interface) < 0)
@@ -267,7 +269,7 @@ void msleep(int duration)
 #ifdef _WIN32
 	Sleep(duration);
 #endif
-#ifdef __linux__
+#if defined(__linux__) || defined(__APPLE__)
 	usleep(duration * 1000);
 #endif
 }

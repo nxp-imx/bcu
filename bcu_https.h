@@ -35,7 +35,7 @@
 #include "windows.h"
 #include "winhttp.h"
 #endif
-#ifdef linux
+#if defined(linux) || defined(__APPLE__)
 #include <curl/curl.h>
 #endif
 

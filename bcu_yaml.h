@@ -34,7 +34,7 @@
 #ifdef _WIN32
 #include "msvs/libyaml/yaml.h"
 #endif
-#ifdef linux
+#if defined(linux) || defined(__APPLE__)
 #include <yaml.h>
 #endif
 #include "board.h"

@@ -35,7 +35,7 @@
 #include <processthreadsapi.h>
 #endif
 
-#ifdef linux
+#if defined(linux) || defined(__APPLE__)
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <stdlib.h>
@@ -91,7 +91,7 @@ char* g_vt_blue = (char*)"\x1B[34m";
 char* g_vt_back_enable = (char*)"\x1B[4m";
 char* g_vt_back_default = (char*)"\x1B[24m";
 #endif
-#ifdef linux
+#if defined(linux) || defined(__APPLE__)
 char* g_vt_back_enable = (char*)"\x1B[100m";
 char* g_vt_back_default = (char*)"\x1B[49m";
 #endif
@@ -149,8 +149,10 @@ static void upgrade_bcu(struct options_setting* setting)
 	}
 
 	strcpy(bcu_download_info.download_name, "bcu");
-#ifdef linux
+#if defined(linux)
 	strcpy(bcu_download_info.extension_name, "");
+#elif defined(__APPLE__)
+	strcpy(bcu_download_info.extension_name, "_mac");
 #else
 	strcpy(bcu_download_info.extension_name, ".exe");
 #endif
@@ -160,7 +162,7 @@ static void upgrade_bcu(struct options_setting* setting)
 	{
 		printf("\nRelease Note for %s:\n%s\n\n", bcu_download_info.tag_name, bcu_download_info.release_note);
 		res = https_download(&bcu_download_info);
-#ifdef linux
+#if defined(linux) || defined(__APPLE__)
 		if (!res)
 		{
 			char cmd[30];
@@ -205,13 +207,15 @@ static void print_help(char* cmd)
 		printf("	%s%-60s%s%s\n", g_vt_default, "lsgpio     [-board=/-auto]", g_vt_green, "show a list of available gpio pin of a board");
 		printf("\n");
 		printf("	%s%-60s%s%s\n", g_vt_default, "upgrade    [-doc] [-f]", g_vt_green, "get the latest BCU release");
+#ifndef __APPLE__
 		printf("	%s%-60s%s%s\n", g_vt_default, "uuu        [-doc]", g_vt_green, "download the latest UUU");
+#endif
 		printf("\n");
 		printf("	%s%-60s%s%s\n", g_vt_default, "version", g_vt_green, "print version number");
 		printf("	%s%-60s%s%s%s\n", g_vt_default, "help", g_vt_green, "show command details", g_vt_default);
 		// printf("	%s%-60s%s%s%s\n", g_vt_default, "help [COMMAND_NAME]", g_vt_green, "show details and options of COMMAND_NAME", g_vt_default);
 
-#ifdef __linux__
+#if defined(__linux__) || defined(__APPLE__)
 		printf("%s", g_vt_kcyn);
 		printf("\n***please remember to run BCU with sudo or config the udev rules%s\n\n\n", g_vt_default);
 #endif
@@ -816,6 +820,7 @@ static void onoff(struct options_setting* setting, int delay_us, int is_init)
 
 static void uuu(struct options_setting* setting)
 {
+#ifndef __APPLE__
 	int res = 0;
 	struct latest_git_info uuu_download_info;
 	strcpy(uuu_download_info.download_url_base, "https://github.com/NXPmicro/mfgtools/releases/download/");
@@ -836,7 +841,7 @@ static void uuu(struct options_setting* setting)
 	}
 
 	strcpy(uuu_download_info.download_name, "uuu");
-#ifdef linux
+#if defined(linux)
 	strcpy(uuu_download_info.extension_name, "");
 #else
 	strcpy(uuu_download_info.extension_name, ".exe");
@@ -844,13 +849,17 @@ static void uuu(struct options_setting* setting)
 
 	printf("\nRelease Note for %s:\n%s\n\n", uuu_download_info.tag_name, uuu_download_info.release_note);
 	res = https_download(&uuu_download_info);
-#ifdef linux
+#if defined(linux)
 	if (!res)
 	{
 		char cmd[30];
 		sprintf(cmd, "chmod a+x %s", uuu_download_info.tag_name);
 		system(cmd);
 	}
+#endif
+
+#else
+	printf("\nuuu is not support MacOS for now.\n");
 #endif
 }
 

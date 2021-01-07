@@ -282,7 +282,7 @@ void* ft4232h_eeprom_create(char* chip_specification, void* parent)
 	if (status != 0)
 	{
 		printf("failed to open ftdi device, err = %d\n", status);
-#ifdef __linux__
+#if defined(__linux__) || defined(__APPLE__)
 		printf("***please make sure you run bcu with sudo\n");
 #endif		
 		free(ftee);
@@ -374,7 +374,7 @@ void* ft4232h_i2c_create(char* chip_specification, void* parent)
 			if (status != 0)
 			{
 				printf("failed to open ftdi device!\n");
-#ifdef __linux__
+#if defined(__linux__) || defined(__APPLE__)
 				printf("***please make sure you run bcu with sudo\n");
 #endif		
 				free(ft);
@@ -653,7 +653,7 @@ void* ft4232h_gpio_create(char* chip_specification, void* parent)
 		if (status != 0)
 		{
 			printf("failed to open ftdi device!\n");
-#ifdef __linux__
+#if defined(__linux__) || defined(__APPLE__)
 			printf("***please make sure you run bcu with sudo\n");
 #endif			
 

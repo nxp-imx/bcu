@@ -40,7 +40,7 @@
 #include "bcu_https.h"
 #include "version.h"
 
-#ifdef linux
+#if defined(linux) || defined(__APPLE__)
 struct MemoryStruct {
 	char* memory;
 	size_t size;
