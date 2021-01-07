@@ -165,8 +165,10 @@ static void upgrade_bcu(struct options_setting* setting)
 #if defined(linux) || defined(__APPLE__)
 		if (!res)
 		{
-			char cmd[30];
-			sprintf(cmd, "chmod a+x %s", bcu_download_info.tag_name);
+			char cmd[50] = { 0 }, filename[25] = { 0 };
+			strcat(filename, bcu_download_info.tag_name);
+			strcat(filename, bcu_download_info.extension_name);
+			sprintf(cmd, "chmod a+x %s", filename);
 			system(cmd);
 		}
 #endif
