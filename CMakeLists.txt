@@ -26,20 +26,10 @@ link_directories(${LIBUSB_LIBRARY_DIRS} ${LIBYAML_LIBRARY_DIRS})
 message("operation system is ${CMAKE_SYSTEM}")
 if (LINUX)
         target_link_libraries (bcu ${LIBUSB_LIBRARIES} ${PROJECT_SOURCE_DIR}/libftdi/src/libftdi1.a ${LIBYAML_LIBRARIES} ${PROJECT_SOURCE_DIR}/libcurl/build.bcu/lib/libcurl.a -lpthread -lssl -lcrypto -lm)
+        execute_process( COMMAND ./create_version_h.sh
+                         COMMAND ./build_libs.sh )
 elseif (MACOS)
         target_link_libraries (bcu ${LIBUSB_LIBDIR}/lib${LIBUSB_LIBRARIES}.dylib ${PROJECT_SOURCE_DIR}/libftdi/src/libftdi1.a ${LIBYAML_LIBDIR}/lib${LIBYAML_LIBRARIES}.dylib ${PROJECT_SOURCE_DIR}/libcurl/build.bcu/lib/libcurl.a -lpthread ${LIBOPENSSL_LIBDIR}/libssl.1.1.dylib ${LIBOPENSSL_LIBDIR}/libcrypto.1.1.dylib -lm)
+        execute_process( COMMAND ./create_version_h.sh
+                         COMMAND ./build_libs_mac.sh )
 endif ()
-
-#below is for version number generation
-#execute_process(
-#  COMMAND git describe --tags --long
-#  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-#  OUTPUT_VARIABLE GIT_VERSION
-#  OUTPUT_STRIP_TRAILING_WHITESPACE
-#)
-#configure_file(
-#  ${CMAKE_SOURCE_DIR}/version.h.in
-#  ${CMAKE_BINARY_DIR}/version.h
-#)
-execute_process( COMMAND ./create_version_h.sh
-                 COMMAND ./build_libs.sh )
