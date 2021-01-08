@@ -4,6 +4,29 @@
 ![GitHub](https://img.shields.io/github/license/NXPmicro/bcu.svg)
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/18825/badge.svg)](https://scan.coverity.com/projects/nxpmicro-bcu)
 
+# **Running environment**
+
+ - Windows 10, 64bit
+    - Need install FTDI Driver for Windows.
+    - Early Windows version(below 1.2.0) need install vs2017 redistribute package
+
+ - Ubuntu 16.04 or above, 64bit
+    - Need install libftdi, libyaml-dev and openssl
+      - $ sudo apt-get install libftdi1-2 libyaml-dev openssl
+    - If you do not want to run BCU as root in Linux, please follow the steps below to set the rules.
+      - $ cd /etc/udev/rules.d/
+      - $ sudo vim xx-ftdi.rules
+      - Add the line to this file: 
+      - SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6011", GROUP="dialout", MODE="0660"
+      - Save the file
+      - Re-plug the debug wire
+
+ - Mac OS 11.x Big Sur or above, x64 (ARM is not support for now)
+    - Need install Homebrew first
+      - $ /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    - Then install other libs by Homebrew
+      - $ brew install pkgconfig libftdi libyaml openssl
+
 # **Board support**
 
 ## i.MX8MP-EVK
