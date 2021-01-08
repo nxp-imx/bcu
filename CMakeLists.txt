@@ -31,5 +31,5 @@ if (LINUX)
 elseif (MACOS)
         target_link_libraries (bcu ${LIBUSB_LIBDIR}/lib${LIBUSB_LIBRARIES}.dylib ${PROJECT_SOURCE_DIR}/libftdi/src/libftdi1.a ${LIBYAML_LIBDIR}/lib${LIBYAML_LIBRARIES}.dylib ${PROJECT_SOURCE_DIR}/libcurl/build.bcu/lib/libcurl.a -lpthread ${LIBOPENSSL_LIBDIR}/libssl.1.1.dylib ${LIBOPENSSL_LIBDIR}/libcrypto.1.1.dylib -lm)
         execute_process( COMMAND ./create_version_h.sh
-                         COMMAND ./build_libs_mac.sh )
+                         COMMAND ./build_libs_mac.sh ${LIBOPENSSL_PREFIX} )
 endif ()
