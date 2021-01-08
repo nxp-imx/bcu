@@ -3,6 +3,15 @@ cmake_minimum_required(VERSION 3.4)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #set(CMAKE_BUILD_TYPE Debug)
+
+if (CMAKE_HOST_WIN32)
+        set(WINDOWS 1)
+elseif (CMAKE_HOST_APPLE)
+        set(MACOS 1)
+elseif (CMAKE_HOST_UNIX)
+        set(LINUX 1)
+endif ()
+
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBYAML REQUIRED yaml-0.1)
 pkg_check_modules(LIBOPENSSL REQUIRED openssl)
@@ -13,7 +22,14 @@ include_directories(${PROJECT_SOURCE_DIR})
 add_executable(bcu bcu.c port.c chip.c board.c bcu_parser.c bcu_yaml.c bcu_https.c bcu_ftdi_eeprom.c)
 #this link directories is not really needed
 link_directories(${LIBUSB_LIBRARY_DIRS} ${LIBYAML_LIBRARY_DIRS})
-target_link_libraries (bcu ${LIBUSB_LIBRARIES} ${PROJECT_SOURCE_DIR}/libftdi/src/libftdi1.a ${LIBYAML_LIBRARIES} ${PROJECT_SOURCE_DIR}/libcurl/build.bcu/lib/libcurl.a -lpthread -lssl -lcrypto -lm)
+
+message("operation system is ${CMAKE_SYSTEM}")
+if (LINUX)
+        target_link_libraries (bcu ${LIBUSB_LIBRARIES} ${PROJECT_SOURCE_DIR}/libftdi/src/libftdi1.a ${LIBYAML_LIBRARIES} ${PROJECT_SOURCE_DIR}/libcurl/build.bcu/lib/libcurl.a -lpthread -lssl -lcrypto -lm)
+elseif (MACOS)
+        target_link_libraries (bcu ${LIBUSB_LIBDIR}/lib${LIBUSB_LIBRARIES}.dylib ${PROJECT_SOURCE_DIR}/libftdi/src/libftdi1.a ${LIBYAML_LIBDIR}/lib${LIBYAML_LIBRARIES}.dylib ${PROJECT_SOURCE_DIR}/libcurl/build.bcu/lib/libcurl.a -lpthread ${LIBOPENSSL_LIBDIR}/libssl.1.1.dylib ${LIBOPENSSL_LIBDIR}/libcrypto.1.1.dylib -lm)
+endif ()
+
 #below is for version number generation
 #execute_process(
 #  COMMAND git describe --tags --long
