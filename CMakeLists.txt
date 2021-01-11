@@ -19,17 +19,18 @@ pkg_check_modules(LIBUSB REQUIRED libusb-1.0)
 project(bcu)
 include_directories(${LIBUSB_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/libftdi/src ${LIBYAML_INCLUDEDIR} ${PROJECT_SOURCE_DIR}/libcurl/include)
 include_directories(${PROJECT_SOURCE_DIR})
-add_executable(bcu bcu.c port.c chip.c board.c bcu_parser.c bcu_yaml.c bcu_https.c bcu_ftdi_eeprom.c)
-#this link directories is not really needed
-link_directories(${LIBUSB_LIBRARY_DIRS} ${LIBYAML_LIBRARY_DIRS})
 
 message("operation system is ${CMAKE_SYSTEM}")
 if (LINUX)
+        add_executable(bcu bcu.c port.c chip.c board.c bcu_parser.c bcu_yaml.c bcu_https.c bcu_ftdi_eeprom.c)
+        link_directories(${LIBUSB_LIBRARY_DIRS} ${LIBYAML_LIBRARY_DIRS})
         target_link_libraries (bcu ${LIBUSB_LIBRARIES} ${PROJECT_SOURCE_DIR}/libftdi/src/libftdi1.a ${LIBYAML_LIBRARIES} ${PROJECT_SOURCE_DIR}/libcurl/build.bcu/lib/libcurl.a -lpthread -lssl -lcrypto -lm)
         execute_process( COMMAND ./create_version_h.sh
                          COMMAND ./build_libs.sh )
 elseif (MACOS)
-        target_link_libraries (bcu ${LIBUSB_LIBDIR}/lib${LIBUSB_LIBRARIES}.dylib ${PROJECT_SOURCE_DIR}/libftdi/src/libftdi1.a ${LIBYAML_LIBDIR}/lib${LIBYAML_LIBRARIES}.dylib ${PROJECT_SOURCE_DIR}/libcurl/build.bcu/lib/libcurl.a -lpthread ${LIBOPENSSL_LIBDIR}/libssl.1.1.dylib ${LIBOPENSSL_LIBDIR}/libcrypto.1.1.dylib -lm)
+        add_executable(bcu_mac bcu.c port.c chip.c board.c bcu_parser.c bcu_yaml.c bcu_https.c bcu_ftdi_eeprom.c)
+        link_directories(${LIBUSB_LIBRARY_DIRS} ${LIBYAML_LIBRARY_DIRS})
+        target_link_libraries (bcu_mac ${LIBUSB_LIBDIR}/lib${LIBUSB_LIBRARIES}.dylib ${PROJECT_SOURCE_DIR}/libftdi/src/libftdi1.a ${LIBYAML_LIBDIR}/lib${LIBYAML_LIBRARIES}.dylib ${PROJECT_SOURCE_DIR}/libcurl/build.bcu/lib/libcurl.a -lpthread ${LIBOPENSSL_LIBDIR}/libssl.1.1.dylib ${LIBOPENSSL_LIBDIR}/libcrypto.1.1.dylib -lm)
         execute_process( COMMAND ./create_version_h.sh
                          COMMAND ./build_libs_mac.sh ${LIBOPENSSL_PREFIX} )
 endif ()
