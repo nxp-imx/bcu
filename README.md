@@ -25,7 +25,13 @@
     - Need install Homebrew first
       - $ /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     - Then install other libs by Homebrew
-      - $ brew install pkgconfig libftdi libyaml openssl
+      - $ brew install libftdi libyaml
+ - Mac OS 11.x Big Sur or above, arm64
+    - Apple Silicon can run x64 binary, but all libs should be installed to the path which is same as x64.
+      - $ arch -x86_64 $SHELL
+      - $ /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    - Install other libs by Homebrew to default path(/usr/local/Cellar)
+      - $ brew install libftdi libyaml
 
 # **Board support**
 
