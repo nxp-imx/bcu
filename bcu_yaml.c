@@ -45,6 +45,7 @@ struct bcu_yaml_version ver_before_big_ver[] =
 	{"1.0.153"},
 	{"1.0.195"},
 	{"1.0.237"},
+	{"1.0.253"},
 	{NULL}
 };
 
@@ -60,7 +61,7 @@ void writeConf(void)
 	char chip_specification[MAX_PATH_LENGTH];
 	int i = 0, j;
 
-	sprintf(text, "config_version: %s\n", GIT_VERSION);
+	sprintf(text, "config_version: %s                              \n", GIT_VERSION);
 	fputs(text, fp);
 	fputs("# show_id can set the display order of the rails.\n# show_id should start from 1.\n# If show_id: 0, it means that this rail will not be displayed and dumped.\n", fp);
 	fputs("#\n# Please DO NOT delete any line of a power rail!\n# If you don't want to show it, please just set its \"show_id\" as 0.\n", fp);
@@ -200,12 +201,20 @@ int replace_str(char* path, char* source, char* dest)
 					fseek(fp, -(move_length + 1), SEEK_CUR);
 #endif
 					fp_start = ftell(fp);
-					for(int i = 0; i < strlen(source); i++)
+					if (strlen(source) >= strlen(dest))
 					{
-						if(i < strlen(dest))
+						for(int i = 0; i < strlen(source); i++)
+						{
+							if(i < strlen(dest))
+								fputc(dest[i], fp);
+							else
+								fputc(' ', fp);
+						}
+					} else {
+						for(int i = 0; i < strlen(dest); i++)
+						{
 							fputc(dest[i], fp);
-						else
-							fputc(' ', fp);
+						}
 					}
 					fseek(fp, fp_end, SEEK_SET);
 				}
