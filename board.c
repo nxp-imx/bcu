@@ -457,7 +457,7 @@ struct mapping imx8ulpevk_board[] = {
 	{"buck1_lsw3_cpu_1v8", power, IMX8ULPEVK_POWER_PATH(4, 2, 0x13, 100, 100), 0x00},
 	{"ldo4_cpu_1v8", power, IMX8ULPEVK_POWER_PATH(4, 3, 0x13, 100, 100), 0x00},
 	{"ldo2_cpu_3v3", power, IMX8ULPEVK_POWER_PATH(4, 4, 0x13, 100, 100), 0x00},
-	{"vsys_5v0", power, IMX8ULPEVK_POWER_SWITCH_PATH(5, 1, 0x14, 20, 2, 10000), 0x00},
+	{"vsys_5v0_4v2", power, IMX8ULPEVK_POWER_SWITCH_PATH(5, 1, 0x14, 20, 2, 10000), 0x00},
 	{"ldo1_cpu_1v1_0v6", power, IMX8ULPEVK_POWER_PATH(5, 3, 0x14, 50, 50), 0x00},
 	{"buck4_dram_1v1", power, IMX8ULPEVK_POWER_PATH(5, 4, 0x14, 50, 50), 0x00},
 
@@ -496,10 +496,8 @@ struct boot_mode imx8ulpevk_board_boot_modes[] = {
 };
 
 struct board_power_group imx8ulpevkpwr_power_groups[] = {
-	// {"GROUP_SOC", "vdd_arm,vdd_soc"},
-	// {"GROUP_SOC_FULL", "vdd_arm,vdd_soc"},
-	// {"GROUP_DRAM", "lpd4_vdd1,lpd4_vdd2"},
-	// {"GROUP_PLATFORM", "vsys_5v"},
+	{"GROUP_SOC_FULL", "buck1_cpu_1v8,buck2_cpu_1v0,buck3_cpu_1v0,buck4_cpu_1v1,ldo1_cpu_1v1,ldo1_cpu_1v1_0v6,buck1_lsw2_cpu_1v8,buck1_lsw3_cpu_1v8,ldo5_cpu_3v0,ldo2_cpu_3v3,buck1_lsw1_cpu_1v8,ldo4_cpu_1v8,buck1_lsw4_cpu_1v8"},
+	{"GROUP_PLATFORM", "vsys_5v0_4v2"},
 	{NULL, 0}
 };
 
