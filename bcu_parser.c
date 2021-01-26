@@ -379,6 +379,14 @@ int parse_options(char* cmd, int argc, char** argv, struct options_setting* sett
 			setting->auto_find_board = 1;
 			// printf("will auto find the board...\n");
 		}
+		else if (strncmp(argv[i], "-boothex=", 9) == 0 && strlen(argv[i]) > 4)
+		{
+			setting->boot_mode_hex = strtol(input, NULL, 16);
+		}
+		else if (strncmp(argv[i], "-bootbin=", 9) == 0 && strlen(argv[i]) > 4)
+		{
+			setting->boot_mode_hex = strtol(input, NULL, 2);
+		}
 		else if (strncmp(argv[i], "-delay=", 7) == 0 && strlen(argv[i]) > 7)
 		{
 			setting->delay = atoi(input);

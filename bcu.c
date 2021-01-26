@@ -185,7 +185,8 @@ static void print_help(char* cmd)
 		printf("%s\n", "Usage:");
 		printf("%s\n\n", "bcu command [-options]");
 		printf("%s\n", "list of available commands:");
-		printf("	%s%-60s%s%s\n", g_vt_default, "reset  [BOOTMODE_NAME] [-hold=] [-board=/-auto] [-id=]", g_vt_green, "reset the board (optional [BOOTMODE_NAME])");
+		printf("	%s%-60s%s%s\n", g_vt_default, "reset  [BOOTMODE_NAME] [-hold=] [-board=/-auto] [-id=]", g_vt_green, "reset the board, and then boot from BOOTMODE_NAME");
+		printf("	%s%-60s%s%s\n", g_vt_default, "       [-boothex=] [-bootbin=]", g_vt_green, "or the boot mode value set by [-boothex=] [-bootbin=]");
 		printf("	%s%-60s%s%s\n", g_vt_default, "onoff  [-hold=] [-board=/-auto] [-id=]", g_vt_green, "press the ON/OFF button once for -hold= time(ms)");
 		printf("	%s%-60s%s%s\n", g_vt_default, "init   [BOOTMODE_NAME] [-board=/-auto] [-id=]", g_vt_green, "enable the remote control with a boot mode");
 		printf("	%s%-60s%s%s\n", g_vt_default, "deinit [BOOTMODE_NAME] [-board=/-auto] [-id=]", g_vt_green, "disable the remote control");
@@ -201,12 +202,13 @@ static void print_help(char* cmd)
 		printf("	%s%-60s%s%s\n", g_vt_default, "get_level [GPIO_NAME] [-board=/-auto] [-id=]", g_vt_green, "get level state of pin GPIO_NAME");
 		printf("	%s%-60s%s%s\n", g_vt_default, "set_gpio [GPIO_NAME] [1/0] [-board=/-auto] [-id=]", g_vt_green, "set pin GPIO_NAME to be high(1) or low(0)");
 		printf("	%s%-60s%s%s\n", g_vt_default, "set_boot_mode [BOOTMODE_NAME] [-board=/-auto] [-id=]", g_vt_green, "set BOOTMODE_NAME as boot mode");
+		printf("	%s%-60s%s%s\n", g_vt_default, "              [-boothex=] [-bootbin=]", g_vt_green, "");
 		printf("	%s%-60s%s%s\n", g_vt_default, "get_boot_mode [-board=/-auto] [-id=]", g_vt_green, "read the boot mode set by BCU before");
 		printf("\n");
 		printf("	%s%-60s%s%s\n", g_vt_default, "lsftdi", g_vt_green, "list all boards connected by ftdi device");
 		printf("	%s%-60s%s%s\n", g_vt_default, "lsboard", g_vt_green, "list all supported board models");
-		printf("	%s%-60s%s%s\n", g_vt_default, "lsbootmode [-board=/-auto]", g_vt_green, "show a list of available boot mode of a board");
-		printf("	%s%-60s%s%s\n", g_vt_default, "lsgpio     [-board=/-auto]", g_vt_green, "show a list of available gpio pin of a board");
+		printf("	%s%-60s%s%s\n", g_vt_default, "lsbootmode [-board=/-auto]", g_vt_green, "show a list of available BOOTMODE_NAME of a board");
+		printf("	%s%-60s%s%s\n", g_vt_default, "lsgpio     [-board=/-auto]", g_vt_green, "show a list of available GPIO_NAME of a board");
 		printf("\n");
 		printf("	%s%-60s%s%s\n", g_vt_default, "upgrade    [-doc] [-f]", g_vt_green, "get the latest BCU release");
 #ifndef __APPLE__
