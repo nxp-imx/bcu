@@ -684,7 +684,7 @@ static void reset(struct options_setting* setting)
 		return;
 	struct gpio_device* gpio = NULL;
 	int status = -1;
-	int a = 0;
+	int a = 0, mask = 0;
 	char sr_name[100];
 
 	status = initialize(setting, RESET_NOW);
@@ -717,6 +717,7 @@ static void reset(struct options_setting* setting)
 	printf("rebooting...\n");
 
 	gpio = get_gpio("reset", board);
+	mask = board->mappings[get_gpio_id("reset", board)].initinfo & 0xF;
 	if (gpio == NULL)
 	{
 		printf("reset: error building device linked list\n");
@@ -726,14 +727,14 @@ static void reset(struct options_setting* setting)
 	//delay
 	msleep(setting->delay);
 
-	status = gpio->gpio_write(gpio, 0x00); //reset low
+	status = gpio->gpio_write(gpio, mask ? 0x00 : 0xFF); //reset low
 	if (setting->hold)
 		msleep(setting->hold);
 	else
 		msleep(500);
 	if (setting->boot_mode_hex != -1)
 	{
-		status |= gpio->gpio_write(gpio, 0xFF) << 1;//reset high
+		status |= gpio->gpio_write(gpio, mask ? 0xFF : 0x00) << 1;//reset high
 	}
 	free_gpio(gpio);
 
@@ -753,12 +754,13 @@ static void reset(struct options_setting* setting)
 			msleep(10);
 
 			gpio = get_gpio("reset", board);
+			mask = board->mappings[get_gpio_id("reset", board)].initinfo & 0xF;
 			if (gpio == NULL)
 			{
 				printf("reset: error building device linked list\n");
 				return;
 			}
-			status |= gpio->gpio_write(gpio, 0xFF) << 3; //reset high
+			status |= gpio->gpio_write(gpio, mask ? 0xFF : 0x00) << 3; //reset high
 			free_gpio(gpio);
 
 			if (!status)
@@ -770,12 +772,13 @@ static void reset(struct options_setting* setting)
 		else
 		{
 			gpio = get_gpio("remote_en", board);
+			mask = board->mappings[get_gpio_id("remote_en", board)].initinfo & 0xF;
 			if (gpio == NULL)
 			{
 				printf("reset: error building device linked list\n");
 				return;
 			}
-			status |= gpio->gpio_write(gpio, 0x00) << 2; //remote_en low
+			status |= gpio->gpio_write(gpio, mask ? 0x00 : 0xFF) << 2; //remote_en low
 			if (!status)
 				printf("%sDISABLE%s remote control, boot by %sBOOT SWITCH%s\n", g_vt_red, g_vt_default, g_vt_yellow, g_vt_default);
 			free_gpio(gpio);
