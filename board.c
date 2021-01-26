@@ -489,9 +489,13 @@ struct mapping imx8ulpevk_board[] = {
 struct boot_mode imx8ulpevk_board_boot_modes[] = {
 	{"fuse", 0x00},
 	{"usb", 0x40},
-	{"emmc", 0x82},
-	{"nand", 0x92},
-	{"nor", 0xa2},
+	{"emmc_s", 0x80},
+	{"emmc_nor_lp", 0x81},
+	{"emmc_nor", 0x82},
+	{"nand_nor", 0x92},
+	{"nor_s", 0xa0},
+	{"nor_nor_lp", 0xa1},
+	{"nor_nor", 0xa2},
 	{NULL, 0}
 };
 
