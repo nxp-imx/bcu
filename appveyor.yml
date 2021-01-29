@@ -1,10 +1,11 @@
-version: 1.1.7
+version: bcu_1.1.12
 
 #- switched to 2017 for now because VS 2019 imagines does not have coverity build tool
 environment:
   matrix:
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
     - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu1604
+    - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu2004
     - APPVEYOR_BUILD_WORKER_IMAGE: macOS
   bcu_coverity_token:
     secure: YuctP7YsJQIzsrBQtgEfwkYPu3StAEWV9SgPIBjwZDo=
@@ -29,12 +30,20 @@ install:
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu1604" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libyaml-dev); fi
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu1604" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libusb-1.0-0-dev); fi
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu1604" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install openssl); fi
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2004" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  update); fi
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2004" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libconfuse-dev swig python-dev libboost-all-dev); fi
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2004" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libyaml-dev); fi
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2004" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libusb-1.0-0-dev); fi
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2004" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install openssl libssl-dev); fi
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "macOS" ]; then ( brew reinstall pkgconfig; export PATH="/usr/local/Cellar/pkg-config/0.29.2_3/bin:${PATH}"; brew reinstall libyaml openssl; brew install libftdi; ln -s /usr/local/Cellar/openssl@1.1/1.1.1i/lib/pkgconfig/*.pc /usr/local/lib/pkgconfig/; pkg-config --list-all;); fi
 
 build_script:
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu1604" ]; then (cmake .); fi
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2004" ]; then (cmake .); fi
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "macOS" ]; then (export PATH="/usr/local/Cellar/pkg-config/0.29.2_3/bin:${PATH}"; cmake .); fi
 - sh: make
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu1604" ]; then (mv bcu bcu_Ubuntu1618); fi
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2004" ]; then (mv bcu bcu_Ubuntu20); fi
 
 # no schedule coverity check:
 #- cmd: cov-build --dir cov-int msbuild %APPVEYOR_BUILD_FOLDER%/Board_Control_Utilities.sln /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
@@ -49,7 +58,8 @@ build_script:
 
 artifacts:
 - path: bcu.exe
-- path: bcu
+- path: bcu_Ubuntu1618
+- path: bcu_Ubuntu20
 - path: bcu_mac
 
 before_deploy:
@@ -59,5 +69,5 @@ deploy:
   description: prebuild for $(APPVEYOR_REPO_COMMIT) \n\n $(APPVEYOR_REPO_COMMIT_MESSAGE)
   auth_token:
     secure: SWWVkwSfPyVIaPChBBl+uAA3Fau9Rl5iNPQ9VRL8yyggXvc6wPcr/O9iXBMVM7Ju
-  artifact: bcu.exe;  bcu;  bcu_mac;
+  artifact: bcu.exe;  bcu_Ubuntu1618;  bcu_Ubuntu20;  bcu_mac;
   draft: true
