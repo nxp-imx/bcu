@@ -1,4 +1,6 @@
-version: bcu_1.1.12
+version: bcu_1.1.13
+
+skip_tags: true
 
 #- switched to 2017 for now because VS 2019 imagines does not have coverity build tool
 environment:
