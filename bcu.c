@@ -124,12 +124,51 @@ static void print_version()
 	printf("version %s\n", GIT_VERSION);
 }
 
+#if defined(linux)
+char* shellcmd(char* cmd, char* buff, int size)
+{
+	char temp[256];
+	FILE* fp = NULL;
+	int offset = 0;
+	int len;
+
+	fp = popen(cmd, "r");
+	if(fp == NULL)
+	{
+		return NULL;
+	}
+
+	while(fgets(temp, sizeof(temp), fp) != NULL)
+	{
+		len = strlen(temp);
+		if(offset + len < size)
+		{
+			strcpy(buff+offset, temp);
+			offset += len;
+		}
+		else
+		{
+			buff[offset] = 0;
+			break;
+		}
+	}
+
+	if(fp != NULL)
+	{
+		pclose(fp);
+	}
+
+	return buff;
+}
+#endif
+
 static void upgrade_bcu(struct options_setting* setting)
 {
 	printf("now version %s\n", GIT_VERSION);
 
 	int res = 0;
 	char version[15];
+	char sysversion[15], sys_ver = 0;
 	struct latest_git_info bcu_download_info;
 	strcpy(bcu_download_info.download_url_base, "https://github.com/NXPmicro/bcu/releases/download/");
 
@@ -150,7 +189,13 @@ static void upgrade_bcu(struct options_setting* setting)
 
 	strcpy(bcu_download_info.download_name, "bcu");
 #if defined(linux)
-	strcpy(bcu_download_info.extension_name, "");
+	memset(sysversion, 0, sizeof(sysversion));
+	shellcmd("lsb_release -r -s", sysversion, sizeof(sysversion));
+	sys_ver = (sysversion[0] - '0') * 10 + (sysversion[1] - '0');
+	if (sys_ver == 20)
+		strcpy(bcu_download_info.extension_name, "_Ubuntu20");
+	else
+		strcpy(bcu_download_info.extension_name, "_Ubuntu1618");
 #elif defined(__APPLE__)
 	strcpy(bcu_download_info.extension_name, "_mac");
 #else
@@ -167,7 +212,7 @@ static void upgrade_bcu(struct options_setting* setting)
 		{
 			char cmd[50] = { 0 }, filename[25] = { 0 };
 			strcat(filename, bcu_download_info.tag_name);
-			strcat(filename, bcu_download_info.extension_name);
+			// strcat(filename, bcu_download_info.extension_name);
 			sprintf(cmd, "chmod a+x %s", filename);
 			system(cmd);
 		}

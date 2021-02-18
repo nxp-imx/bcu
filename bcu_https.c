@@ -140,7 +140,7 @@ int _download(char* url, char* out, char* extname)
 	char outname[50] = "";
 
 	strcat(outname, out);
-	strcat(outname, extname);
+	// strcat(outname, extname);
 
 	chunk = curl_slist_append(chunk, "User-Agent: bcu");
 	curl = curl_easy_init();
@@ -505,8 +505,13 @@ int https_download(struct latest_git_info* get_info)
 	strcat(get_info->download_url, get_info->download_name);
 	strcat(get_info->download_url, get_info->extension_name);
 
+#if defined(WIN32)
 	printf("Downloading %s%s from %s\n", get_info->tag_name,
 			get_info->extension_name, get_info->download_url);
+#else
+	printf("Downloading %s from %s\n", get_info->tag_name,
+			get_info->download_url);
+#endif
 	if(_download(get_info->download_url, get_info->tag_name, get_info->extension_name))
 	{
 		printf("Download Failed!\n");
