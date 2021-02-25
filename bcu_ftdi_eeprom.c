@@ -56,7 +56,7 @@ struct ftdi_eeprom_field_code_tb ftdi_eeprom_field[] = {
 	{ftdi_eeprom_pmic_id, 0x1, "PPF7100BVMA1ES"},  //On imx8dxl-evk
 	{ftdi_eeprom_pmic_id, 0x2, "PCA9450CHN"},  //On imx8mpevk-cpu and imx8mpevk-cpu-pwr
 	{ftdi_eeprom_pmic_id, 0x3, "PPF7100BMMA2ES"},
-	{ftdi_eeprom_pmic_id, 0x4, "PIMX8UD7DVP10SA"},  //On imx8ulp-evk a0
+	{ftdi_eeprom_pmic_id, 0x4, "PCA9460AUK"},  //On imx8ulp-evk a0
 
 	{0, 0, NULL}//null terminated
 };
