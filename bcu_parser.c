@@ -273,7 +273,7 @@ void set_options_default(struct options_setting* setting)
 	setting->force = 0;
 	setting->pmt = 0;
 	setting->nodisplay = 0;
-	setting->dumpname[0] = '\0';
+	setting->dumpname = NULL;
 	setting->refreshms = 0;
 	setting->use_rms = 0;
 	setting->rangefixed = 0;
@@ -425,14 +425,19 @@ int parse_options(char* cmd, int argc, char** argv, struct options_setting* sett
 		else if (strncmp(argv[i], "-dump=", 6) == 0 && strlen(argv[i]) > 6)
 		{
 			setting->dump = 1;
-			strcpy(setting->dumpname, input);
+
+			setting->dumpname = strdup(input);
 			int len1 = strlen(setting->dumpname), len2 = strlen(".csv");
 			if (len1 == 0)
-				strcpy(setting->dumpname, "monitor_record.csv");
+			{
+				free(setting->dumpname);
+				setting->dumpname = strdup("monitor_record.csv");
+			}
 			else
 			{
 				if(strcmp(setting->dumpname + len1 - len2, ".csv"))
 				{
+					setting->dumpname = realloc(setting->dumpname, strlen(setting->dumpname) + strlen(".csv") + 1);
 					strcat(setting->dumpname, ".csv");
 				}
 			}
@@ -441,7 +446,7 @@ int parse_options(char* cmd, int argc, char** argv, struct options_setting* sett
 		else if (strcmp(argv[i], "-dump") == 0)
 		{
 			setting->dump = 1;
-			strcpy(setting->dumpname, "monitor_record.csv");
+			setting->dumpname = strdup("monitor_record.csv");
 			printf("dump data into %s file\n", setting->dumpname);
 		}
 		else if (strcmp(argv[i], "-pmt") == 0)
@@ -454,7 +459,7 @@ int parse_options(char* cmd, int argc, char** argv, struct options_setting* sett
 			if (!setting->dump)
 			{
 				setting->dump = 1;
-				strcpy(setting->dumpname, "monitor_record.csv");
+				setting->dumpname = strdup("monitor_record.csv");
 				printf("dump data into %s file\n", setting->dumpname);
 			}
 		}

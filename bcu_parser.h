@@ -59,7 +59,7 @@ struct options_setting {
 	char gpio_name[MAX_MAPPING_NAME_LENGTH];
 	int location_id;
 	int dump;
-	char dumpname[50];
+	char *dumpname;
 	int force;
 	int pmt;
 	int nodisplay;

@@ -2336,6 +2336,7 @@ static void monitor(struct options_setting* setting)
 			fprintf(fptr, "\n");
 		}
 		fclose(fptr);
+		free(setting->dumpname);
 	}
 	printf("%s", g_vt_clear);
 	printf("%s", g_vt_home);
