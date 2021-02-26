@@ -32,7 +32,7 @@
 #define BCU_YAML_H
 
 #ifdef _WIN32
-#include "msvs/libyaml/yaml.h"
+#include "libyaml/include/yaml.h"
 #endif
 #if defined(linux) || defined(__APPLE__)
 #include <yaml.h>

@@ -44,7 +44,7 @@
     <ClInclude Include="..\..\libyaml\src\yaml_private.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="yaml.h">
+    <ClInclude Include="..\..\libyaml\include\yaml.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
