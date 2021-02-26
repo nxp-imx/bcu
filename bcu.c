@@ -168,7 +168,6 @@ static void upgrade_bcu(struct options_setting* setting)
 
 	int res = 0;
 	char version[15];
-	char sysversion[15], sys_ver = 0;
 	struct latest_git_info bcu_download_info;
 	strcpy(bcu_download_info.download_url_base, "https://github.com/NXPmicro/bcu/releases/download/");
 
@@ -189,6 +188,8 @@ static void upgrade_bcu(struct options_setting* setting)
 
 	strcpy(bcu_download_info.download_name, "bcu");
 #if defined(linux)
+	char sysversion[15], sys_ver = 0;
+
 	memset(sysversion, 0, sizeof(sysversion));
 	shellcmd("lsb_release -r -s", sysversion, sizeof(sysversion));
 	sys_ver = (sysversion[0] - '0') * 10 + (sysversion[1] - '0');
@@ -1243,8 +1244,8 @@ static void monitor(struct options_setting* setting)
 	int sr_level[MAX_NUMBER_OF_POWER];
 	int range_control = 0;
 	int range_level[MAX_NUMBER_OF_POWER] = {0};
-	float cur_range[MAX_NUMBER_OF_POWER];
-	float unused_range[MAX_NUMBER_OF_POWER];
+	double cur_range[MAX_NUMBER_OF_POWER];
+	double unused_range[MAX_NUMBER_OF_POWER];
 
 	//initialize
 	for (int i = 0; i < MAX_NUMBER_OF_POWER; i++)

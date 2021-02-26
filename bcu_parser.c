@@ -460,8 +460,8 @@ int parse_options(char* cmd, int argc, char** argv, struct options_setting* sett
 		}
 		else if (strncmp(argv[i], "-hz=", 4) == 0 && strlen(argv[i]) > 4)
 		{
-			float hz = atof(input);
-			setting->refreshms = 1000.0 / hz;
+			double hz = atof(input);
+			setting->refreshms = (int)(1000.0 / hz);
 		}
 		else if (strcmp(argv[i], "-rms") == 0)
 		{
@@ -799,35 +799,35 @@ void groups_init(struct group* groups, int num)
 	}
 }
 
-void __str_replace(char * cp, int n, char * str)
+void __str_replace(char* cp, int n, char* str)
 {
 	int lenofstr;
-	char * tmp;
+	char* tmp;
 	lenofstr = strlen(str);
-	if(lenofstr < n)
+	if (lenofstr < n)
 	{
-		tmp = cp+n;
-		while(*tmp)
+		tmp = cp + n;
+		while (*tmp)
 		{
-			*(tmp-(n-lenofstr)) = *tmp;
+			*(tmp - (n - lenofstr)) = *tmp;
 			tmp++;
 		}
-		*(tmp-(n-lenofstr)) = *tmp;
+		*(tmp - (n - lenofstr)) = *tmp;
 	}
 	else
 	{
-		if(lenofstr > n)
+		if (lenofstr > n)
 		{
 			tmp = cp;
-			while(*tmp) tmp++;
-			while(tmp>=cp+n)
+			while (*tmp) tmp++;
+			while (tmp >= cp + n)
 			{
-				*(tmp+(lenofstr-n)) = *tmp;
+				*(tmp + (lenofstr - n)) = *tmp;
 				tmp--;
 			}
 		}
 	}
-	strncpy(cp,str,lenofstr);
+	strncpy(cp, str, lenofstr);
 }
 
 int str_replace(char *str, char *source, char *dest)

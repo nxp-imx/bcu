@@ -185,7 +185,7 @@ int _https_get_by_url(char* remote_url, struct latest_git_info* get_info)
 	HINTERNET  hSession = NULL,
 		hConnect = NULL,
 		hRequest = NULL;
-	int strsize = 0;
+	unsigned int strsize = 0;
 	char host[30];
 	char objname[256];
 	wchar_t whost[30];
