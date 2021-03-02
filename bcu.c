@@ -1208,16 +1208,16 @@ static void monitor(struct options_setting* setting)
 
 		/*print first row*/
 		int i = 1, index_n;
-		fprintf(fptr, "time(ms),");
+		fprintf(fptr, "time(ms)");
 		index_n = get_power_index_by_showid(i, board);
 		while (index_n != -1)
 		{
 			if (board->mappings[index_n].type == power && board->mappings[index_n].initinfo != 0)
 			{
 				if (!setting->pmt)
-					fprintf(fptr, "%s voltage(V),%s current(mA),", board->mappings[index_n].name, board->mappings[index_n].name);
+					fprintf(fptr, ",%s voltage(V),%s current(mA)", board->mappings[index_n].name, board->mappings[index_n].name);
 				else
-					fprintf(fptr, "%s voltage(V),%s current(mA),%s power(mW),", board->mappings[index_n].name, board->mappings[index_n].name, board->mappings[index_n].name);
+					fprintf(fptr, ",%s voltage(V),%s current(mA),%s power(mW)", board->mappings[index_n].name, board->mappings[index_n].name, board->mappings[index_n].name);
 			}
 			i++;
 			index_n = get_power_index_by_showid(i, board);
@@ -1296,7 +1296,7 @@ static void monitor(struct options_setting* setting)
 	{
 		for (int i = 0; i < num_of_groups; i++)
 		{
-			fprintf(fptr, "%s Power(mW),", board->power_groups[i].group_name);
+			fprintf(fptr, ",%s Power(mW)", board->power_groups[i].group_name);
 		}
 		fprintf(fptr, "\n");
 	}
@@ -1709,7 +1709,7 @@ static void monitor(struct options_setting* setting)
 		{
 			unsigned long now;
 			get_msecond(&now);
-			fprintf(fptr, "%ld,", (long)now - start);//add time before the first element
+			fprintf(fptr, "%ld", (long)now - start);//add time before the first element
 			for (int m = 0; m < n + 1; m++)
 			{
 				int k = get_power_index_by_showid(m, board);
@@ -1718,14 +1718,14 @@ static void monitor(struct options_setting* setting)
 				if (board->mappings[k].initinfo != 0)
 				{
 					if (!setting->pmt)
-						fprintf(fptr, "%lf,%lf,", vnow[k], cnow_fwrite[k]);
+						fprintf(fptr, ",%lf,%lf", vnow[k], cnow_fwrite[k]);
 					else
-						fprintf(fptr, "%lf,%lf,%lf,", vnow[k], cnow_fwrite[k], pnow_fwrite[k]);
+						fprintf(fptr, ",%lf,%lf,%lf", vnow[k], cnow_fwrite[k], pnow_fwrite[k]);
 				}
 			}
 			for (int k = 0; k < num_of_groups; k++)
 			{
-				fprintf(fptr, "%lf,", groups[k].sum);
+				fprintf(fptr, ",%lf", groups[k].sum);
 			}
 			fprintf(fptr, "\n");
 		}
@@ -2110,8 +2110,8 @@ static void monitor(struct options_setting* setting)
 					groups[k].avg_data_size = 0;
 				}
 				get_msecond(&avgstart);
-				if (setting->dump == 1)
-					fprintf(fptr, "HOT-KEY %d PRESSED: Reset AVG value,\n", hotkey_index);
+				if (setting->dump == 1 && !setting->pmt)
+					fprintf(fptr, "HOT-KEY %d PRESSED: Reset AVG value\n", hotkey_index);
 				break;
 			case 2:
 				for (int k = 0; k < n; k++)
@@ -2129,8 +2129,8 @@ static void monitor(struct options_setting* setting)
 					groups[k].min = 99999;
 				}
 				get_msecond(&maxminstart);
-				if (setting->dump == 1)
-					fprintf(fptr, "HOT-KEY %d PRESSED: Reset MAXMIN value,\n", hotkey_index);
+				if (setting->dump == 1 && !setting->pmt)
+					fprintf(fptr, "HOT-KEY %d PRESSED: Reset MAXMIN value\n", hotkey_index);
 				break;
 			case 3:
 				for (int k = 0; k < n; k++)
@@ -2154,8 +2154,8 @@ static void monitor(struct options_setting* setting)
 					groups[k].min = 99999;
 				}
 				get_msecond(&maxminstart);
-				if (setting->dump == 1)
-					fprintf(fptr, "HOT-KEY %d PRESSED: Reset AVG and MAXMIN value,\n", hotkey_index);
+				if (setting->dump == 1 && !setting->pmt)
+					fprintf(fptr, "HOT-KEY %d PRESSED: Reset AVG and MAXMIN value\n", hotkey_index);
 				avgstart = maxminstart;
 				break;
 			case 4:
@@ -2180,13 +2180,13 @@ static void monitor(struct options_setting* setting)
 				{
 					printf("Will boot from BOOT SWITCH, input=%d%s\n", setting->boot_mode_hex, g_vt_clear_line);
 					setting->boot_mode_hex = -1;
-					if (setting->dump == 1)
-						fprintf(fptr, "HOT-KEY %d PRESSED: Reset the board from BOOT SWITCH,\n", hotkey_index);
+					if (setting->dump == 1 && !setting->pmt)
+						fprintf(fptr, "HOT-KEY %d PRESSED: Reset the board from BOOT SWITCH\n", hotkey_index);
 				}
 				else
 				{
-					if (setting->dump == 1)
-						fprintf(fptr, "HOT-KEY %d PRESSED: Reset the board from %s,\n", hotkey_index, board->boot_modes[setting->boot_mode_hex].name);
+					if (setting->dump == 1 && !setting->pmt)
+						fprintf(fptr, "HOT-KEY %d PRESSED: Reset the board from %s\n", hotkey_index, board->boot_modes[setting->boot_mode_hex].name);
 				}
 
 				reset(setting);
@@ -2218,8 +2218,8 @@ static void monitor(struct options_setting* setting)
 			case 6:
 				printf("\nSimulate pressing the ON/OFF button once shortly%s\n", g_vt_clear_line);
 				onoff(setting, 500, DONT_INIT);
-				if (setting->dump == 1)
-					fprintf(fptr, "HOT-KEY %d PRESSED: Resume the board,\n", hotkey_index);
+				if (setting->dump == 1 && !setting->pmt)
+					fprintf(fptr, "HOT-KEY %d PRESSED: Resume the board\n", hotkey_index);
 				break;
 			default:
 				break;
@@ -2273,9 +2273,9 @@ static void monitor(struct options_setting* setting)
 	free_device_linkedlist_backward(end_point);
 	if (setting->dump == 1)
 	{
-		if (GV_MONITOR_TERMINATED && setting->dump_statistics)
+		if (GV_MONITOR_TERMINATED && setting->dump_statistics && !setting->pmt)
 		{
-			fprintf(fptr, "AVG,");
+			fprintf(fptr, "AVG");
 			for (int m = 0; m < n + 1; m++)
 			{
 				int k = get_power_index_by_showid(m, board);
@@ -2284,18 +2284,18 @@ static void monitor(struct options_setting* setting)
 				if (board->mappings[k].initinfo != 0)
 				{
 					if (!setting->pmt)
-						fprintf(fptr, "%lf,%lf,", vavg[k], cavg[k]);
+						fprintf(fptr, ",%lf,%lf", vavg[k], cavg[k]);
 					else
-						fprintf(fptr, "%lf,%lf,%lf,", vavg[k], cavg[k], pavg[k]);
+						fprintf(fptr, ",%lf,%lf,%lf", vavg[k], cavg[k], pavg[k]);
 				}
 			}
 			for (int k = 0; k < num_of_groups; k++)
 			{
-				fprintf(fptr, "%lf,", groups[k].avg);
+				fprintf(fptr, ",%lf", groups[k].avg);
 			}
 			fprintf(fptr, "\n");
 
-			fprintf(fptr, "MAX,");
+			fprintf(fptr, "MAX");
 			for (int m = 0; m < n + 1; m++)
 			{
 				int k = get_power_index_by_showid(m, board);
@@ -2304,18 +2304,18 @@ static void monitor(struct options_setting* setting)
 				if (board->mappings[k].initinfo != 0)
 				{
 					if (!setting->pmt)
-						fprintf(fptr, "%lf,%lf,", vmax[k], cmax[k]);
+						fprintf(fptr, ",%lf,%lf", vmax[k], cmax[k]);
 					else
-						fprintf(fptr, "%lf,%lf,%lf,", vmax[k], cmax[k], pmax[k]);
+						fprintf(fptr, ",%lf,%lf,%lf", vmax[k], cmax[k], pmax[k]);
 				}
 			}
 			for (int k = 0; k < num_of_groups; k++)
 			{
-				fprintf(fptr, "%lf,", groups[k].max);
+				fprintf(fptr, ",%lf", groups[k].max);
 			}
 			fprintf(fptr, "\n");
 
-			fprintf(fptr, "MIN,");
+			fprintf(fptr, "MIN");
 			for (int m = 0; m < n + 1; m++)
 			{
 				int k = get_power_index_by_showid(m, board);
@@ -2324,14 +2324,14 @@ static void monitor(struct options_setting* setting)
 				if (board->mappings[k].initinfo != 0)
 				{
 					if (!setting->pmt)
-						fprintf(fptr, "%lf,%lf,", vmin[k], cmin[k]);
+						fprintf(fptr, ",%lf,%lf", vmin[k], cmin[k]);
 					else
-						fprintf(fptr, "%lf,%lf,%lf,", vmin[k], cmin[k], pmin[k]);
+						fprintf(fptr, ",%lf,%lf,%lf", vmin[k], cmin[k], pmin[k]);
 				}
 			}
 			for (int k = 0; k < num_of_groups; k++)
 			{
-				fprintf(fptr, "%lf,", groups[k].min);
+				fprintf(fptr, ",%lf", groups[k].min);
 			}
 			fprintf(fptr, "\n");
 		}
