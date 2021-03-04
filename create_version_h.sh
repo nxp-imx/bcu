@@ -1,4 +1,4 @@
-echo creating version.h
+echo creating ${1}/version.h
 
 if [ "${APPVEYOR_BUILD_VERSION}" = "" ];
 then
@@ -8,4 +8,4 @@ else
 fi
 
 version=`git describe --tags --long`
-echo "#define GIT_VERSION \"$version\"" > version.h
+echo "#define GIT_VERSION \"$version\"" > ${1}/version.h

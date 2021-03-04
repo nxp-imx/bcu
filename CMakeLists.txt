@@ -25,8 +25,9 @@ if (LINUX)
         add_executable(bcu bcu.c port.c chip.c board.c bcu_parser.c bcu_yaml.c bcu_https.c bcu_ftdi_eeprom.c)
         link_directories(${LIBUSB_LIBRARY_DIRS} ${LIBYAML_LIBRARY_DIRS})
         target_link_libraries (bcu ${LIBUSB_LIBRARIES} ${PROJECT_SOURCE_DIR}/libftdi/src/libftdi1.a ${LIBYAML_LIBRARIES} ${PROJECT_SOURCE_DIR}/libcurl/build.bcu/lib/libcurl.a -lpthread -lssl -lcrypto -lm)
-        execute_process( COMMAND ./create_version_h.sh
-                         COMMAND ./build_libs.sh )
+        execute_process( COMMAND ${PROJECT_SOURCE_DIR}/create_version_h.sh ${PROJECT_SOURCE_DIR}
+                         COMMAND ${PROJECT_SOURCE_DIR}/build_libs.sh ${PROJECT_SOURCE_DIR})
+        install(TARGETS bcu DESTINATION bin)
 elseif (MACOS)
         add_executable(bcu_mac bcu.c port.c chip.c board.c bcu_parser.c bcu_yaml.c bcu_https.c bcu_ftdi_eeprom.c)
         link_directories(${LIBUSB_LIBRARY_DIRS} ${LIBYAML_LIBRARY_DIRS})
