@@ -15,7 +15,7 @@
 # https://forum.snapcraft.io/c/snapcraft
 #
 
-name: bcu
+name: bcu-nxp
 title: Board Remote Control Utility
 summary: Freescale/NXP I.MX remote control and power measurement tools
 description: |
@@ -27,7 +27,7 @@ description: |
 
   **Search keywords**
 
-  bcu
+  bcu, bcu-nxp, nxp-bcu
 license: BSD-3-Clause
 adopt-info: main
 base: core
@@ -67,7 +67,7 @@ parts:
       snapcraftctl set-version "1.1"
 
 apps:
-  bcu:
+  bcu-nxp:
     command: bin/bcu
 
     environment:
