@@ -1,0 +1,36 @@
+# Run the command, if fails, check and present security confinement
+# warnings to the user
+if ! "${@}" \
+    && test "$(snapctl get disable-snap-confinement-warnings)" != true; then
+    snap_confinement_warning_triggered=false
+    if ! snapctl is-connected home; then
+        snap_confinement_warning_triggered=true
+        printf \
+            "Warning: It appears that the %s snap isn't connected to the \`home\` interface, accessing files under your home directory will not be possible.\n\n" \
+            "${SNAP_NAME}" \
+            1>&2
+        printf \
+            "To fix this problem run the following command as root:\n\n    sudo snap connect %s:home\n\n" \
+            "${SNAP_NAME}" \
+            1>&2
+    fi
+
+    if ! snapctl is-connected raw-usb; then
+        snap_confinement_warning_triggered=true
+        printf \
+            "Warning: It appears that the %s snap isn't connected to the \`raw-usb\` interface, direct-access of USB devices will not be possible.\n\n" \
+            "${SNAP_NAME}" \
+            1>&2
+        printf \
+            "To fix this problem run the following command as root:\n\n    sudo snap connect %s:raw-usb\n\n" \
+            "${SNAP_NAME}" \
+            1>&2
+    fi
+
+    if test "${snap_confinement_warning_triggered}" == true; then
+        printf \
+            "To disable these warnings, run the following command as root:\n\n    sudo snap set %s disable-snap-confinement-warnings=true\n\n" \
+            "${SNAP_NAME}" \
+            1>&2
+    fi
+fi
