@@ -1,0 +1,85 @@
+%YAML 1.1
+---
+# Snapcraft Recipe for bcu (Board Remote Control Utility)
+# ------------------------------
+# This file is in the YAML data serialization format:
+# http://yaml.org
+# For the spec. of writing this file refer the following documentation:
+# * The snapcraft format
+#   https://docs.snapcraft.io/the-snapcraft-format/8337
+# * Snap Documentation
+#   https://docs.snapcraft.io
+# * Topics under the doc category in the Snapcraft Forum
+#   https://forum.snapcraft.io/c/doc
+# For support refer to the snapcraft section in the Snapcraft Forum:
+# https://forum.snapcraft.io/c/snapcraft
+#
+
+name: bcu
+title: Board Remote Control Utility
+summary: Freescale/NXP I.MX remote control and power measurement tools
+description: |
+  **Key features**
+
+  - The real cross platform. Linux, Windows, MacOS(not test yet)
+  - Remote control the supported boards to reset
+  - Measure the power of the boards
+
+  **Search keywords**
+
+  bcu
+license: BSD-3-Clause
+adopt-info: main
+base: core
+confinement: classic
+grade: stable
+
+parts:
+  main:
+    source: https://github.com/NXPmicro/bcu.git
+    source-depth: 50
+    build-snaps:
+      - cmake
+    build-packages:
+      - gcc
+      - libftdi1-dev
+      - libusb-1.0-0-dev
+      - libssl-dev
+      - libyaml-dev
+      - libncurses5-dev
+      - libconfuse-dev
+      - pkg-config
+    plugin: nil
+    override-build: |
+      cmake ../src/ -DCMAKE_INSTALL_PREFIX:PATH=../install
+      make
+      make install
+    stage-packages:
+      - lsb-release
+      - libftdi1-2
+      - libyaml-0-2
+      - libusb-1.0-0
+      - libssl1.0.0
+      - openssl
+    override-stage: |
+      set -xe
+      snapcraftctl stage
+      snapcraftctl set-version "1.1"
+
+apps:
+  bcu:
+    command: bin/bcu
+
+    environment:
+      # Snap runtime only ship C.UTF-8 locale
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
+
+plugs:
+  # Regular files access
+  home:
+    interface: home
+  network:
+    interface: network
+  raw-usb:
+    interface: raw-usb
