@@ -33,5 +33,5 @@ elseif (MACOS)
         link_directories(${LIBUSB_LIBRARY_DIRS} ${LIBYAML_LIBRARY_DIRS})
         target_link_libraries (bcu_mac ${LIBUSB_LIBDIR}/lib${LIBUSB_LIBRARIES}.dylib ${PROJECT_SOURCE_DIR}/libftdi/src/libftdi1.a ${LIBYAML_LIBDIR}/lib${LIBYAML_LIBRARIES}.dylib ${PROJECT_SOURCE_DIR}/libcurl/build.bcu/lib/libcurl.a -lpthread ${LIBOPENSSL_LIBDIR}/libssl.1.1.dylib ${LIBOPENSSL_LIBDIR}/libcrypto.1.1.dylib -lm)
         execute_process( COMMAND ${PROJECT_SOURCE_DIR}/create_version_h.sh ${PROJECT_SOURCE_DIR}
-                         COMMAND ${PROJECT_SOURCE_DIR}/build_libs_mac.sh ${PROJECT_SOURCE_DIR} ${LIBOPENSSL_PREFIX} )
+                         COMMAND ${PROJECT_SOURCE_DIR}/build_libs_mac.sh ${LIBOPENSSL_PREFIX} )
 endif ()
