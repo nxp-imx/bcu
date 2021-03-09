@@ -4,6 +4,9 @@
 ![GitHub](https://img.shields.io/github/license/NXPmicro/bcu.svg)
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/18825/badge.svg)](https://scan.coverity.com/projects/nxpmicro-bcu)
 
+[![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-white.svg)](https://snapcraft.io/bcu-nxp)
+sudo snap install bcu-nxp;snap alias bcu-nxp bcu
+
 # **Running environment**
 
  - Windows 10, 64bit
@@ -11,6 +14,8 @@
     - Early Windows version(below 1.2.0) need install vs2017 redistribute package
 
  - Ubuntu 16.04 or above, 64bit
+    - Get it from the Snap Store:
+      - $ sudo snap install bcu-nxp;snap alias bcu-nxp bcu
     - Need install libftdi, libyaml-dev and openssl
       - $ sudo apt-get install libftdi1-2 libyaml-dev openssl
     - If you do not want to run BCU as root in Linux, please follow the steps below to set the rules.
