@@ -2275,7 +2275,7 @@ static void monitor(struct options_setting* setting)
 	{
 		if (GV_MONITOR_TERMINATED && setting->dump_statistics && !setting->pmt)
 		{
-			fprintf(fptr, "AVG");
+			fprintf(fptr, "AVG%s", setting->use_rms ? "(RMS for current)" : "");
 			for (int m = 0; m < n + 1; m++)
 			{
 				int k = get_power_index_by_showid(m, board);
