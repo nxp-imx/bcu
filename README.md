@@ -5,7 +5,7 @@
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/18825/badge.svg)](https://scan.coverity.com/projects/nxpmicro-bcu)
 
 [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-white.svg)](https://snapcraft.io/bcu-nxp)
-sudo snap install bcu-nxp;snap alias bcu-nxp bcu
+sudo snap install -devmode bcu-nxp;snap alias bcu-nxp bcu
 
 # **Running environment**
 
