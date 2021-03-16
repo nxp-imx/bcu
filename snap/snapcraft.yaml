@@ -104,6 +104,6 @@ apps:
 plugs:
   # Regular files access
   home:
-    read: all
+    # read: all
   network:
   raw-usb:
