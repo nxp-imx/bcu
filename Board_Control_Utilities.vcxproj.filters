@@ -68,7 +68,7 @@
     <ClInclude Include="bcu_ftdi_eeprom.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ftd2xx.h">
+    <ClInclude Include="msvs\d2xx\ftd2xx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
