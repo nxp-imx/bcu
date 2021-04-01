@@ -1,4 +1,4 @@
-version: bcu_1.1.24
+version: bcu_1.0.307
 
 skip_tags: true
 
@@ -26,6 +26,7 @@ init:
 install:
 # - sh: sudo apt-get update
 - cmd: git submodule update --init
+- ps: if ($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2017") { wget "https://www.ftdichip.com/Drivers/CDM/CDM%20v2.12.28%20WHQL%20Certified.zip" -o d2xx.zip; wget "http://stahlworks.com/dev/unzip.exe" -o unzip.exe; unzip.exe "d2xx.zip" -d msvs/d2xx/;}
 - sh: git submodule update --init
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu1604" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  update); fi
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu1604" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libconfuse-dev swig python-dev libboost-all-dev); fi
