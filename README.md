@@ -5,7 +5,11 @@
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/18825/badge.svg)](https://scan.coverity.com/projects/nxpmicro-bcu)
 
 [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-white.svg)](https://snapcraft.io/bcu-nxp)
-sudo snap install -devmode bcu-nxp;snap alias bcu-nxp bcu
+sudo snap install --devmode bcu-nxp; sudo snap alias bcu-nxp bcu
+
+_______________________________________________________________________________________________________
+## **For more details about BCU, please check the BCU release note(BCU.pdf) in the latest release page.**
+_______________________________________________________________________________________________________
 
 # **Running environment**
 
@@ -13,11 +17,20 @@ sudo snap install -devmode bcu-nxp;snap alias bcu-nxp bcu
     - Need install FTDI Driver for Windows.
     - Early Windows version(below 1.2.0) need install vs2017 redistribute package
 
- - Ubuntu 16.04 or above, 64bit
+ - Ubuntu 16.04 or above, or all Linux distribution, 64bit
     - Get it from the Snap Store:
-      - $ sudo snap install bcu-nxp;snap alias bcu-nxp bcu
-    - Need install libftdi, libyaml-dev and openssl
-      - $ sudo apt-get install libftdi1-2 libyaml-dev openssl
+      - $ sudo snap install --devmode bcu-nxp; sudo snap alias bcu-nxp bcu
+    - If you do not want to run BCU as root in Linux, please follow the steps below to set the rules.
+      - $ cd /etc/udev/rules.d/
+      - $ sudo vim xx-ftdi.rules
+      - Add the line to this file: 
+      - SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6011", GROUP="dialout", MODE="0660"
+      - Save the file
+      - Re-plug the debug wire
+
+ - Ubuntu 18.04 or above, 64bit, using binary provided from release page
+    - Need install these libraries
+      - $ sudo apt-get install libftdi1-2 libyaml-dev openssl lsb_release libssl-dev libconfuse-dev
     - If you do not want to run BCU as root in Linux, please follow the steps below to set the rules.
       - $ cd /etc/udev/rules.d/
       - $ sudo vim xx-ftdi.rules
@@ -43,35 +56,19 @@ sudo snap install -devmode bcu-nxp;snap alias bcu-nxp bcu
 ## i.MX8MP-EVK
 
 - imx8mpevk: do not have power measurement function
-- imx8mpevkpwr: have power measurement function
-
-  **!!!NOTE!!!**
-
-  Please make sure your imx8mp power CPU board has done this rework:
-
-  - R208 from 1.0Ohm to 0.4Ohm
-  - R76  from 0.4Ohm to 1.0Ohm
-  - R225 from 2.0Ohm to 1.0Ohm
-  - R227 from 2.0Ohm to 1.0Ohm
-  - R129 from 0.1Ohm to 0.05Ohm
-
-  If your board is not reworked, **please modify rsense1/rsense2 to the old values in config.yaml file by yourself**.
-
-  - vdd_pll_ana_0v8 resense1/resense2 both set to 400(Milliohm)
-  - lpd4_vdd2 resense1/resense2 both set to 100
-  - vdd_usb_0v8 resense1/resense2 both set to 1000
-  - vdd_lvds_1V8 resense1/resense2 both set to 2000
-  - vdd_pci_1v8 resense1/resense2 both set to 2000
-
-
+- imx8mpevkpwra0: have power measurement function
+- imx8mpevkpwra1: have power measurement function
 - imx8mpddr3l: VDB
 - imx8mpddr4: VDB
 
 ## i.MX8DXL-EVK
 
-- imx8dxlevk
-- imx8dxl_ddr3_evk
+- imx8dxlevk: have power measurement function
+- imx8dxl_ddr3_evk: VDB
 
+## i.MX8ULP-EVK
+
+- imx8ulpevk: have power measurement function
 
 _______________________________________________________________________________________________________
 
@@ -82,6 +79,4 @@ ________________________________________________________________________________
 
 
 _______________________________________________________________________________________________________
-
-## **For more details about BCU, please check the BCU release note(BCU.pdf) in the latest release.**
 
