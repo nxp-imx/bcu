@@ -32,7 +32,7 @@ license: BSD-3-Clause
 adopt-info: main
 assumes:
   - command-chain
-base: core
+base: core18
 confinement: strict
 grade: stable
 
