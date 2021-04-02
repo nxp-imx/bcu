@@ -1,4 +1,4 @@
-version: bcu_1.0.307
+version: bcu_1.0.309
 
 skip_tags: true
 
@@ -6,7 +6,7 @@ skip_tags: true
 environment:
   matrix:
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-    - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu1604
+    - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu1804
     - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu2004
     - APPVEYOR_BUILD_WORKER_IMAGE: macOS
   bcu_coverity_token:
@@ -28,24 +28,26 @@ install:
 - cmd: git submodule update --init
 - ps: if ($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2017") { wget "https://www.ftdichip.com/Drivers/CDM/CDM%20v2.12.28%20WHQL%20Certified.zip" -o d2xx.zip; wget "http://stahlworks.com/dev/unzip.exe" -o unzip.exe; unzip.exe "d2xx.zip" -d msvs/d2xx/;}
 - sh: git submodule update --init
-- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu1604" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  update); fi
-- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu1604" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libconfuse-dev swig python-dev libboost-all-dev); fi
-- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu1604" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libyaml-dev); fi
-- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu1604" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libusb-1.0-0-dev); fi
-- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu1604" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install openssl); fi
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu1804" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  update); fi
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu1804" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libconfuse-dev swig python-dev libboost-all-dev); fi
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu1804" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libyaml-dev); fi
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu1804" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libftdi1-dev); fi
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu1804" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libusb-1.0-0-dev); fi
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu1804" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install openssl); fi
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2004" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  update); fi
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2004" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libconfuse-dev swig python-dev libboost-all-dev); fi
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2004" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libyaml-dev); fi
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2004" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libftdi1-dev); fi
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2004" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libusb-1.0-0-dev); fi
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2004" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install openssl libssl-dev); fi
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "macOS" ]; then ( brew reinstall pkgconfig; export PATH="/usr/local/Cellar/pkg-config/0.29.2_3/bin:${PATH}"; brew reinstall libyaml openssl; brew install libftdi; ln -s /usr/local/Cellar/openssl@1.1/1.1.1i/lib/pkgconfig/*.pc /usr/local/lib/pkgconfig/; pkg-config --list-all;); fi
 
 build_script:
-- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu1604" ]; then (cmake .); fi
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu1804" ]; then (cmake .); fi
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2004" ]; then (cmake .); fi
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "macOS" ]; then (export PATH="/usr/local/Cellar/pkg-config/0.29.2_3/bin:${PATH}"; cmake .); fi
 - sh: make
-- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu1604" ]; then (mv bcu bcu_Ubuntu1618); fi
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu1804" ]; then (mv bcu bcu_Ubuntu18); fi
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2004" ]; then (mv bcu bcu_Ubuntu20); fi
 
 # no schedule coverity check:
@@ -61,7 +63,7 @@ build_script:
 
 artifacts:
 - path: bcu.exe
-- path: bcu_Ubuntu1618
+- path: bcu_Ubuntu18
 - path: bcu_Ubuntu20
 - path: bcu_mac
 
@@ -72,5 +74,5 @@ deploy:
   description: prebuild for $(APPVEYOR_REPO_COMMIT) \n\n $(APPVEYOR_REPO_COMMIT_MESSAGE)
   auth_token:
     secure: SWWVkwSfPyVIaPChBBl+uAA3Fau9Rl5iNPQ9VRL8yyggXvc6wPcr/O9iXBMVM7Ju
-  artifact: bcu.exe;  bcu_Ubuntu1618;  bcu_Ubuntu20;  bcu_mac;
+  artifact: bcu.exe;  bcu_Ubuntu18;  bcu_Ubuntu20;  bcu_mac;
   draft: true
