@@ -66,7 +66,7 @@ parts:
       make install
     stage-packages:
       - lsb-release
-      - libftdi1-2
+      - libftdi1-dev
       - libyaml-0-2
       - libusb-1.0-0
       - libssl1.0.0
