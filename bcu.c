@@ -242,11 +242,9 @@ static void print_help(char* cmd)
 		printf("	%s%-60s%s%s\n", g_vt_default, "        [-hz=] [-rms]", g_vt_green, "");
 		printf("	%s%-60s%s%s\n", g_vt_default, "        [-hwfilter] [-unipolar]", g_vt_green, "");
 		printf("\n");
-#ifndef _WIN32
 		printf("	%s%-60s%s%s\n", g_vt_default, "eeprom  [-w] [-r] [-erase]", g_vt_green, "EEPROM read and program");
 		printf("	%s%-60s%s%s\n", g_vt_default, "        [-wsn=] [-brev=] [-srev=]", g_vt_green, "");
 		printf("\n");
-#endif
 		printf("	%s%-60s%s%s\n", g_vt_default, "get_level [GPIO_NAME] [-board=/-auto] [-id=]", g_vt_green, "get level state of pin GPIO_NAME");
 		printf("	%s%-60s%s%s\n", g_vt_default, "set_gpio [GPIO_NAME] [1/0] [-board=/-auto] [-id=]", g_vt_green, "set pin GPIO_NAME to be high(1) or low(0)");
 		printf("	%s%-60s%s%s\n", g_vt_default, "set_boot_mode [BOOTMODE_NAME] [-board=/-auto] [-id=]", g_vt_green, "set BOOTMODE_NAME as boot mode");
@@ -1006,7 +1004,6 @@ static int get_msecond(unsigned long* current_time)
 
 }
 
-#ifndef _WIN32
 static int eeprom(struct options_setting* setting)
 {
 	void* head = NULL;
@@ -1068,7 +1065,6 @@ static int eeprom(struct options_setting* setting)
 
 	return 0;
 }
-#endif
 
 /*
 test code for testing monitor
@@ -2348,7 +2344,6 @@ static void monitor(struct options_setting* setting)
 	return;
 }
 
-#ifndef _WIN32
 int check_board_eeprom(struct board_info* board, int retmode)
 {
 	void* head = NULL;
@@ -2407,7 +2402,6 @@ int find_board_by_eeprom(struct options_setting* setting)
 
 	return -1;
 }
-#endif
 
 static int lsftdi(struct options_setting* setting)
 {
@@ -2419,7 +2413,6 @@ static int lsftdi(struct options_setting* setting)
 	char location_id_str[MAX_NUMBER_OF_USB_DEVICES][MAX_LOCATION_ID_LENGTH];
 	if (!setting->auto_find_board)
 		ft_list_devices(location_id_str, &board_num, LIST_DEVICE_MODE_PRINT);
-#ifndef _WIN32
 	else
 	{	ft_list_devices(location_id_str, &board_num, LIST_DEVICE_MODE_OUTPUT);
 
@@ -2479,7 +2472,6 @@ static int lsftdi(struct options_setting* setting)
 			}
 		}
 	}
-#endif
 
 	return 0;
 }
@@ -2562,7 +2554,6 @@ int main(int argc, char** argv)
 
 	switch (parse_board_id_options(argc, argv, &setting))
 	{
-#ifndef _WIN32
 	case NO_BOARD_AND_ID:
 		ft_list_devices(location_id_str, &board_num, LIST_DEVICE_MODE_OUTPUT);
 
@@ -2692,7 +2683,6 @@ int main(int argc, char** argv)
 			strcpy(setting.board, origin_board_name);
 		}
 		break;
-#endif
 	case NO_USE_AUTO_FIND:
 	default:
 		break;
@@ -2702,12 +2692,14 @@ int main(int argc, char** argv)
 		return 0;
 	}
 
-#ifndef _WIN32
 	//check board eeprom
 	if (strcmp(setting.board, "imx8mpevk") &&
 	    strcmp(setting.board, "imx8dxl_ddr3_evk") &&
 	    strcmp(setting.board, "imx8mpddr3l") &&
 	    strcmp(setting.board, "imx8mpddr4") &&
+#ifdef _WIN32
+	    strcmp(setting.board, "imx8ulpevk") &&
+#endif
 	    strcmp(cmd, "eeprom") &&
 	    strcmp(cmd, "lsbootmode") &&
 	    strcmp(cmd, "lsgpio") &&
@@ -2735,7 +2727,6 @@ int main(int argc, char** argv)
 			printf("%sNOTE:%s If other boards are also connected to the same host, <-auto> may break its ttyUSB function temporarily.%s\n", g_vt_red, g_vt_yellow, g_vt_default);
 		}
 	}
-#endif
 
 	switch (readConf(setting.board, &setting))
 	{
@@ -2785,12 +2776,10 @@ int main(int argc, char** argv)
 		if (argc == 3)
 			print_help(argv[2]);
 	}
-#ifndef _WIN32
 	else if (strcmp(cmd, "eeprom") == 0)
 	{
 		eeprom(&setting);
 	}
-#endif
 	else if (strcmp(cmd, "monitor") == 0)
 	{
 		monitor(&setting);
