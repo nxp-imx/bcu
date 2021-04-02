@@ -47,10 +47,6 @@
 
 char GV_LOCATION_ID[MAX_LOCATION_ID_LENGTH] = "";
 
-#ifdef _WIN32
-FT_PROGRAM_DATA def_ftData = { 0 };
-#endif
-
 int ft_init(struct ftdi_info* ftdi)
 {
 #ifdef _WIN32
@@ -77,34 +73,20 @@ int ft_init(struct ftdi_info* ftdi)
 	ftdi->FT_set_timeouts = (pFT_set_timeouts)GetProcAddress(hGetProcIDDLL, "FT_SetTimeouts");
 	ftdi->FT_purge = (pFT_purge)GetProcAddress(hGetProcIDDLL, "FT_Purge");
 	ftdi->FT_EEPROM_erase = (pFT_EEPROM_erase)GetProcAddress(hGetProcIDDLL, "FT_EraseEE");
-	ftdi->FT_EEPROM_read = (pFT_EEPROM_read)GetProcAddress(hGetProcIDDLL, "FT_EE_Read");
-	ftdi->FT_EEPROM_program = (pFT_EEPROM_program)GetProcAddress(hGetProcIDDLL, "FT_EE_Program");
 	ftdi->FT_EE_uasize = (pFT_EE_uasize)GetProcAddress(hGetProcIDDLL, "FT_EE_UASize");
 	ftdi->FT_EE_uaread = (pFT_EE_uaread)GetProcAddress(hGetProcIDDLL, "FT_EE_UARead");
 	ftdi->FT_EE_uawrite = (pFT_EE_uawrite)GetProcAddress(hGetProcIDDLL, "FT_EE_UAWrite");
 
-	def_ftData.Signature1 = 0x00000000;
-	def_ftData.Signature2 = 0xffffffff;
-	def_ftData.Version = 0x4; // EEPROM structure with FT4232H extensions
-	def_ftData.VendorId = 0x0403;
-	def_ftData.ProductId = 0x6011;
-	def_ftData.Manufacturer = "";
-	def_ftData.ManufacturerId = "";
-	def_ftData.Description = "FT4232H";
-	def_ftData.SerialNumber = "123456";
-	def_ftData.MaxPower = 100;
-	def_ftData.PnP = 1;
-	def_ftData.RemoteWakeup = 0;
-	def_ftData.Rev4 = 0;
-	def_ftData.SerNumEnable8 = 1;
-	def_ftData.AIsVCP8 = 1;
-	def_ftData.BIsVCP8 = 1;
-	def_ftData.CIsVCP8 = 1;
-	def_ftData.DIsVCP8 = 1;
-
 #endif
 	return 0;
 }
+
+enum d2xx_open_method
+{
+	OPEN_BY_SERIAL_NUMBER = 1,
+	OPEN_BY_DESCRIPTION = 2,
+	OPEN_BY_LOCATION = 4
+};
 
 /*issue: need to consider index  number, vender id, and product id*/
 int ft_open_channel(struct ftdi_info* fi, int channel)
@@ -115,33 +97,18 @@ int ft_open_channel(struct ftdi_info* fi, int channel)
 	//	ftdi-FT_open_ex();
 
 	int status = 0;
-	//printf("opening channel %d",channel);
-
-	FT_PROGRAM_DATA ftData;
-	char temp[64];
 	char sn[64] = { 0 };
-	ftData.Signature1 = 0x00000000;
-	ftData.Signature2 = 0xffffffff;
-	ftData.Version = 0x00000004; // EEPROM structure with FT4232H extensions
-	ftData.Manufacturer = temp;
-	ftData.ManufacturerId = temp;
-	ftData.Description = temp;
-	ftData.SerialNumber = sn;
-
-	fi->FT_open(0, &fi->ftdi);
-	fi->FT_EEPROM_read(fi->ftdi, &ftData);
-	fi->FT_close(fi->ftdi);
 
 	if (channel == 0)
-		status = fi->FT_open_ex(strcat(sn, "A"), FT_OPEN_BY_SERIAL_NUMBER, &fi->ftdi);
+		status = fi->FT_open_ex(strcat(sn, "A"), OPEN_BY_SERIAL_NUMBER, &fi->ftdi);
 	else if (channel == 1)
-		status = fi->FT_open_ex(strcat(sn, "A"), FT_OPEN_BY_SERIAL_NUMBER, &fi->ftdi);
+		status = fi->FT_open_ex(strcat(sn, "A"), OPEN_BY_SERIAL_NUMBER, &fi->ftdi);
 	else if (channel == 2)
-		status = fi->FT_open_ex(strcat(sn, "B"), FT_OPEN_BY_SERIAL_NUMBER, &fi->ftdi);
+		status = fi->FT_open_ex(strcat(sn, "B"), OPEN_BY_SERIAL_NUMBER, &fi->ftdi);
 	else if (channel == 3)
-		status = fi->FT_open_ex(strcat(sn, "C"), FT_OPEN_BY_SERIAL_NUMBER, &fi->ftdi);
+		status = fi->FT_open_ex(strcat(sn, "C"), OPEN_BY_SERIAL_NUMBER, &fi->ftdi);
 	else if (channel == 4)
-		status = fi->FT_open_ex(strcat(sn, "D"), FT_OPEN_BY_SERIAL_NUMBER, &fi->ftdi);
+		status = fi->FT_open_ex(strcat(sn, "D"), OPEN_BY_SERIAL_NUMBER, &fi->ftdi);
 	else
 	{
 		status = -1;
@@ -149,7 +116,7 @@ int ft_open_channel(struct ftdi_info* fi, int channel)
 
 	}
 	fi->FT_set_timeouts(fi->ftdi, 300, 300);
-	//status = fi->FT_open_ex(0x192, FT_OPEN_BY_LOCATION, &fi->ftdi);
+	//status = fi->FT_open_ex(0x192, OPEN_BY_LOCATION, &fi->ftdi);
 	if (!status)
 		fi->isinit = 1;
 	return status;
@@ -243,7 +210,7 @@ int ft_read(struct ftdi_info* ftdi, unsigned char* buffer, int size)
 int ft_clear_buffer(struct ftdi_info* ftdi)
 {
 #ifdef _WIN32
-	if (ftdi->FT_purge(ftdi->ftdi, FT_PURGE_RX | FT_PURGE_TX))
+	if (ftdi->FT_purge(ftdi->ftdi, PURGE_RX | PURGE_TX))
 	{
 		printf("clear buffer failed!\n");
 	}
@@ -551,22 +518,22 @@ int ft_open_channel_by_id(struct ftdi_info* fi, int channel, char* id)
 			//printf("opening channel %d",channel);
 
 			if (channel == 0)
-				status = fi->FT_open_ex((PVOID)board_table[j][0], FT_OPEN_BY_LOCATION, &fi->ftdi);
+				status = fi->FT_open_ex((PVOID)board_table[j][0], OPEN_BY_LOCATION, &fi->ftdi);
 			else if (channel == 1)
-				status = fi->FT_open_ex((PVOID)board_table[j][0], FT_OPEN_BY_LOCATION, &fi->ftdi);
+				status = fi->FT_open_ex((PVOID)board_table[j][0], OPEN_BY_LOCATION, &fi->ftdi);
 			else if (channel == 2)
-				status = fi->FT_open_ex((PVOID)board_table[j][1], FT_OPEN_BY_LOCATION, &fi->ftdi);
+				status = fi->FT_open_ex((PVOID)board_table[j][1], OPEN_BY_LOCATION, &fi->ftdi);
 			else if (channel == 3)
-				status = fi->FT_open_ex((PVOID)board_table[j][2], FT_OPEN_BY_LOCATION, &fi->ftdi);
+				status = fi->FT_open_ex((PVOID)board_table[j][2], OPEN_BY_LOCATION, &fi->ftdi);
 			else if (channel == 4)
-				status = fi->FT_open_ex((PVOID)board_table[j][3], FT_OPEN_BY_LOCATION, &fi->ftdi);
+				status = fi->FT_open_ex((PVOID)board_table[j][3], OPEN_BY_LOCATION, &fi->ftdi);
 			else
 			{
 				status = -1;
 				printf("open channel can only range from 0 to 4\n");
 			}
 
-			//status = fi->FT_open_ex(0x192, FT_OPEN_BY_LOCATION, &fi->ftdi);
+			//status = fi->FT_open_ex(0x192, OPEN_BY_LOCATION, &fi->ftdi);
 			if (!status)
 				fi->isinit = 1;
 			return status;
@@ -677,33 +644,9 @@ int ft_write_eeprom(struct ftdi_info* ftdi, unsigned int startaddr, unsigned cha
 {
 #ifdef _WIN32
 
-	FT_PROGRAM_DATA ftData;
 	int status = 0;
-	char temp[64];
-	char sn[64];
-	ftData.Signature1 = 0x00000000;
-	ftData.Signature2 = 0xffffffff;
-	ftData.Version = 0x00000004; // EEPROM structure with FT4232H extensions
-	ftData.Manufacturer = temp;
-	ftData.ManufacturerId = temp;
-	ftData.Description = temp;
-	ftData.SerialNumber = sn;
 
-	status = ftdi->FT_EEPROM_read(ftdi->ftdi, &ftData);
-	if (!status)
-	{
-		strcpy(ftData.SerialNumber, sn_buf);
-		status = ftdi->FT_EEPROM_program(ftdi->ftdi, &ftData);
-		status = ftdi->FT_EE_uawrite(ftdi->ftdi, buffer, size);
-	}
-	else
-	{
-		def_ftData.SerialNumber = sn_buf;
-		status = ftdi->FT_EEPROM_program(ftdi->ftdi, &def_ftData);
-		status = ftdi->FT_EE_uawrite(ftdi->ftdi, buffer, size);
-	}
-
-	 return status;
+	return status;
 #else
 	int f;
 	int value;
@@ -790,30 +733,7 @@ int ft_write_eeprom(struct ftdi_info* ftdi, unsigned int startaddr, unsigned cha
 int ft_read_eeprom(struct ftdi_info* ftdi, unsigned int startaddr, unsigned char* data_buf, int data_size, unsigned char* sn_buf)
 {
 #ifdef _WIN32
-	FT_PROGRAM_DATA ftData;
 	int status = 0;
-	char temp[64];
-	ftData.Signature1 = 0x00000000;
-	ftData.Signature2 = 0xffffffff;
-	ftData.Version = 0x00000004; // EEPROM structure with FT4232H extensions
-	ftData.Manufacturer = temp;
-	ftData.ManufacturerId = temp;
-	ftData.Description = temp;
-	ftData.SerialNumber = sn_buf;
-
-	status = ftdi->FT_EEPROM_read(ftdi->ftdi, &ftData);
-
-	if (!status)
-	{
-		DWORD EEUA_Size;
-		status = ftdi->FT_EE_uasize(ftdi->ftdi, &EEUA_Size);
-
-		unsigned char buf[256] = { 0 };
-		DWORD BytesRead = 0;
-		status = ftdi->FT_EE_uaread(ftdi->ftdi, buf, EEUA_Size, &BytesRead);
-
-		memcpy(data_buf, buf, data_size);
-	}
 
 	return status;
 #else

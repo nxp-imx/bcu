@@ -33,7 +33,6 @@
 
 #ifdef _WIN32
 #include <windows.h>
-#include "msvs/d2xx/ftd2xx.h"
 #endif
 
 #ifdef _WIN32
@@ -50,11 +49,12 @@ typedef int(__stdcall* pFT_get_device_info_detail)(DWORD, LPDWORD, LPDWORD, LPDW
 typedef int(__stdcall* pFT_set_timeouts)(FT_HANDLE, DWORD, DWORD);
 typedef int(__stdcall* pFT_purge)(FT_HANDLE, DWORD);
 typedef int(__stdcall* pFT_EEPROM_erase)(FT_HANDLE);
-typedef int(__stdcall* pFT_EEPROM_read)(FT_HANDLE, PFT_PROGRAM_DATA);
-typedef int(__stdcall* pFT_EEPROM_program)(FT_HANDLE, PFT_PROGRAM_DATA);
 typedef int(__stdcall* pFT_EE_uasize)(FT_HANDLE, LPDWORD);
 typedef int(__stdcall* pFT_EE_uaread)(FT_HANDLE, PUCHAR, DWORD, LPDWORD);
 typedef int(__stdcall* pFT_EE_uawrite)(FT_HANDLE, PUCHAR, DWORD);
+
+#define PURGE_RX 1
+#define PURGE_TX 2
 #endif
 
 /*is there any difference between ST_handle and fdti_context, does the difference matters?*/
@@ -75,8 +75,6 @@ struct ftdi_info {
 	pFT_set_timeouts FT_set_timeouts;
 	pFT_purge FT_purge;
 	pFT_EEPROM_erase FT_EEPROM_erase;
-	pFT_EEPROM_read FT_EEPROM_read;
-	pFT_EEPROM_program FT_EEPROM_program;
 	pFT_EE_uasize FT_EE_uasize;
 	pFT_EE_uaread FT_EE_uaread;
 	pFT_EE_uawrite FT_EE_uawrite;

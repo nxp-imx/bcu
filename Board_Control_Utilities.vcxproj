@@ -170,7 +170,6 @@
     <ClInclude Include="chip.h" />
     <ClInclude Include="ftdi_def.h" />
     <ClInclude Include="bcu_parser.h" />
-    <ClInclude Include="msvs\d2xx\ftd2xx.h" />
     <ClInclude Include="port.h" />
     <ClInclude Include="version.h" />
   </ItemGroup>
