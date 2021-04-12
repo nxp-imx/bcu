@@ -2728,18 +2728,21 @@ int main(int argc, char** argv)
 		}
 	}
 
+	char yamfile[128] = {0};
+	get_yaml_file_path(yamfile);
+
 	switch (readConf(setting.board, &setting))
 	{
 	case 0:
 		break;
 	case -1:
-		printf("Trying to create new config.yaml file...\n");
+		printf("Trying to create new config file to %s ...\n", yamfile);
 		writeConf();
 		if (readConf(setting.board, &setting) < 0)
 			return -1;
 		break;
 	case -2:
-		printf("config.yaml file read error, please check or delete config.yaml and try again.\n");
+		printf("config file read error, please check or delete config file: %s and try again.\n", yamfile);
 		return -2;
 		break;
 	case -3:

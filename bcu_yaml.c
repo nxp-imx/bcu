@@ -50,11 +50,26 @@ struct bcu_yaml_version ver_before_big_ver[] =
 	{NULL}
 };
 
+void get_yaml_file_path(char* path)
+{
+#if defined(linux) || defined(__APPLE__)
+	strcat(path, getenv("HOME"));
+	strcat(path, "/bcu_config.yaml");
+#else
+	const char* homeProfile = "USERPROFILE";
+	GetEnvironmentVariable(homeProfile, path, 128);
+	strcat(path, "\\bcu_config.yaml");
+#endif
+}
+
 void writeConf(void)
 {
-	FILE *fp = fopen("config.yaml", "w+");
+	char yamfile[128] = {0};
+	get_yaml_file_path(yamfile);
+
+	FILE *fp = fopen(yamfile, "w+");
 	if (fp == NULL) {
-		printf("writeConf: Failed to open file!\n");
+		printf("writeConf: Failed to open config file: %s!\n", yamfile);
 		return;
 	}
 
@@ -229,10 +244,12 @@ int replace_str(char* path, char* source, char* dest)
 
 int readConf(char* boardname, struct options_setting* setting)
 {
-	FILE* fh = fopen("config.yaml", "r");
+	char yamfile[128] = {0};
+	get_yaml_file_path(yamfile);
+	FILE* fh = fopen(yamfile, "r");
 	if (fh == NULL)
 	{
-		printf("readConf: Failed to open file!\n");
+		printf("readConf: Failed to open config file: %s!\n", yamfile);
 		return -1;
 	}
 
@@ -343,20 +360,20 @@ int readConf(char* boardname, struct options_setting* setting)
 							{
 								printf("        BCU version: %s\n", GIT_VERSION);
 								printf("Config file version: %s\n", tk);
-								printf("Config file version is too old!\nPlease delete the old config.yaml, then run BCU again!\n");
+								printf("Config file version is too old!\nPlease delete the old config file: %s, then run BCU again!\n", yamfile);
 								return -3;
 							}
 							if (compare_version(ver_before_big_ver[temp].version, &GIT_VERSION[4]) >= 0)
 							{
 								printf("        BCU version: %s\n", GIT_VERSION);
 								printf("Config file version: %s\n", tk);
-								printf("BCU version is too old!\nPlease delete the old config.yaml, then run BCU again!\n");
+								printf("BCU version is too old!\nPlease delete the old config file: %s, then run BCU again!\n", yamfile);
 								return -3;
 							}
 							temp++;
 						}
-						printf("No big change between these two version.\nWill update config.yaml automatically!\n");
-						replace_str("config.yaml", tk, GIT_VERSION);
+						printf("No big change between these two version.\nWill update config file: %s automatically!\n", yamfile);
+						replace_str(yamfile, tk, GIT_VERSION);
 						strcpy(version, GIT_VERSION);
 					}
 					else
@@ -430,7 +447,7 @@ int readConf(char* boardname, struct options_setting* setting)
 	{
 		if (compare_version(&GIT_VERSION[4], &version[4]) != 0)
 		{
-			printf("\nConfig file version is too old!\nPlease delete the old config.yaml, then run BCU again!\n");
+			printf("\nConfig file version is too old!\nPlease delete the old config file: %s, then run BCU again!\n", yamfile);
 			return -3;
 		}
 	}
