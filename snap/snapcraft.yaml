@@ -78,11 +78,10 @@ parts:
     filesets:
       docs-copyright:
       - usr/share/doc/*/copyright
-
       executables:
       - bin/*
-
       library-shared:
+      - usr/lib/**/*.so*
       - lib/**/*.so*
     prime:
       - $docs-copyright
