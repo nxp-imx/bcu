@@ -1149,6 +1149,9 @@ static char catch_input_char()
 #ifdef _WIN32
 		ch = _getch();
 #else
+#ifdef __APPLE__
+		system("stty -icanon");
+#endif
 		ch = (char)getchar();
 #endif
 
