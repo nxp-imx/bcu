@@ -262,7 +262,8 @@ static void print_help(char* cmd)
 #endif
 		printf("\n");
 		printf("	%s%-60s%s%s\n", g_vt_default, "version", g_vt_green, "print version number");
-		printf("	%s%-60s%s%s%s\n", g_vt_default, "help", g_vt_green, "show command details", g_vt_default);
+		printf("	%s%-60s%s%s%s\n", g_vt_default, "-h,  help", g_vt_green, "show command details", g_vt_default);
+		printf("	%s%-60s%s%s%s\n", g_vt_default, "-cp, conf_path", g_vt_green, "show config file path", g_vt_default);
 		// printf("	%s%-60s%s%s%s\n", g_vt_default, "help [COMMAND_NAME]", g_vt_green, "show details and options of COMMAND_NAME", g_vt_default);
 
 #if defined(__linux__) || defined(__APPLE__)
@@ -2523,6 +2524,9 @@ int main(int argc, char** argv)
 		printf("Your console don't support VT mode, fall back to verbose mode");
 	}
 
+	char yamfile[128] = {0};
+	get_yaml_file_path(yamfile);
+
 	switch (argc)
 	{
 	case 1:
@@ -2532,6 +2536,11 @@ int main(int argc, char** argv)
 		if (strcmp(argv[1], "help") == 0 || strcmp(argv[1], "-h") == 0)
 		{
 			print_help(NULL);
+			return 0;
+		}
+		if (strcmp(argv[1], "conf_path") == 0 || strcmp(argv[1], "-cp") == 0)
+		{
+			printf("\nBCU Config file path: %s\n\n", yamfile);
 			return 0;
 		}
 		break;
@@ -2730,9 +2739,6 @@ int main(int argc, char** argv)
 			printf("%sNOTE:%s If other boards are also connected to the same host, <-auto> may break its ttyUSB function temporarily.%s\n", g_vt_red, g_vt_yellow, g_vt_default);
 		}
 	}
-
-	char yamfile[128] = {0};
-	get_yaml_file_path(yamfile);
 
 	switch (readConf(setting.board, &setting))
 	{
