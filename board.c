@@ -453,7 +453,7 @@ struct mapping imx8ulpevk_board[] = {
 	{"ldo1_cpu_1v1", power, IMX8ULPEVK_POWER_PATH(3, 2, 0x12, 100, 100), 0x00},
 	{"buck1_lsw1_cpu_1v8", power, IMX8ULPEVK_POWER_PATH(3, 3, 0x12, 100, 100), 0x00},
 	{"buck1_lsw4_cpu_1v8", power, IMX8ULPEVK_POWER_PATH(3, 4, 0x12, 100, 100), 0x00},
-	{"buck1_lsw2_cpu_1v8", power, IMX8ULPEVK_POWER_PATH(4, 1, 0x13, 250000, 250000), 0x00},
+	{"buck1_lsw2_cpu_1v8", power, IMX8ULPEVK_POWER_PATH(4, 1, 0x13, 100, 100), 0x00},
 	{"buck1_lsw3_cpu_1v8", power, IMX8ULPEVK_POWER_PATH(4, 2, 0x13, 100, 100), 0x00},
 	{"ldo4_cpu_1v8", power, IMX8ULPEVK_POWER_PATH(4, 3, 0x13, 100, 100), 0x00},
 	{"ldo2_cpu_3v3", power, IMX8ULPEVK_POWER_PATH(4, 4, 0x13, 100, 100), 0x00},
