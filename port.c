@@ -47,6 +47,10 @@
 
 char GV_LOCATION_ID[MAX_LOCATION_ID_LENGTH] = "";
 
+#ifdef _WIN32
+EEPROM_DATA epdata = { 0 };
+#endif
+
 int ft_init(struct ftdi_info* ftdi)
 {
 #ifdef _WIN32
@@ -73,9 +77,29 @@ int ft_init(struct ftdi_info* ftdi)
 	ftdi->FT_set_timeouts = (pFT_set_timeouts)GetProcAddress(hGetProcIDDLL, "FT_SetTimeouts");
 	ftdi->FT_purge = (pFT_purge)GetProcAddress(hGetProcIDDLL, "FT_Purge");
 	ftdi->FT_EEPROM_erase = (pFT_EEPROM_erase)GetProcAddress(hGetProcIDDLL, "FT_EraseEE");
+	ftdi->FT_EEPROM_read = (pFT_EEPROM_read)GetProcAddress(hGetProcIDDLL, "FT_EE_Read");
+	ftdi->FT_EEPROM_program = (pFT_EEPROM_program)GetProcAddress(hGetProcIDDLL, "FT_EE_Program");
 	ftdi->FT_EE_uasize = (pFT_EE_uasize)GetProcAddress(hGetProcIDDLL, "FT_EE_UASize");
 	ftdi->FT_EE_uaread = (pFT_EE_uaread)GetProcAddress(hGetProcIDDLL, "FT_EE_UARead");
 	ftdi->FT_EE_uawrite = (pFT_EE_uawrite)GetProcAddress(hGetProcIDDLL, "FT_EE_UAWrite");
+
+	epdata.verify1 = 0x00000000;
+	epdata.verify2 = 0xffffffff;
+	epdata.ver = 0x4;
+	epdata.vid = 0x0403;
+	epdata.pid = 0x6011;
+	epdata.mfr = "";
+	epdata.mfrid = "";
+	epdata.desc = "FT4232H";
+	epdata.sn = "123456";
+	epdata.max_p = 100;
+	epdata.pnp = 1;
+	epdata.r_wakeup = 0;
+	epdata.snen8 = 1;
+	epdata.a_vcp8 = 1;
+	epdata.b_vcp8 = 1;
+	epdata.c_vcp8 = 1;
+	epdata.d_vcp8 = 1;
 
 #endif
 	return 0;
@@ -97,7 +121,20 @@ int ft_open_channel(struct ftdi_info* fi, int channel)
 	//	ftdi-FT_open_ex();
 
 	int status = 0;
+	EEPROM_DATA ep_data;
+	char temp[64];
 	char sn[64] = { 0 };
+	ep_data.verify1 = 0x00000000;
+	ep_data.verify2 = 0xffffffff;
+	ep_data.ver = 0x4;
+	ep_data.mfr = temp;
+	ep_data.mfrid = temp;
+	ep_data.desc = temp;
+	ep_data.sn = sn;
+
+	fi->FT_open(0, &fi->ftdi);
+	fi->FT_EEPROM_read(fi->ftdi, &ep_data);
+	fi->FT_close(fi->ftdi);
 
 	if (channel == 0)
 		status = fi->FT_open_ex(strcat(sn, "A"), OPEN_BY_SERIAL_NUMBER, &fi->ftdi);
@@ -643,8 +680,32 @@ int ft_erase_eeprom(struct ftdi_info* ftdi)
 int ft_write_eeprom(struct ftdi_info* ftdi, unsigned int startaddr, unsigned char* buffer, int size, unsigned char* sn_buf)
 {
 #ifdef _WIN32
-
+	EEPROM_DATA ep_data;
 	int status = 0;
+	char temp[64];
+	char sn[64] = { 0 };
+	ep_data.verify1 = 0x00000000;
+	ep_data.verify2 = 0xffffffff;
+	ep_data.ver = 0x4;
+	ep_data.mfr = temp;
+	ep_data.mfrid = temp;
+	ep_data.desc = temp;
+	ep_data.sn = sn;
+
+	status = ftdi->FT_EEPROM_read(ftdi->ftdi, &ep_data);
+	if (!status)
+	{
+		strcpy(ep_data.sn, sn_buf);
+		status = ftdi->FT_EEPROM_program(ftdi->ftdi, &ep_data);
+		status = ftdi->FT_EE_uawrite(ftdi->ftdi, buffer, size);
+	}
+	else
+	{
+		epdata.sn = sn_buf;
+		int a = sizeof(epdata);
+		status = ftdi->FT_EEPROM_program(ftdi->ftdi, &epdata);
+		status = ftdi->FT_EE_uawrite(ftdi->ftdi, buffer, size);
+	}
 
 	return status;
 #else
@@ -733,7 +794,30 @@ int ft_write_eeprom(struct ftdi_info* ftdi, unsigned int startaddr, unsigned cha
 int ft_read_eeprom(struct ftdi_info* ftdi, unsigned int startaddr, unsigned char* data_buf, int data_size, unsigned char* sn_buf)
 {
 #ifdef _WIN32
+	EEPROM_DATA ep_data;
 	int status = 0;
+	char temp[64];
+	ep_data.verify1 = 0x00000000;
+	ep_data.verify2 = 0xffffffff;
+	ep_data.ver = 0x4; // EEPROM structure with FT4232H extensions
+	ep_data.mfr = temp;
+	ep_data.mfrid = temp;
+	ep_data.desc = temp;
+	ep_data.sn = sn_buf;
+
+	status = ftdi->FT_EEPROM_read(ftdi->ftdi, &ep_data);
+
+	if (!status)
+	{
+		unsigned long EEUA_Size;
+		status = ftdi->FT_EE_uasize(ftdi->ftdi, &EEUA_Size);
+
+		unsigned char buf[256] = { 0 };
+		unsigned long BytesRead = 0;
+		status = ftdi->FT_EE_uaread(ftdi->ftdi, buf, EEUA_Size, &BytesRead);
+
+		memcpy(data_buf, buf, data_size);
+	}
 
 	return status;
 #else

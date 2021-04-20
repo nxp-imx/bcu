@@ -36,6 +36,31 @@
 #endif
 
 #ifdef _WIN32
+
+typedef struct eeprom_data {
+	unsigned long verify1;
+	unsigned long verify2;
+	unsigned long ver;
+	unsigned short vid;
+	unsigned short pid;
+	char *mfr;
+	char *mfrid;
+	char *desc;
+	char *sn;
+	unsigned short max_p;
+	unsigned short pnp;
+	unsigned short self_p;
+	unsigned short r_wakeup;
+	unsigned char reseved0[71];
+	unsigned char snen8;
+	unsigned char reseved1[16];
+	unsigned char a_vcp8;
+	unsigned char b_vcp8;
+	unsigned char c_vcp8;
+	unsigned char d_vcp8;
+	unsigned char reseved2[27];
+} EEPROM_DATA, *PEEPROM_DATA;
+
 typedef PVOID FT_HANDLE;
 typedef int(__stdcall* pFT_open)(int, FT_HANDLE*);
 typedef int(__stdcall* pFT_open_ex)(PVOID, DWORD, FT_HANDLE*);
@@ -49,6 +74,8 @@ typedef int(__stdcall* pFT_get_device_info_detail)(DWORD, LPDWORD, LPDWORD, LPDW
 typedef int(__stdcall* pFT_set_timeouts)(FT_HANDLE, DWORD, DWORD);
 typedef int(__stdcall* pFT_purge)(FT_HANDLE, DWORD);
 typedef int(__stdcall* pFT_EEPROM_erase)(FT_HANDLE);
+typedef int(__stdcall* pFT_EEPROM_read)(FT_HANDLE, PEEPROM_DATA);
+typedef int(__stdcall* pFT_EEPROM_program)(FT_HANDLE, PEEPROM_DATA);
 typedef int(__stdcall* pFT_EE_uasize)(FT_HANDLE, LPDWORD);
 typedef int(__stdcall* pFT_EE_uaread)(FT_HANDLE, PUCHAR, DWORD, LPDWORD);
 typedef int(__stdcall* pFT_EE_uawrite)(FT_HANDLE, PUCHAR, DWORD);
@@ -75,6 +102,8 @@ struct ftdi_info {
 	pFT_set_timeouts FT_set_timeouts;
 	pFT_purge FT_purge;
 	pFT_EEPROM_erase FT_EEPROM_erase;
+	pFT_EEPROM_read FT_EEPROM_read;
+	pFT_EEPROM_program FT_EEPROM_program;
 	pFT_EE_uasize FT_EE_uasize;
 	pFT_EE_uaread FT_EE_uaread;
 	pFT_EE_uawrite FT_EE_uawrite;

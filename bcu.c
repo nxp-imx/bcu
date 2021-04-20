@@ -2709,9 +2709,6 @@ int main(int argc, char** argv)
 	    strcmp(setting.board, "imx8dxl_ddr3_evk") &&
 	    strcmp(setting.board, "imx8mpddr3l") &&
 	    strcmp(setting.board, "imx8mpddr4") &&
-#ifdef _WIN32
-	    strcmp(setting.board, "imx8ulpevk") &&
-#endif
 	    strcmp(cmd, "eeprom") &&
 	    strcmp(cmd, "lsbootmode") &&
 	    strcmp(cmd, "lsgpio") &&
