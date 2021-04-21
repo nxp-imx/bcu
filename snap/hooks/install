@@ -1,0 +1,4 @@
+#!/bin/sh -e
+
+# Create a udev rules file
+echo "SUBSYSTEMS==\"usb\", ATTRS{idVendor}==\"0403\", ATTRS{idProduct}==\"6011\", GROUP=\"dialout\", MODE=\"0660\"" > "/etc/udev/rules.d/bcu-nxp-ftdi.rules"
