@@ -516,14 +516,14 @@ struct board_links null_board_links[] = {
 
 struct board_info board_list[] =
 {
-	{"imx8dxlevk", imx8xxl, imx8xxl_boot_modes, imx8xxl_power_groups, imx8xxlevk_board_links, &imx8dxlevk_ftdi_eeprom_user_area_info},
-	{"imx8dxl_ddr3_evk", imx8dxl_ddr3, imx8xxl_boot_modes, NULL, imx8xxlevk_board_links, NULL},
-	{"imx8mpevkpwra0", imx8mpevkpwr_board_a0, imx8mpevk_board_boot_modes, imx8mpevkpwr_power_groups, imx8mpevk_board_links, &imx8mpevkpwr_a0_ftdi_eeprom_user_area_info},
-	{"imx8mpevkpwra1", imx8mpevkpwr_board_a1, imx8mpevk_board_boot_modes, imx8mpevkpwr_power_groups, imx8mpevk_board_links, &imx8mpevkpwr_a1_ftdi_eeprom_user_area_info},
-	{"imx8mpevk", imx8mpevk_board, imx8mpevk_board_boot_modes, NULL, imx8mpevk_board_links, NULL},
-	{"imx8mpddr3l", imx8mpddr3l_board, null_boot_mode, NULL, null_board_links, NULL},
-	{"imx8mpddr4", imx8mpddr4_board, null_boot_mode, NULL, null_board_links, NULL},
-	{"imx8ulpevk", imx8ulpevk_board, imx8ulpevk_board_boot_modes, imx8ulpevkpwr_power_groups, null_board_links, &imx8ulpevk_ftdi_eeprom_user_area_info},
+	{"imx8dxlevk", imx8xxl, imx8xxl_boot_modes, imx8xxl_power_groups, imx8xxlevk_board_links, &imx8dxlevk_ftdi_eeprom_user_area_info, 500},
+	{"imx8dxl_ddr3_evk", imx8dxl_ddr3, imx8xxl_boot_modes, NULL, imx8xxlevk_board_links, NULL, 500},
+	{"imx8mpevkpwra0", imx8mpevkpwr_board_a0, imx8mpevk_board_boot_modes, imx8mpevkpwr_power_groups, imx8mpevk_board_links, &imx8mpevkpwr_a0_ftdi_eeprom_user_area_info, 500},
+	{"imx8mpevkpwra1", imx8mpevkpwr_board_a1, imx8mpevk_board_boot_modes, imx8mpevkpwr_power_groups, imx8mpevk_board_links, &imx8mpevkpwr_a1_ftdi_eeprom_user_area_info, 500},
+	{"imx8mpevk", imx8mpevk_board, imx8mpevk_board_boot_modes, NULL, imx8mpevk_board_links, NULL, 500},
+	{"imx8mpddr3l", imx8mpddr3l_board, null_boot_mode, NULL, null_board_links, NULL, 500},
+	{"imx8mpddr4", imx8mpddr4_board, null_boot_mode, NULL, null_board_links, NULL, 500},
+	{"imx8ulpevk", imx8ulpevk_board, imx8ulpevk_board_boot_modes, imx8ulpevkpwr_power_groups, null_board_links, &imx8ulpevk_ftdi_eeprom_user_area_info, 9000},
 	//"imx9xxl",&imx9xxl_pins,
 };
 int num_of_boards = sizeof(board_list) / sizeof(struct board_info);

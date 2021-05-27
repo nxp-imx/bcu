@@ -80,6 +80,7 @@ struct board_info {
 	struct board_power_group* power_groups;
 	struct board_links* links;
 	struct ftdi_eeprom_user_area* eeprom_data;
+	unsigned int reset_time_ms;
 };
 
 /*find if there is the gpio_name on the board*/

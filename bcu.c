@@ -780,7 +780,7 @@ static void reset(struct options_setting* setting)
 	if (setting->hold)
 		msleep(setting->hold);
 	else
-		msleep(500);
+		msleep(board->reset_time_ms);
 	if (setting->boot_mode_hex != -1)
 	{
 		status |= gpio->gpio_write(gpio, mask ? 0xFF : 0x00) << 1;//reset high
