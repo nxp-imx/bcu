@@ -2320,7 +2320,8 @@ static void monitor(struct options_setting* setting)
 						gd->gpio_write(gd, 0x00);
 
 					msleep(2);
-					sr_level[sr_index] = (!data == 0) ? 0 : 1;
+					// sr_level[sr_index] = (!data == 0) ? 0 : 1;
+					reset_flag = 1; //to force refresh sr_level, if some rails share SR_ pin
 				}
 			}
 		}
