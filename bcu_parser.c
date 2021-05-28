@@ -268,6 +268,10 @@ void set_options_default(struct options_setting* setting)
 	setting->output_state = -1;
 	setting->delay = 0;
 	setting->boot_mode_hex = -1;
+	for (unsigned int i = 0; i < MAX_BOOT_CONFIG_BYTE; i++)
+	{
+		setting->boot_config_hex[i] = -1;
+	}
 	setting->gpio_name[0] = '\0';
 	setting->dump = 0;
 	setting->force = 0;
@@ -563,6 +567,23 @@ int parse_options(char* cmd, int argc, char** argv, struct options_setting* sett
 					{
 						found = 1;
 						setting->boot_mode_hex = board->boot_modes[k].boot_mode_hex;
+						break;
+					}
+					k++;
+				}
+			}
+			k = 0;
+			if (board->boot_configs != NULL)
+			{
+				while (board->boot_configs[k].name != NULL)
+				{
+					if (strcmp(board->boot_configs[k].name, argv[i]) == 0)
+					{
+						found = 1;
+						for (int bootcfg_n = 0; bootcfg_n < MAX_BOOT_CONFIG_BYTE; bootcfg_n++)
+						{
+							setting->boot_config_hex[bootcfg_n] = board->boot_configs[k].boot_config_hex[bootcfg_n];
+						}
 						break;
 					}
 					k++;

@@ -54,6 +54,7 @@ struct options_setting {
 	int hold;
 	int output_state;
 	int boot_mode_hex;
+	int boot_config_hex[MAX_BOOT_CONFIG_BYTE];
 	int active_low;
 	char path[MAX_PATH_LENGTH];
 	char gpio_name[MAX_MAPPING_NAME_LENGTH];

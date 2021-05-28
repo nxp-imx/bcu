@@ -484,6 +484,51 @@ static void get_gpio_level(struct options_setting* setting)
 	free_device_linkedlist_backward(end_point);
 }
 
+static void set_boot_config(struct options_setting* setting)
+{
+	struct board_info* board = get_board(setting->board);
+	if (board == NULL)
+		return;
+	struct gpio_device* gpio = NULL;
+	int status = -1;
+
+	for (int config_num = 0; config_num < board->boot_cfg_byte_num; config_num++)
+	{
+		if (setting->boot_config_hex[config_num] == -1)
+		{
+			printf("could not detect a valid boot_config_hex_%d!\n", config_num);
+			printf("set_boot_config failed\n");
+			return;
+		}
+		char cfg_str[10] = "boot_cfg";
+		char num_str[2] = "0";
+		num_str[0] += config_num;
+		strcat(cfg_str, num_str);
+		gpio = get_gpio(cfg_str, board);
+		if (gpio == NULL)
+		{
+			printf("set_boot_config: No boot_cfg%d configuration!\n", config_num);
+			return;
+		}
+
+		if (get_boot_mode_offset(gpio->pin_bitmask) < 0)
+		{
+			free_gpio(gpio);
+			return;
+		}
+
+		unsigned char hex_with_offset = setting->boot_config_hex[config_num] << (get_boot_mode_offset(gpio->pin_bitmask));
+		status = gpio->gpio_write(gpio, hex_with_offset);
+
+		if (status)
+			printf("set boot config %d failed, error = 0x%x\n", config_num, status);
+		else
+			printf("set boot config %d successfully\n", config_num);
+
+		free_gpio(gpio);
+	}
+}
+
 static void set_boot_mode(struct options_setting* setting)
 {
 	if (setting->boot_mode_hex == -1)
@@ -520,6 +565,9 @@ static void set_boot_mode(struct options_setting* setting)
 		printf("set boot mode successfully\n");
 
 	free_gpio(gpio);
+
+	if (board->boot_cfg_byte_num > 0)
+		set_boot_config(setting);
 }
 
 static void get_boot_mode(struct options_setting* setting)

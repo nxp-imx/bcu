@@ -33,10 +33,11 @@
 
 #include "bcu_ftdi_eeprom.h"
 
-#define MAX_PATH_LENGTH 800     //maximum path length allowed
-#define MAX_NUMBER_OF_POWER 100 //maximum number of power types
-#define MAX_NUMBER_OF_GROUP 10 //maximum number of power groups
-#define MAX_MAPPING_NAME_LENGTH 30	//maximum length of the name of the mapping
+#define MAX_PATH_LENGTH		800	//maximum path length allowed
+#define MAX_NUMBER_OF_POWER	100	//maximum number of power types
+#define MAX_NUMBER_OF_GROUP	10	//maximum number of power groups
+#define MAX_MAPPING_NAME_LENGTH	30	//maximum length of the name of the mapping
+#define MAX_BOOT_CONFIG_BYTE	5
 
 enum mapping_type {
 	power,
@@ -63,6 +64,11 @@ struct boot_mode {
 	unsigned char boot_mode_hex;
 };
 
+struct boot_config {
+	char* name;
+	unsigned char boot_config_hex[MAX_BOOT_CONFIG_BYTE];
+};
+
 struct board_links {
 	char* flashbin;
 	char* sdcard;
@@ -77,6 +83,8 @@ struct board_info {
 	char* name;
 	struct mapping* mappings;
 	struct boot_mode* boot_modes;
+	unsigned int boot_cfg_byte_num;
+	struct boot_config* boot_configs;
 	struct board_power_group* power_groups;
 	struct board_links* links;
 	struct ftdi_eeprom_user_area* eeprom_data;
