@@ -1956,10 +1956,18 @@ static void monitor(struct options_setting* setting)
 
 				//printf("%-10s|",board->mappings[name[k]].name);
 				printf("%s", g_vt_default);
-				if (m < 27)
-					printf("%c ", 65 + m - 1);//print corresponding letters, start with A
+				if (sr_level[k] > -1)
+				{
+					if (m < 27)
+						printf("%c ", 65 + m - 1);//print corresponding letters, start with A
+					else
+						printf("%c ", 97 + m - 27);//print corresponding letters, start with a
+				}
 				else
-					printf("%c ", 97 + m - 27);//print corresponding letters, start with a
+				{
+					printf("  ");
+				}
+
 				if(range_level[k] == 0x01 || range_level[k] == 0x11)
 				{
 					printf("*");
