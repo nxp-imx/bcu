@@ -491,12 +491,12 @@ struct boot_mode imx8ulpevk_board_boot_modes[] = {
 	{"fuse",	0x00},
 	{"usb",		0x01},
 	{"emmc_s",	0x02},
-	{"emmc_nor_lp",	0x81},
-	{"emmc_nor",	0x82},
-	{"nand_nor",	0x92},
-	{"nor_s",	0xa0},
-	{"nor_nor_lp",	0xa1},
-	{"nor_nor",	0xa2},
+	{"emmc_nor_lp",	0x02},
+	{"emmc_nor",	0x02},
+	{"nand_nor",	0x02},
+	{"nor_s",	0x02},
+	{"nor_nor_lp",	0x02},
+	{"nor_nor",	0x02},
 	{NULL,		0}
 };
 
