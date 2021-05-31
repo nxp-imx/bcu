@@ -2154,6 +2154,7 @@ static void monitor(struct options_setting* setting)
 		{
 			int hotkey_index = (int)ch - '0';
 			int bootmodenum = 0;
+			int input_num = 0;
 			switch (hotkey_index)
 			{
 			case 1:
@@ -2232,13 +2233,16 @@ static void monitor(struct options_setting* setting)
 				printf("Enter   boot from BOOT SWITCH%s\n", g_vt_clear_line);
 				printf("\nPlease select the boot mode after reset: ");
 				if (!setting->nodisplay)
-					setting->boot_mode_hex = catch_input_char_block();
-				else
-					setting->boot_mode_hex = 0;
-				setting->boot_mode_hex -= '0';
-				if (setting->boot_mode_hex >= bootmodenum || setting->boot_mode_hex < 0)
+					input_num = catch_input_char_block() - '0';
+
+				setting->boot_mode_hex = board->boot_modes[input_num].boot_mode_hex;
+				for (int bootcfg_n = 0; bootcfg_n < MAX_BOOT_CONFIG_BYTE; bootcfg_n++)
 				{
-					printf("Will boot from BOOT SWITCH, input=%d%s\n", setting->boot_mode_hex, g_vt_clear_line);
+					setting->boot_config_hex[bootcfg_n] = board->boot_configs[input_num].boot_config_hex[bootcfg_n];
+				}
+				if (input_num >= bootmodenum || input_num < 0)
+				{
+					printf("Will boot from BOOT SWITCH, input=0x%x%s\n", input_num, g_vt_clear_line);
 					setting->boot_mode_hex = -1;
 					if (setting->dump == 1 && !setting->pmt)
 						fprintf(fptr, "HOT-KEY %d PRESSED: Reset the board from BOOT SWITCH\n", hotkey_index);
@@ -2246,7 +2250,7 @@ static void monitor(struct options_setting* setting)
 				else
 				{
 					if (setting->dump == 1 && !setting->pmt)
-						fprintf(fptr, "HOT-KEY %d PRESSED: Reset the board from %s\n", hotkey_index, board->boot_modes[setting->boot_mode_hex].name);
+						fprintf(fptr, "HOT-KEY %d PRESSED: Reset the board from %s\n", hotkey_index, board->boot_modes[input_num].name);
 				}
 
 				reset(setting);
