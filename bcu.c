@@ -99,6 +99,7 @@ char* g_vt_default = (char*)"\x1B[0m";
 char* g_vt_clear = (char*)"\x1B[2J";
 char* g_vt_clear_remain = (char*)"\x1B[0J";
 char* g_vt_clear_line = (char*)"\x1B[K";
+char* g_vt_return_last_line = (char*)"\x1B[1A";
 char* g_vt_home = (char*)"\x1B[H";
 
 void clean_vt_color()
@@ -870,7 +871,7 @@ static void reset(struct options_setting* setting)
 		a++;
 	}
 
-	printf("rebooting...\n");
+	printf("resetting in: %ds", board->reset_time_ms / 1000);
 
 	gpio = get_gpio("reset", board);
 	mask = board->mappings[get_gpio_id("reset", board)].initinfo & 0xF;
@@ -887,7 +888,22 @@ static void reset(struct options_setting* setting)
 	if (setting->hold)
 		msleep(setting->hold);
 	else
-		msleep(board->reset_time_ms);
+	{
+		if (board->reset_time_ms <= 1000)
+			msleep(board->reset_time_ms);
+		else
+		{
+			int i;
+			for(i = board->reset_time_ms; i > 0; i = i - 1000)
+			{
+				printf("\b\b%ds", i / 1000);
+				fflush(stdout);
+				msleep(1000);
+			}
+		}
+	}
+	printf("\n%s%s", g_vt_return_last_line, g_vt_clear_line);
+
 	if (setting->boot_mode_hex != -1)
 	{
 		status |= gpio->gpio_write(gpio, mask ? 0xFF : 0x00) << 1;//reset high
