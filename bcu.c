@@ -570,6 +570,60 @@ static void set_boot_mode(struct options_setting* setting)
 		set_boot_config(setting);
 }
 
+static void get_boot_config(struct options_setting* setting, unsigned char boot_modehex)
+{
+	struct board_info* board = get_board(setting->board);
+	if (board == NULL)
+		return;
+	struct gpio_device* gpio = NULL;
+	int status = -1;
+	unsigned char read_buf;
+	int read_boot_config_hex[MAX_BOOT_CONFIG_BYTE] = { 0 };
+
+	for (int config_num = 0; config_num < board->boot_cfg_byte_num; config_num++)
+	{
+		char cfg_str[10] = "boot_cfg";
+		char num_str[2] = "0";
+		num_str[0] += config_num;
+		strcat(cfg_str, num_str);
+
+		gpio = get_gpio(cfg_str, board);
+		if (gpio == NULL)
+		{
+			printf("get_boot_config: No boot_mode configuration!\n");
+			free_gpio(gpio);
+			return;
+		}
+		if (get_boot_mode_offset(gpio->pin_bitmask) < 0)
+		{
+			free_gpio(gpio);
+			return;
+		}
+		status = gpio->gpio_read(gpio, &read_buf);
+		read_buf = read_buf >> get_boot_mode_offset(gpio->pin_bitmask);
+		if (status)
+			printf("get_boot_config %d failed, error = 0x%x\n", config_num, status);
+		else
+			read_boot_config_hex[config_num] = read_buf;
+
+		free_gpio(gpio);
+	}
+
+	char *bootmodestr = get_boot_config_name_from_hex(board, read_boot_config_hex, boot_modehex);
+	if (bootmodestr == NULL)
+		printf("get_boot_config: cannot find the boot config string.\n");
+	else
+	{
+		printf("get_boot_mode: %s%s%s, ",
+			g_vt_red, bootmodestr, g_vt_default);
+		printf("boot_mode_hex: %s0x%x%s, ",
+			g_vt_red, boot_modehex, g_vt_default);
+		for (int i = 0; i < board->boot_cfg_byte_num; i++)
+			printf("boot_config_%d_hex: %s0x%x%s\n", i,
+				g_vt_red, read_boot_config_hex[i], g_vt_default);
+	}
+}
+
 static void get_boot_mode(struct options_setting* setting)
 {
 	struct board_info* board = get_board(setting->board);
@@ -627,6 +681,8 @@ static void get_boot_mode(struct options_setting* setting)
 		return;
 	}
 	status = gpio->gpio_read(gpio, &read_buf);
+	read_buf = read_buf >> get_boot_mode_offset(gpio->pin_bitmask);
+	free_gpio(gpio);
 	if (status)
 		printf("get_boot_mode failed, error = 0x%x\n", status);
 	else
@@ -635,12 +691,15 @@ static void get_boot_mode(struct options_setting* setting)
 			printf("get_boot_mode hex value: %s0x%x%s, cannot find the boot mode string.\n",
 				g_vt_red, read_buf, g_vt_default);
 		else
-			printf("get_boot_mode: %s%s%s, hex value: %s0x%x%s\n",
-				g_vt_red, get_boot_mode_name_from_hex(board, read_buf),
-				g_vt_default, g_vt_red, read_buf, g_vt_default);
+		{
+			if (!board->boot_cfg_byte_num)
+				printf("get_boot_mode: %s%s%s, hex value: %s0x%x%s\n",
+					g_vt_red, get_boot_mode_name_from_hex(board, read_buf),
+					g_vt_default, g_vt_red, read_buf, g_vt_default);
+			else
+				get_boot_config(setting, read_buf);
+		}
 	}
-
-	free_gpio(gpio);
 }
 
 static void deinitialize(struct options_setting* setting)

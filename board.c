@@ -745,3 +745,25 @@ char* get_boot_mode_name_from_hex(struct board_info* board, int boot_mode_hex)
 	}
 	return NULL;
 }
+
+char* get_boot_config_name_from_hex(struct board_info* board, int *boot_config_hex, int boot_mode_hex)
+{
+	int i = 0;
+
+	while (board->boot_modes[i].name != NULL)
+	{
+		if (board->boot_modes[i].boot_mode_hex == boot_mode_hex)
+		{
+			int j;
+			for (j = 0; j < board->boot_cfg_byte_num; j++)
+			{
+				if (board->boot_configs[i].boot_config_hex[j] != boot_config_hex[j])
+					break;
+			}
+			if (j >= board->boot_cfg_byte_num)
+				return board->boot_configs[i].name;
+		}
+		i++;
+	}
+	return NULL;
+}

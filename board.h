@@ -111,5 +111,6 @@ int get_max_power_name_length(struct board_info* board);
 /*convert bitmask to offset of the boot mode, for example, bitmask 0x38 offset is 3, because 00111000>>3=00000111 */
 int get_boot_mode_offset(unsigned char boot_mode_pin_bitmask);
 char* get_boot_mode_name_from_hex(struct board_info* board, int boot_mode_hex);
+char* get_boot_config_name_from_hex(struct board_info* board, int *boot_config_hex, int boot_mode_hex);
 
 #endif //BOARD_H
