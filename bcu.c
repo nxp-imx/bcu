@@ -725,16 +725,25 @@ static void deinitialize(struct options_setting* setting)
 	free_gpio(gpio);
 
 	gpio = get_gpio("bootmode_sel", board);
-	if (gpio == NULL)
+	if (gpio != NULL)
 	{
-		// printf("deinitialize: Cannot find gpio bootmode_sel!\n");
-		return;
+		mask = board->mappings[get_gpio_id("bootmode_sel", board)].initinfo & 0xF;
+		status = gpio->gpio_write(gpio, mask ? 0x00 : 0xFF); //set it off.
+		if (!status)
+			printf("%sDISABLE%s remote control: bootmode_sel\n", g_vt_red, g_vt_default);
+		free_gpio(gpio);
 	}
-	mask = board->mappings[get_gpio_id("bootmode_sel", board)].initinfo & 0xF;
-	status = gpio->gpio_write(gpio, mask ? 0x00 : 0xFF); //set it off.
-	if (!status)
-		printf("%sDISABLE%s remote control: bootmode_sel\n", g_vt_red, g_vt_default);
-	free_gpio(gpio);
+
+	gpio = get_gpio("ft_reset_boot_mode", board);
+	if (gpio != NULL)
+	{
+		status = gpio->gpio_write(gpio, 0x00);
+		msleep(50);
+		status = gpio->gpio_write(gpio, 0xFF);
+		if (!status)
+			printf("%sRESET%s boot mode pin: ft_reset_boot_mode\n", g_vt_red, g_vt_default);
+		free_gpio(gpio);
+	}
 }
 
 static int initialize(struct options_setting* setting, int isreset)
