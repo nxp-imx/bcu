@@ -82,6 +82,15 @@ struct ftdi_eeprom_user_area imx8dxlevk_ftdi_eeprom_user_area_info = {
 	1
 };
 
+struct ftdi_eeprom_user_area imx8dxlevk_c1_ftdi_eeprom_user_area_info = {
+	0x1,
+	0x1, 0x3, 0x2,
+	0x1, 0x1, 0x2,
+	0x1, 0xF, 0xF,
+	24,
+	1
+};
+
 struct ftdi_eeprom_user_area imx8mpevkpwr_a0_ftdi_eeprom_user_area_info = {
 	0x1,
 	0x4, 0x1, 0x1,
