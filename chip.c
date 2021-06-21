@@ -480,7 +480,7 @@ int ft4232h_i2c_write(void* ft4232h, unsigned char data, int type)
 
 	/*set direction*/
 	buffer[i++] = MPSSE_CMD_SET_DATA_BITS_LOWBYTE;/* MPSSE command */
-	buffer[i++] = VALUE_SCLLOW_SDALOW | ft->val_bitmask; /*Value*/
+	buffer[i++] = VALUE_SCLLOW_SDAHIGH | ft->val_bitmask; /*Value*/
 	buffer[i++] = DIRECTION_SCLOUT_SDAOUT | ft->dir_bitmask; /*Direction*/
 	ftStatus = ft_write(ft->ftdi_info, buffer, i); //Send off the commands
 	if (ftStatus < 0) return ftStatus;
