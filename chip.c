@@ -909,6 +909,7 @@ int pac1934_get_data(void* pac1934, struct pac193x_reg_data* pac_reg)
 	for(k = 0; k < DATA_LEN - 1; k++)
 		parent->i2c_read(parent, &data[k], 0, I2C_TYPE_PAC1934);
 	parent->i2c_read(parent, &data[DATA_LEN - 1], 1, I2C_TYPE_PAC1934);
+	parent->i2c_stop(parent);
 
 	// for(k=0; k<12; k++)
 	// 	printf("ctrl[%d]=0x%x\n", k, ctrl[k]);
