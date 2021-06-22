@@ -255,13 +255,26 @@ int ft_clear_buffer(struct ftdi_info* ftdi)
 #else
 	int num1 = 0;
 	int num2 = 0;
-	// num1=ftdi_usb_purge_rx_buffer(ftdi->ftdi);
+	num1 = ftdi_usb_purge_rx_buffer(ftdi->ftdi);
 	num2 = ftdi_usb_purge_tx_buffer(ftdi->ftdi);
 	if (num1 != 0 || num2 != 0)
 	{
 		printf("clear buffer failed!\n");
 	}
 	return 0;
+#endif
+}
+
+void us_sleep(int duration)
+{
+	if (duration < 1)
+		return;
+
+#ifdef _WIN32
+	Sleep(duration / 1000.0);
+#endif
+#if defined(__linux__) || defined(__APPLE__)
+	usleep(duration);
 #endif
 }
 

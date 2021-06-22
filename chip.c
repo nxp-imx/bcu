@@ -38,7 +38,7 @@
 #include "port.h"
 #include "ftdi_def.h"
 
-#define MAX_FTDI_BUFFER_SIZE 512
+#define MAX_FTDI_BUFFER_SIZE 1024
 
 extern char GV_LOCATION_ID[];
 
@@ -327,6 +327,7 @@ void* ft4232h_i2c_create(char* chip_specification, void* parent)
 	}
 	ft->i2c_device.device.parent = parent;
 	ft->i2c_device.i2c_read = ft4232h_i2c_read;
+	ft->i2c_device.i2c_readn = ft4232h_i2c_readn;
 	ft->i2c_device.i2c_write = ft4232h_i2c_write;
 	ft->i2c_device.i2c_start = ft4232h_i2c_start;
 	ft->i2c_device.i2c_stop = ft4232h_i2c_stop;
@@ -440,6 +441,64 @@ int ft4232h_i2c_read(void* ft4232h, unsigned char* data_buffer, int is_nack, int
 	if (ftStatus < 0) return ftStatus;
 	*data_buffer = in_buffer[0];
 
+#ifdef _WIN32
+	if (type == I2C_TYPE_GPIO)
+#endif
+		ft_clear_buffer(ft->ftdi_info);
+
+	return 0;
+
+}
+
+int ft4232h_i2c_readn(void* ft4232h, unsigned char* data_buffer, int type, int len)
+{
+	struct ft4232h* ft = ft4232h;
+	unsigned char buffer[MAX_FTDI_BUFFER_SIZE] = {0};
+	unsigned char in_buffer[MAX_FTDI_BUFFER_SIZE] = {0};
+	int i = 0, ftStatus = 0, j;
+
+// #ifdef _WIN32
+// 	if (type == I2C_TYPE_GPIO)
+// #endif
+// 		ft_clear_buffer(ft->ftdi_info);
+
+	for (j = 0; j < len; j++)
+	{
+		buffer[i++] = MPSSE_CMD_SET_DATA_BITS_LOWBYTE;
+		buffer[i++] = VALUE_SCLLOW_SDALOW | ft->val_bitmask;
+		buffer[i++] = DIRECTION_SCLOUT_SDAIN | ft->dir_bitmask;
+
+		buffer[i++] = MPSSE_CMD_DATA_IN_BITS_POS_EDGE;
+		buffer[i++] = DATA_SIZE_8BITS;
+
+		buffer[i++] = MPSSE_CMD_SEND_IMMEDIATE;
+
+		buffer[i++] = MPSSE_CMD_SET_DATA_BITS_LOWBYTE;
+		buffer[i++] = VALUE_SCLLOW_SDALOW | ft->val_bitmask;
+		buffer[i++] = DIRECTION_SCLOUT_SDAOUT | ft->dir_bitmask;
+
+		buffer[i++] = MPSSE_CMD_DATA_OUT_BITS_NEG_EDGE;
+		buffer[i++] = 0;// 0 means send one bit
+		if (j < len - 1)
+			buffer[i++] = 0x00;// MSB zero means ACK
+		else
+			buffer[i++] = 0xFF;// MSB zero means ACK
+	}
+
+	ftStatus = ft_write(ft->ftdi_info, buffer, i); //Send off the commands
+	if (ftStatus < 0)
+		return ftStatus;
+	us_sleep(500);
+	ftStatus = ft_read(ft->ftdi_info, in_buffer, len); //Read one byte
+	if (ftStatus < 0)
+		return ftStatus;
+	memcpy(data_buffer, in_buffer, len);
+
+#ifdef _WIN32
+	if (type == I2C_TYPE_GPIO)
+#endif
+		ft_clear_buffer(ft->ftdi_info);
+
 	return 0;
 
 }
@@ -450,11 +509,6 @@ int ft4232h_i2c_write(void* ft4232h, unsigned char data, int type)
 	unsigned char buffer[MAX_FTDI_BUFFER_SIZE];
 	unsigned char in_buffer[MAX_FTDI_BUFFER_SIZE];
 	int i = 0, ftStatus = 0;
-
-#ifdef _WIN32
-	if (type == I2C_TYPE_GPIO)
-#endif
-		ft_clear_buffer(ft->ftdi_info);
 
 	buffer[i++] = MPSSE_CMD_SET_DATA_BITS_LOWBYTE; //Command to set directions of lower 8 pins and force value on bits set as output
 	buffer[i++] = VALUE_SCLLOW_SDALOW | ft->val_bitmask;
@@ -492,6 +546,11 @@ int ft4232h_i2c_write(void* ft4232h, unsigned char data, int type)
 		// printf("can't get the ACK bit after write\n");
 		return -1; /*Error, can't get the ACK bit */
 	}
+
+#ifdef _WIN32
+	if (type == I2C_TYPE_GPIO)
+#endif
+		ft_clear_buffer(ft->ftdi_info);
 
 	return 0;
 }
@@ -831,7 +890,7 @@ int pac1934_write_bipolar(void* pac1934, int value)
 	parent->i2c_start(parent);
 	if(parent->i2c_write(parent, addr_plus_write, I2C_TYPE_PAC1934))
 	{
-		printf("pac 1934 failure get ack\n");
+		printf("pac1934_write_bipolar: pac 1934 failure get ack\n");
 		return -1;
 	};
 	parent->i2c_write(parent, PAC1934_REG_NEG_PWR_ADDR, I2C_TYPE_PAC1934);
@@ -857,7 +916,7 @@ int pac1934_snapshot(void* pac1934)
 	parent->i2c_start(parent);
 	if(parent->i2c_write(parent, addr_plus_write, I2C_TYPE_PAC1934))
 	{
-		printf("pac 1934 failure get ack\n");
+		printf("pac1934_snapshot: pac 1934 failure get ack\n");
 		return -1;
 	};
 	parent->i2c_write(parent, 0x00, I2C_TYPE_PAC1934); //refresh;
@@ -889,7 +948,7 @@ int pac1934_get_data(void* pac1934, struct pac193x_reg_data* pac_reg)
 	// unsigned char ctrl[12];
 	int k;
 	#define DATA_LEN 17
-	unsigned char data[DATA_LEN];
+	unsigned char data[DATA_LEN] = {0};
 	unsigned char start_read_reg_base;
 
 	int status = 0;
@@ -906,9 +965,10 @@ int pac1934_get_data(void* pac1934, struct pac193x_reg_data* pac_reg)
 	parent->i2c_write(parent, start_read_reg_base, I2C_TYPE_PAC1934); //start get data;
 	parent->i2c_start(parent);
 	parent->i2c_write(parent, addr_plus_read, I2C_TYPE_PAC1934);
-	for(k = 0; k < DATA_LEN - 1; k++)
-		parent->i2c_read(parent, &data[k], 0, I2C_TYPE_PAC1934);
-	parent->i2c_read(parent, &data[DATA_LEN - 1], 1, I2C_TYPE_PAC1934);
+	// for(k = 0; k < DATA_LEN - 1; k++)
+	// 	parent->i2c_read(parent, &data[k], 0, I2C_TYPE_PAC1934);
+	// parent->i2c_read(parent, &data[DATA_LEN - 1], 1, I2C_TYPE_PAC1934);
+	parent->i2c_readn(parent, data, I2C_TYPE_PAC1934, DATA_LEN);
 	parent->i2c_stop(parent);
 
 	// for(k=0; k<12; k++)

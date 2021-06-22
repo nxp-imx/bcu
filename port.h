@@ -142,6 +142,7 @@ int ft_read(struct ftdi_info* ftdi, unsigned char* buffer, int size);
 int ft_read_pins(struct ftdi_info* ftdi, unsigned char* pins);
 int ft_clear_buffer(struct ftdi_info* ftdi);
 void ft_list_devices(char location_str[][MAX_LOCATION_ID_LENGTH], int *board_num, int mode);
+void us_sleep(int duration);
 void msleep(int duration);
 int ft_erase_eeprom(struct ftdi_info* ftdi);
 int ft_write_eeprom(struct ftdi_info* ftdi, unsigned int startaddr, unsigned char* buffer, int size, unsigned char* sn_buf);

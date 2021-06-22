@@ -52,6 +52,7 @@ struct device {
 struct i2c_device {
 	struct device device;
 	int (*i2c_read)(void*, unsigned char*, int, int); //Read one byte, give ack/nack
+	int (*i2c_readn)(void*, unsigned char*, int, int); //Read n bytes, give ack/nack
 	int (*i2c_write)(void*, unsigned char, int); //Write one byte, check ack/nack
 	int (*i2c_start)(void*);
 	int (*i2c_stop)(void*); //sending Start/Stop Condition
@@ -153,6 +154,7 @@ struct ft4232h {
 	int isinit;
 };
 int ft4232h_i2c_read(void* ft4232h, unsigned char* data_buffer, int is_nack, int type);
+int ft4232h_i2c_readn(void* ft4232h, unsigned char* data_buffer, int type, int len);
 int ft4232h_i2c_write(void* ft4232h, unsigned char data, int type);
 int ft4232h_i2c_start(void* f2232h);
 int ft4232h_i2c_stop(void* ft4232h);
