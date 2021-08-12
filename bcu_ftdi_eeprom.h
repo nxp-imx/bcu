@@ -95,6 +95,7 @@ extern struct ftdi_eeprom_user_area imx8mpevkpwr_a0_ftdi_eeprom_user_area_info;
 extern struct ftdi_eeprom_user_area imx8mpevkpwr_a1_ftdi_eeprom_user_area_info;
 extern struct ftdi_eeprom_user_area imx8ulpevk_ftdi_eeprom_user_area_info;
 extern struct ftdi_eeprom_user_area val_board_1_ftdi_eeprom_user_area_info;
+extern struct ftdi_eeprom_user_area val_board_2_ftdi_eeprom_user_area_info;
 extern struct ftdi_eeprom_field_code_tb ftdi_eeprom_field[];
 
 #endif //BCU_FTDI_EEPROM_H

@@ -49,17 +49,20 @@ struct ftdi_eeprom_field_code_tb ftdi_eeprom_field[] = {
 	{ftdi_eeprom_board_id, 0x6, "NXP i.MX8MP DDR4 Board"},
 	{ftdi_eeprom_board_id, 0x7, "NXP i.MX8ULP EVK Board"},
 	{ftdi_eeprom_board_id, 0x8, "NXP VAL_BOARD_1 Board"},
+	{ftdi_eeprom_board_id, 0x9, "NXP VAL_BOARD_2 Board"},
 
 	{ftdi_eeprom_soc_id, 0x1, "i.MX8DXL"},
 	{ftdi_eeprom_soc_id, 0x2, "i.MX8MP"},
 	{ftdi_eeprom_soc_id, 0x3, "i.MX8ULP"},
 	{ftdi_eeprom_soc_id, 0x4, "VAL_BOARD_1"},
+	{ftdi_eeprom_soc_id, 0x5, "VAL_BOARD_1"},
 
 	{ftdi_eeprom_pmic_id, 0x1, "PPF7100BVMA1ES"},  //On imx8dxl-evk
 	{ftdi_eeprom_pmic_id, 0x2, "PCA9450CHN"},  //On imx8mpevk-cpu and imx8mpevk-cpu-pwr
 	{ftdi_eeprom_pmic_id, 0x3, "PPF7100BMMA2ES"},
 	{ftdi_eeprom_pmic_id, 0x4, "PCA9460AUK"},  //On imx8ulp-evk a0
 	{ftdi_eeprom_pmic_id, 0x5, "PCA9450AAHN"},  //On val_board_1 a0
+	{ftdi_eeprom_pmic_id, 0x6, "PCA9450BHN"},  //On val_board_2 a0
 
 	{0, 0, NULL}//null terminated
 };
@@ -124,6 +127,15 @@ struct ftdi_eeprom_user_area val_board_1_ftdi_eeprom_user_area_info = {
 	0x4, 0x1, 0x1,
 	0x5, 0xF, 0xF,
 	37,
+	1
+};
+
+struct ftdi_eeprom_user_area val_board_2_ftdi_eeprom_user_area_info = {
+	0x1,
+	0x9, 0x1, 0x2,
+	0x5, 0x1, 0x1,
+	0x6, 0xF, 0xF,
+	34,
 	1
 };
 
