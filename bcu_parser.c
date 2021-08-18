@@ -748,7 +748,7 @@ void* build_device_linkedlist_smart(void** new_head, char* new_path, void* old_h
 static int parse_group(int id, struct group* group_ptr, struct board_info* board)
 {
 	strcpy(group_ptr->name, board->power_groups[id].group_name);
-	printf("group name: %s\n", group_ptr->name);
+	// printf("group name: %s\n", group_ptr->name);
 
 	group_ptr->num_of_members = 0;
 	if (strlen(board->power_groups[id].group_string) < (MAX_MAPPING_NAME_LENGTH * MAX_NUMBER_OF_POWER))
@@ -764,7 +764,7 @@ static int parse_group(int id, struct group* group_ptr, struct board_info* board
 	char* group_member_name = strtok(group_member_string, ",");
 	while (group_member_name != NULL)
 	{
-		printf("member: %s\n", group_member_name);
+		// printf("member: %s\n", group_member_name);
 		int power_index = 0;
 		int mapping_index = 0;
 		int found = 0;

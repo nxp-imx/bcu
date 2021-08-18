@@ -2493,6 +2493,836 @@ static void monitor(struct options_setting* setting)
 	return;
 }
 
+#if defined(linux) || defined(__APPLE__)
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#endif
+
+#ifdef _WIN32
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#endif
+
+#define PORT 65432
+
+char *iso8601(char *local_time)
+{
+	time_t t_time;
+	struct tm *t_tm;
+ 
+	t_time = time(NULL);
+	t_tm = localtime(&t_time);
+	if (t_tm == NULL)
+		return NULL;
+ 
+	if (strftime(local_time, 32, "%FT%T%z", t_tm) == 0)
+		return NULL;
+
+	local_time[25] = local_time[24];
+	local_time[24] = local_time[23];
+	local_time[22] = ':';
+	local_time[26] = '\0';
+	return local_time;
+}
+
+static int server_monitor(struct options_setting* setting)
+{
+	signal(SIGINT, handle_sigint);
+	struct board_info* board = get_board(setting->board);
+	if (board == NULL) {
+		// printf("entered board model are not supported.\n");
+		return -1;
+	}
+
+	int ret = 0;
+
+	char previous_path[MAX_PATH_LENGTH];
+	void* head = NULL;
+	void* end_point = NULL;
+
+	double voltage = 0;
+	double current = 0;
+	double power = 0;
+	char ch = ' ';
+	char sr_path[MAX_PATH_LENGTH];
+
+	char sr_name[100];
+	unsigned long start, avgstart, maxminstart;
+	get_msecond(&start);
+	avgstart = start;
+	maxminstart = start;
+	unsigned long times = 1;
+	FILE* fptr = NULL;
+	int reset_flag = 0;
+
+	int serverSocket;
+
+	struct sockaddr_in server_addr;
+	struct sockaddr_in clientAddr;
+	int addr_len = sizeof(clientAddr);
+	int client;
+	char sendbuf[4096] = { 0 };
+	char recvbuf[4096] = { 0 };
+	int iDataNum;
+	char logtime[32] = { 0 };
+	int accepted;
+
+#ifdef _WIN32
+	WSADATA wsaData;
+	unsigned long ul = 1;
+	// Initialize Winsock
+	ret = WSAStartup(MAKEWORD(2, 2), &wsaData);
+	if (ret != 0) {
+		printf("WSAStartup failed with error: %d\n", ret);
+		return 1;
+	}
+#endif
+
+	serverSocket = socket(AF_INET, SOCK_STREAM, 0);
+#ifdef _WIN32
+	if (serverSocket == INVALID_SOCKET)
+	{
+		printf("socket failed with error: %ld\n", WSAGetLastError());
+		WSACleanup();
+#else
+	if (serverSocket < 0)
+	{
+		perror("socket");
+#endif
+		return -1;
+	}
+
+#ifdef _WIN32
+	ret = ioctlsocket(serverSocket, FIONBIO, (unsigned long*)&ul);
+	if (ret == SOCKET_ERROR)
+	{
+		printf("ioctlsocket failed with error: %d\n", WSAGetLastError());
+		closesocket(serverSocket);
+		WSACleanup();
+		return -10;
+	}
+#endif
+
+	memset(&server_addr, 0, sizeof(server_addr));
+
+	server_addr.sin_family = AF_INET;
+	server_addr.sin_port = htons(PORT);
+	server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+
+	ret = bind(serverSocket, (struct sockaddr*)&server_addr, sizeof(server_addr));
+#ifdef _WIN32
+	if (ret == SOCKET_ERROR)
+	{
+		printf("bind failed with error: %d\n", WSAGetLastError());
+		closesocket(serverSocket);
+		WSACleanup();
+#else
+	if (ret < 0)
+	{
+		perror("connect");
+#endif
+		return -11;
+	}
+
+	ret = listen(serverSocket, 5);
+#ifdef _WIN32
+	if (ret == SOCKET_ERROR)
+	{
+		printf("listen failed with error: %d\n", WSAGetLastError());
+		closesocket(serverSocket);
+		WSACleanup();
+#else
+	if (ret < 0)
+	{
+		perror("listen");
+#endif
+		return -12;
+	}
+
+retry:
+	printf("[%s] listening Port %d on all IPs.\n", iso8601(logtime), PORT);
+	accepted = 0;
+	do {
+		client = accept(serverSocket, (struct sockaddr*)&clientAddr, (socklen_t*)&addr_len);
+#ifdef _WIN32
+		if (client == INVALID_SOCKET)
+		{
+			if (WSAGetLastError() != WSAEWOULDBLOCK)
+			{
+				printf("accept failed with error: %d\n", WSAGetLastError());
+				closesocket(serverSocket);
+				WSACleanup();
+				return -10;
+			}
+#else
+		if (client < 0)
+		{
+			perror("accept");
+			return -10;
+#endif
+		}
+		else
+		{
+			accepted = 1;
+		}
+	} while (!accepted);
+	printf("[%s] IP is %s\n", iso8601(logtime), inet_ntoa(clientAddr.sin_addr));
+	printf("[%s] Port is %d\n", iso8601(logtime), htons(clientAddr.sin_port));
+	printf("[%s] Start collecting data...\n", iso8601(logtime));
+	printf("[%s] Waiting request message...\n", iso8601(logtime));
+
+	if (setting->dump == 1)
+	{
+		fptr = fopen(setting->dumpname, "w+");
+		if (fptr == NULL)
+		{
+			printf("\nOpen file ERROR!\nPlease check if the \"%s\" file is still opened.\nExit...\n", setting->dumpname);
+			return -1;
+		}
+
+		/*print first row*/
+		int i = 1, index_n;
+		fprintf(fptr, "time(ms)");
+		index_n = get_power_index_by_showid(i, board);
+		while (index_n != -1)
+		{
+			if (board->mappings[index_n].type == power && board->mappings[index_n].initinfo != 0)
+			{
+				if (!setting->pmt)
+					fprintf(fptr, ",%s voltage(V),%s current(mA)", board->mappings[index_n].name, board->mappings[index_n].name);
+				else
+					fprintf(fptr, ",%s voltage(V),%s current(mA),%s power(mW)", board->mappings[index_n].name, board->mappings[index_n].name, board->mappings[index_n].name);
+			}
+			i++;
+			index_n = get_power_index_by_showid(i, board);
+		}
+	}
+
+	int n = 0; //n is the number of variables need to be measured
+	int index = 0;
+	while (board->mappings[index].name != NULL)
+	{
+		if (board->mappings[index].type == power)
+			n++;
+		index++;
+	}
+	//ideally I should be able to use n as the size of array, but Visual studio does not allow variable length array declaration...
+	// so 100 maximum variable for now...I could use dynamic memory allocation instead, but then I will have to free it one by one in the end..
+	int name[MAX_NUMBER_OF_POWER];
+	double vnow[MAX_NUMBER_OF_POWER]; double vavg[MAX_NUMBER_OF_POWER]; double vmax[MAX_NUMBER_OF_POWER]; double vmin[MAX_NUMBER_OF_POWER];
+	double cnow[MAX_NUMBER_OF_POWER]; double cavg[MAX_NUMBER_OF_POWER]; double cmax[MAX_NUMBER_OF_POWER]; double cmin[MAX_NUMBER_OF_POWER];
+	double pnow[MAX_NUMBER_OF_POWER]; double pavg[MAX_NUMBER_OF_POWER]; double pmax[MAX_NUMBER_OF_POWER]; double pmin[MAX_NUMBER_OF_POWER];
+	double data_size[MAX_NUMBER_OF_POWER];
+	double pavg_server_data_size[MAX_NUMBER_OF_POWER];
+	double cnow_fwrite[MAX_NUMBER_OF_POWER];
+	double pnow_fwrite[MAX_NUMBER_OF_POWER];
+	int sr_level[MAX_NUMBER_OF_POWER];
+	int range_control = 0;
+	int range_level[MAX_NUMBER_OF_POWER] = {0};
+	double cur_range[MAX_NUMBER_OF_POWER];
+	double unused_range[MAX_NUMBER_OF_POWER];
+	double pavg_server[MAX_NUMBER_OF_POWER];
+
+
+	//initialize
+	for (int i = 0; i < MAX_NUMBER_OF_POWER; i++)
+	{
+		vavg[i] = 0; vmax[i] = 0; vmin[i] = 99999;
+		cavg[i] = 0; cmax[i] = 0; cmin[i] = 99999;
+		pavg[i] = 0; pmax[i] = 0; pmin[i] = 99999;
+		pavg_server[i] = 0;
+		data_size[i] = 0;
+		pavg_server_data_size[i] = 0;
+		name[i] = 0;
+	}
+	int previous_width = monitor_size(GET_COLUMN);
+
+	//power groups
+	struct group groups[MAX_NUMBER_OF_POWER];
+	groups_init(groups, MAX_NUMBER_OF_POWER);
+
+	int num_of_groups = parse_groups(groups, board);
+	if (num_of_groups == -1)
+	{
+		free_device_linkedlist_backward(end_point);
+		if (setting->dump == 1)
+		{
+			fclose(fptr);
+		}
+		return -1;
+	}
+
+	if (setting->dump == 1)
+	{
+		for (int i = 0; i < num_of_groups; i++)
+		{
+			fprintf(fptr, ",%s Power(mW)", board->power_groups[i].group_name);
+		}
+		fprintf(fptr, "\n");
+	}
+
+	//get first channels of all groups of rails
+	int a = 0, pac_group_num = 0, last_pac_group = 0, pac_channel_num = 0;
+	struct pac193x_reg_data pac_data[MAX_NUMBER_OF_POWER];
+	char pac193x_group_path[MAX_NUMBER_OF_POWER][MAX_PATH_LENGTH];
+	while (board->mappings[a].name != NULL)
+	{
+		if (board->mappings[a].type == power && board->mappings[a].initinfo != 0) //-------------------------------------------------------------------------
+		{
+			end_point = build_device_linkedlist_smart(&head, board->mappings[a].path, head, previous_path);
+			strcpy(previous_path, board->mappings[a].path);
+
+			if (end_point == NULL) {
+				printf("monitor:failed to build device linkedlist\n");
+				if (setting->dump == 1)
+				{
+					fclose(fptr);
+				}
+				return -1;
+			}
+			struct power_device* pd = end_point;
+
+			int now_pac_group = pd->power_get_group(pd);
+			if(last_pac_group != now_pac_group)
+			{
+				strcpy(pac193x_group_path[now_pac_group - 1], board->mappings[a].path);
+				pac_group_num++;
+				last_pac_group = now_pac_group;
+			}
+
+			pac_channel_num++;
+
+			if (setting->rangefixed == 1)
+			{
+				strcpy(sr_name, "SR_");
+				strcat(sr_name, board->mappings[a].name);
+				if (get_path(sr_path, sr_name, board) != -1)
+				{
+					end_point = build_device_linkedlist_smart(&head, sr_path, head, previous_path);
+					strcpy(previous_path, sr_path);
+
+					if (end_point == NULL) {
+						printf("monitor:failed to build device linkedlist\n");
+						if (setting->dump == 1)
+						{
+							fclose(fptr);
+						}
+						return -1;
+					}
+					struct gpio_device* gd = end_point;
+					if ((board->mappings[a].initinfo & 0x3) == 0)
+					{
+						sr_level[a] = 0;
+						gd->gpio_write(gd, 0x00);
+					}
+					else if ((board->mappings[a].initinfo & 0x3) == 1)
+					{
+						sr_level[a] = 1;
+						gd->gpio_write(gd, 0xFF);
+					}
+				}
+				else
+				{
+					sr_level[a] = -1;
+				}
+			}
+			//get SR(sense resistor) switch logic level
+			else
+			{
+				strcpy(sr_name, "SR_");
+				strcat(sr_name, board->mappings[a].name);
+				if (get_path(sr_path, sr_name, board) != -1)
+				{
+					end_point = build_device_linkedlist_smart(&head, sr_path, head, previous_path);
+					strcpy(previous_path, sr_path);
+
+					if (end_point == NULL) {
+						printf("monitor:failed to build device linkedlist\n");
+						if (setting->dump == 1)
+						{
+							fclose(fptr);
+						}
+						return -1;
+					}
+					struct gpio_device* gd = end_point;
+					unsigned char data;
+					gd->gpio_get_output(gd, &data);
+
+					if (data == 0)
+						sr_level[a] = 0;
+					else
+						sr_level[a] = 1;
+				}
+				else
+				{
+					sr_level[a] = -1;
+				}
+			}
+		}
+		a++;
+	}
+
+	int pac_group_count = pac_group_num;
+	for(a = 0; a < MAX_NUMBER_OF_POWER; a++)
+	{
+		if (strlen(pac193x_group_path[a]) < 10)
+		{
+			continue;
+		}
+		if (pac_group_count <= 0)
+			break;
+		end_point = build_device_linkedlist_smart(&head, pac193x_group_path[a], head, previous_path);
+		strcpy(previous_path, pac193x_group_path[a]);
+
+		if (end_point == NULL) {
+			printf("monitor:failed to build device linkedlist\n");
+			if (setting->dump == 1)
+			{
+				fclose(fptr);
+			}
+			return -1;
+		}
+		struct power_device* pd = end_point;
+
+		if (setting->use_bipolar)
+			pd->power_write_bipolar(pd, 1);
+		else
+			pd->power_write_bipolar(pd, 0);
+
+		//snapshot once to skip the first data that may not match the polarity configuration
+		pd->power_set_snapshot(pd);
+
+		pac_group_count--;
+	}
+
+#if 1
+	unsigned long last_display = 0, now_display;
+	while (!GV_MONITOR_TERMINATED)
+	{
+		get_msecond(&now_display);
+		int candisplay = 0, interval;
+		interval = now_display - last_display;
+		if (interval > setting->refreshms || last_display == 0)
+		{
+			candisplay = 1;
+			last_display = now_display;
+		}
+		else
+		{
+			candisplay = 0;
+		}
+		//first refresh all pac1934's
+		pac_group_count = pac_group_num;
+		for(a = 0; a < MAX_NUMBER_OF_POWER; a++)
+		{
+			if (strlen(pac193x_group_path[a]) < 10)
+			{
+				continue;
+			}
+			if (pac_group_count <= 0)
+				break;
+			end_point = build_device_linkedlist_smart(&head, pac193x_group_path[a], head, previous_path);
+			strcpy(previous_path, pac193x_group_path[a]);
+
+			if (end_point == NULL) {
+				printf("monitor:failed to build device linkedlist\n");
+				if (setting->dump == 1)
+				{
+					fclose(fptr);
+				}
+				return -1;
+			}
+			struct power_device* pd = end_point;
+
+			pd->power_set_snapshot(pd);
+			pac_group_count--;
+		}
+		if (pac_group_num < 4)
+			msleep(1);
+		int cannotacc = 0;
+		pac_group_count = pac_group_num;
+		for(a = 0; a < MAX_NUMBER_OF_POWER; a++)
+		{
+			if (pac_group_count <= 0)
+				break;
+
+			if (strlen(pac193x_group_path[a]) < 10)
+			{
+				continue;
+			}
+			end_point = build_device_linkedlist_smart(&head, pac193x_group_path[a], head, previous_path);
+			strcpy(previous_path, pac193x_group_path[a]);
+
+			if (end_point == NULL) {
+				printf("monitor:failed to build device linkedlist\n");
+				if (setting->dump == 1)
+				{
+					fclose(fptr);
+				}
+				return -1;
+			}
+			struct power_device* pd = end_point;
+
+			if (setting->use_hwfilter)
+				pd->power_set_hwfilter(pd, 1);
+			else
+				pd->power_set_hwfilter(pd, 0);
+
+			if (setting->use_bipolar)
+				pd->power_set_bipolar(pd, 1);
+			else
+				pd->power_set_bipolar(pd, 0);
+
+			int b;
+			for (b = 0; b < 50; b++)
+			{
+				if (pd->power_get_data(pd, &pac_data[a]) >= 0)
+				{
+					break;
+				}
+				else
+					cannotacc = 1;
+			}
+			if (b == 50)
+			{
+				printf("PAC1934 cannot access!\n");
+				return -1;
+			}
+			else if(cannotacc == 1)
+				break;
+			pac_group_count--;
+		}
+		if(cannotacc == 1)
+			continue;
+		//calculate the value and store them in array
+		int i = 0;//i is the index of all mappings
+		int j = 0;//j is the index of the power related mapping only
+		while (board->mappings[i].name != NULL)
+		{
+			if (board->mappings[i].type == power && board->mappings[i].initinfo != 0)
+			{
+				name[j] = i;
+
+				if (reset_flag == 1)
+				{
+					strcpy(sr_name, "SR_");
+					strcat(sr_name, board->mappings[name[j]].name);
+					if (get_path(sr_path, sr_name, board) != -1)
+					{
+						end_point = build_device_linkedlist_smart(&head, sr_path, head, previous_path);
+						strcpy(previous_path, sr_path);
+
+						if (end_point == NULL) {
+							printf("monitor:failed to build device linkedlist\n");
+							if (setting->dump == 1)
+							{
+								fclose(fptr);
+							}
+							return -1;
+						}
+						struct gpio_device* gd = end_point;
+						unsigned char data;
+						gd->gpio_get_output(gd, &data);
+
+						if (data == 0)
+							sr_level[j] = 0;
+						else
+							sr_level[j] = 1;
+					}
+					else
+					{
+						sr_level[j] = -1;
+					}
+				}
+
+				end_point = build_device_linkedlist_smart(&head, board->mappings[i].path, head, previous_path);
+				strcpy(previous_path, board->mappings[i].path);
+
+				if (end_point == NULL) {
+					printf("monitor:failed to build device linkedlist\n");
+					if (setting->dump == 1)
+					{
+						fclose(fptr);
+					}
+					return -1;
+				}
+				struct power_device* pd = end_point;
+				
+				if(sr_level[j] == 0)
+					pd->switch_sensor(pd, 1);
+				else
+					pd->switch_sensor(pd, 0);
+
+				int group = pd->power_get_group(pd) - 1;
+				int sensor = pd->power_get_sensor(pd) - 1;
+				voltage = pac_data[group].vbus[sensor] - (pac_data[group].vsense[sensor] / 1000000);
+				current = pac_data[group].vsense[sensor] / pd->power_get_cur_res(pd);
+				cnow_fwrite[j] = current;
+				pnow_fwrite[j] = current * voltage;
+
+				if (range_control == 0)
+				{
+					range_level[j] = (char)(0 | range_level[j] << 4);  //mA
+				}
+				else if (range_control == 2)
+				{
+					current *= 1000;
+					range_level[j] = (char)(1 | range_level[j] << 4);  //uA
+				}
+				else
+				{
+					if ( (!(range_level[j] & 0xf) && cavg[j] < 1) || ((range_level[j] & 0xf) && cavg[j] < 1000))
+					{
+						current *= 1000;
+						range_level[j] = (char)(1 | range_level[j] << 4);  //uA
+					}
+					else
+						range_level[j] = (char)(0 | range_level[j] << 4);  //mA
+				}
+
+				cur_range[j] = 100000.0 / pd->power_get_cur_res(pd);
+				unused_range[j] = 100000.0 / pd->power_get_unused_res(pd);
+				// cur_range[j] = pac_data[pd->power_get_group(pd) - 1].vsense[pd->power_get_sensor(pd) - 1];
+
+				// printf("current %f\n", current);
+				double power = current * voltage;
+				vnow[j] = voltage;
+				cnow[j] = current;
+				pnow[j] = power;
+				pavg_server[j] = (pavg_server_data_size[j] * pavg_server[j] + power) / ((double)(pavg_server_data_size[j] + 1));
+				if (range_level[j] == 0x0 || range_level[j] == 0x11)
+				{
+					vmin[j] = (voltage < vmin[j]) ? voltage : vmin[j];
+					cmin[j] = (current < cmin[j]) ? current : cmin[j];
+					pmin[j] = (power < pmin[j]) ? power : pmin[j];
+					vmax[j] = (voltage > vmax[j]) ? voltage : vmax[j];
+					cmax[j] = (current > cmax[j]) ? current : cmax[j];
+					pmax[j] = (power > pmax[j]) ? power : pmax[j];
+					vavg[j] = (data_size[j] * vavg[j] + voltage) / (double)(data_size[j] + 1);
+					pavg[j] = (data_size[j] * pavg[j] + power) / ((double)(data_size[j] + 1));
+				}
+				else if (range_level[j] == 0x01)
+				{
+					vmin[j] = (voltage < vmin[j]) ? voltage : vmin[j];
+					cmin[j] = (current < cmin[j] * 1000) ? current : cmin[j] * 1000;
+					pmin[j] = (power < pmin[j] * 1000) ? power : pmin[j] * 1000;
+					vmax[j] = (voltage > vmax[j]) ? voltage : vmax[j];
+					cmax[j] = (current > cmax[j] * 1000) ? current : cmax[j] * 1000;
+					pmax[j] = (power > pmax[j] * 1000) ? power : pmax[j] * 1000;
+					cavg[j] *= 1000;
+					vavg[j] = (data_size[j] * vavg[j] + voltage) / (double)(data_size[j] + 1);
+					pavg[j] = (data_size[j] * pavg[j] * 1000 + power) / ((double)(data_size[j] + 1));
+				} 
+				else if (range_level[j] == 0x10)
+				{
+					vmin[j] = (voltage < vmin[j]) ? voltage : vmin[j];
+					cmin[j] = (current < cmin[j] / 1000) ? current : cmin[j] / 1000;
+					pmin[j] = (power < pmin[j] / 1000) ? power : pmin[j] / 1000;
+					vmax[j] = (voltage > vmax[j]) ? voltage : vmax[j];
+					cmax[j] = (current > cmax[j] / 1000) ? current : cmax[j] / 1000;
+					pmax[j] = (power > pmax[j] / 1000) ? power : pmax[j] / 1000;
+					cavg[j] /= 1000;
+					vavg[j] = (data_size[j] * vavg[j] + voltage) / (double)(data_size[j] + 1);
+					pavg[j] = (data_size[j] * pavg[j] / 1000 + power) / ((double)(data_size[j] + 1));
+				}
+
+				if (setting->use_rms)
+				{
+					cavg[j] = sqrt((data_size[j] * cavg[j] * cavg[j] + current * current) / (double)(data_size[j] + 1));
+					pavg[j] = cavg[j] * vavg[j];
+				}
+				else
+					cavg[j] = (data_size[j] * cavg[j] + current) / (double)(data_size[j] + 1);
+
+				data_size[j] = data_size[j] + 1;
+				pavg_server_data_size[j] = pavg_server_data_size[j] + 1;
+
+				j++;
+			}
+			else
+				j++;
+			i++;
+		}
+
+		if (reset_flag == 1)
+			reset_flag = 0;
+
+#if 1
+		//get groups data
+		for (int k = 0; k < num_of_groups; k++)
+		{
+			groups[k].sum = 0;
+			for (int x = 0; x < groups[k].num_of_members; x++)
+			{
+				int mi = groups[k].member_index[x];
+				if (range_level[mi] == 0x01 || range_level[mi] == 0x11)
+					pnow[mi] /= 1000;
+				groups[k].sum += pnow[mi];
+			}
+			groups[k].max = (groups[k].sum > groups[k].max) ? groups[k].sum : groups[k].max;
+			groups[k].min = (groups[k].sum < groups[k].min) ? groups[k].sum : groups[k].min;
+			groups[k].avg = (groups[k].avg_data_size * groups[k].avg + groups[k].sum) / (groups[k].avg_data_size + 1);
+			groups[k].avg_data_size++;
+		}
+		//dump data to file
+		if (setting->dump == 1)
+		{
+			unsigned long now;
+			get_msecond(&now);
+			fprintf(fptr, "%ld", (long)now - start);//add time before the first element
+			for (int m = 0; m < n + 1; m++)
+			{
+				int k = get_power_index_by_showid(m, board);
+				if (k < 0)
+					continue;
+				if (board->mappings[k].initinfo != 0)
+				{
+					if (!setting->pmt)
+						fprintf(fptr, ",%lf,%lf", vnow[k], cnow_fwrite[k]);
+					else
+						fprintf(fptr, ",%lf,%lf,%lf", vnow[k], cnow_fwrite[k], pnow_fwrite[k]);
+				}
+			}
+			for (int k = 0; k < num_of_groups; k++)
+			{
+				fprintf(fptr, ",%lf", groups[k].sum);
+			}
+			fprintf(fptr, "\n");
+		}
+
+		iDataNum = recv(client, recvbuf, 1024, MSG_DONTWAIT);
+		if (iDataNum > 0)
+		{
+			// printf("Received data: [%s]\n", recvbuf);
+			if (strcmp(recvbuf, "data request") == 0)
+			{
+				printf("[%s] Data Request.\n", iso8601(logtime));
+				strcpy(sendbuf, "");
+
+				char time[32] = {0};
+				strcat(sendbuf, iso8601(time));
+				strcat(sendbuf, ";");
+
+				for (int m = 0; m < n + 1; m++)
+				{
+					int k = get_power_index_by_showid(m, board);
+					if (k < 0)
+						continue;
+					if (board->mappings[k].initinfo != 0)
+					{
+						strcat(sendbuf, board->mappings[k].name);
+						strcat(sendbuf, ":");
+						char temp[20] = {0};
+						sprintf(temp, "%lf", pavg_server[k]);
+						strcat(sendbuf, temp);
+						strcat(sendbuf, ";");
+					}
+				}
+				
+				send(client, sendbuf, strlen(sendbuf), 0);
+
+				for (int i = 0; i < MAX_NUMBER_OF_POWER; i++)
+				{
+					pavg_server[i] = 0;
+					pavg_server_data_size[i] = 0;
+				}
+			}
+			else if (strcmp(recvbuf, "quit") == 0)
+			{
+				printf("[%s] Client requests to exit server monitor...\n", iso8601(logtime));
+				ret = 1;
+				break;
+			} else {
+				send(client, "Unsupported request!", strlen("unsupported request!"), 0);
+			}
+		} else if (iDataNum == 0){
+			printf("[%s] Client disconnects! Stop collecting data...\n", iso8601(logtime));
+			ret = 2;
+			goto retry;
+		}
+
+		memset(recvbuf, 0, sizeof recvbuf);
+
+		times++;
+#endif
+	}
+
+#ifdef _WIN32
+	WSACleanup();
+#endif
+
+	free_device_linkedlist_backward(end_point);
+	if (setting->dump == 1)
+	{
+		if (GV_MONITOR_TERMINATED && setting->dump_statistics && !setting->pmt)
+		{
+			fprintf(fptr, "AVG%s", setting->use_rms ? "(RMS for current)" : "");
+			for (int m = 0; m < n + 1; m++)
+			{
+				int k = get_power_index_by_showid(m, board);
+				if (k < 0)
+					continue;
+				if (board->mappings[k].initinfo != 0)
+				{
+					if (!setting->pmt)
+						fprintf(fptr, ",%lf,%lf", vavg[k], cavg[k]);
+					else
+						fprintf(fptr, ",%lf,%lf,%lf", vavg[k], cavg[k], pavg[k]);
+				}
+			}
+			for (int k = 0; k < num_of_groups; k++)
+			{
+				fprintf(fptr, ",%lf", groups[k].avg);
+			}
+			fprintf(fptr, "\n");
+
+			fprintf(fptr, "MAX");
+			for (int m = 0; m < n + 1; m++)
+			{
+				int k = get_power_index_by_showid(m, board);
+				if (k < 0)
+					continue;
+				if (board->mappings[k].initinfo != 0)
+				{
+					if (!setting->pmt)
+						fprintf(fptr, ",%lf,%lf", vmax[k], cmax[k]);
+					else
+						fprintf(fptr, ",%lf,%lf,%lf", vmax[k], cmax[k], pmax[k]);
+				}
+			}
+			for (int k = 0; k < num_of_groups; k++)
+			{
+				fprintf(fptr, ",%lf", groups[k].max);
+			}
+			fprintf(fptr, "\n");
+
+			fprintf(fptr, "MIN");
+			for (int m = 0; m < n + 1; m++)
+			{
+				int k = get_power_index_by_showid(m, board);
+				if (k < 0)
+					continue;
+				if (board->mappings[k].initinfo != 0)
+				{
+					if (!setting->pmt)
+						fprintf(fptr, ",%lf,%lf", vmin[k], cmin[k]);
+					else
+						fprintf(fptr, ",%lf,%lf,%lf", vmin[k], cmin[k], pmin[k]);
+				}
+			}
+			for (int k = 0; k < num_of_groups; k++)
+			{
+				fprintf(fptr, ",%lf", groups[k].min);
+			}
+			fprintf(fptr, "\n");
+		}
+		fclose(fptr);
+		free(setting->dumpname);
+	}
+#endif
+	return 0;
+}
+
 int check_board_eeprom(struct board_info* board, int retmode)
 {
 	void* head = NULL;
@@ -2937,6 +3767,15 @@ int main(int argc, char** argv)
 	else if (strcmp(cmd, "monitor") == 0)
 	{
 		monitor(&setting);
+	}
+	else if (strcmp(cmd, "server") == 0)
+	{
+		server_monitor(&setting);
+		// printf(">>>>>>>>>>>>>1>>>>>>>>>>>>>>>>>>>>ret:%d\n", aaaaa);
+		// while (aaaaa == 0) {
+		// 	aaaaa = server_monitor(&setting);
+		// 	printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>ret:%d\n", aaaaa);
+		// } 
 	}
 	/*
 	due to the unavoidable large chunk size of monitor() function,
