@@ -75,6 +75,7 @@ struct options_setting {
 	unsigned char eeprom_board_rev[3];
 	unsigned char eeprom_soc_rev[3];
 	int download_doc;
+	int download_pre_release;
 	char groups[MAX_NUMBER_OF_POWER * MAX_MAPPING_NAME_LENGTH];
 };
 

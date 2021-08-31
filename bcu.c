@@ -172,10 +172,21 @@ static void upgrade_bcu(struct options_setting* setting)
 	struct latest_git_info bcu_download_info;
 	strcpy(bcu_download_info.download_url_base, "https://github.com/NXPmicro/bcu/releases/download/");
 
-	if (https_get_by_url("https://api.github.com/repos/NXPmicro/bcu/releases", &bcu_download_info))
+	if (setting->download_pre_release == 1)
 	{
-		printf("Fail to get the latest BCU!\n");
-		return;
+		if (https_get_by_url("https://api.github.com/repos/NXPmicro/bcu/releases", &bcu_download_info))
+		{
+			printf("Fail to get the latest pre-released BCU!\n");
+			return;
+		}
+	}
+	else
+	{
+		if (https_get_by_url("https://api.github.com/repos/NXPmicro/bcu/releases/latest", &bcu_download_info))
+		{
+			printf("Fail to get the latest released BCU!\n");
+			return;
+		}
 	}
 	https_response_parse(&bcu_download_info);
 
@@ -259,7 +270,7 @@ static void print_help(char* cmd)
 		printf("\n");
 		printf("	%s%-60s%s%s\n", g_vt_default, "upgrade    [-doc] [-f]", g_vt_green, "get the latest BCU release");
 #ifndef __APPLE__
-		printf("	%s%-60s%s%s\n", g_vt_default, "uuu        [-doc]", g_vt_green, "download the latest UUU");
+		printf("	%s%-60s%s%s\n", g_vt_default, "uuu        [-doc] [-pre]", g_vt_green, "download the latest UUU");
 #endif
 		printf("\n");
 		printf("	%s%-60s%s%s\n", g_vt_default, "version", g_vt_green, "print version number");

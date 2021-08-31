@@ -286,6 +286,7 @@ void set_options_default(struct options_setting* setting)
 	setting->dump_statistics = 0;
 	setting->eeprom_function = 0;
 	setting->download_doc = 0;
+	setting->download_pre_release = 0;
 }
 
 
@@ -537,6 +538,10 @@ int parse_options(char* cmd, int argc, char** argv, struct options_setting* sett
 		else if (strcmp(argv[i], "-doc") == 0)
 		{
 			setting->download_doc = 1;
+		}
+		else if (strcmp(argv[i], "-pre") == 0)
+		{
+			setting->download_pre_release = 1;
 		}
 		else if (strncmp(argv[i], "-board=", 7) == 0 && strlen(argv[i]) > 7)
 		{
