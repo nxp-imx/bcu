@@ -254,6 +254,9 @@ static void print_help(char* cmd)
 		printf("	%s%-60s%s%s\n", g_vt_default, "        [-hz=] [-rms]", g_vt_green, "");
 		printf("	%s%-60s%s%s\n", g_vt_default, "        [-hwfilter] [-unipolar]", g_vt_green, "");
 		printf("\n");
+		printf("	%s%-60s%s%s\n", g_vt_default, "server  [-board=/-auto] [-id=]", g_vt_green, "monitor power consumption");
+		printf("	%s%-60s%s%s\n", g_vt_default, "        [-hwfilter] [-unipolar]", g_vt_green, "");
+		printf("\n");
 		printf("	%s%-60s%s%s\n", g_vt_default, "eeprom  [-w] [-r] [-erase]", g_vt_green, "EEPROM read and program");
 		printf("	%s%-60s%s%s\n", g_vt_default, "        [-wsn=] [-brev=] [-srev=]", g_vt_green, "");
 		printf("\n");
