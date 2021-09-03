@@ -51,9 +51,85 @@ struct name_and_init_func chip_list[] =
 	"pac1934", pac1934_create,
 	"pca6416a", pca6416a_create,
 	"pcal6524h", pcal6524h_create,
-	"at24cxx", at24cxx_create
+	"at24cxx", at24cxx_create,
+	"pct2075", pct2075_create,
 };
 int num_of_chips = sizeof(chip_list) / sizeof(struct name_and_init_func);
+
+//////////////////////////PCT2075//////////////////////////////////
+void* pct2075_create(char* chip_specification, void* parent)
+{
+	struct pct2075* temp = (struct pct2075*)malloc(sizeof(struct pct2075));
+
+	if (temp == NULL)
+	{
+		printf("malloc failed\n");
+		return NULL;
+	}
+	temp->temp_dev.device.parent = parent;
+	temp->temp_dev.temp_read = temp_read;
+	temp->temp_dev.temp_enable = temp_enable;
+	temp->addr = extract_parameter_value(chip_specification, "addr");
+	//printf("AT24CXX created!\n");
+	return temp;
+}
+
+float temp_read(void* pct2075)
+{
+	struct pct2075* temp = pct2075;
+	struct i2c_device* parent = (void*)temp->temp_dev.device.parent;
+	char addr_plus_write = (temp->addr) << 1;
+	char addr_plus_read = (temp->addr << 1) + 1;
+	int status, i = 0;
+	unsigned char data_buffer[2] = {0};
+	short data = 0;
+
+	parent->i2c_start(parent);
+	status = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_TEMP);
+	if (status)
+	{
+		// printf("oh no! no ack received!\n");
+		return -10;
+	}
+	parent->i2c_write(parent, 0x00, I2C_TYPE_TEMP);
+	parent->i2c_start(parent);
+	parent->i2c_write(parent, addr_plus_read, I2C_TYPE_TEMP);
+	parent->i2c_read(parent, &data_buffer[0], 0, I2C_TYPE_TEMP);
+	parent->i2c_read(parent, &data_buffer[1], 1, I2C_TYPE_TEMP);
+	parent->i2c_stop(parent);
+
+	data = (data_buffer[0] << 8 | data_buffer[1]) >> 5;
+
+	if (data >= 1024)
+		return (float)((data - 2048) / 8.0);
+	else
+		return (float)((data) / 8.0);
+
+	return 0;
+}
+
+int temp_enable(void* pct2075, int enable)
+{
+	struct pct2075* temp = pct2075;
+	struct i2c_device* parent = (void*)temp->temp_dev.device.parent;
+	char addr_plus_write = (temp->addr) << 1;
+	int status, i = 0;
+	unsigned char data_buffer[2] = {0};
+	short data = 0;
+
+	parent->i2c_start(parent);
+	status = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_TEMP);
+	if (status)
+	{
+		// printf("oh no! no ack received!\n");
+		return -10;
+	}
+	parent->i2c_write(parent, 0x01, I2C_TYPE_TEMP);
+	parent->i2c_write(parent, enable ? 0x1 : 0x0, I2C_TYPE_TEMP);
+	parent->i2c_stop(parent);
+
+	return 0;
+}
 
 //////////////////////////AT24CXX//////////////////////////////////
 void* at24cxx_create(char* chip_specification, void* parent)

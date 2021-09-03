@@ -48,6 +48,7 @@ struct device {
 #define I2C_TYPE_GPIO		1
 #define I2C_TYPE_PCA9548	2
 #define I2C_TYPE_AT24		3
+#define I2C_TYPE_TEMP		4
 
 struct i2c_device {
 	struct device device;
@@ -98,11 +99,25 @@ struct eeprom_device {
 	int (*eeprom_check_board)(void*);//you dont have to implement unless it is used in monitor
 };
 
+struct temp_device {
+	struct device device;
+	float (*temp_read)(void*);
+	int (*temp_enable)(void*, int);
+};
+
 struct name_and_init_func {
 	char* name;
 	void* (*create_funcptr)(char*, void*);
 };
 
+///////////////////////////////////////////////////////////////////////
+struct pct2075 {
+	struct temp_device temp_dev;
+	int addr;
+};
+float temp_read(void* pct2075);
+int temp_enable(void* pct2075, int enable);
+void* pct2075_create(char* chip_specification, void* parent);
 ///////////////////////////////////////////////////////////////////////
 enum eeprom_type {
 	EEPROM_TYPE_AT24C02,

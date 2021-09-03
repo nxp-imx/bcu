@@ -43,7 +43,8 @@ enum mapping_type {
 	power,
 	gpio,
 	bcu_eeprom,
-	ftdi_eeprom
+	ftdi_eeprom,
+	temperature
 };
 
 /*

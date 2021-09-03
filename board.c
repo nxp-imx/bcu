@@ -575,6 +575,7 @@ struct mapping val_board_1[] = {
 	{"io_nint",		gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x80}", 0x00},
 
 	{"93lcx6",		ftdi_eeprom, "/ft4232h_eeprom{uasize=0xFF}", 0x00},
+	{"temp",		temperature, "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}/pct2075{addr=0x48}", 0x00},
 
 	{NULL, 0, NULL, 0} //null terminated
 };
@@ -662,6 +663,7 @@ struct mapping val_board_2[] = {
 	{"io_nint",		gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x80}", 0x00},
 
 	{"93lcx6",		ftdi_eeprom, "/ft4232h_eeprom{uasize=0xFF}", 0x00},
+	{"temp",		temperature, "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}/pct2075{addr=0x48}", 0x00},
 
 	{NULL, 0, NULL, 0} //null terminated
 };

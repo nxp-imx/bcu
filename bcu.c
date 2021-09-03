@@ -386,6 +386,46 @@ void free_gpio(struct gpio_device* gpio)
 	return;
 }
 
+static void get_temp(struct options_setting* setting)
+{
+	struct board_info* board = get_board(setting->board);
+	if (board == NULL)
+		return;
+	void* head = NULL;
+	void* end_point;
+	char path[MAX_PATH_LENGTH];
+	int status = -1;
+
+	if (strlen(setting->path) == 0)
+	{
+		if (get_path(path, "temp", board) == -1) {
+			printf("temperature: failed to find temperature path\n"); return;
+		}
+		end_point = build_device_linkedlist_forward(&head, path);
+	}
+	else
+	{
+		end_point = build_device_linkedlist_forward(&head, setting->path);
+	}
+
+	if (end_point == NULL)
+	{
+		printf("temperature: error building device linked list\n");
+		return;
+	}
+
+	struct temp_device* temp = end_point;
+	float degrees = 0;
+
+	temp->temp_enable(temp, 1);
+	degrees = temp->temp_read(temp);
+	temp->temp_enable(temp, 0);
+
+	printf("Temperature is %.3f Celsius.\n", degrees);
+
+	free_device_linkedlist_backward(end_point);
+}
+
 static void set_gpio(struct options_setting* setting)
 {
 	struct board_info* board = get_board(setting->board);
@@ -3789,11 +3829,10 @@ int main(int argc, char** argv)
 	else if (strcmp(cmd, "server") == 0)
 	{
 		server_monitor(&setting);
-		// printf(">>>>>>>>>>>>>1>>>>>>>>>>>>>>>>>>>>ret:%d\n", aaaaa);
-		// while (aaaaa == 0) {
-		// 	aaaaa = server_monitor(&setting);
-		// 	printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>ret:%d\n", aaaaa);
-		// } 
+	}
+	else if (strcmp(cmd, "temp") == 0)
+	{
+		get_temp(&setting);
 	}
 	/*
 	due to the unavoidable large chunk size of monitor() function,
