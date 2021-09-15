@@ -59,6 +59,7 @@ struct options_setting {
 	char path[MAX_PATH_LENGTH];
 	char gpio_name[MAX_MAPPING_NAME_LENGTH];
 	int location_id;
+	int temperature;
 	int dump;
 	char *dumpname;
 	int force;

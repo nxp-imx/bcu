@@ -253,6 +253,7 @@ static void print_help(char* cmd)
 		printf("	%s%-60s%s%s\n", g_vt_default, "        [-dump/-dump=] [-nodisplay] [-pmt] [-stats]", g_vt_green, "");
 		printf("	%s%-60s%s%s\n", g_vt_default, "        [-hz=] [-rms]", g_vt_green, "");
 		printf("	%s%-60s%s%s\n", g_vt_default, "        [-hwfilter] [-unipolar]", g_vt_green, "");
+		printf("	%s%-60s%s%s\n", g_vt_default, "        [-temp]", g_vt_green, "");
 		printf("\n");
 		printf("	%s%-60s%s%s\n", g_vt_default, "server  [-board=/-auto] [-id=]", g_vt_green, "monitor power consumption");
 		printf("	%s%-60s%s%s\n", g_vt_default, "        [-hwfilter] [-unipolar]", g_vt_green, "");
@@ -260,6 +261,7 @@ static void print_help(char* cmd)
 		printf("	%s%-60s%s%s\n", g_vt_default, "eeprom  [-w] [-r] [-erase]", g_vt_green, "EEPROM read and program");
 		printf("	%s%-60s%s%s\n", g_vt_default, "        [-wsn=] [-brev=] [-srev=]", g_vt_green, "");
 		printf("\n");
+		printf("	%s%-60s%s%s\n", g_vt_default, "temp    [-board=/-auto] [-id=]", g_vt_green, "Get temperature value");
 		printf("	%s%-60s%s%s\n", g_vt_default, "get_level [GPIO_NAME] [-board=/-auto] [-id=]", g_vt_green, "get level state of pin GPIO_NAME");
 		printf("	%s%-60s%s%s\n", g_vt_default, "set_gpio [GPIO_NAME] [1/0] [-board=/-auto] [-id=]", g_vt_green, "set pin GPIO_NAME to be high(1) or low(0)");
 		printf("	%s%-60s%s%s\n", g_vt_default, "set_boot_mode [BOOTMODE_NAME] [-board=/-auto] [-id=]", g_vt_green, "set BOOTMODE_NAME as boot mode");
@@ -386,7 +388,7 @@ void free_gpio(struct gpio_device* gpio)
 	return;
 }
 
-static void get_temp(struct options_setting* setting)
+static void get_temp(struct options_setting* setting)//
 {
 	struct board_info* board = get_board(setting->board);
 	if (board == NULL)
@@ -1436,6 +1438,7 @@ static void monitor(struct options_setting* setting)
 	int range_level[MAX_NUMBER_OF_POWER] = {0};
 	double cur_range[MAX_NUMBER_OF_POWER];
 	double unused_range[MAX_NUMBER_OF_POWER];
+	float degrees = 0;
 
 	//initialize
 	for (int i = 0; i < MAX_NUMBER_OF_POWER; i++)
@@ -1488,6 +1491,8 @@ static void monitor(struct options_setting* setting)
 		{
 			fprintf(fptr, ",%s Power(mW)", board->power_groups[i].group_name);
 		}
+		if (setting->temperature)
+			fprintf(fptr, ",Temperature (°C)");
 		fprintf(fptr, "\n");
 	}
 
@@ -1779,7 +1784,7 @@ static void monitor(struct options_setting* setting)
 					return;
 				}
 				struct power_device* pd = end_point;
-				
+
 				if(sr_level[j] == 0)
 					pd->switch_sensor(pd, 1);
 				else
@@ -1894,6 +1899,24 @@ static void monitor(struct options_setting* setting)
 			groups[k].avg = (groups[k].avg_data_size * groups[k].avg + groups[k].sum) / (groups[k].avg_data_size + 1);
 			groups[k].avg_data_size++;
 		}
+
+		if (setting->temperature)
+		{
+			char tpath[MAX_PATH_LENGTH];
+			if (get_path(tpath, "temp", board) == -1) {
+				printf("temperature: failed to find temperature path\n");
+				setting->temperature = 0;
+			}
+			else
+			{
+				end_point = build_device_linkedlist_smart(&head, tpath, head, previous_path);
+
+				struct temp_device* temp = end_point;
+
+				degrees = temp->temp_read(temp);
+			}
+		}
+
 		//dump data to file
 		if (setting->dump == 1)
 		{
@@ -1917,6 +1940,8 @@ static void monitor(struct options_setting* setting)
 			{
 				fprintf(fptr, ",%lf", groups[k].sum);
 			}
+			if (setting->temperature)
+				fprintf(fptr, ",%.3f", degrees);
 			fprintf(fptr, "\n");
 		}
 
@@ -2242,6 +2267,8 @@ static void monitor(struct options_setting* setting)
 			unsigned long now;
 			get_msecond(&now);
 			int cap_interval;
+			if (setting->temperature)
+				printf("SoC Temp: %.3f °C   ", degrees);
 			printf("Capture time:");
 			cap_interval = now - avgstart;
 			if (cap_interval > 10000)

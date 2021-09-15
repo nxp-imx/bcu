@@ -273,6 +273,7 @@ void set_options_default(struct options_setting* setting)
 		setting->boot_config_hex[i] = -1;
 	}
 	setting->gpio_name[0] = '\0';
+	setting->temperature = 0;
 	setting->dump = 0;
 	setting->force = 0;
 	setting->pmt = 0;
@@ -484,6 +485,10 @@ int parse_options(char* cmd, int argc, char** argv, struct options_setting* sett
 		else if (strcmp(argv[i], "-unipolar") == 0)
 		{
 			setting->use_bipolar = 0;
+		}
+		else if (strcmp(argv[i], "-temp") == 0)
+		{
+			setting->temperature = 1;
 		}
 		else if (strcmp(argv[i], "-stats") == 0)
 		{
