@@ -1028,7 +1028,7 @@ static void reset(struct options_setting* setting)
 		printf("reset successfully\n");
 }
 
-static void onoff(struct options_setting* setting, int delay_us, int is_init)
+static void onoff(struct options_setting* setting, int delay_ms, int is_init)
 {
 	struct board_info* board = get_board(setting->board);
 	if (board == NULL)
@@ -1040,8 +1040,8 @@ static void onoff(struct options_setting* setting, int delay_us, int is_init)
 	if (is_init)
 		initialize(setting, INIT_WITHOUT_BOOTMODE);
 
-	if (delay_us == 0)
-		delay_us = 500;
+	if (delay_ms == 0)
+		delay_ms = 500;
 
 	gpio = get_gpio("onoff", board);
 	if (gpio == NULL)
@@ -1050,12 +1050,12 @@ static void onoff(struct options_setting* setting, int delay_us, int is_init)
 		return;
 	}
 
-	printf("onoff button will be pressed for %dus\n", delay_us);
+	printf("onoff button will be pressed for %dms\n", delay_ms);
 
 	mask = board->mappings[get_gpio_id("onoff", board)].initinfo & 0xF;
 
 	status = gpio->gpio_write(gpio, mask ? 0x00 : 0xFF); //set it off.
-	msleep(delay_us);
+	msleep(delay_ms);
 	status = gpio->gpio_write(gpio, mask ? 0xFF : 0x00); //set it on.
 
 	free_gpio(gpio);
