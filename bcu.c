@@ -273,9 +273,9 @@ static void print_help(char* cmd)
 		printf("	%s%-60s%s%s\n", g_vt_default, "lsbootmode [-board=/-auto]", g_vt_green, "show a list of available BOOTMODE_NAME of a board");
 		printf("	%s%-60s%s%s\n", g_vt_default, "lsgpio     [-board=/-auto]", g_vt_green, "show a list of available GPIO_NAME of a board");
 		printf("\n");
-		printf("	%s%-60s%s%s\n", g_vt_default, "upgrade    [-doc] [-f]", g_vt_green, "get the latest BCU release");
+		printf("	%s%-60s%s%s\n", g_vt_default, "upgrade    [-doc] [-f] [-pre]", g_vt_green, "get the latest BCU release");
 #ifndef __APPLE__
-		printf("	%s%-60s%s%s\n", g_vt_default, "uuu        [-doc] [-pre]", g_vt_green, "download the latest UUU");
+		printf("	%s%-60s%s%s\n", g_vt_default, "uuu        [-doc]", g_vt_green, "download the latest UUU");
 #endif
 		printf("\n");
 		printf("	%s%-60s%s%s\n", g_vt_default, "version", g_vt_green, "print version number");
