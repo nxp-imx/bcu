@@ -176,7 +176,7 @@ int ft4232h_i2c_stop(void* ft4232h);
 void* ft4232h_i2c_create(char* chip_specification, void* parent);
 int ft4232h_i2c_init(struct ft4232h* ft);
 int ft4232h_i2c_free(void* ft4232h);
-void ft4232h_i2c_remove_all(void);
+void ft4232h_i2c_remove_all(int disable_1_exit_handler);
 ///////////////////////////////////////////////////////////////////////
 
 struct ft4232h_gpio {

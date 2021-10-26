@@ -465,11 +465,14 @@ void* ft4232h_i2c_create(char* chip_specification, void* parent)
 	return ft;
 }
 
-void ft4232h_i2c_remove_all(void)
+void ft4232h_i2c_remove_all(int enable_1_exit_handler)
 {
 	int i;
 	for (i = 0; i < MAX_FT_I2C_CHANNEL_NUMBER; i++)
 	{
+		if (!enable_1_exit_handler && i == 1)
+			continue;
+
 		if (g_ftdi_info[i].isinit)
 		{
 			ft_close(&g_ftdi_info[i]);

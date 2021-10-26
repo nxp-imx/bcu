@@ -79,6 +79,7 @@ extern int num_of_boards;
 extern struct board_info board_list[];
 
 int GV_MONITOR_TERMINATED = 0;
+static int enable_exit_handler = 0;
 
 char* g_vt_red = (char*)"\x1B[91m";
 char* g_vt_green = (char*)"\x1B[92m";
@@ -2419,7 +2420,7 @@ static void monitor(struct options_setting* setting)
 				}
 
 				reset(setting);
-				ft4232h_i2c_remove_all();
+				ft4232h_i2c_remove_all(enable_exit_handler);
 				strcpy(previous_path, "");
 
 				msleep(300); //wait PMIC power on
@@ -3430,7 +3431,7 @@ int check_board_eeprom(struct board_info* board, int retmode)
 			status = bcu_eeprom_checkboard(eeprom, board->eeprom_data);
 			if (board->mappings[j].type == bcu_eeprom)
 				free_device_linkedlist_backward(end_point);
-			ft4232h_i2c_remove_all();
+			ft4232h_i2c_remove_all(enable_exit_handler);
 
 			if (status == 0)
 			{
@@ -3572,7 +3573,7 @@ static int enable_vt_mode()
 
 void terminateBCU(void)
 {
-	ft4232h_i2c_remove_all();
+	ft4232h_i2c_remove_all(enable_exit_handler);
 }
 
 int main(int argc, char** argv)
@@ -3763,6 +3764,11 @@ int main(int argc, char** argv)
 	if (parse_options(cmd, argc, argv, &setting) == -1) {
 		return 0;
 	}
+
+	if (strcmp(setting.board, "imx8dxlevk") == 0 ||
+	    strcmp(setting.board, "imx8dxlevkc1") == 0 ||
+	    strcmp(setting.board, "imx8dxl_ddr3_evk") == 0)
+		enable_exit_handler = 1;
 
 	//check board eeprom
 	if (strcmp(setting.board, "imx8mpevk") &&
