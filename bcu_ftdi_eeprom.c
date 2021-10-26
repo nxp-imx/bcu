@@ -50,6 +50,7 @@ struct ftdi_eeprom_field_code_tb ftdi_eeprom_field[] = {
 	{ftdi_eeprom_board_id, 0x7, "NXP i.MX8ULP EVK Board"},
 	{ftdi_eeprom_board_id, 0x8, "NXP VAL_BOARD_1 Board"},
 	{ftdi_eeprom_board_id, 0x9, "NXP VAL_BOARD_2 Board"},
+	{ftdi_eeprom_board_id, 0xa, "NXP i.MX8ULP EVK9 Board"},
 
 	{ftdi_eeprom_soc_id, 0x1, "i.MX8DXL"},
 	{ftdi_eeprom_soc_id, 0x2, "i.MX8MP"},
@@ -115,6 +116,15 @@ struct ftdi_eeprom_user_area imx8mpevkpwr_a1_ftdi_eeprom_user_area_info = {
 struct ftdi_eeprom_user_area imx8ulpevk_ftdi_eeprom_user_area_info = {
 	0x1,
 	0x7, 0x1, 0x1,
+	0x3, 0x1, 0x1,
+	0x4, 0xF, 0xF,
+	15,
+	1
+};
+
+struct ftdi_eeprom_user_area imx8ulpevk9_ftdi_eeprom_user_area_info = {
+	0x1,
+	0xa, 0x1, 0x1,
 	0x3, 0x1, 0x1,
 	0x4, 0xF, 0xF,
 	15,
