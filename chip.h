@@ -142,6 +142,7 @@ struct pca9548 {
 	int addr;
 };
 int pca9548_read(void* pca9548, unsigned char* data_buffer, int is_nack, int type);
+int pca9548_readn(void* pca9548, unsigned char* data_buffer, int type, int len);
 int pca9548_write(void* pca9548, unsigned char data, int type);
 int pca9548_start(void* pca9548);
 int pca9548_stop(void* pca9548);

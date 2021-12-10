@@ -263,6 +263,7 @@ void* pca9548_create(char* chip_specification, void* parent)
 	}
 	pca->i2c_device.device.parent = parent;
 	pca->i2c_device.i2c_read = pca9548_read;
+	pca->i2c_device.i2c_readn = pca9548_readn;
 	pca->i2c_device.i2c_write = pca9548_write;
 	pca->i2c_device.i2c_start = pca9548_start;
 	pca->i2c_device.i2c_stop = pca9548_stop;
@@ -278,6 +279,14 @@ int pca9548_read(void* pca9548, unsigned char* data_buffer, int is_nack, int typ
 	struct pca9548* pca = pca9548;
 	struct i2c_device* parent = (void*)pca->i2c_device.device.parent;
 	parent->i2c_read(parent, data_buffer, is_nack, type);
+	return 0;
+}
+
+int pca9548_readn(void* pca9548, unsigned char* data_buffer, int type, int len)
+{
+	struct pca9548* pca = pca9548;
+	struct i2c_device* parent = (void*)pca->i2c_device.device.parent;
+	parent->i2c_readn(parent, data_buffer, type, len);
 	return 0;
 }
 
