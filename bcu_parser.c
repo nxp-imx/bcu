@@ -262,6 +262,7 @@ void* build_device_linkedlist_forward(void** head, char* path)
 void set_options_default(struct options_setting* setting)
 {
 	strcpy(setting->board, "");
+	setting->restore = 0;
 	setting->auto_find_board = 0;
 	setting->path[0] = '\0';
 	setting->location_id = -1;
@@ -547,6 +548,10 @@ int parse_options(char* cmd, int argc, char** argv, struct options_setting* sett
 		else if (strcmp(argv[i], "-pre") == 0)
 		{
 			setting->download_pre_release = 1;
+		}
+		else if (strcmp(argv[i], "-restore") == 0)
+		{
+			setting->restore = 1;
 		}
 		else if (strncmp(argv[i], "-board=", 7) == 0 && strlen(argv[i]) > 7)
 		{

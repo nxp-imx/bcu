@@ -3770,6 +3770,9 @@ int main(int argc, char** argv)
 	    strcmp(setting.board, "imx8dxl_ddr3_evk") == 0)
 		enable_exit_handler = 1;
 
+	if (setting.restore == 1)
+		enable_exit_handler = 1;
+
 	//check board eeprom
 	if (strcmp(setting.board, "imx8mpevk") &&
 	    strcmp(setting.board, "imx8dxl_ddr3_evk") &&
