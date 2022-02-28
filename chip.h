@@ -251,4 +251,19 @@ void* pcal6524h_create(char* chip_specification, void* parent);
 int pcal6524h_set_direction(struct pcal6524h* pca, unsigned char value);
 int pcal6524h_set_output(struct pcal6524h* pca, unsigned char value);
 int pcal6524h_get_output(void* pcal6524h, unsigned char* current_output);
+////////////////////////////////////////////////////////////////////////
+struct adp5585 {
+	struct gpio_device gpio_device;
+	int addr;
+	int port;
+	unsigned char pin_bitmask; //specify which pin to use
+};
+int adp5585_read(void* adp5585, unsigned char* bit_value_buffer);
+int adp5585_write(void* adp5585, unsigned char bit_value);
+int adp5585_toggle(void* adp5585);
+void* adp5585_create(char* chip_specification, void* parent);
+int adp5585_set_direction(struct adp5585* pca, unsigned char value);
+int adp5585_set_output(struct adp5585* pca, unsigned char value);
+int adp5585_get_output(void* adp5585, unsigned char* current_output);
+
 #endif //CHIP_H
