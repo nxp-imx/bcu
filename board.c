@@ -429,8 +429,8 @@ struct board_links imx8mpevk_board_links[] = {
 #define IMX8ULPEVK_POWER_SWITCH_PATH(group, sensor1, addr, rsense1, sensor2, rsense2) "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0xF0}/pac1934{group="#group";sensor="#sensor1";addr="#addr";rsense1="#rsense1";sensor2="#sensor2";rsense2="#rsense2"}"
 #define IMX8ULPEVK_POWER_PATH(group, sensor, addr, rsense1, rsense2) "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0xF0}/pac1934{group="#group";sensor="#sensor";addr="#addr";rsense1="#rsense1";rsense2="#rsense2"}"
 #define IMX8ULPEVK_GPIO_EXTENDER_PATH "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0xF0}"
-struct mapping imx8ulpevk_board[] = {
-	{"buck4_cpu_1v1", power, IMX8ULPEVK_POWER_SWITCH_PATH(1, 1, 0x10, 2000, 2, 2000), 0x00},
+struct mapping imx8ulpevkb2_board[] = {
+	{"buck4_cpu_1v1", power, IMX8ULPEVK_POWER_PATH(1, 1, 0x10, 2000, 2000), 0x00},
 	{"buck1_cpu_1v8", power, IMX8ULPEVK_POWER_SWITCH_PATH(1, 3, 0x10, 100, 4, 10000), 0x00},
 	{"buck2_cpu_1v0", power, IMX8ULPEVK_POWER_SWITCH_PATH(2, 1, 0x11, 50, 2, 10000), 0x00},
 	{"buck3_cpu_1v0", power, IMX8ULPEVK_POWER_SWITCH_PATH(2, 3, 0x11, 20, 4, 10000), 0x00},
@@ -472,8 +472,8 @@ struct mapping imx8ulpevk_board[] = {
 	{NULL, 0, NULL, 0} //null terminated
 };
 
-struct mapping imx8ulpevkb2_board[] = {
-	{"buck4_cpu_1v1", power, IMX8ULPEVK_POWER_SWITCH_PATH(1, 1, 0x10, 400, 2, 400), 0x00},
+struct mapping imx8ulpevk_board[] = {
+	{"buck4_cpu_1v1", power, IMX8ULPEVK_POWER_PATH(1, 1, 0x10, 400, 400), 0x00},
 	{"buck1_cpu_1v8", power, IMX8ULPEVK_POWER_SWITCH_PATH(1, 3, 0x10, 100, 4, 10000), 0x00},
 	{"buck2_cpu_1v0", power, IMX8ULPEVK_POWER_SWITCH_PATH(2, 1, 0x11, 50, 2, 10000), 0x00},
 	{"buck3_cpu_1v0", power, IMX8ULPEVK_POWER_SWITCH_PATH(2, 3, 0x11, 20, 4, 10000), 0x00},
