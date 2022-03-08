@@ -53,6 +53,7 @@ struct bcu_yaml_version ver_before_big_ver[] =
 	{"1.1.29"},
 	{"1.1.37"},
 	{"1.1.39"},
+	{"1.1.41"},
 	{NULL}
 };
 
