@@ -1,4 +1,4 @@
-version: bcu_1.1.43
+version: bcu_1.1.45
 
 skip_tags: true
 
@@ -41,7 +41,7 @@ install:
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2004" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libusb-1.0-0-dev); fi
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2004" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install openssl libssl-dev); fi
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "macOS" ]; then ( brew update;); fi
-- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "macOS" ]; then ( brew reinstall pkgconfig; export PATH="/usr/local/Cellar/pkg-config/0.29.2_3/bin:${PATH}"; brew reinstall libyaml openssl; brew install libftdi; pkg-config --list-all;); fi
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "macOS" ]; then ( brew remove curl libssh2; brew reinstall pkgconfig; export PATH="/usr/local/Cellar/pkg-config/0.29.2_3/bin:${PATH}"; brew reinstall libyaml openssl openssl@1.1; brew install libftdi; pkg-config --list-all;); fi
 
 build_script:
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu1804" ]; then (cmake .); fi
