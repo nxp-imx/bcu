@@ -51,6 +51,7 @@ struct ftdi_eeprom_field_code_tb ftdi_eeprom_field[] = {
 	{ftdi_eeprom_board_id, 0x8, "NXP VAL_BOARD_1 Board"},
 	{ftdi_eeprom_board_id, 0x9, "NXP VAL_BOARD_2 Board"},
 	{ftdi_eeprom_board_id, 0xa, "NXP i.MX8ULP EVK9 Board"},
+	{ftdi_eeprom_board_id, 0xb, "NXP i.MX8ULP Watch VAL Board"},
 
 	{ftdi_eeprom_soc_id, 0x1, "i.MX8DXL"},
 	{ftdi_eeprom_soc_id, 0x2, "i.MX8MP"},
@@ -64,6 +65,7 @@ struct ftdi_eeprom_field_code_tb ftdi_eeprom_field[] = {
 	{ftdi_eeprom_pmic_id, 0x4, "PCA9460AUK"},  //On imx8ulp-evk a0
 	{ftdi_eeprom_pmic_id, 0x5, "PCA9450AAHN"},  //On val_board_1 a0
 	{ftdi_eeprom_pmic_id, 0x6, "PCA9450BHN"},  //On val_board_2 a0
+	{ftdi_eeprom_pmic_id, 0x7, "PCA9460B"},  //On imx8ulp watch val
 
 	{0, 0, NULL}//null terminated
 };
@@ -137,6 +139,15 @@ struct ftdi_eeprom_user_area imx8ulpevk9_ftdi_eeprom_user_area_info = {
 	0x3, 0x1, 0x1,
 	0x4, 0xF, 0xF,
 	15,
+	1
+};
+
+struct ftdi_eeprom_user_area imx8ulpwatchval_ftdi_eeprom_user_area_info = {
+	0x1,
+	0xb, 0x1, 0x1,
+	0x3, 0x1, 0x1,
+	0x7, 0xF, 0xF,
+	20,
 	1
 };
 
