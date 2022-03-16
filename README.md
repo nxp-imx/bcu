@@ -5,7 +5,10 @@
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/18825/badge.svg)](https://scan.coverity.com/projects/nxpmicro-bcu)
 
 [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-white.svg)](https://snapcraft.io/bcu-nxp)
-sudo snap install --devmode bcu-nxp; sudo snap alias bcu-nxp bcu
+  - Install
+    - $ sudo snap install --devmode bcu-nxp; sudo snap alias bcu-nxp bcu
+  - Upgrade
+    - $ sudo snap refresh bcu-nxp --devmode
 
 _______________________________________________________________________________________________________
 ## **For more details about BCU, please check the BCU release note(BCU.pdf) in the latest release page.**
@@ -17,25 +20,31 @@ ________________________________________________________________________________
     - Need install FTDI Driver for Windows.
     - Early Windows version(below 1.2.0) need install vs2017 redistribute package
 
- - Ubuntu 16.04 or above, or all Linux distribution, 64bit
+ - Ubuntu 16.04 or above, or **all Linux distribution**, 64bit
     - Get it from the Snap Store:
       - $ sudo snap install --devmode bcu-nxp; sudo snap alias bcu-nxp bcu
     - If you do not want to run BCU as root in Linux, please follow the steps below to set the rules.
       - $ cd /etc/udev/rules.d/
       - $ sudo vim xx-ftdi.rules
       - Add the line to this file: 
-      - SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6011", GROUP="dialout", MODE="0660"
+      ```
+      SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6011", GROUP="dialout", MODE="0660"
+      ```
       - Save the file
       - Re-plug the debug wire
+    - To upgrade to the latest BCU version, please use this command: 
+      - $ sudo snap refresh bcu-nxp --devmode
 
  - Ubuntu 18.04 or above, 64bit, using binary provided from release page
     - Need install these libraries
-      - $ sudo apt-get install libftdi1-2 libyaml-dev openssl lsb_release libssl-dev libconfuse-dev
+      - $ sudo apt-get install libftdi1-2 libyaml-dev openssl lsb_release(*only needed on 18.04*) libssl-dev libconfuse-dev
     - If you do not want to run BCU as root in Linux, please follow the steps below to set the rules.
       - $ cd /etc/udev/rules.d/
       - $ sudo vim xx-ftdi.rules
       - Add the line to this file: 
-      - SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6011", GROUP="dialout", MODE="0660"
+      ```
+      SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6011", GROUP="dialout", MODE="0660"
+      ```
       - Save the file
       - Re-plug the debug wire
 
@@ -69,10 +78,20 @@ ________________________________________________________________________________
 ## i.MX8ULP-EVK
 
 - imx8ulpevk: have power measurement function
+- imx8ulpevk9: have power measurement function
+- imx8ulpwatchval: VDB
+
+## Val_board_1
+
+- val_board_1: VDB
+
+## Val_board_2
+
+- val_board_2: VDB
 
 _______________________________________________________________________________________________________
 
-## Methods to get support:
+## To get support:
 
  - From NXP internal issue: Create Jira ticket in MLK project, component TOOLS
  - From Customers: Create new Issue in this repo https://github.com/NXPmicro/bcu
