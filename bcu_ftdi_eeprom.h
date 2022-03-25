@@ -59,14 +59,14 @@ struct ftdi_eeprom_user_area
 {
 	unsigned short config_flag : 2,
 		       board_id : 14;
-	unsigned char  board_rev_c : 4,
-		       board_rev_n : 4;
+	unsigned char  board_rev_n : 4,
+		       board_rev_c : 4;
 	unsigned char  soc_id;
-	unsigned char  soc_rev_c : 4,
-		       soc_rev_n : 4;
+	unsigned char  soc_rev_n : 4,
+		       soc_rev_c : 4;
 	unsigned char  pmic_id;
-	unsigned char  pmic_rev_c : 4,
-		       pmic_rev_n : 4;
+	unsigned char  pmic_rev_n : 4,
+		       pmic_rev_c : 4;
 	unsigned char  nbr_pwr_rails;
 	unsigned short sn;
 };
