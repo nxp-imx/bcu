@@ -58,7 +58,7 @@ struct ftdi_eeprom_field_code_tb ftdi_eeprom_field[] = {
 	{ftdi_eeprom_soc_id, 0x2, "i.MX8MP"},
 	{ftdi_eeprom_soc_id, 0x3, "i.MX8ULP"},
 	{ftdi_eeprom_soc_id, 0x4, "VAL_BOARD_1"},
-	{ftdi_eeprom_soc_id, 0x5, "VAL_BOARD_1"},
+	{ftdi_eeprom_soc_id, 0x5, "VAL_BOARD_2"},
 	{ftdi_eeprom_soc_id, 0x6, "i.MX93"},
 
 	{ftdi_eeprom_pmic_id, 0x1, "PPF7100BVMA1ES"},  //On imx8dxl-evk
