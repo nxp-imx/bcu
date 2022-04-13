@@ -88,6 +88,7 @@ struct gpio_device {
 	int (*gpio_toggle)(void*);//you dont have to implement unless it is used in monitor
 	int (*gpio_get_output)(void*, unsigned char*);//you dont have to implement unless it is used in monitor
 	unsigned char pin_bitmask; // specify which pins are output
+	int active_level;
 	int opendrain;
 };
 
@@ -204,8 +205,10 @@ struct pac1934 {
 	int sensor;
 	int addr;
 	int rs1;
+	int group2;
 	int sensor2;
 	int rs2;
+	int cur_group;
 	int cur_sensor;
 	int cur_rs;
 	int hwfilter;

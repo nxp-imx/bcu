@@ -381,6 +381,56 @@ int get_gpio_id(char* gpio_name, struct board_info* board)
 	return id;
 }
 
+int set_gpiod(struct gpio_device* gpio, int onoff)
+{
+	int ret = 0;
+
+	if (gpio == NULL)
+		return -1;
+
+	if (gpio->active_level == 0)
+	{
+		if (onoff == 0)
+			ret = gpio->gpio_write(gpio, 0xFF);
+		else
+			ret = gpio->gpio_write(gpio, 0x00);
+	}
+	else
+	{
+		if (onoff == 0)
+			ret = gpio->gpio_write(gpio, 0x00);
+		else
+			ret = gpio->gpio_write(gpio, 0xFF);
+	}
+
+	return ret;
+}
+
+int get_gpiod(struct gpio_device* gpio, unsigned char* data)
+{
+	int ret = 0;
+	unsigned char tmp = -1;
+
+	if (gpio == NULL)
+		return -1;
+
+	if (gpio->active_level == 0)
+	{
+		ret = gpio->gpio_get_output(gpio, &tmp);
+		if (ret < 0)
+			return ret;
+
+		if (tmp > 0)
+			*data = 0;
+		else
+			*data = 1;
+	}
+	else
+		ret = gpio->gpio_get_output(gpio, data);
+
+	return ret;
+}
+
 void free_gpio(struct gpio_device* gpio)
 {
 	void* end_point = (void*)gpio;
@@ -697,6 +747,8 @@ static void get_boot_mode(struct options_setting* setting)
 		status = gpio->gpio_read(gpio, &read_buf);
 		if (status)
 			printf("get_boot_mode failed, error = 0x%x\n", status);
+		if (read_buf > 0)
+			read_buf = 1;
 		if (read_buf != (board->mappings[get_gpio_id("bootmode_sel", board)].initinfo & 0xF))
 		{
 			printf("get_boot_mode: bootmode_sel is disabled, boot from BOOT SWITCH!\n");
@@ -717,6 +769,8 @@ static void get_boot_mode(struct options_setting* setting)
 		status = gpio->gpio_read(gpio, &read_buf);
 		if (status)
 			printf("get_boot_mode failed, error = 0x%x\n", status);
+		if (read_buf > 0)
+			read_buf = 1;
 		if (read_buf != (board->mappings[get_gpio_id("remote_en", board)].initinfo & 0xF))
 		{
 			printf("get_boot_mode: remote_en is disabled, boot from BOOT SWITCH!\n");
@@ -931,7 +985,7 @@ static void reset(struct options_setting* setting)
 				a++;
 				continue;
 			}
-			status = gpio->gpio_write(gpio, 0xFF); //set it high.
+			status = set_gpiod(gpio, 1); //set it active, use bigger range
 			free_gpio(gpio);
 		}
 		a++;
@@ -1549,12 +1603,12 @@ static void monitor(struct options_setting* setting)
 					if ((board->mappings[a].initinfo & 0x3) == 0)
 					{
 						sr_level[a] = 0;
-						gd->gpio_write(gd, 0x00);
+						set_gpiod(gd, 0);
 					}
 					else if ((board->mappings[a].initinfo & 0x3) == 1)
 					{
 						sr_level[a] = 1;
-						gd->gpio_write(gd, 0xFF);
+						set_gpiod(gd, 1);
 					}
 				}
 				else
@@ -1582,7 +1636,7 @@ static void monitor(struct options_setting* setting)
 					}
 					struct gpio_device* gd = end_point;
 					unsigned char data;
-					gd->gpio_get_output(gd, &data);
+					get_gpiod(gd, &data);
 
 					if (data == 0)
 						sr_level[a] = 0;
@@ -1760,7 +1814,7 @@ static void monitor(struct options_setting* setting)
 						}
 						struct gpio_device* gd = end_point;
 						unsigned char data;
-						gd->gpio_get_output(gd, &data);
+						get_gpiod(gd, &data);
 
 						if (data == 0)
 							sr_level[j] = 0;
@@ -2483,11 +2537,12 @@ static void monitor(struct options_setting* setting)
 					}
 					struct gpio_device* gd = end_point;
 					unsigned char data;
-					gd->gpio_get_output(gd, &data);
+					get_gpiod(gd, &data);
+
 					if (data == 0)
-						gd->gpio_write(gd, 0xFF);
+						set_gpiod(gd, 1);
 					else
-						gd->gpio_write(gd, 0x00);
+						set_gpiod(gd, 0);
 
 					msleep(2);
 					// sr_level[sr_index] = (!data == 0) ? 0 : 1;
@@ -2895,12 +2950,12 @@ retry:
 					if ((board->mappings[a].initinfo & 0x3) == 0)
 					{
 						sr_level[a] = 0;
-						gd->gpio_write(gd, 0x00);
+						set_gpiod(gd, 0);
 					}
 					else if ((board->mappings[a].initinfo & 0x3) == 1)
 					{
 						sr_level[a] = 1;
-						gd->gpio_write(gd, 0xFF);
+						set_gpiod(gd, 1);
 					}
 				}
 				else
@@ -2928,7 +2983,7 @@ retry:
 					}
 					struct gpio_device* gd = end_point;
 					unsigned char data;
-					gd->gpio_get_output(gd, &data);
+					get_gpiod(gd, &data);
 
 					if (data == 0)
 						sr_level[a] = 0;
@@ -3104,7 +3159,7 @@ retry:
 						}
 						struct gpio_device* gd = end_point;
 						unsigned char data;
-						gd->gpio_get_output(gd, &data);
+						get_gpiod(gd, &data);
 
 						if (data == 0)
 							sr_level[j] = 0;

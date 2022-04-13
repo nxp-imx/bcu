@@ -896,8 +896,10 @@ void* pac1934_create(char* chip_specification, void* parent)
 	pac->sensor = extract_parameter_value(chip_specification, "sensor");
 	pac->addr = extract_parameter_value(chip_specification, "addr");
 	pac->rs1 = extract_parameter_value(chip_specification, "rsense1");
+	pac->group2 = extract_parameter_value(chip_specification, "group2");
 	pac->sensor2 = extract_parameter_value(chip_specification, "sensor2");
 	pac->rs2 = extract_parameter_value(chip_specification, "rsense2");
+	pac->cur_group = pac->group;
 	pac->cur_sensor = pac->sensor;
 	pac->cur_rs = pac->rs1;
 	//printf("pac1934 created!\n");
@@ -910,11 +912,14 @@ int pac1934_switch(void *pac1934, int i)
 
 	if (i == 0)
 	{
+		pac->cur_group = pac->group;
 		pac->cur_sensor = pac->sensor;
 		pac->cur_rs = pac->rs1;
 	}
 	else if (i == 1)
 	{
+		if(pac->group2 != -1)
+			pac->cur_group = pac->group2;
 		if(pac->sensor2 != -1)
 			pac->cur_sensor = pac->sensor2;
 		pac->cur_rs =  pac->rs2;
@@ -929,7 +934,7 @@ int get_pac1934_group(void* pac1934)
 {
 	struct pac1934* pac = pac1934;
 
-	return pac->group;
+	return pac->cur_group;
 }
 
 int get_pac1934_sensor(void* pac1934)
@@ -1104,6 +1109,7 @@ void* pca6416a_create(char* chip_specification, void* parent)
 	pca->gpio_device.gpio_get_output = pca6416a_get_output;
 	pca->gpio_device.pin_bitmask = extract_parameter_value(chip_specification, "pin_bitmask");
 	pca->gpio_device.opendrain = extract_parameter_value(chip_specification, "opendrain");
+	pca->gpio_device.active_level = extract_parameter_value(chip_specification, "active_level");
 
 	pca->addr = extract_parameter_value(chip_specification, "addr");
 	pca->port = extract_parameter_value(chip_specification, "port");
@@ -1366,6 +1372,7 @@ void* pcal6524h_create(char* chip_specification, void* parent)
 	pca->gpio_device.gpio_get_output = pcal6524h_get_output;
 	pca->gpio_device.pin_bitmask = extract_parameter_value(chip_specification, "pin_bitmask");
 	pca->gpio_device.opendrain = extract_parameter_value(chip_specification, "opendrain");
+	pca->gpio_device.active_level = extract_parameter_value(chip_specification, "active_level");
 
 	pca->addr = extract_parameter_value(chip_specification, "addr");
 	pca->port = extract_parameter_value(chip_specification, "port");
@@ -1591,12 +1598,13 @@ void* adp5585_create(char* chip_specification, void* parent)
 	adp->gpio_device.gpio_get_output = adp5585_get_output;
 	adp->gpio_device.pin_bitmask = extract_parameter_value(chip_specification, "pin_bitmask");
 	adp->gpio_device.opendrain = extract_parameter_value(chip_specification, "opendrain");
+	adp->gpio_device.active_level = extract_parameter_value(chip_specification, "active_level");
 
 	adp->addr = extract_parameter_value(chip_specification, "addr");
 	adp->port = extract_parameter_value(chip_specification, "port");
 
 	if (adp->gpio_device.opendrain <= 0)
-		adp5585_set_direction(adp, ~adp->gpio_device.pin_bitmask);
+		adp5585_set_direction(adp, adp->gpio_device.pin_bitmask);
 	else
 		adp5585_set_output(adp, ~adp->gpio_device.pin_bitmask);
 
@@ -1660,7 +1668,7 @@ int adp5585_read(void* adp5585, unsigned char* bit_value_buffer)
 	struct i2c_device* parent = (void*)adp->gpio_device.device.parent;
 	unsigned char addr_plus_write = (adp->addr << 1) + 0;
 	unsigned char addr_plus_read = (adp->addr << 1) + 1;
-	unsigned char input_cmd = (adp->port) + 0x15; //x15h is the input status reg
+	unsigned char input_cmd = (adp->port) + 0x23; //x15h is the input status reg, will only be used when INPUT
 	int bSucceed = 0;
 
 	bSucceed = parent->i2c_start(parent);
@@ -1679,7 +1687,8 @@ int adp5585_read(void* adp5585, unsigned char* bit_value_buffer)
 	if (bSucceed) return bSucceed;
 
 	//mask away unwanted value;
-	*bit_value_buffer = (*bit_value_buffer) & (~adp->gpio_device.pin_bitmask);
+	*bit_value_buffer = (*bit_value_buffer) & (adp->gpio_device.pin_bitmask);
+
 	return 0;
 }
 
@@ -1727,44 +1736,7 @@ int adp5585_set_direction(struct adp5585* adp, unsigned char value)
 
 int adp5585_toggle(void* adp5585)
 {
-	printf("adp5585_toggle: TBD.>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-	// struct adp5585* adp = adp5585;
-	// struct i2c_device* parent = (void*)adp->gpio_device.device.parent;
-	// unsigned char addr_plus_write = (adp->addr << 1) + 0;
-	// unsigned char addr_plus_read = (adp->addr << 1) + 1;
-
-	// unsigned char output_cmd = (adp->port) + 0x04; //x02h is the output command for port 0
-	// unsigned char current_output[1];
-	// int bSucceed = 0;
-
-	// //read current output register
-	// bSucceed = parent->i2c_start(parent);
-	// if (bSucceed) return bSucceed;
-	// bSucceed = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_GPIO);
-	// if (bSucceed) return bSucceed;
-	// bSucceed = parent->i2c_write(parent, output_cmd, I2C_TYPE_GPIO);
-	// if (bSucceed) return bSucceed;
-	// bSucceed = parent->i2c_start(parent);
-	// if (bSucceed) return bSucceed;
-	// bSucceed = parent->i2c_write(parent, addr_plus_read, I2C_TYPE_GPIO);
-	// if (bSucceed) return bSucceed;
-	// bSucceed = parent->i2c_read(parent, current_output, 1, I2C_TYPE_GPIO);
-	// if (bSucceed) return bSucceed;
-	// bSucceed = parent->i2c_stop(parent);
-	// if (bSucceed) return bSucceed;
-
-	// unsigned char output_data = current_output[0] ^ adp->gpio_device.pin_bitmask;
-	// //read current input register
-	// bSucceed = parent->i2c_start(parent);
-	// if (bSucceed) return bSucceed;
-	// bSucceed = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_GPIO);
-	// if (bSucceed) return bSucceed;
-	// bSucceed = parent->i2c_write(parent, output_cmd, I2C_TYPE_GPIO);
-	// if (bSucceed) return bSucceed;
-	// bSucceed = parent->i2c_write(parent, output_data, I2C_TYPE_GPIO);
-	// if (bSucceed) return bSucceed;
-	// bSucceed = parent->i2c_stop(parent);
-	// if (bSucceed) return bSucceed;
+	printf("adp5585_toggle: TBD\n");
 
 	return 0;
 }

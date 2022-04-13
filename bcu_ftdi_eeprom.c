@@ -52,12 +52,14 @@ struct ftdi_eeprom_field_code_tb ftdi_eeprom_field[] = {
 	{ftdi_eeprom_board_id, 0x9, "NXP VAL_BOARD_2 Board"},
 	{ftdi_eeprom_board_id, 0xa, "NXP i.MX8ULP EVK9 Board"},
 	{ftdi_eeprom_board_id, 0xb, "NXP i.MX8ULP Watch VAL Board"},
+	{ftdi_eeprom_board_id, 0xc, "NXP i.MX93 EVK Board"},
 
 	{ftdi_eeprom_soc_id, 0x1, "i.MX8DXL"},
 	{ftdi_eeprom_soc_id, 0x2, "i.MX8MP"},
 	{ftdi_eeprom_soc_id, 0x3, "i.MX8ULP"},
 	{ftdi_eeprom_soc_id, 0x4, "VAL_BOARD_1"},
 	{ftdi_eeprom_soc_id, 0x5, "VAL_BOARD_1"},
+	{ftdi_eeprom_soc_id, 0x6, "i.MX93"},
 
 	{ftdi_eeprom_pmic_id, 0x1, "PPF7100BVMA1ES"},  //On imx8dxl-evk
 	{ftdi_eeprom_pmic_id, 0x2, "PCA9450CHN"},  //On imx8mpevk-cpu and imx8mpevk-cpu-pwr
@@ -66,6 +68,7 @@ struct ftdi_eeprom_field_code_tb ftdi_eeprom_field[] = {
 	{ftdi_eeprom_pmic_id, 0x5, "PCA9450AAHN"},  //On val_board_1 a0
 	{ftdi_eeprom_pmic_id, 0x6, "PCA9450BHN"},  //On val_board_2 a0
 	{ftdi_eeprom_pmic_id, 0x7, "PCA9460B"},  //On imx8ulp watch val
+	{ftdi_eeprom_pmic_id, 0x8, "PCA9451AHN"},  //On imx93 evk
 
 	{0, 0, NULL}//null terminated
 };
@@ -166,6 +169,15 @@ struct ftdi_eeprom_user_area val_board_2_ftdi_eeprom_user_area_info = {
 	0x5, 0x0, 0x0,
 	0x6, 0xF, 0xF,
 	34,
+	1
+};
+
+struct ftdi_eeprom_user_area imx93evk11_ftdi_eeprom_user_area_info = {
+	0x1,		//config
+	0xc, 0x0, 0x0,	//board_id, board_rev_number, board_rev_char
+	0x6, 0x0, 0x0,	//soc_id, soc_rev_number, soc_rev_char
+	0x8, 0xF, 0xF,	//pmic_id, pmic_rev_number, pmic_rev_char
+	21,
 	1
 };
 
