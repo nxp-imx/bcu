@@ -875,22 +875,22 @@ struct mapping imx93evk11_board[] = {
 };
 
 struct boot_mode imx93evk11_board_boot_modes[] = {
-	{"fuse", 0x01},
-	{"usb", 0x03},
-	{"emmc", 0x00},
-	{"sd", 0x02},
-	{"nor", 0x05},
-	{"nand_2k", 0x07},
-	{"nand_4k", 0x04},
+	{"fuse", 0x00},
+	{"usb", 0x01},
+	{"emmc", 0x02},
+	{"sd", 0x03},
+	{"nor", 0x04},
+	{"nand_2k", 0x05},
 	{"infinite_loop", 0x06},
-	{"m_fuse", 0x09},
-	{"m_usb", 0x0b},
-	{"m_emmc", 0x08},
-	{"m_sd", 0x0a},
-	{"m_nor", 0x0d},
-	{"m_nand_2k", 0x0f},
-	{"m_nand_4k", 0x0c},
+	{"test_mode", 0x07},
+	{"m_fuse", 0x08},
+	{"m_usb", 0x09},
+	{"m_emmc", 0x0a},
+	{"m_sd", 0x0b},
+	{"m_nor", 0x0c},
+	{"m_nand_2k", 0x0d},
 	{"m_infinite_loop", 0x0e},
+	{"m_test_mode", 0x0f},
 	{NULL, 0}
 };
 
