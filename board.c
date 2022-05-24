@@ -874,6 +874,53 @@ struct mapping imx93evk11_board[] = {
 	{NULL, 0, NULL, 0} //null terminated
 };
 
+struct mapping val_board_3[] = {
+	{"nvcc_bbsm_1p8",	power, IMX93EVK_POWER_SWITCH_PATH(1, 4, 0x11, 10000, 1, 509000), 0x00},
+	{"vdd_soc",		power, IMX93EVK_POWER_SWITCH_GROUP_PATH(2, 2, 0x12, 20, 1, 2, 1020), 0x00},
+	{"lpd4x_vddq",		power, IMX93EVK_POWER_PATH(2, 1, 0x12, 250, 250), 0x00},
+	{"nvcc_sd2",		power, IMX93EVK_POWER_PATH(2, 3, 0x12, 1000, 1000), 0x00},
+	{"vdd2_ddr",		power, IMX93EVK_POWER_SWITCH_GROUP_PATH(2, 4, 0x12, 50, 3, 3, 2050), 0x00},
+	{"vddq_ddr",		power, IMX93EVK_POWER_SWITCH_PATH(3, 2, 0x13, 50, 1, 2050), 0x00},
+	{"lpd4x_vdd2",		power, IMX93EVK_POWER_PATH(3, 4, 0x13, 100, 100), 0x00},
+	{"vsys_5v",		power, IMX93EVK_POWER_SWITCH_GROUP_PATH(4, 1, 0x14, 20, 1, 3, 420), 0x00},
+	{"nvcc_3p3",		power, IMX93EVK_POWER_PATH(4, 2, 0x14, 100, 100), 0x00},
+	{"vdd_usb_3p3",		power, IMX93EVK_POWER_PATH(4, 3, 0x14, 4990, 4990), 0x00},
+	{"vdd_ana_0p8",		power, IMX93EVK_POWER_PATH(4, 4, 0x14, 400, 400), 0x00},
+	{"lpd4x_vdd1",		power, IMX93EVK_POWER_PATH(5, 1, 0x15, 250, 250), 0x00},
+	{"vdd_ana_1p8",		power, IMX93EVK_POWER_PATH(5, 2, 0x15, 250, 250), 0x00},
+	{"vsd2_3v3",		power, IMX93EVK_POWER_PATH(5, 3, 0x15, 100, 100), 0x00},
+	{"nvcc_1p8",		power, IMX93EVK_POWER_PATH(5, 4, 0x15, 100, 100), 0x00},
+	{"vpcie_3v3",		power, IMX93EVK_POWER_PATH(6, 1, 0x16, 10, 10), 0x00},
+	{"dcdc_5v",		power, IMX93EVK_POWER_PATH(6, 2, 0x16, 10, 10), 0x00},
+	{"vsys_in",		power, IMX93EVK_POWER_PATH(6, 3, 0x16, 10, 10), 0x00},
+	{"vdd_5v_in",		power, IMX93EVK_POWER_PATH(6, 4, 0x16, 10, 10), 0x00},
+
+	{"boot_mode",		gpio, IMX93EVK_GPIO_EXTENDER_PATH"/pca9655e{addr=0x21;port=0;pin_bitmask=0x0F;opendrain=0;}", 0x80},
+	{"ft_por_b",		gpio, IMX93EVK_GPIO_EXTENDER_PATH"/pca9655e{addr=0x21;port=1;pin_bitmask=0x01;opendrain=0;}", 0x70},
+	{"reset",		gpio, IMX93EVK_GPIO_EXTENDER_PATH"/pca9655e{addr=0x21;port=1;pin_bitmask=0x02;opendrain=0;}", 0x60},
+	{"onoff",		gpio, IMX93EVK_GPIO_EXTENDER_PATH"/pca9655e{addr=0x21;port=1;pin_bitmask=0x04;opendrain=0;}", 0x50},
+	{"remote_en",		gpio, IMX93EVK_GPIO_EXTENDER_PATH"/pca9655e{addr=0x21;port=1;pin_bitmask=0x08;opendrain=0;}", 0x41},
+	{"mode_dir",		gpio, IMX93EVK_GPIO_EXTENDER_PATH"/pca9655e{addr=0x21;port=1;pin_bitmask=0x10;opendrain=0;}", 0x31},
+	{"ft_sd_pwren",		gpio, IMX93EVK_GPIO_EXTENDER_PATH"/pca9655e{addr=0x21;port=1;pin_bitmask=0x20;opendrain=0;}", 0x11},
+	{"ft_sd_cd",		gpio, IMX93EVK_GPIO_EXTENDER_PATH"/pca9655e{addr=0x21;port=1;pin_bitmask=0x40;opendrain=0;}", 0x21},
+
+	{"SR_vsys_5v",		gpio, IMX93EVK_GPIO_EXTENDER_PATH"/adp5585{addr=0x34;port=0;pin_bitmask=0x01;opendrain=0;active_level=0;}", 0x00},
+	{"SR_nvcc_bbsm_1p8",	gpio, IMX93EVK_GPIO_EXTENDER_PATH"/adp5585{addr=0x34;port=0;pin_bitmask=0x02;opendrain=0;active_level=0;}", 0x00},
+	{"SR_vdd_soc",		gpio, IMX93EVK_GPIO_EXTENDER_PATH"/adp5585{addr=0x34;port=0;pin_bitmask=0x04;opendrain=0;active_level=0;}", 0x00},
+	{"SR_vdd2_ddr",		gpio, IMX93EVK_GPIO_EXTENDER_PATH"/adp5585{addr=0x34;port=0;pin_bitmask=0x08;opendrain=0;active_level=0;}", 0x00},
+	{"SR_vddq_ddr",		gpio, IMX93EVK_GPIO_EXTENDER_PATH"/adp5585{addr=0x34;port=0;pin_bitmask=0x10;opendrain=0;active_level=0;}", 0x00},
+
+	{"ft_io_nrst1",		gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x08}", 0x00},
+	{"ft_io_nint1",		gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x10}", 0x00},
+	{"ft_io_nint",		gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x20}", 0x00},
+	{"ft_io_nrst",		gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x40}", 0x00},
+
+	{"93lcx6",		ftdi_eeprom, "/ft4232h_eeprom{uasize=0xFF}", 0x00},
+	{"temp",		temperature, "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}/pct2075{addr=0x48}", 0x00},
+
+	{NULL, 0, NULL, 0} //null terminated
+};
+
 struct boot_mode imx93evk11_board_boot_modes[] = {
 	{"fuse", 0x00},
 	{"usb", 0x01},
@@ -927,6 +974,7 @@ struct board_info board_list[] =
 	{"val_board_1",		val_board_1,		val_board_1_boot_modes,		2,	val_board_1_boot_config,	val_board_1_power_groups,	null_board_links,		&val_board_1_ftdi_eeprom_user_area_info,	500},
 	{"val_board_2",		val_board_2,		val_board_2_boot_modes,		0,	NULL,				val_board_2_power_groups,	null_board_links,		&val_board_2_ftdi_eeprom_user_area_info,	500},
 	{"imx93evk11",		imx93evk11_board,	imx93evk11_board_boot_modes,	0,	NULL,				imx93evk11_power_groups,	null_board_links,		&imx93evk11_ftdi_eeprom_user_area_info,		500},
+	{"val_board_3",		val_board_3,		imx93evk11_board_boot_modes,	0,	NULL,				imx93evk11_power_groups,	null_board_links,		&val_board_3_ftdi_eeprom_user_area_info,	500},
 	//"imx9xxl",&imx9xxl_pins,
 };
 int num_of_boards = sizeof(board_list) / sizeof(struct board_info);
