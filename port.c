@@ -350,8 +350,8 @@ void ft_list_devices(char location_str[][MAX_LOCATION_ID_LENGTH], int *board_num
 						board_table[k][2] = loc_id;
 					else if (strcmp("D", &Description[strlen(Description) - 1]) == 0)
 						board_table[k][3] = loc_id;
-					else
-						printf("detected channel information are not found!\n");
+					// else
+					// 	printf("detected channel information are not found!\n");
 				}
 			}
 			if (!found)
@@ -361,16 +361,27 @@ void ft_list_devices(char location_str[][MAX_LOCATION_ID_LENGTH], int *board_num
 				if (strcmp("A", &Description[strlen(Description) - 1]) == 0) {
 					board_table[detected_boards][0] = loc_id;
 					sprintf(location_id_str[detected_boards], "%x", loc_id);
+					detected_boards++;
 				}
-				else if (strcmp("B", &Description[strlen(Description) - 1]) == 0)
+				else if (strcmp("B", &Description[strlen(Description) - 1]) == 0) {
+					board_table[detected_boards][0] = loc_id - 1;
+					sprintf(location_id_str[detected_boards], "%x", loc_id - 1);
 					board_table[detected_boards][1] = loc_id;
-				else if (strcmp("C", &Description[strlen(Description) - 1]) == 0)
+					detected_boards++;
+				}
+				else if (strcmp("C", &Description[strlen(Description) - 1]) == 0) {
+					board_table[detected_boards][0] = loc_id - 2;
+					sprintf(location_id_str[detected_boards], "%x", loc_id - 2);
 					board_table[detected_boards][2] = loc_id;
-				else if (strcmp("D", &Description[strlen(Description) - 1]) == 0)
+					detected_boards++;
+				}
+				else if (strcmp("D", &Description[strlen(Description) - 1]) == 0) {
+					board_table[detected_boards][0] = loc_id - 3;
+					sprintf(location_id_str[detected_boards], "%x", loc_id - 3);
 					board_table[detected_boards][3] = loc_id;
-				else
+					detected_boards++;
+				} else
 					printf("detected channel information are not found!\n");
-				detected_boards++;
 			}
 		}
 		if (mode == LIST_DEVICE_MODE_PRINT)
