@@ -569,7 +569,7 @@ struct mapping imx8ulpwatchval_board[] = {
 	{"buck4_cpu_1v1", power, IMX8ULPEVK_POWER_PATH(3, 4, 0x12, 2000, 2000), 0x00},
 	{"buck4_lsw4_cpu_1v1", power, IMX8ULPEVK_POWER_PATH(4, 1, 0x13, 500, 500), 0x00},
 	{"buck1_lsw3_cpu_1v8", power, IMX8ULPEVK_POWER_PATH(4, 2, 0x13, 1000, 1000), 0x00},
-	{"ldo1_cpu_0v6", power, IMX8ULPEVK_POWER_SWITCH_PATH(4, 3, 0x13, 50, 4, 10000), 0x00},
+	{"ldo1_cpu_0v6", power, IMX8ULPEVK_POWER_PATH(4, 3, 0x13, 50, 50), 0x00},
 	{"pmic_4v2", power, IMX8ULPEVK_POWER_SWITCH_PATH(5, 1, 0x14, 20, 2, 10000), 0x00},
 	{"ldo1_dram_0v6", power, IMX8ULPEVK_POWER_PATH(5, 3, 0x14, 50, 50), 0x00},
 	{"buck4_dram_1v1", power, IMX8ULPEVK_POWER_PATH(5, 4, 0x14, 50, 50), 0x00},
