@@ -226,6 +226,20 @@ int pac1934_snapshot(void* pac1934);
 int pac1934_get_data(void* pac1934, struct pac193x_reg_data* pac_reg);
 void* pac1934_create(char* chip_specification, void* parent);
 ////////////////////////////////////////////////////////////////////////
+struct pca6408a {
+	struct gpio_device gpio_device;
+	int addr;
+	unsigned char pin_bitmask; //specify which pin to use
+};
+int pca6408a_read(void* pca6408a, unsigned char* bit_value_buffer);
+int pca6408a_write(void* pca6408a, unsigned char bit_value);
+int pca6408a_toggle(void* pca6408a);
+void* pca6408a_create(char* chip_specification, void* parent);
+int pca6408a_set_direction(struct pca6408a* pca, unsigned char value);
+int pca6408a_get_direction(void* pca6408a, unsigned char* bit_value_buffer);
+int pca6408a_set_output(struct pca6408a* pca, unsigned char value);
+int pca6408a_get_output(void* pca6408a, unsigned char* current_output);
+////////////////////////////////////////////////////////////////////////
 struct pca6416a {
 	struct gpio_device gpio_device;
 	int addr;

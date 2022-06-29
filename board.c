@@ -580,14 +580,14 @@ struct mapping imx8ulpwatchval_board[] = {
 	{"per_1v8", power, IMX8ULPEVK_POWER_SWITCH_PATH(7, 1, 0x1F, 100, 2, 10000), 0x00},
 	{"per_3v3", power, IMX8ULPEVK_POWER_SWITCH_PATH(7, 3, 0x1F, 100, 4, 10000), 0x00},
 
-	{"SR_buck1_cpu_1v8", gpio, IMX8ULPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=0;pin_bitmask=0x01;opendrain=0;}", 0x00},
-	{"SR_buck1_io_1v8", gpio, IMX8ULPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=0;pin_bitmask=0x02;opendrain=0;}", 0x00},
-	{"SR_buck2_cpu_1v0", gpio, IMX8ULPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=0;pin_bitmask=0x04;opendrain=0;}", 0x00},
-	{"SR_buck3_cpu_1v0", gpio, IMX8ULPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=0;pin_bitmask=0x08;opendrain=0;}", 0x00},
-	{"SR_ldo1_cpu_0v6", gpio, IMX8ULPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=0;pin_bitmask=0x10;opendrain=0;}", 0x00},
-	{"SR_pmic_4v2", gpio, IMX8ULPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=0;pin_bitmask=0x20;opendrain=0;}", 0x00},
-	{"SR_per_1v8", gpio, IMX8ULPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=0;pin_bitmask=0x40;opendrain=0;}", 0x00},
-	{"SR_per_3v3", gpio, IMX8ULPEVK_GPIO_EXTENDER_PATH"/pca6416a{addr=0x20;port=0;pin_bitmask=0x80;opendrain=0;}", 0x00},
+	{"SR_buck1_cpu_1v8", gpio, IMX8ULPEVK_GPIO_EXTENDER_PATH"/pca6408a{addr=0x20;pin_bitmask=0x01;opendrain=0;}", 0x00},
+	{"SR_buck1_io_1v8", gpio, IMX8ULPEVK_GPIO_EXTENDER_PATH"/pca6408a{addr=0x20;pin_bitmask=0x02;opendrain=0;}", 0x00},
+	{"SR_buck2_cpu_1v0", gpio, IMX8ULPEVK_GPIO_EXTENDER_PATH"/pca6408a{addr=0x20;pin_bitmask=0x04;opendrain=0;}", 0x00},
+	{"SR_buck3_cpu_1v0", gpio, IMX8ULPEVK_GPIO_EXTENDER_PATH"/pca6408a{addr=0x20;pin_bitmask=0x08;opendrain=0;}", 0x00},
+	{"SR_ldo1_cpu_0v6", gpio, IMX8ULPEVK_GPIO_EXTENDER_PATH"/pca6408a{addr=0x20;pin_bitmask=0x10;opendrain=0;}", 0x00},
+	{"SR_pmic_4v2", gpio, IMX8ULPEVK_GPIO_EXTENDER_PATH"/pca6408a{addr=0x20;pin_bitmask=0x20;opendrain=0;}", 0x00},
+	{"SR_per_1v8", gpio, IMX8ULPEVK_GPIO_EXTENDER_PATH"/pca6408a{addr=0x20;pin_bitmask=0x40;opendrain=0;}", 0x00},
+	{"SR_per_3v3", gpio, IMX8ULPEVK_GPIO_EXTENDER_PATH"/pca6408a{addr=0x20;pin_bitmask=0x80;opendrain=0;}", 0x00},
 
 	{"93lcx6", ftdi_eeprom, "/ft4232h_eeprom{uasize=0xFF}", 0x00},
 
