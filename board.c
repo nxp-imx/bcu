@@ -44,6 +44,8 @@
 #define IMX8XXL_POWER_PATH(channel, sensor, rsense1, rsense2) "/ft4232h_i2c{channel=1;dir_bitmask=0x60;val_bitmask=0x40}/pca9548{channel="#channel";addr=0x70}/pac1934{group="#channel";sensor="#sensor";addr=0x10;rsense1="#rsense1";rsense2="#rsense2"}"
 
 #define IMX8XXL_EXP_PATH(port,bitmask) "/ft4232h_i2c{channel=1;dir_bitmask=0x60;val_bitmask=0x40}/pca9548{channel=0;addr=0x70}/pca6416a{addr=0x20;port="#port";pin_bitmask="#bitmask";opendrain=1;}"
+#define IMX8XXL_EXP8_PATH(bitmask) "/ft4232h_i2c{channel=1;dir_bitmask=0x60;val_bitmask=0x40}/pca9548{channel=0;addr=0x70}/pca6408a{addr=0x20;pin_bitmask="#bitmask";opendrain=1;}"
+
 struct mapping imx8xxl[] = {
 	{"on_board_5v0",power,IMX8XXL_POWER_PATH(1,1,10,10), 0x00},
 	{"vdd_usb_3v3",power,IMX8XXL_POWER_PATH(1,2,1650,1650), 0x00},
@@ -94,6 +96,30 @@ struct mapping imx8xxl[] = {
 
 	{"at24cxx", bcu_eeprom, "/ft4232h_i2c{channel=1;dir_bitmask=0x60;val_bitmask=0x40}/at24cxx{addr=0x57;type=0x0;}", 0x00},
 	// {"93lcx6", ftdi_eeprom , "/ft4232h_eeprom{uasize=0xFF}", 0x00},
+
+	{NULL, 0, NULL, 0}//null terminated
+};
+
+// DXL Orange Box
+struct mapping imx8dxl_obx[] = {
+
+	{"boot_mode",gpio,IMX8XXL_EXP8_PATH(0x07), 0x30},
+	{"testmod_sel",gpio, IMX8XXL_EXP8_PATH(0x8), 0x00},
+	{"bootmode_sel",gpio, IMX8XXL_EXP8_PATH(0x10), 0x10},
+	{"sd_pwr",gpio, IMX8XXL_EXP8_PATH(0x20), 0x00},
+	{"smi_sel",gpio, IMX8XXL_EXP8_PATH(0xc0), 0x00},
+
+	{"reset",gpio, "/ft4232h_gpio{channel=0;pin_bitmask=0x20}", 0x11},
+	{"jtag_sel",gpio, "/ft4232h_gpio{channel=0;pin_bitmask=0x40}", 0x01},
+	{"onoff", gpio, "/ft4232h_gpio{channel=0;pin_bitmask=0x80}", 0x21},
+	{"remote_en",gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x20}", 0x40},
+	{"ft_reset", gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x40}", 0x31},
+	{"sys_ps_pg", gpio, "/ft4232h_gpio{channel=3;pin_bitmask=0x08}", 0x00},
+	{"pmic_stby", gpio, "/ft4232h_gpio{channel=3;pin_bitmask=0x20}", 0x00},
+
+
+	{"at24cxx", bcu_eeprom, "/ft4232h_i2c{channel=1;dir_bitmask=0x60;val_bitmask=0x40}/at24cxx{addr=0x57;type=0x0;}", 0x00},
+	{"93lcx6", ftdi_eeprom , "/ft4232h_eeprom{uasize=0xFF}", 0x00},
 
 	{NULL, 0, NULL, 0}//null terminated
 };
@@ -963,6 +989,7 @@ struct board_info board_list[] =
 	{"imx8dxlevk",		imx8xxl,		imx8xxl_boot_modes,		0,	NULL,				imx8xxl_power_groups,		imx8xxlevk_board_links,		&imx8dxlevk_ftdi_eeprom_user_area_info,		500},
 	{"imx8dxlevkc1",	imx8xxl_board_c1,	imx8xxl_boot_modes,		0,	NULL,				imx8xxl_power_groups,		imx8xxlevk_board_links,		&imx8dxlevk_c1_ftdi_eeprom_user_area_info,	500},
 	{"imx8dxl_ddr3_evk",	imx8dxl_ddr3,		imx8xxl_boot_modes,		0,	NULL,				NULL,				imx8xxlevk_board_links,		NULL,						500},
+	{"imx8dxl_obx",		imx8dxl_obx,		imx8xxl_boot_modes,		0,	NULL,				NULL,				imx8xxlevk_board_links,		&imx8dxl_obx_ftdi_eeprom_user_area_info,						500},
 	{"imx8mpevkpwra0",	imx8mpevkpwr_board_a0,	imx8mpevk_board_boot_modes,	0,	NULL,				imx8mpevkpwr_power_groups,	imx8mpevk_board_links,		&imx8mpevkpwr_a0_ftdi_eeprom_user_area_info,	500},
 	{"imx8mpevkpwra1",	imx8mpevkpwr_board_a1,	imx8mpevk_board_boot_modes,	0,	NULL,				imx8mpevkpwr_power_groups,	imx8mpevk_board_links,		&imx8mpevkpwr_a1_ftdi_eeprom_user_area_info,	500},
 	{"imx8mpevk",		imx8mpevk_board,	imx8mpevk_board_boot_modes,	0,	NULL,				NULL,				imx8mpevk_board_links,		NULL,						500},
