@@ -54,6 +54,7 @@ struct ftdi_eeprom_field_code_tb ftdi_eeprom_field[] = {
 	{ftdi_eeprom_board_id, 0xb, "NXP i.MX8ULP Watch VAL Board"},
 	{ftdi_eeprom_board_id, 0xc, "NXP i.MX93 EVK Board"},
 	{ftdi_eeprom_board_id, 0xd, "NXP VAL_BOARD_3 Board"},
+	{ftdi_eeprom_board_id, 0xe, "NXP i.MX8DXL Orange Box"},
 
 	{ftdi_eeprom_soc_id, 0x1, "i.MX8DXL"},
 	{ftdi_eeprom_soc_id, 0x2, "i.MX8MP"},
@@ -189,6 +190,15 @@ struct ftdi_eeprom_user_area val_board_3_ftdi_eeprom_user_area_info = {
 	0x8, 0xF, 0xF,	//pmic_id, pmic_rev_number, pmic_rev_char
 	19,
 	1
+};
+
+struct ftdi_eeprom_user_area imx8dxl_obx_ftdi_eeprom_user_area_info = {
+        0x1,            //config
+        0xe, 0x0, 0x0,  //board_id, board_rev_number, board_rev_char
+        0x1, 0x1, 0x0,  //soc_id, soc_rev_number, soc_rev_char
+        0x1, 0xF, 0xF,  //pmic_id, pmic_rev_number, pmic_rev_char
+        0,
+        1
 };
 
 void data_add_1(struct ftdi_eeprom_user_area* data)
