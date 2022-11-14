@@ -109,14 +109,13 @@ struct mapping imx8dxl_obx[] = {
 	{"sd_pwr",gpio, IMX8XXL_EXP8_PATH(0x20), 0x00},
 	{"smi_sel",gpio, IMX8XXL_EXP8_PATH(0xc0), 0x00},
 
-	{"reset",gpio, "/ft4232h_gpio{channel=0;pin_bitmask=0x20}", 0x11},
-	{"jtag_sel",gpio, "/ft4232h_gpio{channel=0;pin_bitmask=0x40}", 0x01},
-	{"onoff", gpio, "/ft4232h_gpio{channel=0;pin_bitmask=0x80}", 0x21},
-	{"remote_en",gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x20}", 0x40},
-	{"ft_reset", gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x40}", 0x31},
+	{"reset",gpio, "/ft4232h_gpio{channel=0;pin_bitmask=0x20}", 0x21},
+	{"jtag_sel",gpio, "/ft4232h_gpio{channel=0;pin_bitmask=0x40}", 0x11},
+	{"onoff", gpio, "/ft4232h_gpio{channel=0;pin_bitmask=0x80}", 0x31},
+	{"remote_en",gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x20}", 0x50},
+	{"ft_reset", gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x40}", 0x41},
 	{"sys_ps_pg", gpio, "/ft4232h_gpio{channel=3;pin_bitmask=0x08}", 0x00},
 	{"pmic_stby", gpio, "/ft4232h_gpio{channel=3;pin_bitmask=0x20}", 0x00},
-
 
 	{"at24cxx", bcu_eeprom, "/ft4232h_i2c{channel=1;dir_bitmask=0x60;val_bitmask=0x40}/at24cxx{addr=0x57;type=0x0;}", 0x00},
 	{"93lcx6", ftdi_eeprom , "/ft4232h_eeprom{uasize=0xFF}", 0x00},
