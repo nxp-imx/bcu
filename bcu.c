@@ -2456,9 +2456,12 @@ static void monitor(struct options_setting* setting)
 					input_num = catch_input_char_block() - '0';
 
 				setting->boot_mode_hex = board->boot_modes[input_num].boot_mode_hex;
-				for (int bootcfg_n = 0; bootcfg_n < MAX_BOOT_CONFIG_BYTE; bootcfg_n++)
+				if (board->boot_configs != NULL)
 				{
-					setting->boot_config_hex[bootcfg_n] = board->boot_configs[input_num].boot_config_hex[bootcfg_n];
+					for (int bootcfg_n = 0; bootcfg_n < MAX_BOOT_CONFIG_BYTE; bootcfg_n++)
+					{
+						setting->boot_config_hex[bootcfg_n] = board->boot_configs[input_num].boot_config_hex[bootcfg_n];
+					}
 				}
 				if (input_num >= bootmodenum || input_num < 0)
 				{
