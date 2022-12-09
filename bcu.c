@@ -2287,7 +2287,10 @@ static void monitor(struct options_setting* setting)
 				printf("%s", g_vt_default);
 				printfpadding("group", max_group_length);
 				printf("%s", g_vt_kcyn);
-				printf(" |%-6s %-6s %-6s %-6s", "now", setting->use_rms ? "rms" : "avg", "max", "min");
+				if(range_control)
+					printf(" |%-9s %-9s %-9s %-9s", "now", setting->use_rms ? "rms" : "avg", "max", "min");
+				else
+					printf(" |%-6s %-6s %-6s %-6s", "now", setting->use_rms ? "rms" : "avg", "max", "min");
 				printf("%s", g_vt_default);
 				printf(" |Group members%s\n", g_vt_clear_line);
 				printf("%s", g_vt_default);
@@ -2298,19 +2301,42 @@ static void monitor(struct options_setting* setting)
 				printfpadding(groups[k].name, max_group_length);
 				printf("%s", g_vt_kcyn);
 				printf(" |");
-				printf("%-6.1f ", groups[k].sum);
-				printf("%-6.1f ", groups[k].avg);
-				printf("%-6.1f ", groups[k].max);
-				printf("%-6.1f", groups[k].min);
+				if(range_control)
+				{
+					printf("%-9.4f ", groups[k].sum);
+					printf("%-9.4f ", groups[k].avg);
+					printf("%-9.4f ", groups[k].max);
+					printf("%-9.4f", groups[k].min);
+				}
+				else
+				{
+					printf("%-6.1f ", groups[k].sum);
+					printf("%-6.1f ", groups[k].avg);
+					printf("%-6.1f ", groups[k].max);
+					printf("%-6.1f", groups[k].min);
+				}
 				printf("%s", g_vt_default);
 				printf(" |");
 				// printf("  ");
-				if (strlen(groups[k].member_list) < (size_t)(monitor_size(GET_COLUMN) - max_group_length - 30))
-					printf("%s%s\n", groups[k].member_list, g_vt_clear_line);
+				if(range_control)
+				{
+					if (strlen(groups[k].member_list) < (size_t)(monitor_size(GET_COLUMN) - max_group_length - 42))
+						printf("%s%s\n", groups[k].member_list, g_vt_clear_line);
+					else
+					{
+						printfpadding(groups[k].member_list, monitor_size(GET_COLUMN) - max_group_length - 42 - 10);
+						printf("...%s\n", g_vt_clear_line);
+					}
+				}
 				else
 				{
-					printfpadding(groups[k].member_list, monitor_size(GET_COLUMN) - max_group_length - 30 - 10);
-					printf("...%s\n", g_vt_clear_line);
+					if (strlen(groups[k].member_list) < (size_t)(monitor_size(GET_COLUMN) - max_group_length - 30))
+						printf("%s%s\n", groups[k].member_list, g_vt_clear_line);
+					else
+					{
+						printfpadding(groups[k].member_list, monitor_size(GET_COLUMN) - max_group_length - 30 - 10);
+						printf("...%s\n", g_vt_clear_line);
+					}
 				}
 			}
 
