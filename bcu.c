@@ -2017,6 +2017,8 @@ static void monitor(struct options_setting* setting)
 			max_length = (get_max_power_name_length(board) <= 25) ? get_max_power_name_length(board) : 25;
 			max_length = (max_length < 8) ? 8 : max_length; //the word "location" has a minimum of 8 letters
 			location_length = max_length + 3;//1 for letter, 1 for space between letter and location_name, 1 for space between location and '|''
+			if (range_control)
+				location_length++; //1 for '*'
 
 			if (available_width - max_length < DISPLAY_WIDTH_MODE_1 || (available_width - max_length <= DISPLAY_WIDTH_MODE_5 && range_control == 2))
 			{
@@ -2184,15 +2186,13 @@ static void monitor(struct options_setting* setting)
 					printf("  ");
 				}
 
-				if(range_level[k] == 0x01 || range_level[k] == 0x11)
-				{
+				if (range_level[k] == 0x01 || range_level[k] == 0x11)
 					printf("*");
-					printfpadding(board->mappings[name[k]].name, max_length - 1);
-				}
-				else
-					printfpadding(board->mappings[name[k]].name, max_length);
+				printfpadding(board->mappings[name[k]].name, max_length);
 
 				printf("%s", g_vt_green);
+				if (!(range_level[k] == 0x01 || range_level[k] == 0x11) && range_control)
+					printf(" ");
 				printf(" |");
 
 				printf("%s", g_vt_green);
