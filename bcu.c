@@ -1024,10 +1024,8 @@ static void reset(struct options_setting* setting)
 	}
 	printf("\n%s%s", g_vt_return_last_line, g_vt_clear_line);
 
-	if (setting->boot_mode_hex != -1)
-	{
-		status |= gpio->gpio_write(gpio, mask ? 0xFF : 0x00) << 1;//reset high
-	}
+	status |= gpio->gpio_write(gpio, mask ? 0xFF : 0x00) << 1;//reset high
+
 	free_gpio(gpio);
 
 	if (setting->boot_mode_hex == -1)
