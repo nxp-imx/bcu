@@ -94,7 +94,7 @@ ________________________________________________________________________________
 ## To get support:
 
  - From NXP internal issue: Create Jira ticket in MLK project, component TOOLS
- - From Customers: Create new Issue in this repo https://github.com/NXPmicro/bcu
+ - From Customers: Create new Issue in this repo https://github.com/nxp-imx/bcu
 
 
 _______________________________________________________________________________________________________
