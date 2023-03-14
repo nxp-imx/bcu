@@ -1,0 +1,12 @@
+
+Package:                     bcu.git
+Version:                     3
+Outgoing License:            BSD-3-Clause 
+License File:                LICENSE
+Type of Content:             source
+Description and comments:    NXP i.MX remote control and power measurement tools.
+Release Location:            https://github.com/nxp-imx/bcu -b master
+Origin:                      NXP (BSD-3-clause)
+                             curl (curl) - https://github.com/curl/curl
+                             LibYAML (MIT) - https://github.com/yaml/libyaml
+Generated Binary:            bcu_Ubuntu18, bcu_Ubuntu20, bcu.exe, bcu_mac
