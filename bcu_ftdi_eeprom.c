@@ -183,6 +183,16 @@ struct ftdi_eeprom_user_area imx93evk11_ftdi_eeprom_user_area_info = {
 	1
 };
 
+struct ftdi_eeprom_user_area imx93evk11b1_ftdi_eeprom_user_area_info = {
+	0x1,		//config
+	0xc, 0x1, 0x1,	//board_id, board_rev_number, board_rev_char
+	0x6, 0x0, 0x0,	//soc_id, soc_rev_number, soc_rev_char
+	0x8, 0xF, 0xF,	//pmic_id, pmic_rev_number, pmic_rev_char
+	21,
+	1
+};
+
+
 struct ftdi_eeprom_user_area val_board_3_ftdi_eeprom_user_area_info = {
 	0x1,		//config
 	0xd, 0x0, 0x0,	//board_id, board_rev_number, board_rev_char
