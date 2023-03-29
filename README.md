@@ -1,7 +1,7 @@
 # bcu (Board Control Utilities)
 
-[![Build status](https://ci.appveyor.com/api/projects/status/github/NXPmicro/bcu?svg=true)](https://ci.appveyor.com/project/nxpfrankli/bcu)
-![GitHub](https://img.shields.io/github/license/NXPmicro/bcu.svg)
+[![Build status](https://ci.appveyor.com/api/projects/status/github/nxp-imx/bcu?svg=true)](https://ci.appveyor.com/project/nxpfrankli/bcu)
+![GitHub](https://img.shields.io/github/license/nxp-imx/bcu.svg)
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/18825/badge.svg)](https://scan.coverity.com/projects/nxpmicro-bcu)
 
 [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-white.svg)](https://snapcraft.io/bcu-nxp)

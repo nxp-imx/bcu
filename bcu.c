@@ -171,11 +171,11 @@ static void upgrade_bcu(struct options_setting* setting)
 	int res = 0;
 	char version[15];
 	struct latest_git_info bcu_download_info;
-	strcpy(bcu_download_info.download_url_base, "https://github.com/NXPmicro/bcu/releases/download/");
+	strcpy(bcu_download_info.download_url_base, "https://github.com/nxp-imx/bcu/releases/download/");
 
 	if (setting->download_pre_release == 1)
 	{
-		if (https_get_by_url("https://api.github.com/repos/NXPmicro/bcu/releases", &bcu_download_info))
+		if (https_get_by_url("https://api.github.com/repos/nxp-imx/bcu/releases", &bcu_download_info))
 		{
 			printf("Fail to get the latest pre-released BCU!\n");
 			return;
@@ -183,7 +183,7 @@ static void upgrade_bcu(struct options_setting* setting)
 	}
 	else
 	{
-		if (https_get_by_url("https://api.github.com/repos/NXPmicro/bcu/releases/latest", &bcu_download_info))
+		if (https_get_by_url("https://api.github.com/repos/nxp-imx/bcu/releases/latest", &bcu_download_info))
 		{
 			printf("Fail to get the latest released BCU!\n");
 			return;
@@ -1124,9 +1124,9 @@ static void uuu(struct options_setting* setting)
 #ifndef __APPLE__
 	int res = 0;
 	struct latest_git_info uuu_download_info;
-	strcpy(uuu_download_info.download_url_base, "https://github.com/NXPmicro/mfgtools/releases/download/");
+	strcpy(uuu_download_info.download_url_base, "https://github.com/nxp-imx/mfgtools/releases/download/");
 
-	if (https_get_by_url("https://api.github.com/repos/NXPmicro/mfgtools/releases", &uuu_download_info))
+	if (https_get_by_url("https://api.github.com/repos/nxp-imx/mfgtools/releases", &uuu_download_info))
 	{
 		printf("Fail to get the latest UUU!\n");
 		return;
