@@ -74,6 +74,7 @@ ________________________________________________________________________________
 
 - imx8dxlevk: have power measurement function
 - imx8dxl_ddr3_evk: VDB
+- imx8dxl_obx
 
 ## i.MX8ULP-EVK
 
@@ -81,13 +82,16 @@ ________________________________________________________________________________
 - imx8ulpevk9: have power measurement function
 - imx8ulpwatchval: VDB
 
-## Val_board_1
+## Val_board_x
 
 - val_board_1: VDB
-
-## Val_board_2
-
 - val_board_2: VDB
+- val_board_3: VDB
+
+## i.MX93
+
+- imx93evk11/imx93evk11b1: have power measurement function
+- imx93qsb
 
 _______________________________________________________________________________________________________
 
