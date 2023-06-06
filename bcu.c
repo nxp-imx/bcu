@@ -208,8 +208,12 @@ static void upgrade_bcu(struct options_setting* setting)
 	sys_ver = (sysversion[0] - '0') * 10 + (sysversion[1] - '0');
 	if (sys_ver == 20)
 		strcpy(bcu_download_info.extension_name, "_Ubuntu20");
-	else
+	else if (sys_ver == 18)
 		strcpy(bcu_download_info.extension_name, "_Ubuntu18");
+	else {
+		printf("Unsupported OS version!\n");
+		return;
+	}
 #elif defined(__APPLE__)
 	strcpy(bcu_download_info.extension_name, "_mac");
 #else
