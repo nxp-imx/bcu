@@ -1,0 +1,56 @@
+name: Build for x64 Ubuntu 20.04 and 22.04
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - bcu*
+  pull_request:
+    types:
+      - opened
+      - synchronize
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-20.04, ubuntu-22.04]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up environment
+        run: |
+          git submodule update --init
+          sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libftdi1-dev libyaml-dev openssl libncurses5-dev libssl-dev libconfuse-dev
+
+      - name: Build
+        id: build
+        run: |
+          cmake .
+          make
+          mv bcu bcu_${{ matrix.os }}
+
+      - name: Create version number
+        run: |
+          echo "VERSION_NUMBER_WITH_OFFSET=$((GITHUB_RUN_NUMBER-22))" >> $GITHUB_ENV
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: bcu_${{ matrix.os }}
+          path: ./bcu_${{ matrix.os }}
+
+      - name: Create or Update Release
+        if: always()
+        uses: ncipollo/release-action@v1
+        with:
+          name: "bcu_1.2.${{ env.VERSION_NUMBER_WITH_OFFSET }}"
+          tag: "bcu_1.2.${{ env.VERSION_NUMBER_WITH_OFFSET }}"
+          commit: ${{ github.sha }}
+          allowUpdates: true
+          artifacts: "bcu_${{ matrix.os }}"
+          draft: true
+          # prerelease: true
