@@ -1,0 +1,56 @@
+name: Build for x64 Windows
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - bcu*
+  pull_request:
+    types:
+      - opened
+      - synchronize
+
+jobs:
+  build:
+    runs-on: windows-2019
+    strategy:
+      matrix:
+        configuration: ['Release']
+        platform: ['x64']
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up environment
+        run: |
+          git submodule update --init
+
+      - name: Set up Visual Studio
+        uses: microsoft/setup-msbuild@v1.1
+
+      - name: Build static solution
+        run: |
+          msbuild /p:Configuration=${{ matrix.configuration }} /p:PlatformToolset=v141 /p:Platform=${{ matrix.platform }} Board_Control_Utilities.sln
+
+      - name: Create version number
+        run: |
+          echo "VERSION_NUMBER_WITH_OFFSET=$((GITHUB_RUN_NUMBER))" >> $GITHUB_ENV
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: bcu.exe
+          path: ./x64/Release/bcu.exe
+
+      - name: Create or Update Release
+        if: always()
+        uses: ncipollo/release-action@v1
+        with:
+          name: "bcu_1.2.${{ env.VERSION_NUMBER_WITH_OFFSET }}"
+          tag: "bcu_1.2.${{ env.VERSION_NUMBER_WITH_OFFSET }}"
+          commit: ${{ github.sha }}
+          allowUpdates: true
+          artifacts: "bcu.exe"
+          draft: true
+          # prerelease: true
