@@ -11,6 +11,9 @@ on:
       - opened
       - synchronize
 
+env:
+  APPVEYOR_BUILD_VERSION: "bcu_1.2.1"
+
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -37,10 +40,6 @@ jobs:
           make
           mv bcu_mac bcu_${{ matrix.os }}
 
-      - name: Create version number
-        run: |
-          echo "VERSION_NUMBER_WITH_OFFSET=$((GITHUB_RUN_NUMBER))" >> $GITHUB_ENV
-
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v2
         with:
@@ -51,10 +50,10 @@ jobs:
         if: always()
         uses: ncipollo/release-action@v1
         with:
-          name: "bcu_1.2.${{ env.VERSION_NUMBER_WITH_OFFSET }}"
-          tag: "bcu_1.2.${{ env.VERSION_NUMBER_WITH_OFFSET }}"
+          name: "${{ env.APPVEYOR_BUILD_VERSION }}"
+          tag: "${{ env.APPVEYOR_BUILD_VERSION }}"
           commit: ${{ github.sha }}
           allowUpdates: true
           artifacts: "bcu_${{ matrix.os }}"
-          draft: true
-          # prerelease: true
+          # draft: true
+          prerelease: true

@@ -11,14 +11,21 @@ on:
       - opened
       - synchronize
 
+env:
+  APPVEYOR_BUILD_VERSION: "bcu_1.2.1"
+
 jobs:
   build:
-    runs-on: windows-2019
+    runs-on: windows-latest
     strategy:
       matrix:
         configuration: ['Release']
         platform: ['x64']
     steps:
+      - name: print version
+        run: |
+          echo ${{ env.APPVEYOR_BUILD_VERSION }}
+
       - name: Checkout code
         uses: actions/checkout@v2
 
@@ -31,11 +38,8 @@ jobs:
 
       - name: Build static solution
         run: |
-          msbuild /p:Configuration=${{ matrix.configuration }} /p:PlatformToolset=v141 /p:Platform=${{ matrix.platform }} Board_Control_Utilities.sln
-
-      - name: Create version number
-        run: |
-          echo "VERSION_NUMBER_WITH_OFFSET=$((GITHUB_RUN_NUMBER))" >> $GITHUB_ENV
+          msbuild /p:Configuration=${{ matrix.configuration }} /p:PlatformToolset=v143 /p:Platform=${{ matrix.platform }} Board_Control_Utilities.sln
+          mv ./x64/Release/Board_Control_Utilities.exe ./x64/Release/bcu.exe
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v2
@@ -47,10 +51,10 @@ jobs:
         if: always()
         uses: ncipollo/release-action@v1
         with:
-          name: "bcu_1.2.${{ env.VERSION_NUMBER_WITH_OFFSET }}"
-          tag: "bcu_1.2.${{ env.VERSION_NUMBER_WITH_OFFSET }}"
+          name: "${{ env.APPVEYOR_BUILD_VERSION }}"
+          tag: "${{ env.APPVEYOR_BUILD_VERSION }}"
           commit: ${{ github.sha }}
           allowUpdates: true
-          artifacts: "bcu.exe"
-          draft: true
-          # prerelease: true
+          artifacts: "x64/Release/bcu.exe"
+          # draft: true
+          prerelease: true
