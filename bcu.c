@@ -982,7 +982,7 @@ static void reset(struct options_setting* setting)
 		{
 			strcpy(sr_name, "SR_");
 			strcat(sr_name, board->mappings[a].name);
-
+GET_GPIO:
 			gpio = get_gpio(sr_name, board);
 			if (gpio == NULL)
 			{
@@ -991,6 +991,13 @@ static void reset(struct options_setting* setting)
 			}
 			status = set_gpiod(gpio, 1); //set it active, use bigger range
 			free_gpio(gpio);
+
+			if (strncmp(sr_name, "SR_", 3) == 0)
+			{
+				strcpy(sr_name, "SRD_");
+				strcat(sr_name, board->mappings[a].name);
+				goto GET_GPIO;
+			}
 		}
 		a++;
 	}
@@ -1623,6 +1630,7 @@ static void monitor(struct options_setting* setting)
 			{
 				strcpy(sr_name, "SR_");
 				strcat(sr_name, board->mappings[a].name);
+GET_PATH1:
 				if (get_path(sr_path, sr_name, board) != -1)
 				{
 					end_point = build_device_linkedlist_smart(&head, sr_path, head, previous_path);
@@ -1644,10 +1652,18 @@ static void monitor(struct options_setting* setting)
 						sr_level[a] = 0;
 					else
 						sr_level[a] = 1;
+
+					if (strncmp(sr_name, "SR_", 3) == 0)
+					{
+						strcpy(sr_name, "SRD_");
+						strcat(sr_name, board->mappings[a].name);
+						goto GET_PATH1;
+					}
 				}
 				else
 				{
-					sr_level[a] = -1;
+					if (strncmp(sr_name, "SRD_", 4) != 0)
+						sr_level[a] = -1;
 				}
 			}
 		}
@@ -1801,6 +1817,7 @@ static void monitor(struct options_setting* setting)
 				{
 					strcpy(sr_name, "SR_");
 					strcat(sr_name, board->mappings[name[j]].name);
+GET_PATH2:
 					if (get_path(sr_path, sr_name, board) != -1)
 					{
 						end_point = build_device_linkedlist_smart(&head, sr_path, head, previous_path);
@@ -1822,10 +1839,18 @@ static void monitor(struct options_setting* setting)
 							sr_level[j] = 0;
 						else
 							sr_level[j] = 1;
+
+						if (strncmp(sr_name, "SR_", 3) == 0)
+						{
+							strcpy(sr_name, "SRD_");
+							strcat(sr_name, board->mappings[name[j]].name);
+							goto GET_PATH2;
+						}
 					}
 					else
 					{
-						sr_level[j] = -1;
+						if (strncmp(sr_name, "SRD_", 4) != 0)
+							sr_level[j] = -1;
 					}
 				}
 
@@ -2557,7 +2582,7 @@ static void monitor(struct options_setting* setting)
 				if (board->mappings[name[sr_index]].name == NULL)
 					return;
 				strcat(sr_name, board->mappings[name[sr_index]].name);
-
+GET_PATH3:
 				if (get_path(sr_path, sr_name, board) != -1)
 				{
 					end_point = build_device_linkedlist_smart(&head, sr_path, head, previous_path);
@@ -2578,6 +2603,13 @@ static void monitor(struct options_setting* setting)
 					msleep(2);
 					// sr_level[sr_index] = (!data == 0) ? 0 : 1;
 					reset_flag = 1; //to force refresh sr_level, if some rails share SR_ pin
+				}
+
+				if (strncmp(sr_name, "SR_", 3) == 0)
+				{
+					strcpy(sr_name, "SRD_");
+					strcat(sr_name, board->mappings[name[sr_index]].name);
+					goto GET_PATH3;
 				}
 			}
 		}
