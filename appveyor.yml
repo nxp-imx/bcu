@@ -1,4 +1,4 @@
-version: bcu_1.1.68
+version: bcu_1.1.70
 
 skip_tags: true
 
@@ -34,7 +34,7 @@ install:
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu1804" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libftdi1-dev); fi
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu1804" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libusb-1.0-0-dev); fi
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu1804" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install openssl); fi
-- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2004" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  update); fi
+# - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2004" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  update); fi
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2004" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libconfuse-dev swig python-dev libboost-all-dev); fi
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2004" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libyaml-dev); fi
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2004" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libftdi1-dev); fi
