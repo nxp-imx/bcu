@@ -55,6 +55,7 @@ struct ftdi_eeprom_field_code_tb ftdi_eeprom_field[] = {
 	{ftdi_eeprom_board_id, 0xc, "NXP i.MX93 EVK Board"},
 	{ftdi_eeprom_board_id, 0xd, "NXP VAL_BOARD_3 Board"},
 	{ftdi_eeprom_board_id, 0xe, "NXP i.MX8DXL Orange Box"},
+	{ftdi_eeprom_board_id, 0xf, "NXP i.MX95 EVK 19x19 Board"},
 
 	{ftdi_eeprom_soc_id, 0x1, "i.MX8DXL"},
 	{ftdi_eeprom_soc_id, 0x2, "i.MX8MP"},
@@ -62,6 +63,7 @@ struct ftdi_eeprom_field_code_tb ftdi_eeprom_field[] = {
 	{ftdi_eeprom_soc_id, 0x4, "VAL_BOARD_1"},
 	{ftdi_eeprom_soc_id, 0x5, "VAL_BOARD_2"},
 	{ftdi_eeprom_soc_id, 0x6, "i.MX93"},
+	{ftdi_eeprom_soc_id, 0x7, "i.MX95"},
 
 	{ftdi_eeprom_pmic_id, 0x1, "PPF7100BVMA1ES"},  //On imx8dxl-evk
 	{ftdi_eeprom_pmic_id, 0x2, "PCA9450CHN"},  //On imx8mpevk-cpu and imx8mpevk-cpu-pwr
@@ -71,6 +73,7 @@ struct ftdi_eeprom_field_code_tb ftdi_eeprom_field[] = {
 	{ftdi_eeprom_pmic_id, 0x6, "PCA9450BHN"},  //On val_board_2 a0
 	{ftdi_eeprom_pmic_id, 0x7, "PCA9460B"},  //On imx8ulp watch val
 	{ftdi_eeprom_pmic_id, 0x8, "PCA9451AHN"},  //On imx93 evk
+	{ftdi_eeprom_pmic_id, 0x9, "PPF0900AMBA1ES"},  //On imx95 evk 19x19
 
 	{0, 0, NULL}//null terminated
 };
@@ -192,7 +195,6 @@ struct ftdi_eeprom_user_area imx93evk11b1_ftdi_eeprom_user_area_info = {
 	1
 };
 
-
 struct ftdi_eeprom_user_area val_board_3_ftdi_eeprom_user_area_info = {
 	0x1,		//config
 	0xd, 0x0, 0x0,	//board_id, board_rev_number, board_rev_char
@@ -203,12 +205,21 @@ struct ftdi_eeprom_user_area val_board_3_ftdi_eeprom_user_area_info = {
 };
 
 struct ftdi_eeprom_user_area imx8dxl_obx_ftdi_eeprom_user_area_info = {
-        0x1,            //config
-        0xe, 0x0, 0x0,  //board_id, board_rev_number, board_rev_char
-        0x1, 0x1, 0x0,  //soc_id, soc_rev_number, soc_rev_char
-        0x1, 0xF, 0xF,  //pmic_id, pmic_rev_number, pmic_rev_char
-        0,
-        1
+	0x1,		//config
+	0xe, 0x0, 0x0,	//board_id, board_rev_number, board_rev_char
+	0x1, 0x1, 0x0,	//soc_id, soc_rev_number, soc_rev_char
+	0x1, 0xF, 0xF,	//pmic_id, pmic_rev_number, pmic_rev_char
+	0,
+	1
+};
+
+struct ftdi_eeprom_user_area imx95evk19_ftdi_eeprom_user_area_info = {
+	0x1,		//config
+	0xf, 0x0, 0x0,	//board_id, board_rev_number, board_rev_char
+	0x7, 0x0, 0x0,	//soc_id, soc_rev_number, soc_rev_char
+	0x9, 0xF, 0xF,	//pmic_id, pmic_rev_number, pmic_rev_char
+	16,
+	1
 };
 
 void data_add_1(struct ftdi_eeprom_user_area* data)
