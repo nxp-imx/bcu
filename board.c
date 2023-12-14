@@ -1097,18 +1097,18 @@ struct mapping imx95evk19_board[] = {
 };
 
 struct boot_mode imx95evk_board_boot_modes[] = {
-	{"usb", 0x01},
-	{"emmc", 0x02},
-	{"sd", 0x03},
-	{"nor", 0x04},
-	{"nand_2k", 0x05},
-	{"nand_4k", 0x06},
-	{"m_usb", 0x09},
-	{"m_emmc", 0x0a},
-	{"m_sd", 0x0b},
-	{"m_nor", 0x0c},
-	{"m_nand_2k", 0x0d},
-	{"m_nand_4k", 0x0e},
+	{"a_usb", 0x01},
+	{"a_emmc", 0x02},
+	{"a_sd", 0x03},
+	{"a_nor", 0x04},
+	{"a_nand_2k", 0x05},
+	{"a_nand_4k", 0x06},
+	{"usb", 0x09},
+	{"emmc", 0x0a},
+	{"sd", 0x0b},
+	{"nor", 0x0c},
+	{"nand_2k", 0x0d},
+	{"nand_4k", 0x0e},
 	{NULL, 0}
 };
 
