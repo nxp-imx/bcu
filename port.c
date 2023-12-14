@@ -432,6 +432,8 @@ void ft_list_devices(char location_str[][MAX_LOCATION_ID_LENGTH], int *board_num
 	char location_id[MAX_NUMBER_OF_USB_DEVICES][MAX_LOCATION_ID_LENGTH];
 	struct libusb_device* dev_ptrs[MAX_NUMBER_OF_USB_DEVICES];
 	memset(location_id, 0, sizeof(location_id));
+	struct libusb_device_descriptor desc;
+	char serial[33];
 
 	i = 0;
 	for (curdev = devlist; curdev != NULL; i++)
@@ -462,8 +464,21 @@ void ft_list_devices(char location_str[][MAX_LOCATION_ID_LENGTH], int *board_num
 				strcat(location_id[i], ".");
 			}
 		}
+
+		if (!libusb_get_device_descriptor(curdev->dev, &desc))
+		{
+			libusb_device_handle *handle;
+
+			memset(serial, 0, sizeof(serial));
+
+			libusb_open(curdev->dev, &handle);
+			if (handle)
+				libusb_get_string_descriptor_ascii(handle, desc.iSerialNumber, serial, 31);
+			libusb_close(handle);
+		}
+
 		if (mode == LIST_DEVICE_MODE_PRINT)
-			printf("board[%d] location_id=%s\n", i, location_id[i]);
+			printf("board[%d] location_id=%s serial_no: %s\n", i, location_id[i], serial);
 		else
 			strcpy(location_str[i], location_id[i]);
 
