@@ -1112,11 +1112,10 @@ struct boot_mode imx95evk_board_boot_modes[] = {
 	{NULL, 0}
 };
 
-struct board_power_group imx95evk11_power_groups[] = {
-	{"GROUP_SOC", "nvcc_bbsm_1p8,vdd_soc,vdd2_ddr,vddq_ddr,vdd_ana_0p8,vdd_ana_1p8,vdd_usb_3p3"},
-	{"GROUP_SOC_FULL", "nvcc_bbsm_1p8,vdd_soc,vdd2_ddr,vddq_ddr,vdd_ana_0p8,vdd_ana_1p8,vdd_usb_3p3,nvcc_sd2,nvcc_3p3,nvcc_1p8"},
-	{"GROUP_DRAM", "lpd4x_vdd1,lpd4x_vddq,lpd4x_vdd2"},
-	{"GROUP_PLATFORM", "vsys_in"},
+struct board_power_group imx95evk19_power_groups[] = {
+	{"GROUP_SOC", "vdd_arm,vdd_soc,nvcc_bbsm_1v8,vdd_ana_1v8,vdd_ana_0v8,vdd_usb_3v3,vdd_ddr,vddq_ddr"},
+	{"GROUP_SOC_FULL", "vdd_arm,vdd_soc,nvcc_bbsm_1v8,vdd_ana_1v8,vdd_ana_0v8,vdd_usb_3v3,vdd_ddr,vddq_ddr,nvcc_sdio2,nvcc_3v3,nvcc_wakeup,nvcc_enet_ccm"},
+	{"GROUP_DRAM", "lpd5_vdd1,lpd5_vddq,lpd5_vdd2"},
 	{NULL, 0}
 };
 
@@ -1149,7 +1148,7 @@ struct board_info board_list[] =
 	{"imx93evk11b1",	imx93evk11b1_board,	imx93evk11_board_boot_modes,	0,	NULL,				imx93evk11_power_groups,	null_board_links,		&imx93evk11b1_ftdi_eeprom_user_area_info,	500},
 	{"val_board_3",		val_board_3,		imx93evk11_board_boot_modes,	0,	NULL,				imx93evk11_power_groups,	null_board_links,		&val_board_3_ftdi_eeprom_user_area_info,	500},
 	{"imx93qsb",		imx93qsb_board,		imx93evk11_board_boot_modes,	0,	NULL,				NULL,				null_board_links,		NULL,						500},
-	{"imx95evk19",		imx95evk19_board,	imx95evk_board_boot_modes,	0,	NULL,				NULL,				null_board_links,		&imx95evk19_ftdi_eeprom_user_area_info,		500},
+	{"imx95evk19",		imx95evk19_board,	imx95evk_board_boot_modes,	0,	NULL,				imx95evk19_power_groups,	null_board_links,		&imx95evk19_ftdi_eeprom_user_area_info,		500},
 	//"imx9xxl",&imx9xxl_pins,
 };
 int num_of_boards = sizeof(board_list) / sizeof(struct board_info);
