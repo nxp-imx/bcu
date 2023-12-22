@@ -123,15 +123,6 @@ struct ftdi_eeprom_user_area imx8mpevkpwr_a1_ftdi_eeprom_user_area_info = {
 	1
 };
 
-struct ftdi_eeprom_user_area imx8ulpevk_ftdi_eeprom_user_area_info = {
-	0x1,
-	0x7, 0x0, 0x0,
-	0x3, 0x0, 0x0,
-	0x4, 0xF, 0xF,
-	15,
-	1
-};
-
 struct ftdi_eeprom_user_area imx8ulpevkb2_ftdi_eeprom_user_area_info = {
 	0x1,
 	0x7, 0x2, 0x1,
