@@ -68,7 +68,11 @@ struct bcu_yaml_version ver_before_big_ver[] =
 void get_yaml_file_path(char* path)
 {
 #if defined(linux) || defined(__APPLE__)
-	strcat(path, getenv("HOME"));
+	char * tmpenv;
+	if (( tmpenv = getenv( "HOME" )) != NULL )
+		strcat(path, tmpenv);
+	else
+		printf("HOME env variable not set.\n");
 	strcat(path, "/bcu_config.yaml");
 #else
 	const char* homeProfile = "USERPROFILE";
