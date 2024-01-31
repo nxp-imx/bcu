@@ -1082,6 +1082,161 @@ struct board_links null_board_links[] = {
 	""
 };
 
+#define NXP_CUSTOM_POWER_SWITCH_PATH(group, sensor1, addr, rsense1, sensor2, rsense2) "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0xF0}/pac1934{group="#group";sensor="#sensor1";addr="#addr";rsense1="#rsense1";sensor2="#sensor2";rsense2="#rsense2"}"
+#define NXP_CUSTOM_GPIO_EXTENDER_PATH "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0xF0}"
+
+struct mapping nxp_custom_board[] = {
+	{"J1_Rail",		power, NXP_CUSTOM_POWER_SWITCH_PATH(1, 	2, 0x19, 20, 1, 180), 0x00},
+	{"J2_Rail",		power, NXP_CUSTOM_POWER_SWITCH_PATH(2, 	2, 0x16, 20, 1, 180), 0x00},
+	{"J3_Rail",		power, NXP_CUSTOM_POWER_SWITCH_PATH(3, 	2, 0x1B, 20, 1, 180), 0x00},
+	{"J4_Rail",		power, NXP_CUSTOM_POWER_SWITCH_PATH(4, 	2, 0x12, 20, 1, 180), 0x00},
+	{"J5_Rail",		power, NXP_CUSTOM_POWER_SWITCH_PATH(5, 	2, 0x13, 20, 1, 180), 0x00},
+	{"J6_Rail",		power, NXP_CUSTOM_POWER_SWITCH_PATH(6, 	2, 0x14, 20, 1, 180), 0x00},
+	{"J7_Rail",		power, NXP_CUSTOM_POWER_SWITCH_PATH(7, 	2, 0x15, 20, 1, 180), 0x00},
+	{"J8_Rail",		power, NXP_CUSTOM_POWER_SWITCH_PATH(8, 	2, 0x17, 20, 1, 180), 0x00},
+	{"J9_Rail",		power, NXP_CUSTOM_POWER_SWITCH_PATH(9, 	2, 0x18, 20, 1, 180), 0x00},
+	{"J10_Rail",	power, NXP_CUSTOM_POWER_SWITCH_PATH(10,	2, 0x1A, 20, 1, 180), 0x00},
+
+	{"SR_J1_Rail",	gpio, NXP_CUSTOM_GPIO_EXTENDER_PATH"/adp5585{addr=0x34;port=1;pin_bitmask=0x01;opendrain=0;active_level=1;}", 0x00},
+	{"SR_J2_Rail",	gpio, NXP_CUSTOM_GPIO_EXTENDER_PATH"/adp5585{addr=0x34;port=1;pin_bitmask=0x02;opendrain=0;active_level=1;}", 0x00},
+	{"SR_J3_Rail",	gpio, NXP_CUSTOM_GPIO_EXTENDER_PATH"/adp5585{addr=0x34;port=1;pin_bitmask=0x04;opendrain=0;active_level=1;}", 0x00},
+	{"SR_J4_Rail",	gpio, NXP_CUSTOM_GPIO_EXTENDER_PATH"/adp5585{addr=0x34;port=1;pin_bitmask=0x08;opendrain=0;active_level=1;}", 0x00},
+	{"SR_J5_Rail",	gpio, NXP_CUSTOM_GPIO_EXTENDER_PATH"/adp5585{addr=0x34;port=1;pin_bitmask=0x10;opendrain=0;active_level=1;}", 0x00},
+
+	{"SR_J6_Rail",	gpio, NXP_CUSTOM_GPIO_EXTENDER_PATH"/adp5585{addr=0x34;port=0;pin_bitmask=0x10;opendrain=0;active_level=1;}", 0x00},
+	{"SR_J7_Rail",	gpio, NXP_CUSTOM_GPIO_EXTENDER_PATH"/adp5585{addr=0x34;port=0;pin_bitmask=0x08;opendrain=0;active_level=1;}", 0x00},
+	{"SR_J8_Rail",	gpio, NXP_CUSTOM_GPIO_EXTENDER_PATH"/adp5585{addr=0x34;port=0;pin_bitmask=0x04;opendrain=0;active_level=1;}", 0x00},
+	{"SR_J9_Rail",	gpio, NXP_CUSTOM_GPIO_EXTENDER_PATH"/adp5585{addr=0x34;port=0;pin_bitmask=0x02;opendrain=0;active_level=1;}", 0x00},
+	{"SR_J10_Rail",	gpio, NXP_CUSTOM_GPIO_EXTENDER_PATH"/adp5585{addr=0x34;port=0;pin_bitmask=0x01;opendrain=0;active_level=1;}", 0x00},
+
+	{"ft_io_nint",	gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x20}", 0x00},
+	{"ft_io_nrst",	gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x40}", 0x00},
+
+	{"93lcx6",		ftdi_eeprom, "/ft4232h_eeprom{uasize=0xFF}", 0x00},
+	{"temp",		temperature, "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}/pct2075{addr=0x48}", 0x00},
+
+	{NULL, 0, NULL, 0} //null terminated
+};
+
+struct board_power_group nxp_custom_power_groups[] = {
+	{"GROUP_SOC", "J1_Rail,J2_Rail,J3_Rail,J4_Rail,J5_Rail,J6_Rail,J7_Rail,J8_Rail,J9_Rail,J10_Rail"},
+	{NULL, 0}
+};
+
+
+#define BENCH_IMX8QM_POWER_SWITCH_PATH(group, sensor1, addr, rsense1, sensor2, rsense2) "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0xF0}/pac1934{group="#group";sensor="#sensor1";addr="#addr";rsense1="#rsense1";sensor2="#sensor2";rsense2="#rsense2"}"
+#define BENCH_IMX8QM_GPIO_EXTENDER_PATH "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0xF0}"
+
+struct mapping bench_imx8qm_board[] = {
+	{"VCC_MEMC",		power, BENCH_IMX8QM_POWER_SWITCH_PATH(1, 	2, 0x19, 20, 1, 976), 0x00},
+	{"VCC_DDRIO0",		power, BENCH_IMX8QM_POWER_SWITCH_PATH(2, 	2, 0x16, 20, 1, 499), 0x00},
+	{"VCC_3V3",			power, BENCH_IMX8QM_POWER_SWITCH_PATH(3, 	2, 0x1B, 20, 1, 499), 0x00},
+	{"VCC_GPU0",		power, BENCH_IMX8QM_POWER_SWITCH_PATH(4, 	2, 0x12, 20, 1, 976), 0x00},
+	{"VCC_GPU1",		power, BENCH_IMX8QM_POWER_SWITCH_PATH(5, 	2, 0x13, 20, 1, 976), 0x00},
+	{"VCC_MAIN",		power, BENCH_IMX8QM_POWER_SWITCH_PATH(6, 	2, 0x14, 20, 1, 499), 0x00},
+	{"VCC_1V8",			power, BENCH_IMX8QM_POWER_SWITCH_PATH(7, 	2, 0x15, 20, 1, 499), 0x00},
+	{"VCC_DDRIO1",		power, BENCH_IMX8QM_POWER_SWITCH_PATH(8, 	2, 0x17, 20, 1, 499), 0x00},
+	{"VCC_CPU0",		power, BENCH_IMX8QM_POWER_SWITCH_PATH(9, 	2, 0x18, 20, 1, 976), 0x00},
+	{"VCC_CPU1",		power, BENCH_IMX8QM_POWER_SWITCH_PATH(10,	2, 0x1A, 20, 1, 976), 0x00},
+
+	{"SR_VCC_MEMC",	gpio, BENCH_IMX8QM_GPIO_EXTENDER_PATH"/adp5585{addr=0x34;port=1;pin_bitmask=0x01;opendrain=0;active_level=1;}", 0x00},
+	{"SR_VCC_DDRIO0",	gpio, BENCH_IMX8QM_GPIO_EXTENDER_PATH"/adp5585{addr=0x34;port=1;pin_bitmask=0x02;opendrain=0;active_level=1;}", 0x00},
+	{"SR_VCC_3V3",	gpio, BENCH_IMX8QM_GPIO_EXTENDER_PATH"/adp5585{addr=0x34;port=1;pin_bitmask=0x04;opendrain=0;active_level=1;}", 0x00},
+	{"SR_VCC_GPU0",	gpio, BENCH_IMX8QM_GPIO_EXTENDER_PATH"/adp5585{addr=0x34;port=1;pin_bitmask=0x08;opendrain=0;active_level=1;}", 0x00},
+	{"SR_VCC_GPU1",	gpio, BENCH_IMX8QM_GPIO_EXTENDER_PATH"/adp5585{addr=0x34;port=1;pin_bitmask=0x10;opendrain=0;active_level=1;}", 0x00},
+
+	{"SR_VCC_MAIN",	gpio, BENCH_IMX8QM_GPIO_EXTENDER_PATH"/adp5585{addr=0x34;port=0;pin_bitmask=0x10;opendrain=0;active_level=1;}", 0x00},
+	{"SR_VCC_1V8",	gpio, BENCH_IMX8QM_GPIO_EXTENDER_PATH"/adp5585{addr=0x34;port=0;pin_bitmask=0x08;opendrain=0;active_level=1;}", 0x00},
+	{"SR_VCC_DDRIO1",	gpio, BENCH_IMX8QM_GPIO_EXTENDER_PATH"/adp5585{addr=0x34;port=0;pin_bitmask=0x04;opendrain=0;active_level=1;}", 0x00},
+	{"SR_VCC_CPU0",	gpio, BENCH_IMX8QM_GPIO_EXTENDER_PATH"/adp5585{addr=0x34;port=0;pin_bitmask=0x02;opendrain=0;active_level=1;}", 0x00},
+	{"SR_VCC_CPU1",	gpio, BENCH_IMX8QM_GPIO_EXTENDER_PATH"/adp5585{addr=0x34;port=0;pin_bitmask=0x01;opendrain=0;active_level=1;}", 0x00},
+
+	{"ft_io_nint",	gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x20}", 0x00},
+	{"ft_io_nrst",	gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x40}", 0x00},
+
+	{"93lcx6",		ftdi_eeprom, "/ft4232h_eeprom{uasize=0xFF}", 0x00},
+	{"temp",		temperature, "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}/pct2075{addr=0x48}", 0x00},
+
+	{NULL, 0, NULL, 0} //null terminated
+};
+
+struct board_power_group bench_imx8qm_power_groups[] = {
+	{"GROUP_SOC", "VCC_CPU0,VCC_CPU1,VCC_DDRIO0,VCC_DDRIO1,VCC_GPU0,VCC_GPU1,VCC_MAIN,VCC_MEMC"},
+	{"GROUP_SOC_FULL", "VCC_1V8,VCC_3V3,VCC_CPU0,VCC_CPU1,VCC_DDRIO0,VCC_DDRIO1,VCC_GPU0,VCC_GPU1,VCC_MAIN,VCC_MEMC"},
+	{NULL, 0}
+};
+
+#define BENCH_IMX8QXP_POWER_SWITCH_PATH(group, sensor1, addr, rsense1, sensor2, rsense2) "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0xF0}/pac1934{group="#group";sensor="#sensor1";addr="#addr";rsense1="#rsense1";sensor2="#sensor2";rsense2="#rsense2"}"
+#define BENCH_IMX8QXP_GPIO_EXTENDER_PATH "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0xF0}"
+
+struct mapping bench_imx8qxp_board[] = {
+	{"VCC_1V8",		power, BENCH_IMX8QXP_POWER_SWITCH_PATH(1, 	2, 0x19, 20, 1, 499), 0x00},
+	{"VCC_3V3",		power, BENCH_IMX8QXP_POWER_SWITCH_PATH(2, 	2, 0x16, 20, 1, 499), 0x00},
+	{"VCC_CPU",		power, BENCH_IMX8QXP_POWER_SWITCH_PATH(3, 	2, 0x1B, 20, 1, 976), 0x00},
+	{"VCC_DDRIO",	power, BENCH_IMX8QXP_POWER_SWITCH_PATH(4, 	2, 0x12, 20, 1, 499), 0x00},
+	{"VCC_GPU",		power, BENCH_IMX8QXP_POWER_SWITCH_PATH(5, 	2, 0x13, 20, 1, 976), 0x00},
+	{"VCC_MAIN",	power, BENCH_IMX8QXP_POWER_SWITCH_PATH(6, 	2, 0x14, 20, 1, 499), 0x00},
+
+	{"SR_VCC_1V8",	gpio, BENCH_IMX8QXP_GPIO_EXTENDER_PATH"/adp5585{addr=0x34;port=1;pin_bitmask=0x01;opendrain=0;active_level=1;}", 0x00},
+	{"SR_VCC_3V3",	gpio, BENCH_IMX8QXP_GPIO_EXTENDER_PATH"/adp5585{addr=0x34;port=1;pin_bitmask=0x02;opendrain=0;active_level=1;}", 0x00},
+	{"SR_VCC_CPU",	gpio, BENCH_IMX8QXP_GPIO_EXTENDER_PATH"/adp5585{addr=0x34;port=1;pin_bitmask=0x04;opendrain=0;active_level=1;}", 0x00},
+	{"SR_VCC_DDRIO",gpio, BENCH_IMX8QXP_GPIO_EXTENDER_PATH"/adp5585{addr=0x34;port=1;pin_bitmask=0x08;opendrain=0;active_level=1;}", 0x00},
+	{"SR_VCC_GPU",	gpio, BENCH_IMX8QXP_GPIO_EXTENDER_PATH"/adp5585{addr=0x34;port=1;pin_bitmask=0x10;opendrain=0;active_level=1;}", 0x00},
+
+	{"SR_VCC_MAIN",	gpio, BENCH_IMX8QXP_GPIO_EXTENDER_PATH"/adp5585{addr=0x34;port=0;pin_bitmask=0x10;opendrain=0;active_level=1;}", 0x00},
+
+	{"ft_io_nint",	gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x20}", 0x00},
+	{"ft_io_nrst",	gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x40}", 0x00},
+
+	{"93lcx6",		ftdi_eeprom, "/ft4232h_eeprom{uasize=0xFF}", 0x00},
+	{"temp",		temperature, "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}/pct2075{addr=0x48}", 0x00},
+
+	{NULL, 0, NULL, 0} //null terminated
+};
+
+struct board_power_group bench_imx8qxp_power_groups[] = {
+	{"GROUP_SOC", "VCC_CPU,VCC_DDRIO,VCC_GPU,VCC_MAIN"},
+	{"GROUP_SOC_FULL", "VCC_1V8,VCC_3V3,VCC_CPU,VCC_DDRIO,VCC_GPU,VCC_MAIN"},
+	{NULL, 0}
+};
+
+#define VAL_BOARD_4_POWER_SWITCH_PATH(group, sensor1, addr, rsense1, sensor2, rsense2) "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0xF0}/pac1934{group="#group";sensor="#sensor1";addr="#addr";rsense1="#rsense1";sensor2="#sensor2";rsense2="#rsense2"}"
+#define VAL_BOARD_4_GPIO_EXTENDER_PATH "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0xF0}"
+
+struct mapping val_board_4_board[] = {
+	{"VDDCORE",		power, VAL_BOARD_4_POWER_SWITCH_PATH(1, 	2, 0x19, 20, 1, 180), 0x00},
+	{"VDDRCORE",	power, VAL_BOARD_4_POWER_SWITCH_PATH(2, 	2, 0x16, 20, 1, 180), 0x00},
+	{"VDDA18",		power, VAL_BOARD_4_POWER_SWITCH_PATH(3, 	2, 0x1B, 20, 1, 180), 0x00},
+	{"VDDLPDDR",	power, VAL_BOARD_4_POWER_SWITCH_PATH(4, 	2, 0x12, 20, 1, 180), 0x00},
+	{"DVDD18",		power, VAL_BOARD_4_POWER_SWITCH_PATH(5, 	2, 0x13, 20, 1, 180), 0x00},
+	{"DVDD33",		power, VAL_BOARD_4_POWER_SWITCH_PATH(6, 	2, 0x14, 20, 1, 180), 0x00},
+	{"VDDUSB",		power, VAL_BOARD_4_POWER_SWITCH_PATH(7, 	2, 0x15, 20, 1, 180), 0x00},
+	
+
+	{"SR_VDDCORE",	gpio, VAL_BOARD_4_GPIO_EXTENDER_PATH"/adp5585{addr=0x34;port=1;pin_bitmask=0x01;opendrain=0;active_level=1;}", 0x00},
+	{"SR_VDDRCORE",	gpio, VAL_BOARD_4_GPIO_EXTENDER_PATH"/adp5585{addr=0x34;port=1;pin_bitmask=0x02;opendrain=0;active_level=1;}", 0x00},
+	{"SR_VDDA18",	gpio, VAL_BOARD_4_GPIO_EXTENDER_PATH"/adp5585{addr=0x34;port=1;pin_bitmask=0x04;opendrain=0;active_level=1;}", 0x00},
+	{"SR_VDDLPDDR",	gpio, VAL_BOARD_4_GPIO_EXTENDER_PATH"/adp5585{addr=0x34;port=1;pin_bitmask=0x08;opendrain=0;active_level=1;}", 0x00},
+	{"SR_DVDD18",	gpio, VAL_BOARD_4_GPIO_EXTENDER_PATH"/adp5585{addr=0x34;port=1;pin_bitmask=0x10;opendrain=0;active_level=1;}", 0x00},
+
+	{"SR_DVDD33",	gpio, VAL_BOARD_4_GPIO_EXTENDER_PATH"/adp5585{addr=0x34;port=0;pin_bitmask=0x10;opendrain=0;active_level=1;}", 0x00},
+	{"SR_VDDUSB",	gpio, VAL_BOARD_4_GPIO_EXTENDER_PATH"/adp5585{addr=0x34;port=0;pin_bitmask=0x08;opendrain=0;active_level=1;}", 0x00},
+
+	{"ft_io_nint",	gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x20}", 0x00},
+	{"ft_io_nrst",	gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x40}", 0x00},
+
+	{"93lcx6",		ftdi_eeprom, "/ft4232h_eeprom{uasize=0xFF}", 0x00},
+	{"temp",		temperature, "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}/pct2075{addr=0x48}", 0x00},
+
+	{NULL, 0, NULL, 0} //null terminated
+};
+
+struct board_power_group val_board_4_power_groups[] = {
+	{"GROUP_SOC", "VDDCORE,VDDRCORE,VDDA18,VDDLPDDR,DVDD18,DVDD33"},
+	{"GROUP_PLATFORM", "VDDUSB"},
+	{NULL, 0}
+};
+
 struct board_info board_list[] =
 {
 	{"imx8dxlevk",		imx8xxl,		imx8xxl_boot_modes,		0,	NULL,				imx8xxl_power_groups,		imx8xxlevk_board_links,		&imx8dxlevk_ftdi_eeprom_user_area_info,		500},
@@ -1102,6 +1257,10 @@ struct board_info board_list[] =
 	{"val_board_3",		val_board_3,		imx93evk11_board_boot_modes,	0,	NULL,				imx93evk11_power_groups,	null_board_links,		&val_board_3_ftdi_eeprom_user_area_info,	500},
 	{"imx93qsb",		imx93qsb_board,		imx93evk11_board_boot_modes,	0,	NULL,				NULL,				null_board_links,		NULL,						500},
 	{"imx95evk19",		imx95evk19_board,	imx95evk_board_boot_modes,	0,	NULL,				imx95evk19_power_groups,	null_board_links,		&imx95evk19_ftdi_eeprom_user_area_info,		500},
+	{"nxp_custom",			nxp_custom_board,		null_boot_mode,					0,	NULL,							nxp_custom_power_groups,		null_board_links,			&nxp_custom_ftdi_eeprom_user_area_info,			500},
+	{"val_board_4",			val_board_4_board,		null_boot_mode,					0,	NULL,							val_board_4_power_groups,		null_board_links,			&val_board_4_ftdi_eeprom_user_area_info,			500},
+	{"bench_imx8qm",				bench_imx8qm_board,			null_boot_mode,					0,	NULL,							bench_imx8qm_power_groups,			null_board_links,			&bench_imx8qm_ftdi_eeprom_user_area_info,				500},
+	{"bench_imx8qxp",				bench_imx8qxp_board,			null_boot_mode,					0,	NULL,							bench_imx8qxp_power_groups,			null_board_links,			&bench_imx8qxp_ftdi_eeprom_user_area_info,				500},
 	//"imx9xxl",&imx9xxl_pins,
 };
 int num_of_boards = sizeof(board_list) / sizeof(struct board_info);

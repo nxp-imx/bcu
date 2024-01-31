@@ -69,6 +69,7 @@ struct pac193x_reg_data {
 
 struct power_device {
 	struct device device;
+	int (*power_get_addr)(void*);
 	int (*power_get_group)(void*);
 	int (*power_get_sensor)(void*);
 	int (*power_get_cur_res)(void*);
@@ -76,6 +77,7 @@ struct power_device {
 	void (*power_set_hwfilter)(void*, int);
 	void (*power_set_bipolar)(void* , int);
 	int (*power_write_bipolar)(void* , int);
+	int (*power_write_no_skip)(void* , int);
 	int (*power_set_snapshot)(void*);
 	int (*power_get_data)(void*, struct pac193x_reg_data*);
 	int (*switch_sensor)(void *, int i);
@@ -198,6 +200,7 @@ int ft4232h_gpio_free(void* ft4232h);
 #define PAC1934_REG_VBUS1_ADDR 0x07
 #define PAC1934_REG_VBUS1_AVG_ADDR 0x0F
 #define PAC1934_REG_NEG_PWR_ADDR 0x1D
+#define PAC1934_REG_CHANNEL_DIS_AND_SMBUS_ADDR 0x1C
 
 struct pac1934 {
 	struct power_device power_device;
@@ -213,8 +216,10 @@ struct pac1934 {
 	int cur_rs;
 	int hwfilter;
 	int bipolar;
+	int no_skip;
 };
 int pac1934_switch(void *pac1934, int i);
+int get_pac1934_addr(void* pac1934);
 int get_pac1934_group(void* pac1934);
 int get_pac1934_sensor(void* pac1934);
 int get_pac1934_cur_res(void* pac1934);
@@ -222,6 +227,7 @@ int get_pac1934_unused_res(void* pac1934);
 void pac1934_set_hwfilter(void* pac1934, int onoff);
 void pac1934_set_bipolar(void* pac1934, int value);
 int pac1934_write_bipolar(void* pac1934, int value);
+int pac1934_write_no_skip(void* pac1934, int value);
 int pac1934_snapshot(void* pac1934);
 int pac1934_get_data(void* pac1934, struct pac193x_reg_data* pac_reg);
 void* pac1934_create(char* chip_specification, void* parent);

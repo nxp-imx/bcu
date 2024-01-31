@@ -883,6 +883,7 @@ void* pac1934_create(char* chip_specification, void* parent)
 		return NULL;
 	}
 	pac->power_device.device.parent = parent;
+	pac->power_device.power_get_addr = get_pac1934_addr;
 	pac->power_device.power_get_group = get_pac1934_group;
 	pac->power_device.power_get_sensor = get_pac1934_sensor;
 	pac->power_device.power_get_cur_res = get_pac1934_cur_res;
@@ -890,6 +891,7 @@ void* pac1934_create(char* chip_specification, void* parent)
 	pac->power_device.power_set_hwfilter = pac1934_set_hwfilter;
 	pac->power_device.power_set_bipolar = pac1934_set_bipolar;
 	pac->power_device.power_write_bipolar = pac1934_write_bipolar;
+	pac->power_device.power_write_no_skip = pac1934_write_no_skip;
 	pac->power_device.power_set_snapshot = pac1934_snapshot;
 	pac->power_device.power_get_data = pac1934_get_data;
 	pac->power_device.switch_sensor = pac1934_switch;
@@ -923,12 +925,19 @@ int pac1934_switch(void *pac1934, int i)
 			pac->cur_group = pac->group2;
 		if(pac->sensor2 != -1)
 			pac->cur_sensor = pac->sensor2;
-		pac->cur_rs =  pac->rs2;
+		pac->cur_rs =  pac->rs1 + pac->rs2;
 	}
 	else
 		return -1;
 
 	return 0;
+}
+
+int get_pac1934_addr(void* pac1934)
+{
+	struct pac1934* pac = pac1934;
+
+	return pac->addr;
 }
 
 int get_pac1934_group(void* pac1934)
@@ -957,7 +966,7 @@ int get_pac1934_unused_res(void* pac1934)
 	struct pac1934* pac = pac1934;
 
 	if (pac->rs1 == pac->cur_rs)
-		return pac->rs2;
+		return pac->rs1 + pac->rs2;
 	else
 		return pac->rs1;
 }
@@ -997,6 +1006,31 @@ int pac1934_write_bipolar(void* pac1934, int value)
 	parent->i2c_stop(parent);
 
 	pac->bipolar = value;
+
+	return 0;
+}
+
+int pac1934_write_no_skip(void* pac1934, int value)
+{
+	struct pac1934* pac = pac1934;
+	struct i2c_device* parent = (void*)pac->power_device.device.parent;
+	char addr_plus_write = (pac->addr) << 1;
+	char addr_plus_read = (pac->addr << 1) + 1;
+
+	parent->i2c_start(parent);
+	if(parent->i2c_write(parent, addr_plus_write, I2C_TYPE_PAC1934))
+	{
+		printf("pac1934_write_no_skip: pac 1934 failure get ack\n");
+		return -1;
+	};
+	parent->i2c_write(parent, PAC1934_REG_CHANNEL_DIS_AND_SMBUS_ADDR, I2C_TYPE_PAC1934);
+	if (value)
+		parent->i2c_write(parent, 0x02, I2C_TYPE_PAC1934);
+	else
+		parent->i2c_write(parent, 0x00, I2C_TYPE_PAC1934);
+	parent->i2c_stop(parent);
+
+	pac->no_skip = value;
 
 	return 0;
 }

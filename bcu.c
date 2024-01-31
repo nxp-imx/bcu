@@ -1646,6 +1646,9 @@ GET_PATH1:
 					}
 					struct gpio_device* gd = end_point;
 					unsigned char data;
+					
+					set_gpiod(gd, 1); //initialize all pins to 1
+
 					get_gpiod(gd, &data);
 
 					if (data == 0)
@@ -1696,6 +1699,11 @@ GET_PATH1:
 			pd->power_write_bipolar(pd, 1);
 		else
 			pd->power_write_bipolar(pd, 0);
+
+		if (setting->use_no_skip) //added "no skip" functionality to make possible to use PAC1932 with same library for PAC1934
+			pd->power_write_no_skip(pd, 1);
+		else
+			pd->power_write_no_skip(pd, 0);
 
 		//snapshot once to skip the first data that may not match the polarity configuration
 		pd->power_set_snapshot(pd);
