@@ -107,6 +107,8 @@ extern struct ftdi_eeprom_user_area nxp_custom_ftdi_eeprom_user_area_info;
 extern struct ftdi_eeprom_user_area val_board_4_ftdi_eeprom_user_area_info;
 extern struct ftdi_eeprom_user_area bench_imx8qm_ftdi_eeprom_user_area_info;
 extern struct ftdi_eeprom_user_area bench_imx8qxp_ftdi_eeprom_user_area_info;
+extern struct ftdi_eeprom_user_area bench_imx8mq_ftdi_eeprom_user_area_info;
+extern struct ftdi_eeprom_user_area bench_mcu_ftdi_eeprom_user_area_info;
 extern struct ftdi_eeprom_field_code_tb ftdi_eeprom_field[];
 
 
