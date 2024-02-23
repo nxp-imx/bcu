@@ -132,7 +132,8 @@ int ft_open_channel(struct ftdi_info* fi, int channel)
 	ep_data.desc = temp;
 	ep_data.sn = sn;
 
-	fi->FT_open(0, &fi->ftdi);
+	//change to use bus B, it should always be found, because it will not be used as COM port.
+	fi->FT_open(2, &fi->ftdi);
 	fi->FT_EEPROM_read(fi->ftdi, &ep_data);
 	fi->FT_close(fi->ftdi);
 
@@ -530,6 +531,9 @@ int ft_open_channel_by_id(struct ftdi_info* fi, int channel, char* id)
 	char location_id_str[MAX_NUMBER_OF_USB_DEVICES][MAX_LOCATION_ID_LENGTH];
 	int detected_boards = 0;
 
+	memset(board_table, -1, sizeof(board_table));
+	memset(location_id_str, 0, sizeof(location_id_str));
+
 	ftStatus = ft.FT_create_device_info_list(&numDevs);
 
 	if (ftStatus != 0)
@@ -568,24 +572,44 @@ int ft_open_channel_by_id(struct ftdi_info* fi, int channel, char* id)
 			}
 			if (!found)
 			{
-				board_table[detected_boards][4] = loc_id;
+				board_table[detected_boards][4] = loc_id - i;
 				if (strcmp("A", &Description[strlen(Description) - 1]) == 0)
 				{
 					sprintf(location_id_str[detected_boards], "%x", loc_id);
 					board_table[detected_boards][0] = loc_id;
 				}
-				else if (strcmp("B", &Description[strlen(Description) - 1]) == 0)
+				else if (strcmp("B", &Description[strlen(Description) - 1]) == 0) //bus B should be always found
+				{
+					sprintf(location_id_str[detected_boards], "%x", loc_id - 1);
 					board_table[detected_boards][1] = loc_id;
+				}
 				else if (strcmp("C", &Description[strlen(Description) - 1]) == 0)
 					board_table[detected_boards][2] = loc_id;
 				else if (strcmp("D", &Description[strlen(Description) - 1]) == 0)
 					board_table[detected_boards][3] = loc_id;
 				else
+				{
 					printf("detected channel information are not found!\n");
+					continue;
+				}
 				detected_boards++;
 			}
 		}
 	}
+
+	//check board_table bus A values if is -1.
+	for (int a = 0; a < detected_boards; a++)
+	{
+		for (int b = 0; b < 4; b++)
+		{
+			if (board_table[a][b] == -1)
+			{
+				if (b == 0 && board_table[a][b + 1] != -1)
+					board_table[a][b] = board_table[a][b + 1] - 1;
+			}
+		}
+	}
+
 	for (int j = 0; j < detected_boards; j++)
 	{
 		if (strcmp(location_id_str[j], id) == 0)
