@@ -360,10 +360,10 @@ void* ft4232h_eeprom_create(char* chip_specification, void* parent)
 	if (!ftee->ftdi_info->isinit)
 	{
 		if (strlen(GV_LOCATION_ID) == 0) {
-			status = ft_open_channel(ftee->ftdi_info, 0);
+			status = ft_open_channel(ftee->ftdi_info, 2);
 		}
 		else {
-			status = ft_open_channel_by_id(ftee->ftdi_info, 0, GV_LOCATION_ID);
+			status = ft_open_channel_by_id(ftee->ftdi_info, 2, GV_LOCATION_ID);
 		}
 	}
 
