@@ -572,7 +572,7 @@ int ft_open_channel_by_id(struct ftdi_info* fi, int channel, char* id)
 			}
 			if (!found)
 			{
-				board_table[detected_boards][4] = loc_id - i;
+				board_table[detected_boards][4] = loc_id - ( i % 4 );
 				if (strcmp("A", &Description[strlen(Description) - 1]) == 0)
 				{
 					sprintf(location_id_str[detected_boards], "%x", loc_id);
