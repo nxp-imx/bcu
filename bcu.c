@@ -1002,10 +1002,11 @@ GET_GPIO:
 		a++;
 	}
 
-	printf("resetting in: %ds", board->reset_time_ms / 1000);
+	printf("resetting in: %fs\n", board->reset_time_ms / 1000.0);
 
 	gpio = get_gpio("reset", board);
 	mask = board->mappings[get_gpio_id("reset", board)].initinfo & 0xF;
+
 	if (gpio == NULL)
 	{
 		printf("reset: error building device linked list\n");
@@ -2250,22 +2251,22 @@ GET_PATH2:
 
 				if (range_control != 2)
 				{
-					printf("%-6.1f ", cnow[k]);
-					printf("%-6.1f ", cavg[k]);
+					printf("%-6.2f ", cnow[k]);
+					printf("%-6.2f ", cavg[k]);
 					if (available_width - max_length > DISPLAY_WIDTH_MODE_3)
 					{
-						printf("%-7.1f ", cmax[k]);
-						printf("%-6.1f ", cmin[k]);
+						printf("%-7.2f ", cmax[k]);
+						printf("%-6.2f ", cmin[k]);
 					}
 				}
 				else
 				{
-					printf("%-9.1f ", cnow[k]);
-					printf("%-9.1f ", cavg[k]);
+					printf("%-9.2f ", cnow[k]);
+					printf("%-9.2f ", cavg[k]);
 					if (available_width - max_length > DISPLAY_WIDTH_MODE_3)
 					{
-						printf("%-9.1f ", cmax[k]);
-						printf("%-9.1f ", cmin[k]);
+						printf("%-9.2f ", cmax[k]);
+						printf("%-9.2f ", cmin[k]);
 					}
 				}
 
@@ -2275,22 +2276,22 @@ GET_PATH2:
 				printf("%s", g_vt_kcyn);
 				if (range_control != 2)
 				{
-					printf("%-6.1f ", pnow[k]);
-					printf("%-6.1f ", pavg[k]);
+					printf("%-6.2f ", pnow[k]);
+					printf("%-6.2f ", pavg[k]);
 					if (available_width - max_length > DISPLAY_WIDTH_MODE_2)
 					{
-						printf("%-7.1f ", pmax[k]);
-						printf("%-6.1f ", pmin[k]);
+						printf("%-7.2f ", pmax[k]);
+						printf("%-6.2f ", pmin[k]);
 					}
 				}
 				else
 				{
-					printf("%-10.1f ", pnow[k]);
-					printf("%-10.1f ", pavg[k]);
+					printf("%-10.2f ", pnow[k]);
+					printf("%-10.2f ", pavg[k]);
 					if (available_width - max_length > DISPLAY_WIDTH_MODE_2)
 					{
-						printf("%-10.1f ", pmax[k]);
-						printf("%-10.1f ", pmin[k]);
+						printf("%-10.2f ", pmax[k]);
+						printf("%-10.2f ", pmin[k]);
 					}
 				}
 				if(range_level[k] == 0x01 || range_level[k] == 0x11)
@@ -2299,11 +2300,11 @@ GET_PATH2:
 				printf("%s", g_vt_red);
 				if (sr_level[k] == -1)
 				{
-					printf("|[*]%-8.1f", cur_range[k]);
+					printf("|[*]%-8.2f", cur_range[k]);
 				}
 				else
 				{
-					printf("|[%s]%-8.1f [%s]%-8.1f", sr_level[k] ? "*" : " ", sr_level[k] ? cur_range[k] : unused_range[k], sr_level[k] ? " " : "*", sr_level[k] ? unused_range[k] : cur_range[k]);
+					printf("|[%s]%-8.2f [%s]%-8.2f", sr_level[k] ? "*" : " ", sr_level[k] ? cur_range[k] : unused_range[k], sr_level[k] ? " " : "*", sr_level[k] ? unused_range[k] : cur_range[k]);
 				}
 
 				printf("%s\n", g_vt_clear_line);
@@ -2347,10 +2348,10 @@ GET_PATH2:
 				}
 				else
 				{
-					printf("%-6.1f ", groups[k].sum);
-					printf("%-6.1f ", groups[k].avg);
-					printf("%-6.1f ", groups[k].max);
-					printf("%-6.1f", groups[k].min);
+					printf("%-6.2f ", groups[k].sum);
+					printf("%-6.2f ", groups[k].avg);
+					printf("%-6.2f ", groups[k].max);
+					printf("%-6.2f", groups[k].min);
 				}
 				printf("%s", g_vt_default);
 				printf(" |");
@@ -2401,7 +2402,7 @@ GET_PATH2:
 				printf("\n                ");
 
 			if (last_display != 0)
-				printf("Display freq: %.1fHz      Total sampling times: %ld%s\n", (1000.0 / interval), times, g_vt_clear_line);
+				printf("Display freq: %.2fHz      Total sampling times: %ld%s\n", (1000.0 / interval), times, g_vt_clear_line);
 		}
 
 		if (candisplay == 1 && setting->dump == 1)

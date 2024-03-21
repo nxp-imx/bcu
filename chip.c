@@ -1066,7 +1066,7 @@ double pac1934_reg2current(unsigned int reg, unsigned char complement)
 		}
 	}
 	else
-		return ((double)reg) / 65535 * 100000;
+		return ((double)reg) / 65536 * 100000;
 }
 
 int pac1934_get_data(void* pac1934, struct pac193x_reg_data* pac_reg)
