@@ -282,6 +282,7 @@ void set_options_default(struct options_setting* setting)
 	setting->rangefixed = 0;
 	setting->use_hwfilter = 0;
 	setting->use_bipolar = 1;
+	setting->use_no_skip = 1;	
 	setting->dump_statistics = 0;
 	setting->eeprom_function = 0;
 	setting->download_doc = 0;

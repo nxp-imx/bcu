@@ -71,6 +71,7 @@ struct options_setting {
 	int rangefixed;
 	int use_hwfilter;
 	int use_bipolar;
+	int use_no_skip;
 	int dump_statistics;
 	int eeprom_function;
 	short eeprom_usr_sn;
