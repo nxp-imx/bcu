@@ -66,6 +66,7 @@ struct ftdi_eeprom_field_code_tb ftdi_eeprom_field[] = {
 	{ftdi_eeprom_board_id, 0x17,"NXP BENCH_IMX8QM_RevB Board"},
 	{ftdi_eeprom_board_id, 0x18,"NXP BENCH_IMX8QXP_RevB Board"},
 	{ftdi_eeprom_board_id, 0x19, "NXP i.MX91 QSB Board"},
+	{ftdi_eeprom_board_id, 0x1a, "NXP i.MX95 EVK 15x15 Board"},
 
 	{ftdi_eeprom_soc_id, 0x1, "i.MX8DXL"},
 	{ftdi_eeprom_soc_id, 0x2, "i.MX8MP"},
@@ -104,6 +105,7 @@ struct ftdi_eeprom_field_code_tb ftdi_eeprom_field[] = {
 	{ftdi_eeprom_pmic_id, 0x11, "BENCH_IMX8QM_RevB PMIC"},  //
 	{ftdi_eeprom_pmic_id, 0x12, "BENCH_IMX8QXP_RevB PMIC"},  //
 	{ftdi_eeprom_pmic_id, 0x13, "PF9453AHN"},  //On imx91 qsb
+	{ftdi_eeprom_pmic_id, 0x14, "PPF0900AVNA2ES"},  //On imx95 evk 15x15
 
 
 	{0, 0, NULL}//null terminated
@@ -331,6 +333,15 @@ struct ftdi_eeprom_user_area bench_imx8qxp_revB_ftdi_eeprom_user_area_info = {
 	0x10, 0x1, 0x1,	//soc_id, soc_rev_number, soc_rev_char
 	0x12, 0x1, 0x1,	//pmic_id, pmic_rev_number, pmic_rev_char
 	6,				//no of power rails
+	1
+};
+
+struct ftdi_eeprom_user_area imx95evk15_ftdi_eeprom_user_area_info = {
+	0x1,		//config
+	0x1a, 0x0, 0x0,	//board_id, board_rev_number, board_rev_char
+	0x7,  0x0, 0x0,	//soc_id, soc_rev_number, soc_rev_char
+	0x14, 0xF, 0xF,	//pmic_id, pmic_rev_number, pmic_rev_char
+	16,
 	1
 };
 
