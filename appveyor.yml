@@ -1,4 +1,4 @@
-version: bcu_1.1.78
+version: bcu_1.1.79
 
 skip_tags: true
 
@@ -8,6 +8,7 @@ environment:
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
     - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu1804
     - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu2004
+    - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu2204
     - APPVEYOR_BUILD_WORKER_IMAGE: macOS-BigSur
   bcu_coverity_token:
     secure: YuctP7YsJQIzsrBQtgEfwkYPu3StAEWV9SgPIBjwZDo=
@@ -40,16 +41,23 @@ install:
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2004" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libftdi1-dev); fi
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2004" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libusb-1.0-0-dev); fi
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2004" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install openssl libssl-dev); fi
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2204" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libconfuse-dev swig python-dev libboost-all-dev); fi
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2204" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libyaml-dev); fi
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2204" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libftdi1-dev); fi
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2204" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libusb-1.0-0-dev); fi
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2204" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install openssl libssl-dev); fi
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "macOS-BigSur" ]; then ( brew update;); fi
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "macOS-BigSur" ]; then ( brew remove curl libssh2; brew reinstall pkgconfig; export PATH="/usr/local/Cellar/pkg-config/0.29.2_3/bin:${PATH}"; brew reinstall libyaml openssl openssl@1.1; brew install libftdi; pkg-config --list-all;); fi
 
 build_script:
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu1804" ]; then (cmake .); fi
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2004" ]; then (cmake .); fi
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2204" ]; then (cmake .); fi
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "macOS-BigSur" ]; then (export PATH="/usr/local/Cellar/pkg-config/0.29.2_3/bin:${PATH}"; export PKG_CONFIG_PATH="/usr/local/opt/openssl@1.1/lib/pkgconfig"; cmake .); fi
 - sh: make
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu1804" ]; then (mv bcu bcu_Ubuntu18); fi
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2004" ]; then (mv bcu bcu_Ubuntu20); fi
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2204" ]; then (mv bcu bcu_Ubuntu22); fi
 
 # no schedule coverity check:
 #- cmd: cov-build --dir cov-int msbuild %APPVEYOR_BUILD_FOLDER%/Board_Control_Utilities.sln /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
@@ -66,6 +74,7 @@ artifacts:
 - path: bcu.exe
 - path: bcu_Ubuntu18
 - path: bcu_Ubuntu20
+- path: bcu_Ubuntu22
 - path: bcu_mac
 
 before_deploy:
@@ -75,5 +84,5 @@ deploy:
   description: prebuild for $(APPVEYOR_REPO_COMMIT) \n\n $(APPVEYOR_REPO_COMMIT_MESSAGE)
   auth_token:
     secure: SWWVkwSfPyVIaPChBBl+uAA3Fau9Rl5iNPQ9VRL8yyggXvc6wPcr/O9iXBMVM7Ju
-  artifact: bcu.exe;  bcu_Ubuntu18;  bcu_Ubuntu20;  bcu_mac;
+  artifact: bcu.exe;  bcu_Ubuntu18;  bcu_Ubuntu20;  bcu_Ubuntu22;  bcu_mac;
   draft: true
