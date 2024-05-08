@@ -925,7 +925,7 @@ int pac1934_switch(void *pac1934, int i)
 			pac->cur_group = pac->group2;
 		if(pac->sensor2 != -1)
 			pac->cur_sensor = pac->sensor2;
-		pac->cur_rs =  pac->rs1 + pac->rs2;
+		pac->cur_rs =  pac->rs2;
 	}
 	else
 		return -1;
@@ -966,7 +966,7 @@ int get_pac1934_unused_res(void* pac1934)
 	struct pac1934* pac = pac1934;
 
 	if (pac->rs1 == pac->cur_rs)
-		return pac->rs1 + pac->rs2;
+		return pac->rs2;
 	else
 		return pac->rs1;
 }
