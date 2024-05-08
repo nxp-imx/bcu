@@ -206,13 +206,20 @@ static void upgrade_bcu(struct options_setting* setting)
 	memset(sysversion, 0, sizeof(sysversion));
 	shellcmd("lsb_release -r -s", sysversion, sizeof(sysversion));
 	sys_ver = (sysversion[0] - '0') * 10 + (sysversion[1] - '0');
-	if (sys_ver == 20)
-		strcpy(bcu_download_info.extension_name, "_Ubuntu20");
-	else if (sys_ver == 18)
-		strcpy(bcu_download_info.extension_name, "_Ubuntu18");
-	else {
-		printf("Unsupported OS version!\n");
-		return;
+	switch (sys_ver)
+	{
+		case 22:
+			strcpy(bcu_download_info.extension_name, "_Ubuntu22");
+			break;
+		case 20:
+			strcpy(bcu_download_info.extension_name, "_Ubuntu20");
+			break;
+		case 18:
+			strcpy(bcu_download_info.extension_name, "_Ubuntu18");
+			break;
+		default:
+			printf("Unsupported OS version!\n");
+			return;
 	}
 #elif defined(__APPLE__)
 	strcpy(bcu_download_info.extension_name, "_mac");
@@ -1648,7 +1655,7 @@ GET_PATH1:
 					struct gpio_device* gd = end_point;
 					unsigned char data;
 					
-					set_gpiod(gd, 1); //initialize all pins to 1
+					// set_gpiod(gd, 1); //initialize all pins to 1
 
 					get_gpiod(gd, &data);
 
