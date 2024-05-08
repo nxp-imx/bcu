@@ -67,6 +67,7 @@ struct ftdi_eeprom_field_code_tb ftdi_eeprom_field[] = {
 	{ftdi_eeprom_board_id, 0x18,"NXP BENCH_IMX8QXP_RevB Board"},
 	{ftdi_eeprom_board_id, 0x19, "NXP i.MX91 QSB Board"},
 	{ftdi_eeprom_board_id, 0x1a, "NXP i.MX95 EVK 15x15 Board"},
+	{ftdi_eeprom_board_id, 0x1b, "NXP i.MX91 11x11 EVK Board"},
 
 	{ftdi_eeprom_soc_id, 0x1, "i.MX8DXL"},
 	{ftdi_eeprom_soc_id, 0x2, "i.MX8MP"},
@@ -207,6 +208,15 @@ struct ftdi_eeprom_user_area imx91qsb_ftdi_eeprom_user_area_info = {
 	0x11, 0x0, 0x0,	//soc_id, soc_rev_number, soc_rev_char
 	0x13, 0xF, 0xF,	//pmic_id, pmic_rev_number, pmic_rev_char
 	13,
+	1
+};
+
+struct ftdi_eeprom_user_area imx91evk11_ftdi_eeprom_user_area_info = {
+	0x1,		//config
+	0x1b, 0x0, 0x0, //board_id, board_rev_number, board_rev_char
+	0x11, 0x0, 0x0,  //soc_id, soc_rev_number, soc_rev_char
+	0x8,  0xF, 0xF,  //pmic_id, pmic_rev_number, pmic_rev_char
+	21,
 	1
 };
 
