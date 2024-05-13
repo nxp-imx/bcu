@@ -360,10 +360,18 @@ void* ft4232h_eeprom_create(char* chip_specification, void* parent)
 	if (!ftee->ftdi_info->isinit)
 	{
 		if (strlen(GV_LOCATION_ID) == 0) {
+#if defined(__linux__) || defined(__APPLE__)
+			status = ft_open_channel(ftee->ftdi_info, 0);
+#else
 			status = ft_open_channel(ftee->ftdi_info, 2);
+#endif
 		}
 		else {
+#if defined(__linux__) || defined(__APPLE__)
+			status = ft_open_channel_by_id(ftee->ftdi_info, 0, GV_LOCATION_ID);
+#else
 			status = ft_open_channel_by_id(ftee->ftdi_info, 2, GV_LOCATION_ID);
+#endif
 		}
 	}
 
@@ -372,7 +380,7 @@ void* ft4232h_eeprom_create(char* chip_specification, void* parent)
 		printf("failed to open ftdi device, err = %d\n", status);
 #if defined(__linux__) || defined(__APPLE__)
 		printf("***please make sure you run bcu with sudo\n");
-#endif		
+#endif
 		free(ftee);
 		return NULL;
 	}
