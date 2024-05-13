@@ -93,7 +93,7 @@ void writeConf(void)
 		return;
 	}
 
-	char text[255];
+	char text[512];
 	char chip_specification[MAX_PATH_LENGTH];
 	int i = 0, j;
 
