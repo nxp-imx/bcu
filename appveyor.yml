@@ -1,4 +1,4 @@
-version: bcu_1.1.79
+version: bcu_1.1.82
 
 skip_tags: true
 
@@ -9,7 +9,7 @@ environment:
     - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu1804
     - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu2004
     - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu2204
-    - APPVEYOR_BUILD_WORKER_IMAGE: macOS-BigSur
+    # - APPVEYOR_BUILD_WORKER_IMAGE: macOS-BigSur
   bcu_coverity_token:
     secure: YuctP7YsJQIzsrBQtgEfwkYPu3StAEWV9SgPIBjwZDo=
 
@@ -41,11 +41,11 @@ install:
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2004" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libftdi1-dev); fi
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2004" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libusb-1.0-0-dev); fi
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2004" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install openssl libssl-dev); fi
-- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2204" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libconfuse-dev swig python-dev libboost-all-dev); fi
-- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2204" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libyaml-dev); fi
-- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2204" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libftdi1-dev); fi
-- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2204" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libusb-1.0-0-dev); fi
-- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2204" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install openssl libssl-dev); fi
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2204" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes install libconfuse-dev swig libboost-all-dev); fi
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2204" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes install libyaml-dev); fi
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2204" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes install libftdi1-dev); fi
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2204" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes install libusb-1.0-0-dev); fi
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "Ubuntu2204" ]; then (sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes install openssl libssl-dev); fi
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "macOS-BigSur" ]; then ( brew update;); fi
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "macOS-BigSur" ]; then ( brew remove curl libssh2; brew reinstall pkgconfig; export PATH="/usr/local/Cellar/pkg-config/0.29.2_3/bin:${PATH}"; brew reinstall libyaml openssl openssl@1.1; brew install libftdi; pkg-config --list-all;); fi
 
