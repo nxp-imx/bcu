@@ -1766,7 +1766,7 @@ int pcal6524h_read(void* pcal6524h, unsigned char* bit_value_buffer)
 	if (bSucceed) return bSucceed;
 
 	//mask away unwanted value;
-	*bit_value_buffer = (*bit_value_buffer) & (~pca->gpio_device.pin_bitmask);
+	*bit_value_buffer = (*bit_value_buffer) & (pca->gpio_device.pin_bitmask);
 	return 0;
 }
 
