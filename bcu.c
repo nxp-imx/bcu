@@ -1647,8 +1647,16 @@ GET_PATH1:
 					}
 					struct gpio_device* gd = end_point;
 					unsigned char data;
-					
-					set_gpiod(gd, 1); //initialize all pins to 1
+
+					//initialize gpio pin with value from 4 LSB bits of initinfo; 0 means high current, 1 means low current
+					if ((board->mappings[get_gpio_id(sr_name, board)].initinfo & 0xF) == 0)
+					{
+						set_gpiod(gd, 1);
+					}
+					else if ((board->mappings[get_gpio_id(sr_name, board)].initinfo & 0xF) == 1)
+					{
+						set_gpiod(gd, 0);
+					}
 
 					get_gpiod(gd, &data);
 

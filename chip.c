@@ -995,7 +995,7 @@ int pac1934_write_bipolar(void* pac1934, int value)
 	parent->i2c_start(parent);
 	if(parent->i2c_write(parent, addr_plus_write, I2C_TYPE_PAC1934))
 	{
-		printf("pac1934_write_bipolar: pac 1934 failure get ack\n");
+		printf("pac1934_write_bipolar: pac 1934 failure get ack, addr:%x\n", pac->addr);
 		return -1;
 	};
 	parent->i2c_write(parent, PAC1934_REG_NEG_PWR_ADDR, I2C_TYPE_PAC1934);
