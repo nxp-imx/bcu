@@ -62,6 +62,7 @@ struct bcu_yaml_version ver_before_big_ver[] =
 	{"1.1.71"},
 	{"1.1.72"},
 	{"1.1.75"},
+	{"1.1.78"},
 	{NULL}
 };
 
@@ -92,7 +93,7 @@ void writeConf(void)
 		return;
 	}
 
-	char text[255];
+	char text[512];
 	char chip_specification[MAX_PATH_LENGTH];
 	int i = 0, j;
 
