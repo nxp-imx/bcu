@@ -360,10 +360,18 @@ void* ft4232h_eeprom_create(char* chip_specification, void* parent)
 	if (!ftee->ftdi_info->isinit)
 	{
 		if (strlen(GV_LOCATION_ID) == 0) {
+#if defined(__linux__) || defined(__APPLE__)
+			status = ft_open_channel(ftee->ftdi_info, 0);
+#else
 			status = ft_open_channel(ftee->ftdi_info, 2);
+#endif
 		}
 		else {
+#if defined(__linux__) || defined(__APPLE__)
+			status = ft_open_channel_by_id(ftee->ftdi_info, 0, GV_LOCATION_ID);
+#else
 			status = ft_open_channel_by_id(ftee->ftdi_info, 2, GV_LOCATION_ID);
+#endif
 		}
 	}
 
@@ -372,7 +380,7 @@ void* ft4232h_eeprom_create(char* chip_specification, void* parent)
 		printf("failed to open ftdi device, err = %d\n", status);
 #if defined(__linux__) || defined(__APPLE__)
 		printf("***please make sure you run bcu with sudo\n");
-#endif		
+#endif
 		free(ftee);
 		return NULL;
 	}
@@ -925,7 +933,7 @@ int pac1934_switch(void *pac1934, int i)
 			pac->cur_group = pac->group2;
 		if(pac->sensor2 != -1)
 			pac->cur_sensor = pac->sensor2;
-		pac->cur_rs =  pac->rs1 + pac->rs2;
+		pac->cur_rs =  pac->rs2;
 	}
 	else
 		return -1;
@@ -966,7 +974,7 @@ int get_pac1934_unused_res(void* pac1934)
 	struct pac1934* pac = pac1934;
 
 	if (pac->rs1 == pac->cur_rs)
-		return pac->rs1 + pac->rs2;
+		return pac->rs2;
 	else
 		return pac->rs1;
 }
@@ -1758,7 +1766,7 @@ int pcal6524h_read(void* pcal6524h, unsigned char* bit_value_buffer)
 	if (bSucceed) return bSucceed;
 
 	//mask away unwanted value;
-	*bit_value_buffer = (*bit_value_buffer) & (~pca->gpio_device.pin_bitmask);
+	*bit_value_buffer = (*bit_value_buffer) & (pca->gpio_device.pin_bitmask);
 	return 0;
 }
 
