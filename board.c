@@ -182,7 +182,7 @@ struct board_power_group imx8xxl_power_groups[] = {
 	{"GROUP_DRAM", "ddr_vdd1,ddr_vdd2"},
 	{"GROUP_PLATFORM", "on_board_12v0"},
 	{"GROUP_CUSTOM", "3v3_pmic_in,3v3_io,3v3_enet,vdd_usb_3v3"},
-	{"GROUP_on_board", "on_board_1v8, on_board_3v3, on_board_5v0"},
+	{"GROUP_on_board", "on_board_1v8,on_board_3v3,on_board_5v0"},
 	{"GROUP_1v8_6", "1v8_6"},
 
 
@@ -1367,10 +1367,11 @@ struct mapping bench_imx8qm_revB_board[] = {
 	{"SR_VCC_3V3",	gpio, BENCH_IMX8QM_revB_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=0;pin_bitmask=0x04;opendrain=0;}", 0x00},
 
 
-	{"boot_mode",		gpio, BENCH_IMX8QM_revB_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=0;pin_bitmask=0x3F;opendrain=1;}", 0x10},
+	{"boot_mode",	gpio, BENCH_IMX8QM_revB_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=0;pin_bitmask=0x3F;opendrain=1;}", 0x10},
 	{"reset",		gpio, BENCH_IMX8QM_revB_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=0;pin_bitmask=0x40;opendrain=1;}", 0x21},
 	{"onoff",		gpio, BENCH_IMX8QM_revB_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x02;opendrain=1;}", 0x31},
-	{"remote_en",		gpio, BENCH_IMX8QM_revB_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=0;pin_bitmask=0x80;opendrain=1;}", 0x41},
+	{"remote_en",	gpio, BENCH_IMX8QM_revB_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=0;pin_bitmask=0x80;opendrain=1;}", 0x41},
+	{"onoff_2",		gpio, BENCH_IMX8QM_revB_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=2;pin_bitmask=0x01;opendrain=1;}", 0x51},
 	
 	{"onoff_otg",		gpio, BENCH_IMX8QM_revB_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=0;pin_bitmask=0x01;opendrain=1;}", 0x51},
 
