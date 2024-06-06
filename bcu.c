@@ -2275,7 +2275,7 @@ GET_PATH2:
 					printf("%-9.4f ", cavg[k]);
 					if (available_width - max_length > DISPLAY_WIDTH_MODE_3)
 					{
-						printf("%-7.2f ", cmax[k]);
+						printf("%-7.4f ", cmax[k]);
 						printf("%-9.4f ", cmin[k]);
 					}
 				}
@@ -2300,7 +2300,7 @@ GET_PATH2:
 					printf("%-9.4f ", pavg[k]);
 					if (available_width - max_length > DISPLAY_WIDTH_MODE_2)
 					{
-						printf("%-7.2f ", pmax[k]);
+						printf("%-7.4f ", pmax[k]);
 						printf("%-9.4f ", pmin[k]);
 					}
 				}
