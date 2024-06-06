@@ -33,6 +33,6 @@ elseif (MACOS)
         add_executable(bcu_mac bcu.c port.c chip.c board.c bcu_parser.c bcu_yaml.c bcu_https.c bcu_ftdi_eeprom.c)
         link_directories(${LIBUSB_LIBRARY_DIRS} ${LIBFTDI_LIBRARY_DIRS} ${LIBYAML_LIBRARY_DIRS})
         target_link_libraries (bcu_mac ${LIBUSB_LIBDIR}/lib${LIBUSB_LIBRARIES}.dylib ${LIBFTDI_LIBDIR}/${LIBFTDI_MODULE_NAME}.dylib ${LIBYAML_LIBDIR}/lib${LIBYAML_LIBRARIES}.dylib ${PROJECT_SOURCE_DIR}/libcurl/build.bcu/lib/libcurl.a -lpthread ${LIBOPENSSL_LIBDIR}/libssl.1.1.dylib ${LIBOPENSSL_LIBDIR}/libcrypto.1.1.dylib -lm)
-        execute_process( COMMAND ${PROJECT_SOURCE_DIR}/create_version_h.sh ${PROJECT_SOURCE_DIR}
-                         COMMAND ${PROJECT_SOURCE_DIR}/build_libs_mac.sh ${LIBOPENSSL_PREFIX} )
+        execute_process( COMMAND sh ${PROJECT_SOURCE_DIR}/create_version_h.sh ${PROJECT_SOURCE_DIR}
+                         COMMAND sh ${PROJECT_SOURCE_DIR}/build_libs_mac.sh ${LIBOPENSSL_PREFIX} )
 endif ()

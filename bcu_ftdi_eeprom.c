@@ -52,7 +52,7 @@ struct ftdi_eeprom_field_code_tb ftdi_eeprom_field[] = {
 	{ftdi_eeprom_board_id, 0x9, "NXP VAL_BOARD_2 Board"},
 	{ftdi_eeprom_board_id, 0xa, "NXP i.MX8ULP EVK9 Board"},
 	{ftdi_eeprom_board_id, 0xb, "NXP i.MX8ULP Watch VAL Board"},
-	{ftdi_eeprom_board_id, 0xc, "NXP i.MX93 EVK Board"},
+	{ftdi_eeprom_board_id, 0xc, "NXP i.MX93 11x11 EVK Board"},
 	{ftdi_eeprom_board_id, 0xd, "NXP VAL_BOARD_3 Board"},
 	{ftdi_eeprom_board_id, 0xe, "NXP i.MX8DXL Orange Box"},
 	{ftdi_eeprom_board_id, 0xf, "NXP i.MX95 EVK 19x19 Board"},
@@ -68,8 +68,9 @@ struct ftdi_eeprom_field_code_tb ftdi_eeprom_field[] = {
 	{ftdi_eeprom_board_id, 0x19, "NXP i.MX91 QSB Board"},
 	{ftdi_eeprom_board_id, 0x1a, "NXP i.MX95 EVK 15x15 Board"},
 	{ftdi_eeprom_board_id, 0x1b, "NXP i.MX91 11x11 EVK Board"},
-	{ftdi_eeprom_board_id, 0x1c,"NXP VAL_BOARD_5 Board"},
-	{ftdi_eeprom_board_id, 0x1d,"NXP VAL_BOARD_6 Board"},
+	{ftdi_eeprom_board_id, 0x1c, "NXP i.MX93 14x14 EVK Board"},
+	{ftdi_eeprom_board_id, 0x1d,"NXP VAL_BOARD_5 Board"},
+	{ftdi_eeprom_board_id, 0x12,"NXP VAL_BOARD_6 Board"},
 
 	{ftdi_eeprom_soc_id, 0x1, "i.MX8DXL"},
 	{ftdi_eeprom_soc_id, 0x2, "i.MX8MP"},
@@ -111,8 +112,9 @@ struct ftdi_eeprom_field_code_tb ftdi_eeprom_field[] = {
 	{ftdi_eeprom_pmic_id, 0x12, "BENCH_IMX8QXP_RevB PMIC"},  //
 	{ftdi_eeprom_pmic_id, 0x13, "PF9453AHN"},  //On imx91 qsb
 	{ftdi_eeprom_pmic_id, 0x14, "PPF0900AVNA2ES"},  //On imx95 evk 15x15
-	{ftdi_eeprom_pmic_id, 0x15, "VAL_BOARD_5 PMIC"},  //
+	{ftdi_eeprom_pmic_id, 0x15, "PCA9452"},  //On imx93 14x14 evk
 	{ftdi_eeprom_pmic_id, 0x16, "VAL_BOARD_5 PMIC"},  //
+	{ftdi_eeprom_pmic_id, 0x17, "VAL_BOARD_6 PMIC"},  //
 
 	{0, 0, NULL}//null terminated
 };
@@ -240,6 +242,15 @@ struct ftdi_eeprom_user_area imx93evk11b1_ftdi_eeprom_user_area_info = {
 	0x6, 0x0, 0x0,	//soc_id, soc_rev_number, soc_rev_char
 	0x8, 0xF, 0xF,	//pmic_id, pmic_rev_number, pmic_rev_char
 	21,
+	1
+};
+
+struct ftdi_eeprom_user_area imx93evk14_ftdi_eeprom_user_area_info = {
+	0x1,		//config
+	0x1c, 0x1, 0x1,	//board_id, board_rev_number, board_rev_char
+	0x6,  0x0, 0x0,	//soc_id, soc_rev_number, soc_rev_char
+	0x15, 0xF, 0xF,	//pmic_id, pmic_rev_number, pmic_rev_char
+	4,
 	1
 };
 
