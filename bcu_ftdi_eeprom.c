@@ -389,7 +389,7 @@ struct ftdi_eeprom_user_area val_board_6_ftdi_eeprom_user_area_info = {
 	1
 };
 
-struct ftdi_eeprom_user_area bench_imx8ull_revB_ftdi_eeprom_user_area_info = {
+struct ftdi_eeprom_user_area bench_imx6ull_revB_ftdi_eeprom_user_area_info = {
 	0x1,		//config
 	0x1E, 0x1, 0x1,	//board_id, board_rev_number, board_rev_char
 	0x14, 0x1, 0x1,	//soc_id, soc_rev_number, soc_rev_char
