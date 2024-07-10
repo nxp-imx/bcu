@@ -574,13 +574,20 @@ struct mapping imx8ulpwatchval_board[] = {
 	{NULL, 0, NULL, 0} //null terminated
 };
 
-struct mapping imx8ulpwatchref_board[] = {
+struct mapping imx8ulpwatchuwb_board[] = {
 	{"vdd_pmic_4v2",	power, IMX8ULPEVK_POWER_PATH(1, 1, 0x10, 50, 50), 0x00},
 	{"vdd_per_1v8",		power, IMX8ULPEVK_POWER_PATH(1, 2, 0x10, 100, 100), 0x00},
 	{"vdd_per_3v3",		power, IMX8ULPEVK_POWER_PATH(1, 3, 0x10, 50, 50), 0x00},
 	{"vdd_bat_4v2",		power, IMX8ULPEVK_POWER_PATH(1, 4, 0x10, 50, 50), 0x00},
 
 	{NULL, 0, NULL, 0} //null terminated
+};
+
+struct board_power_group imx8ulpwatchuwb_power_groups[] = {
+	{"GROUP_PMIC", "vdd_pmic_4v2"},
+	{"GROUP_PERIPHERALS", "vdd_per_1v8,vdd_per_3v3"},
+	{"GROUP_TOTAL", "vdd_bat_4v2"},
+	{NULL, 0}
 };
 
 struct boot_mode imx8ulpevk_board_boot_modes[] = {
@@ -1662,7 +1669,7 @@ struct board_info board_list[] =
 	{"imx8ulpevkb2",	imx8ulpevkb2_board,	imx8ulpevk_board_boot_modes,	1,	imx8ulpevk_board_boot_config,	imx8ulpevkpwr_power_groups,	null_board_links,		&imx8ulpevkb2_ftdi_eeprom_user_area_info,	9000},
 	{"imx8ulpevk9",		imx8ulpevk9_board,	imx8ulpevk_board_boot_modes,	1,	imx8ulpevk_board_boot_config,	imx8ulpevkpwr_power_groups,	null_board_links,		&imx8ulpevk9_ftdi_eeprom_user_area_info,	9000},
 	{"imx8ulpwatchval",	imx8ulpwatchval_board,	null_boot_mode,			0,	NULL,				imx8ulpwatchval_power_groups,	null_board_links,		&imx8ulpwatchval_ftdi_eeprom_user_area_info,	500},
-	{"imx8ulpwatchref",	imx8ulpwatchref_board,	null_boot_mode,			0,	NULL,				NULL,				null_board_links,		NULL,						0},
+	{"imx8ulpwatchuwb",	imx8ulpwatchuwb_board,	null_boot_mode,			0,	NULL,				imx8ulpwatchuwb_power_groups,	null_board_links,		NULL,						0},
 	{"val_board_1",		val_board_1,		val_board_1_boot_modes,		2,	val_board_1_boot_config,	val_board_1_power_groups,	null_board_links,		&val_board_1_ftdi_eeprom_user_area_info,	500},
 	{"val_board_2",		val_board_2,		val_board_2_boot_modes,		0,	NULL,				val_board_2_power_groups,	null_board_links,		&val_board_2_ftdi_eeprom_user_area_info,	500},
 	{"imx91qsb",		imx91qsb_board,		imx91qsb_board_boot_modes,	0,	NULL,				NULL,				null_board_links,		&imx91qsb_ftdi_eeprom_user_area_info,		500},
