@@ -1993,9 +1993,10 @@ GET_PATH2:
 			for (int x = 0; x < groups[k].num_of_members; x++)
 			{
 				int mi = groups[k].member_index[x];
+				double pnow_t = pnow[mi];
 				if (range_level[mi] == 0x01 || range_level[mi] == 0x11)
-					pnow[mi] /= 1000;
-				groups[k].sum += pnow[mi];
+					pnow_t = pnow[mi] / 1000;
+				groups[k].sum += pnow_t;
 			}
 			groups[k].max = (groups[k].sum > groups[k].max) ? groups[k].sum : groups[k].max;
 			groups[k].min = (groups[k].sum < groups[k].min) ? groups[k].sum : groups[k].min;
