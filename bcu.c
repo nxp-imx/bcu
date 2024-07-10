@@ -930,7 +930,7 @@ static int initialize(struct options_setting* setting, int isreset)
 			continue;
 		}
 
-		if (setting->boot_mode_hex == -1 && strcmp(name, "mode_dir") == 0)
+		if (setting->boot_mode_hex == -1 && strcmp(name, "mode_dir") == 0 && isreset != INIT_WITHOUT_BOOTMODE)
 		{
 			output = board->mappings[get_gpio_id("mode_dir", board)].initinfo & 0xF ? 0 : 1;
 		}
