@@ -1672,7 +1672,7 @@ struct board_info board_list[] =
 	{"imx8ulpwatchuwb",	imx8ulpwatchuwb_board,	null_boot_mode,			0,	NULL,				imx8ulpwatchuwb_power_groups,	null_board_links,		NULL,						0},
 	{"val_board_1",		val_board_1,		val_board_1_boot_modes,		2,	val_board_1_boot_config,	val_board_1_power_groups,	null_board_links,		&val_board_1_ftdi_eeprom_user_area_info,	500},
 	{"val_board_2",		val_board_2,		val_board_2_boot_modes,		0,	NULL,				val_board_2_power_groups,	null_board_links,		&val_board_2_ftdi_eeprom_user_area_info,	500},
-	{"imx91qsb",		imx91qsb_board,		imx91qsb_board_boot_modes,	0,	NULL,				NULL,				null_board_links,		&imx91qsb_ftdi_eeprom_user_area_info,		500},
+	{"imx91qsb",		imx91qsb_board,		imx91qsb_board_boot_modes,	0,	NULL,				NULL,				null_board_links,		&imx91qsb_ftdi_eeprom_user_area_info,		9000},
 	{"imx91evk11",		imx93evk11b1_board,	imx91qsb_board_boot_modes,	0,	NULL,				imx93evk11_power_groups,	null_board_links,		&imx91evk11_ftdi_eeprom_user_area_info,		500},
 	{"imx93evk11",		imx93evk11_board,	imx93evk11_board_boot_modes,	0,	NULL,				imx93evk11_power_groups,	null_board_links,		&imx93evk11_ftdi_eeprom_user_area_info,		500},
 	{"imx93evk11b1",	imx93evk11b1_board,	imx93evk11_board_boot_modes,	0,	NULL,				imx93evk11_power_groups,	null_board_links,		&imx93evk11b1_ftdi_eeprom_user_area_info,	500},
