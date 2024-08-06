@@ -133,7 +133,7 @@ int ft_open_channel(struct ftdi_info* fi, int channel)
 	ep_data.sn = sn;
 
 	//change to use bus B, it should always be found, because it will not be used as COM port.
-	fi->FT_open(2, &fi->ftdi);
+	fi->FT_open(1, &fi->ftdi);
 	fi->FT_EEPROM_read(fi->ftdi, &ep_data);
 	fi->FT_close(fi->ftdi);
 
