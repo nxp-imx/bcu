@@ -1014,7 +1014,7 @@ GET_GPIO:
 		a++;
 	}
 
-	printf("resetting in: %fs\n", board->reset_time_ms / 1000.0);
+	printf("resetting in: %.2fs\n", (setting->hold ? setting->hold : board->reset_time_ms) / 1000.0);
 
 	gpio = get_gpio("reset", board);
 	mask = board->mappings[get_gpio_id("reset", board)].initinfo & 0xF;
