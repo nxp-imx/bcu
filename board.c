@@ -847,10 +847,6 @@ struct mapping imx91qsb_board[] = {
 	{"ft_sd_pwren",		gpio, IMX93EVK_GPIO_EXTENDER_PATH"/pca9655e{addr=0x21;port=1;pin_bitmask=0x20;opendrain=0;}", 0x11},
 	{"ft_sd_cd",		gpio, IMX93EVK_GPIO_EXTENDER_PATH"/pca9655e{addr=0x21;port=1;pin_bitmask=0x40;opendrain=0;}", 0x21},
 
-	{"ft_tst0",		gpio, "/ft4232h_gpio{channel=0;pin_bitmask=0x10}", 0x00},
-	{"ft_tst1",		gpio, "/ft4232h_gpio{channel=0;pin_bitmask=0x20}", 0x00},
-	{"ft_tst2",		gpio, "/ft4232h_gpio{channel=0;pin_bitmask=0x40}", 0x00},
-	{"ft_tst3",		gpio, "/ft4232h_gpio{channel=0;pin_bitmask=0x80}", 0x00},
 	{"ft_io_nint1",		gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x10}", 0x00},
 
 	{"93lcx6",		ftdi_eeprom, "/ft4232h_eeprom{uasize=0xFF}", 0x00},
