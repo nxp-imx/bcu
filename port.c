@@ -472,10 +472,13 @@ void ft_list_devices(char location_str[][MAX_LOCATION_ID_LENGTH], int *board_num
 
 			memset(serial, 0, sizeof(serial));
 
-			libusb_open(curdev->dev, &handle);
-			if (handle && desc.iSerialNumber)
-				libusb_get_string_descriptor_ascii(handle, desc.iSerialNumber, serial, 31);
-			libusb_close(handle);
+			ret = libusb_open(curdev->dev, &handle);
+			if (!ret)
+			{
+				if (handle && desc.iSerialNumber)
+					libusb_get_string_descriptor_ascii(handle, desc.iSerialNumber, serial, 31);
+				libusb_close(handle);
+			}
 		}
 
 		if (mode == LIST_DEVICE_MODE_PRINT)
