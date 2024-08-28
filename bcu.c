@@ -4055,7 +4055,8 @@ int main(int argc, char** argv)
 	}
 	else if (strcmp(cmd, "version") == 0)
 	{
-		print_version();
+		// skip the version print, because it has been printed at the beginning
+		// print_version();
 	}
 	else if (strcmp(cmd, "upgrade") == 0)
 	{
