@@ -179,11 +179,18 @@ int at24cxx_read(void* at24cxx, unsigned char* data_buffer, unsigned int startad
 		// printf("oh no! no ack received!\n");
 		return -10;
 	}
-	if (at24->type == EEPROM_TYPE_AT24C32)
-		parent->i2c_write(parent, 0, I2C_TYPE_AT24);
-	parent->i2c_write(parent, startaddr, I2C_TYPE_AT24);
+	if (at24->type == EEPROM_TYPE_AT24C32) {
+		status = parent->i2c_write(parent, 0, I2C_TYPE_AT24);
+		if (status)
+			return -10;
+	}
+	status = parent->i2c_write(parent, startaddr, I2C_TYPE_AT24);
+	if (status)
+		return -10;
 	parent->i2c_start(parent);
-	parent->i2c_write(parent, addr_plus_read, I2C_TYPE_AT24);
+	status = parent->i2c_write(parent, addr_plus_read, I2C_TYPE_AT24);
+	if (status)
+		return -10;
 	for (i = 0; i < size - 1; i++)
 		parent->i2c_read(parent, &data_buffer[i], 0, I2C_TYPE_AT24);
 	parent->i2c_read(parent, &data_buffer[i], 1, I2C_TYPE_AT24);
