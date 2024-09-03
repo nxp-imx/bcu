@@ -1652,6 +1652,75 @@ struct board_power_group bench_mcu_power_groups[] = {
 };
 
 
+#define IMX943EVK_POWER_PATH(group, sensor, addr, rsense1, rsense2) "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0xF0}/pac1934{group="#group";sensor="#sensor";addr="#addr";rsense1="#rsense1";rsense2="#rsense2"}"
+#define IMX943EVK_GPIO_EXTENDER_PATH "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0xF0}"
+struct mapping val_board_7_board[] = {
+	{"vdd1_1v8_lp4_mem",		power, IMX943EVK_POWER_PATH(1, 1, 0x11, 5, 5), 0x00},
+	{"vdd_ddr_0v8",			power, IMX943EVK_POWER_PATH(1, 2, 0x11, 5, 5), 0x00},
+	{"vdd_soc_lp",			power, IMX943EVK_POWER_PATH(1, 3, 0x11, 10, 10), 0x00},
+	{"nvcc_bbsm_1v8",		power, IMX943EVK_POWER_PATH(1, 4, 0x11, 10, 10), 0x00},
+	{"sense_vdd_soc",		power, IMX943EVK_POWER_PATH(2, 1, 0x12, 400, 400), 0x00},
+	{"nvcc_1v8_3v3_enet_ccm",	power, IMX943EVK_POWER_PATH(2, 2, 0x12, 10, 10), 0x00},
+	{"nvcc_sdio2",			power, IMX943EVK_POWER_PATH(2, 3, 0x12, 10, 10), 0x00},
+	{"nvcc_1v8_3v3_wakeup",		power, IMX943EVK_POWER_PATH(2, 4, 0x12, 250, 250), 0x00},
+	{"vdd_usb_3v3",			power, IMX943EVK_POWER_PATH(3, 1, 0x13, 100, 100), 0x00},
+	{"nvcc_3v3",			power, IMX943EVK_POWER_PATH(3, 2, 0x13, 100, 100), 0x00},
+	{"vdd2_lp4_1v1",		power, IMX943EVK_POWER_PATH(3, 3, 0x13, 400, 400), 0x00},
+	{"vdd2_lp4_1v1_mem",		power, IMX943EVK_POWER_PATH(3, 4, 0x13, 10, 10), 0x00},
+	{"vddq_ddr_0v8",		power, IMX943EVK_POWER_PATH(4, 1, 0x14, 50, 50), 0x00},
+	{"vrefh_1v8_adc",		power, IMX943EVK_POWER_PATH(4, 2, 0x14, 100, 100), 0x00},
+	{"vdd_ana_1v8",			power, IMX943EVK_POWER_PATH(4, 3, 0x14, 100, 100), 0x00},
+	{"vdd_ana_0v8",			power, IMX943EVK_POWER_PATH(4, 4, 0x14, 10000, 10000), 0x00},
+
+	{"boot_mode",		gpio, IMX943EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=0;pin_bitmask=0x0F;opendrain=0;}", 0x80},
+	{"ft_tst0",		gpio, IMX943EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=0;pin_bitmask=0x10;opendrain=0;}", 0x00},
+	{"ft_tst1",		gpio, IMX943EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=0;pin_bitmask=0x20;opendrain=0;}", 0x00},
+	{"ft_tst2",		gpio, IMX943EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=0;pin_bitmask=0x40;opendrain=0;}", 0x00},
+	{"tp77",		gpio, IMX943EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=0;pin_bitmask=0x80;opendrain=0;}", 0x00},
+	{"ft_por",		gpio, IMX943EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x01;opendrain=0;}", 0x00},
+	{"reset",		gpio, IMX943EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x02;opendrain=0;}", 0x70},
+	{"onoff",		gpio, IMX943EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x04;opendrain=0;}", 0x60},
+	{"remote_en",		gpio, IMX943EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x08;opendrain=0;}", 0x51},
+	{"mode_dir",		gpio, IMX943EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x10;opendrain=0;}", 0x41},
+	{"ft_sd2_pwren",	gpio, IMX943EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x20;opendrain=0;}", 0x11},
+	{"ft_sd2_cd",		gpio, IMX943EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x40;opendrain=0;}", 0x21},
+	{"ft_fta_sel",		gpio, IMX943EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x80;opendrain=0;}", 0x31},
+	{"ft_i2c_rpt_en",	gpio, IMX943EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=2;pin_bitmask=0x01;opendrain=0;}", 0x00},
+	{"ft_sd3_pwren",	gpio, IMX943EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=2;pin_bitmask=0x02;opendrain=0;}", 0x00},
+	{"brd_id0",		gpio, IMX943EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=2;pin_bitmask=0x20;opendrain=0;}", 0x00},
+	{"brd_id1",		gpio, IMX943EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=2;pin_bitmask=0x40;opendrain=0;}", 0x00},
+	{"brd_id2",		gpio, IMX943EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=2;pin_bitmask=0x80;opendrain=0;}", 0x00},
+
+	{"ft_io_rst1_b",	gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x08}", 0x00},
+	{"ft_io_int1_b",	gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x10}", 0x00},
+
+	{"93lcx6",		ftdi_eeprom, "/ft4232h_eeprom{uasize=0xFF}", 0x00},
+	{"temp",		temperature, "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}/pct2075{addr=0x48}", 0x00},
+
+	{NULL, 0, NULL, 0} //null terminated
+};
+
+struct boot_mode imx943_board_boot_modes[] = {
+	{"a_usb", 0x01},
+	{"a_emmc", 0x02},
+	{"a_sd", 0x03},
+	{"a_nor", 0x04},
+	{"a_nand_2k", 0x05},
+	{"a_nand_4k", 0x06},
+	{"usb", 0x09},
+	{"emmc", 0x0a},
+	{"sd", 0x0b},
+	{"nor", 0x0c},
+	{"nand_2k", 0x0d},
+	{"nand_4k", 0x0e},
+	{NULL, 0}
+};
+
+struct board_power_group imx943fval_power_groups[] = {
+	{NULL, 0}
+};
+
+
 struct board_info board_list[] =
 {
 	{"imx8dxlevk",		imx8xxl,		imx8xxl_boot_modes,		0,	NULL,				imx8xxl_power_groups,		imx8xxlevk_board_links,		&imx8dxlevk_ftdi_eeprom_user_area_info,		500},
@@ -1686,6 +1755,7 @@ struct board_info board_list[] =
 	{"bench_imx8qxp_revB",	bench_imx8qxp_revB_board, bench_imx8qxp_revB_boot_modes, 0,	NULL,				bench_imx8qxp_revB_power_groups, null_board_links,		&bench_imx8qxp_revB_ftdi_eeprom_user_area_info,	500},
 	{"bench_imx8mq",	bench_imx8mq_board,	bench_imx8mq_boot_modes,	0,	NULL,				bench_imx8mq_power_groups,	null_board_links,		&bench_imx8mq_ftdi_eeprom_user_area_info,	500},
 	{"bench_mcu",		bench_mcu_board,	null_boot_mode,			0,	NULL,				bench_mcu_power_groups,		null_board_links,		&bench_mcu_ftdi_eeprom_user_area_info,		500},
+	{"val_board_7",		val_board_7_board,	imx943_board_boot_modes,	0,	NULL,				NULL,				null_board_links,		&val_board_7_ftdi_eeprom_user_area_info,	500},
 	//"imx9xxl",&imx9xxl_pins,
 };
 int num_of_boards = sizeof(board_list) / sizeof(struct board_info);
