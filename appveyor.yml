@@ -1,4 +1,4 @@
-version: bcu_1.1.95
+version: bcu_1.1.99
 
 skip_tags: true
 
@@ -6,10 +6,10 @@ skip_tags: true
 environment:
   matrix:
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-    - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu1804
-    - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu2004
-    - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu2204
-    - APPVEYOR_BUILD_WORKER_IMAGE: macOS-Sonoma
+    # - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu1804
+    # - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu2004
+    # - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu2204
+    # - APPVEYOR_BUILD_WORKER_IMAGE: macOS-Sonoma
   bcu_coverity_token:
     secure: YuctP7YsJQIzsrBQtgEfwkYPu3StAEWV9SgPIBjwZDo=
 

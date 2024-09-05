@@ -71,7 +71,9 @@ struct ftdi_eeprom_field_code_tb ftdi_eeprom_field[] = {
 	{ftdi_eeprom_board_id, 0x1c, "NXP i.MX93 14x14 EVK Board"},
 	{ftdi_eeprom_board_id, 0x1d,"NXP VAL_BOARD_5 Board"},
 	{ftdi_eeprom_board_id, 0x1e,"NXP VAL_BOARD_6 Board"},
-	{ftdi_eeprom_board_id, 0x1F,"NXP VAL_BOARD_8 Board"},
+	{ftdi_eeprom_board_id, 0x1f, "NXP VAL_BOARD_7 Board"},
+  {ftdi_eeprom_board_id, 0x20,"NXP BENCH_IMX6ULL Board"},
+  {ftdi_eeprom_board_id, 0x21,"NXP VAL_BOARD_8 Board"},
 
 	{ftdi_eeprom_soc_id, 0x1, "i.MX8DXL"},
 	{ftdi_eeprom_soc_id, 0x2, "i.MX8MP"},
@@ -92,7 +94,9 @@ struct ftdi_eeprom_field_code_tb ftdi_eeprom_field[] = {
 	{ftdi_eeprom_soc_id, 0x11, "i.MX91"},
 	{ftdi_eeprom_soc_id, 0x12, "VAL_BOARD_5 SOC"},
 	{ftdi_eeprom_soc_id, 0x13, "VAL_BOARD_6 SOC"},
-	{ftdi_eeprom_soc_id, 0x14, "VAL_BOARD_8 SOC"},
+	{ftdi_eeprom_soc_id, 0x14, "i.MX943"},
+  {ftdi_eeprom_soc_id, 0x15, "BENCH_IMX6ULL SOC"},
+  {ftdi_eeprom_soc_id, 0x16, "VAL_BOARD_8 SOC"},
 
 	{ftdi_eeprom_pmic_id, 0x1, "PPF7100BVMA1ES"},  //On imx8dxl-evk
 	{ftdi_eeprom_pmic_id, 0x2, "PCA9450CHN"},  //On imx8mpevk-cpu and imx8mpevk-cpu-pwr
@@ -117,7 +121,9 @@ struct ftdi_eeprom_field_code_tb ftdi_eeprom_field[] = {
 	{ftdi_eeprom_pmic_id, 0x15, "PCA9452"},  //On imx93 14x14 evk
 	{ftdi_eeprom_pmic_id, 0x16, "VAL_BOARD_5 PMIC"},  //
 	{ftdi_eeprom_pmic_id, 0x17, "VAL_BOARD_6 PMIC"},  //
-	{ftdi_eeprom_pmic_id, 0x18, "VAL_BOARD_8 PMIC"},  //
+	{ftdi_eeprom_pmic_id, 0x18, "MFS5600"},  //On val_board_7
+  {ftdi_eeprom_pmic_id, 0x19, "BENCH_IMX6ULL PMIC"},  //
+  {ftdi_eeprom_pmic_id, 0x20, "VAL_BOARD_8 PMIC"},  //
 
 	{0, 0, NULL}//null terminated
 };
@@ -392,6 +398,15 @@ struct ftdi_eeprom_user_area val_board_6_ftdi_eeprom_user_area_info = {
 	1
 };
 
+struct ftdi_eeprom_user_area val_board_7_ftdi_eeprom_user_area_info = {
+	0x1,		//config
+	0x1f, 0x0, 0x0,	//board_id, board_rev_number, board_rev_char
+	0x14, 0x0, 0x0,	//soc_id, soc_rev_number, soc_rev_char
+	0x18, 0xf, 0xf,	//pmic_id, pmic_rev_number, pmic_rev_char
+	7,				//no of power rails
+	1
+};
+
 struct ftdi_eeprom_user_area bench_imx6ull_revB_ftdi_eeprom_user_area_info = {
 	0x1,		//config
 	0x1E, 0x1, 0x1,	//board_id, board_rev_number, board_rev_char
@@ -406,7 +421,7 @@ struct ftdi_eeprom_user_area val_board_8_ftdi_eeprom_user_area_info = {
 	0x1F, 0x3, 0xa,	//board_id, board_rev_number, board_rev_char
 	0x15, 0x1, 0x1,	//soc_id, soc_rev_number, soc_rev_char
 	0x18, 0x1, 0x1,	//pmic_id, pmic_rev_number, pmic_rev_char
-	7,				//no of power rails
+  7,				//no of power rails
 	1
 };
 
