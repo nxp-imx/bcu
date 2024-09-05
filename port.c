@@ -133,7 +133,7 @@ int ft_open_channel(struct ftdi_info* fi, int channel)
 	ep_data.sn = sn;
 
 	//change to use bus B, it should always be found, because it will not be used as COM port.
-	fi->FT_open(2, &fi->ftdi);
+	fi->FT_open(1, &fi->ftdi);
 	fi->FT_EEPROM_read(fi->ftdi, &ep_data);
 	fi->FT_close(fi->ftdi);
 
@@ -473,13 +473,13 @@ void ft_list_devices(char location_str[][MAX_LOCATION_ID_LENGTH], int *board_num
 			memset(serial, 0, sizeof(serial));
 
 			libusb_open(curdev->dev, &handle);
-			if (handle)
+			if (handle && desc.iSerialNumber)
 				libusb_get_string_descriptor_ascii(handle, desc.iSerialNumber, serial, 31);
 			libusb_close(handle);
 		}
 
 		if (mode == LIST_DEVICE_MODE_PRINT)
-			printf("board[%d] location_id=%s serial_no: %s\n", i, location_id[i], serial);
+			printf("board[%d] location_id=%s serial_no: %s\n", i, location_id[i], serial[0] == '\0' ? "N/A" : serial);
 		else
 			strcpy(location_str[i], location_id[i]);
 
