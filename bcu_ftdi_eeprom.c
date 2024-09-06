@@ -382,18 +382,18 @@ struct ftdi_eeprom_user_area imx95evk15_ftdi_eeprom_user_area_info = {
 
 struct ftdi_eeprom_user_area val_board_5_ftdi_eeprom_user_area_info = {
 	0x1,		//config
-	0x1c, 0x3, 0xa,	//board_id, board_rev_number, board_rev_char
+	0x1d, 0x3, 0xa,	//board_id, board_rev_number, board_rev_char
 	0x12, 0x1, 0x1,	//soc_id, soc_rev_number, soc_rev_char
-	0x15, 0x1, 0x1,	//pmic_id, pmic_rev_number, pmic_rev_char
+	0x16, 0x1, 0x1,	//pmic_id, pmic_rev_number, pmic_rev_char
 	6,				//no of power rails
 	1
 };
 
 struct ftdi_eeprom_user_area val_board_6_ftdi_eeprom_user_area_info = {
 	0x1,		//config
-	0x1D, 0x3, 0xa,	//board_id, board_rev_number, board_rev_char
+	0x1e, 0x3, 0xa,	//board_id, board_rev_number, board_rev_char
 	0x13, 0x1, 0x1,	//soc_id, soc_rev_number, soc_rev_char
-	0x16, 0x1, 0x1,	//pmic_id, pmic_rev_number, pmic_rev_char
+	0x17, 0x1, 0x1,	//pmic_id, pmic_rev_number, pmic_rev_char
 	6,				//no of power rails
 	1
 };
@@ -409,18 +409,18 @@ struct ftdi_eeprom_user_area val_board_7_ftdi_eeprom_user_area_info = {
 
 struct ftdi_eeprom_user_area bench_imx6ull_revB_ftdi_eeprom_user_area_info = {
 	0x1,		//config
-	0x1E, 0x1, 0x1,	//board_id, board_rev_number, board_rev_char
-	0x14, 0x1, 0x1,	//soc_id, soc_rev_number, soc_rev_char
-	0x17, 0x1, 0x1,	//pmic_id, pmic_rev_number, pmic_rev_char
+	0x20, 0x1, 0x1,	//board_id, board_rev_number, board_rev_char
+	0x15, 0x1, 0x1,	//soc_id, soc_rev_number, soc_rev_char
+	0x19, 0x1, 0x1,	//pmic_id, pmic_rev_number, pmic_rev_char
 	8,				//no of power rails
 	1
 };
 
 struct ftdi_eeprom_user_area val_board_8_ftdi_eeprom_user_area_info = {
 	0x1,		//config
-	0x1F, 0x3, 0xa,	//board_id, board_rev_number, board_rev_char
-	0x15, 0x1, 0x1,	//soc_id, soc_rev_number, soc_rev_char
-	0x18, 0x1, 0x1,	//pmic_id, pmic_rev_number, pmic_rev_char
+	0x21, 0x3, 0xa,	//board_id, board_rev_number, board_rev_char
+	0x16, 0x1, 0x1,	//soc_id, soc_rev_number, soc_rev_char
+	0x20, 0x1, 0x1,	//pmic_id, pmic_rev_number, pmic_rev_char
   7,				//no of power rails
 	1
 };
