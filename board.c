@@ -184,9 +184,6 @@ struct board_power_group imx8xxl_power_groups[] = {
 	{"GROUP_CUSTOM", "3v3_pmic_in,3v3_io,3v3_enet,vdd_usb_3v3"},
 	{"GROUP_on_board", "on_board_1v8,on_board_3v3,on_board_5v0"},
 	{"GROUP_1v8_6", "1v8_6"},
-
-
-
 	{NULL, 0}
 };
 
@@ -1298,7 +1295,6 @@ struct mapping nxp_custom_revB_board[] = {
 	// {"SR_J10_Rail",	gpio, NXP_CUSTOM_revB_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=0;pin_bitmask=0x10;opendrain=0;}", 0x00},
 	// {"SR_J11_Rail",	gpio, NXP_CUSTOM_revB_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=0;pin_bitmask=0x04;opendrain=0;}", 0x00},
 
- 
 	// {"boot_mode",		gpio, NXP_CUSTOM_revB_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=0;pin_bitmask=0x3F;opendrain=1;}", 0x10},
 	// // {"ft_por_b",		gpio, IMX93EVK_GPIO_EXTENDER_PATH"/pca9655e{addr=0x21;port=1;pin_bitmask=0x01;opendrain=0;}", 0x70},
 	{"reset",		gpio, NXP_CUSTOM_revB_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=0;pin_bitmask=0x01;opendrain=1;}", 0x21},
@@ -1307,7 +1303,6 @@ struct mapping nxp_custom_revB_board[] = {
 	// {"mode_dir",		gpio, IMX93EVK_GPIO_EXTENDER_PATH"/pca9655e{addr=0x21;port=1;pin_bitmask=0x10;opendrain=0;}", 0x31},
 	// {"ft_sd_pwren",		gpio, IMX93EVK_GPIO_EXTENDER_PATH"/pca9655e{addr=0x21;port=1;pin_bitmask=0x20;opendrain=0;}", 0x11},
 	// {"ft_sd_cd",		gpio, IMX93EVK_GPIO_EXTENDER_PATH"/pca9655e{addr=0x21;port=1;pin_bitmask=0x40;opendrain=0;}", 0x21},
-
 
 	{"ft_io_nint",	gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x08}", 0x00},
 	{"ft_io_nrst",	gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x10}", 0x00},
@@ -1446,7 +1441,6 @@ struct mapping bench_imx8qm_revB_board[] = {
 	{"SR_VCC_MEMC",	gpio, BENCH_IMX8QM_revB_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=0;pin_bitmask=0x40;opendrain=0;}", 0x00},
 	{"SR_VCC_1V8",	gpio, BENCH_IMX8QM_revB_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=0;pin_bitmask=0x10;opendrain=0;}", 0x00},
 	{"SR_VCC_3V3",	gpio, BENCH_IMX8QM_revB_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=0;pin_bitmask=0x04;opendrain=0;}", 0x00},
-
 
 	{"boot_mode",	gpio, BENCH_IMX8QM_revB_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=0;pin_bitmask=0x3F;opendrain=1;}", 0x10},//1-6
 	{"reset",		gpio, BENCH_IMX8QM_revB_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=0;pin_bitmask=0x40;opendrain=1;}", 0x21},//7
@@ -1589,7 +1583,6 @@ struct mapping val_board_4_board[] = {
 	{"DVDD33",		power, VAL_BOARD_4_POWER_SWITCH_PATH(6, 	2, 0x14, 20, 1, 180), 0x00},
 	{"VDDUSB",		power, VAL_BOARD_4_POWER_SWITCH_PATH(7, 	2, 0x15, 20, 1, 180), 0x00},
 	
-
 	{"SR_VDDCORE",	gpio, VAL_BOARD_4_GPIO_EXTENDER_PATH"/adp5585{addr=0x34;port=1;pin_bitmask=0x01;opendrain=0;active_level=1;}", 0x00},
 	{"SR_VDDRCORE",	gpio, VAL_BOARD_4_GPIO_EXTENDER_PATH"/adp5585{addr=0x34;port=1;pin_bitmask=0x02;opendrain=0;active_level=1;}", 0x00},
 	{"SR_VDDA18",	gpio, VAL_BOARD_4_GPIO_EXTENDER_PATH"/adp5585{addr=0x34;port=1;pin_bitmask=0x04;opendrain=0;active_level=1;}", 0x00},
@@ -1633,7 +1626,6 @@ struct mapping val_board_5_board[] = {
 	{"SR_VBAT_VDD",			gpio, VAL_BOARD_5_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x80;opendrain=0;}", 0x01},
 	{"SR_1.8V_DDR",			gpio, VAL_BOARD_5_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=2;pin_bitmask=0x02;opendrain=0;}", 0x01},
 	{"SR_5V_VDD_SOM",	gpio, VAL_BOARD_5_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=2;pin_bitmask=0x08;opendrain=0;}", 0x00},
-
 
 	// {"boot_mode",		gpio, VAL_BOARD_5_revB_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=0;pin_bitmask=0x3F;opendrain=1;}", 0x10},
 	{"reset",		gpio, VAL_BOARD_5_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=0;pin_bitmask=0x02;opendrain=1;}", 0x21},
@@ -1684,7 +1676,6 @@ struct mapping val_board_8_board[] = {
 	{"SR_SoC_DVDD1V8",			gpio, VAL_BOARD_8_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x80;opendrain=0;}", 0x00},
 	{"SR_VDDA_1V8",			gpio, VAL_BOARD_8_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=2;pin_bitmask=0x02;opendrain=0;}", 0x00},
 	{"SR_VDD_LPDDR4",	gpio, VAL_BOARD_8_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=2;pin_bitmask=0x08;opendrain=0;}", 0x00},
-
 
 	// {"boot_mode",		gpio, VAL_BOARD_8_revB_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=0;pin_bitmask=0x3F;opendrain=1;}", 0x10},
 	{"reset",		gpio, VAL_BOARD_8_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=0;pin_bitmask=0x02;opendrain=1;}", 0x21},
@@ -1791,8 +1782,6 @@ struct mapping bench_imx6ull_revB_board[] = {
 	{"SR_DCDC_3V3",			gpio, IMX6ULL_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=2;pin_bitmask=0x20;opendrain=0;}", 0x00},
 	{"SR_VDD_PLATFORM",		gpio, IMX6ULL_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=2;pin_bitmask=0x80;opendrain=0;}", 0x00},
 	
-
- 
 	// {"boot_mode",		gpio, IMX6ULL_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=0;pin_bitmask=0x3F;opendrain=1;}", 0x10},
 	// // {"ft_por_b",		gpio, IMX93EVK_GPIO_EXTENDER_PATH"/pca9655e{addr=0x21;port=1;pin_bitmask=0x01;opendrain=0;}", 0x70},
 	{"reset",		gpio, IMX6ULL_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=0;pin_bitmask=0x01;opendrain=1;}", 0x21},
@@ -1801,7 +1790,6 @@ struct mapping bench_imx6ull_revB_board[] = {
 	// {"mode_dir",		gpio, IMX93EVK_GPIO_EXTENDER_PATH"/pca9655e{addr=0x21;port=1;pin_bitmask=0x10;opendrain=0;}", 0x31},
 	// {"ft_sd_pwren",		gpio, IMX93EVK_GPIO_EXTENDER_PATH"/pca9655e{addr=0x21;port=1;pin_bitmask=0x20;opendrain=0;}", 0x11},
 	// {"ft_sd_cd",		gpio, IMX93EVK_GPIO_EXTENDER_PATH"/pca9655e{addr=0x21;port=1;pin_bitmask=0x40;opendrain=0;}", 0x21},
-
 
 	{"ft_io_nint",	gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x08}", 0x00},
 	{"ft_io_nrst",	gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x10}", 0x00},
