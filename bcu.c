@@ -2272,22 +2272,22 @@ GET_PATH2:
 
 				if (range_control != 2)
 				{
-					printf("%-9.4f ", cnow[k]);
-					printf("%-9.4f ", cavg[k]);
+					printf("%-9.2f ", cnow[k]);
+					printf("%-9.2f ", cavg[k]);
 					if (available_width - max_length > DISPLAY_WIDTH_MODE_3)
 					{
-						printf("%-7.4f ", cmax[k]);
-						printf("%-9.4f ", cmin[k]);
+						printf("%-7.2f ", cmax[k]);
+						printf("%-9.2f ", cmin[k]);
 					}
 				}
 				else
 				{
-					printf("%-9.4f ", cnow[k]);
-					printf("%-9.4f ", cavg[k]);
+					printf("%-9.2f ", cnow[k]);
+					printf("%-9.2f ", cavg[k]);
 					if (available_width - max_length > DISPLAY_WIDTH_MODE_3)
 					{
-						printf("%-9.4f ", cmax[k]);
-						printf("%-9.4f ", cmin[k]);
+						printf("%-9.2f ", cmax[k]);
+						printf("%-9.2f ", cmin[k]);
 					}
 				}
 
@@ -2297,12 +2297,12 @@ GET_PATH2:
 				printf("%s", g_vt_kcyn);
 				if (range_control != 2)
 				{
-					printf("%-9.4f ", pnow[k]);
-					printf("%-9.4f ", pavg[k]);
+					printf("%-9.2f ", pnow[k]);
+					printf("%-9.2f ", pavg[k]);
 					if (available_width - max_length > DISPLAY_WIDTH_MODE_2)
 					{
-						printf("%-7.4f ", pmax[k]);
-						printf("%-9.4f ", pmin[k]);
+						printf("%-7.2f ", pmax[k]);
+						printf("%-9.2f ", pmin[k]);
 					}
 				}
 				else
@@ -2369,10 +2369,10 @@ GET_PATH2:
 				}
 				else
 				{
-					printf("%-9.4f ", groups[k].sum);
-					printf("%-9.4f ", groups[k].avg);
-					printf("%-9.4f ", groups[k].max);
-					printf("%-9.4f", groups[k].min);
+					printf("%-9.2f ", groups[k].sum);
+					printf("%-9.2f ", groups[k].avg);
+					printf("%-9.2f ", groups[k].max);
+					printf("%-9.2f", groups[k].min);
 				}
 				printf("%s", g_vt_default);
 				printf(" |");
