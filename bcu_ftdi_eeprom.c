@@ -75,6 +75,7 @@ struct ftdi_eeprom_field_code_tb ftdi_eeprom_field[] = {
   	{ftdi_eeprom_board_id, 0x20,"NXP BENCH_IMX6ULL Board"},
   	{ftdi_eeprom_board_id, 0x21,"NXP VAL_BOARD_8 Board"},
 	{ftdi_eeprom_board_id, 0x22,"NXP VAL_BOARD_9 Board"},
+	{ftdi_eeprom_board_id, 0x23,"NXP VAL_BOARD_10 Board"},
 
 	{ftdi_eeprom_soc_id, 0x1, "i.MX8DXL"},
 	{ftdi_eeprom_soc_id, 0x2, "i.MX8MP"},
@@ -99,6 +100,7 @@ struct ftdi_eeprom_field_code_tb ftdi_eeprom_field[] = {
   	{ftdi_eeprom_soc_id, 0x15, "BENCH_IMX6ULL SOC"},
   	{ftdi_eeprom_soc_id, 0x16, "VAL_BOARD_8 SOC"},
 	{ftdi_eeprom_soc_id, 0x17, "VAL_BOARD_9 SOC"},
+	{ftdi_eeprom_soc_id, 0x18, "VAL_BOARD_10 SOC"},
 
 	{ftdi_eeprom_pmic_id, 0x1, "PPF7100BVMA1ES"},  //On imx8dxl-evk
 	{ftdi_eeprom_pmic_id, 0x2, "PCA9450CHN"},  //On imx8mpevk-cpu and imx8mpevk-cpu-pwr
@@ -127,6 +129,7 @@ struct ftdi_eeprom_field_code_tb ftdi_eeprom_field[] = {
   	{ftdi_eeprom_pmic_id, 0x19, "BENCH_IMX6ULL PMIC"},  //
   	{ftdi_eeprom_pmic_id, 0x20, "VAL_BOARD_8 PMIC"},  //
 	{ftdi_eeprom_pmic_id, 0x21, "VAL_BOARD_9 PMIC"},  //
+	{ftdi_eeprom_pmic_id, 0x22, "VAL_BOARD_10 PMIC"},  //
 
 	{0, 0, NULL}//null terminated
 };
@@ -434,6 +437,15 @@ struct ftdi_eeprom_user_area val_board_9_ftdi_eeprom_user_area_info = {
 	0x17, 0x1, 0x1,	//soc_id, soc_rev_number, soc_rev_char
 	0x21, 0x1, 0x1,	//pmic_id, pmic_rev_number, pmic_rev_char
   	10,				//no of power rails
+	1
+};
+
+struct ftdi_eeprom_user_area val_board_10_ftdi_eeprom_user_area_info = {
+	0x1,		//config
+	0x23, 0x3, 0xa,	//board_id, board_rev_number, board_rev_char
+	0x18, 0x1, 0x1,	//soc_id, soc_rev_number, soc_rev_char
+	0x22, 0x1, 0x1,	//pmic_id, pmic_rev_number, pmic_rev_char
+  	0,				//no of power rails
 	1
 };
 
