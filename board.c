@@ -2013,9 +2013,11 @@ struct board_power_group val_board_10_power_groups[] = {
 };
 
 struct boot_mode val_board_10_boot_modes[] = {
+	{"fuse_imx8qm", 0x00},
+	{"usb_imx8qm", 0x04},
 	{"emmc_imx8qm", 0x08},
 	{"sd_imx8qm", 0x0C},
-	{"usb_imx8qm", 0x04},
+	{"qspi_imx8qm", 0x18},
 	{NULL, 0}
 };
 
