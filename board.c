@@ -1527,13 +1527,13 @@ struct board_power_group bench_imx8qxp_power_groups[] = {
 #define BENCH_IMX8QXP_revB_GPIO_EXTENDER_PATH "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0xF0}"
 
 struct mapping bench_imx8qxp_revB_board[] = {
-	{"VDD_PLATFORM",		power, BENCH_IMX8QXP_revB_POWER_PATH(1, 	1, 0x10, 20, 0), 0x00},
-	{"VCC_CPU",		power, BENCH_IMX8QXP_revB_POWER_SWITCH_PATH(2, 	2, 0x11, 20, 1, 996), 0x00},
-	{"VCC_GPU",		power, BENCH_IMX8QXP_revB_POWER_SWITCH_PATH(3, 	2, 0x12, 20, 1, 996), 0x00},
-	{"VCC_MAIN",		power, BENCH_IMX8QXP_revB_POWER_SWITCH_PATH(4, 	2, 0x13, 20, 1, 519), 0x00},
-	{"VCC_DDRIO",		power, BENCH_IMX8QXP_revB_POWER_SWITCH_PATH(5, 	2, 0x14, 20, 1, 519), 0x00},
-	{"VCC_1V8",		power, BENCH_IMX8QXP_revB_POWER_SWITCH_PATH(6, 	2, 0x15, 20, 1, 519), 0x00},
-	{"VCC_3V3",		power, BENCH_IMX8QXP_revB_POWER_SWITCH_PATH(7, 	2, 0x16, 20, 1, 519), 0x00},
+	{"VDD_PLATFORM",power, BENCH_IMX8QXP_revB_POWER_PATH(1, 	1, 0x10, 20, 0), 0x00},//J1
+	{"VCC_CPU",		power, BENCH_IMX8QXP_revB_POWER_SWITCH_PATH(2, 	2, 0x11, 20, 1, 996), 0x00},//J2//L7
+	{"VCC_GPU",		power, BENCH_IMX8QXP_revB_POWER_SWITCH_PATH(3, 	2, 0x12, 20, 1, 996), 0x00},//J3//L4
+	{"VCC_MAIN",	power, BENCH_IMX8QXP_revB_POWER_SWITCH_PATH(4, 	2, 0x13, 20, 1, 519), 0x00},//J4//L1+L2
+	{"VCC_DDRIO",	power, BENCH_IMX8QXP_revB_POWER_SWITCH_PATH(5, 	2, 0x14, 20, 1, 519), 0x00},//J5//L6
+	{"VCC_1V8",		power, BENCH_IMX8QXP_revB_POWER_SWITCH_PATH(6, 	2, 0x15, 20, 1, 519), 0x00},//J6//L5
+	{"VCC_3V3",		power, BENCH_IMX8QXP_revB_POWER_SWITCH_PATH(7, 	2, 0x16, 20, 1, 519), 0x00},//J7//L3
 	
 	{"SR_VCC_CPU",	gpio, BENCH_IMX8QXP_revB_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x08;opendrain=0;}", 0x00},
 	{"SR_VCC_GPU",	gpio, BENCH_IMX8QXP_revB_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x20;opendrain=0;}", 0x00},
@@ -1542,12 +1542,13 @@ struct mapping bench_imx8qxp_revB_board[] = {
 	{"SR_VCC_1V8",	gpio, BENCH_IMX8QXP_revB_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=2;pin_bitmask=0x08;opendrain=0;}", 0x00},
 	{"SR_VCC_3V3",	gpio, BENCH_IMX8QXP_revB_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=2;pin_bitmask=0x20;opendrain=0;}", 0x00},
 	
-	{"boot_mode",		gpio, BENCH_IMX8QXP_revB_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=0;pin_bitmask=0x0F;opendrain=1;}", 0x10},
-	{"reset",		gpio, BENCH_IMX8QXP_revB_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=0;pin_bitmask=0x10;opendrain=1;}", 0x21},
-	{"onoff",		gpio, BENCH_IMX8QXP_revB_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x02;opendrain=1;}", 0x31},
-	{"remote_en",		gpio, BENCH_IMX8QXP_revB_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=0;pin_bitmask=0x80;opendrain=1;}", 0x41},
+	{"boot_mode",		gpio, BENCH_IMX8QXP_revB_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=0;pin_bitmask=0x0F;opendrain=1;}", 0x10},//1-4
+	{"reset",		gpio, BENCH_IMX8QXP_revB_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=0;pin_bitmask=0x10;opendrain=1;}", 0x21},//5
+	{"onoff",		gpio, BENCH_IMX8QXP_revB_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x02;opendrain=1;}", 0x31},//J1
+	{"remote_en",		gpio, BENCH_IMX8QXP_revB_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=0;pin_bitmask=0x80;opendrain=1;}", 0x41},//8
+	{"onoff_2",		gpio, BENCH_IMX8QXP_revB_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=2;pin_bitmask=0x01;opendrain=1;}", 0x51},//17
 
-	{"onoff_otg",		gpio, BENCH_IMX8QXP_revB_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=2;pin_bitmask=0x80;opendrain=1;}", 0x51},
+	{"onoff_otg",		gpio, BENCH_IMX8QXP_revB_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=2;pin_bitmask=0x80;opendrain=1;}", 0x51},//J8
 	
 	{"ft_io_nint",	gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x08}", 0x00},
 	{"ft_io_nrst",	gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x10}", 0x00},
