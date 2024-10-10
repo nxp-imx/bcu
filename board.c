@@ -2062,7 +2062,7 @@ struct board_info board_list[] =
 	{"bench_mcu",		bench_mcu_board,	null_boot_mode,			0,	NULL,				bench_mcu_power_groups,		null_board_links,		&bench_mcu_ftdi_eeprom_user_area_info,		500},
 	{"val_board_7",		val_board_7_board,	imx943_board_boot_modes,	0,	NULL,				NULL,				null_board_links,		&val_board_7_ftdi_eeprom_user_area_info,	500},
 	{"val_board_9",		val_board_9_board,		null_boot_mode,					0,	NULL,							val_board_9_power_groups,		null_board_links,			&val_board_9_ftdi_eeprom_user_area_info,			500},
-	{"val_board_10",	val_board_10_board,		val_board_10_boot_modes,					0,	NULL,					val_board_9_power_groups,		null_board_links,			&val_board_10_ftdi_eeprom_user_area_info,			500},
+	{"val_board_10",	val_board_10_board,		val_board_10_boot_modes,					0,	NULL,					val_board_10_power_groups,		null_board_links,			&val_board_10_ftdi_eeprom_user_area_info,			500},
 	//"imx9xxl",&imx9xxl_pins,
 };
 int num_of_boards = sizeof(board_list) / sizeof(struct board_info);
