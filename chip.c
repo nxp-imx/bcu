@@ -1010,7 +1010,7 @@ int pac1934_write_bipolar(void* pac1934, int value)
 	parent->i2c_start(parent);
 	if(parent->i2c_write(parent, addr_plus_write, I2C_TYPE_PAC1934))
 	{
-		printf("pac1934_write_bipolar: pac 1934 failure get ack\n");
+		printf("pac1934_write_bipolar: pac 1934 failure get ack, addr: 0x%x\n", pac->addr);
 		return -1;
 	};
 	parent->i2c_write(parent, PAC1934_REG_NEG_PWR_ADDR, I2C_TYPE_PAC1934);
@@ -1035,7 +1035,7 @@ int pac1934_write_no_skip(void* pac1934, int value)
 	parent->i2c_start(parent);
 	if(parent->i2c_write(parent, addr_plus_write, I2C_TYPE_PAC1934))
 	{
-		printf("pac1934_write_no_skip: pac 1934 failure get ack\n");
+		printf("pac1934_write_no_skip: pac 1934 failure get ack, addr: 0x%x\n", pac->addr);
 		return -1;
 	};
 	parent->i2c_write(parent, PAC1934_REG_CHANNEL_DIS_AND_SMBUS_ADDR, I2C_TYPE_PAC1934);
@@ -1061,7 +1061,7 @@ int pac1934_snapshot(void* pac1934)
 	parent->i2c_start(parent);
 	if(parent->i2c_write(parent, addr_plus_write, I2C_TYPE_PAC1934))
 	{
-		printf("pac1934_snapshot: pac 1934 failure get ack\n");
+		printf("pac1934_snapshot: pac 1934 failure get ack, addr: 0x%x\n", pac->addr);
 		return -1;
 	};
 	parent->i2c_write(parent, 0x00, I2C_TYPE_PAC1934); //refresh;
