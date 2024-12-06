@@ -76,6 +76,7 @@ struct ftdi_eeprom_field_code_tb ftdi_eeprom_field[] = {
 	{ftdi_eeprom_board_id, 0x21,"NXP VAL_BOARD_8 Board"},
 	{ftdi_eeprom_board_id, 0x22,"NXP VAL_BOARD_9 Board"},
 	{ftdi_eeprom_board_id, 0x23,"NXP VAL_BOARD_10 Board"},
+	{ftdi_eeprom_board_id, 0x24,"NXP i.MX943 19x19 EVK Board"},
 
 	{ftdi_eeprom_soc_id, 0x1, "i.MX8DXL"},
 	{ftdi_eeprom_soc_id, 0x2, "i.MX8MP"},
@@ -401,6 +402,15 @@ struct ftdi_eeprom_user_area val_board_6_ftdi_eeprom_user_area_info = {
 	0x13, 0x1, 0x1,	//soc_id, soc_rev_number, soc_rev_char
 	0x17, 0x1, 0x1,	//pmic_id, pmic_rev_number, pmic_rev_char
 	6,		//no of power rails
+	1
+};
+
+struct ftdi_eeprom_user_area imx943evk19_ftdi_eeprom_user_area_info = {
+	0x1,		//config
+	0x24, 0x0, 0x0,	//board_id, board_rev_number, board_rev_char
+	0x14, 0x0, 0x0,	//soc_id, soc_rev_number, soc_rev_char
+	0x18, 0xf, 0xf,	//pmic_id, pmic_rev_number, pmic_rev_char
+	19,		//no of power rails
 	1
 };
 
