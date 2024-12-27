@@ -288,5 +288,19 @@ void* adp5585_create(char* chip_specification, void* parent);
 int adp5585_set_direction(struct adp5585* pca, unsigned char value);
 int adp5585_set_output(struct adp5585* pca, unsigned char value);
 int adp5585_get_output(void* adp5585, unsigned char* current_output);
+////////////////////////////////////////////////////////////////////////
+struct pca9670 {
+	struct gpio_device gpio_device;
+	int addr;
+	int port;
+	unsigned char pin_bitmask; //specify which pin to use
+};
+int pca9670_read(void* pca9670, unsigned char* bit_value_buffer);
+int pca9670_write(void* pca9670, unsigned char bit_value);
+int pca9670_toggle(void* pca9670);
+void* pca9670_create(char* chip_specification, void* parent);
+int pca9670_set_direction(struct pca9670* pca, unsigned char value);
+int pca9670_set_output(struct pca9670* pca, unsigned char value);
+int pca9670_get_output(void* pca9670, unsigned char* current_output);
 
 #endif //CHIP_H

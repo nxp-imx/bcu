@@ -53,6 +53,7 @@ struct name_and_init_func chip_list[] =
 	"pca6416a", pca6416a_create,
 	"pca9655e", pca6416a_create,
 	"pcal6524h", pcal6524h_create,
+	"pca9670", pca9670_create,
 	"adp5585", adp5585_create,
 	"at24cxx", at24cxx_create,
 	"pct2075", pct2075_create,
@@ -2081,6 +2082,112 @@ int adp5585_get_output(void* adp5585, unsigned char* current_output)
 	if (bSucceed) return bSucceed;
 
 	*current_output = (*current_output) & adp->gpio_device.pin_bitmask;
+
+	return 0;
+}
+
+////////////////////////PCA9670//////////////////////////////////
+
+void* pca9670_create(char* chip_specification, void* parent)
+{
+	struct pca9670* pca = (struct pca9670*)malloc(sizeof(struct pca9670));
+	if (pca == NULL)
+	{
+		printf("malloc failed\n");
+		return NULL;
+	}
+	pca->gpio_device.device.parent = parent;
+	pca->gpio_device.gpio_read = pca9670_read;
+	pca->gpio_device.gpio_write = pca9670_write;
+	pca->gpio_device.gpio_get_output = pca9670_get_output;
+	pca->gpio_device.pin_bitmask = extract_parameter_value(chip_specification, "pin_bitmask");
+	pca->gpio_device.opendrain = extract_parameter_value(chip_specification, "opendrain");
+	pca->gpio_device.active_level = extract_parameter_value(chip_specification, "active_level");
+
+	pca->addr = extract_parameter_value(chip_specification, "addr");
+	pca->port = extract_parameter_value(chip_specification, "port");
+
+	return pca;
+}
+
+int pca9670_write(void* pca9670, unsigned char bit_value)
+{
+	struct pca9670* pca = pca9670;
+
+	return pca9670_set_output(pca, bit_value);
+}
+
+int pca9670_set_output(struct pca9670* pca9670, unsigned char bit_value)
+{
+	struct pca9670* pca = pca9670;
+	struct i2c_device* parent = (void*)pca->gpio_device.device.parent;
+	unsigned char addr_plus_write = (pca->addr << 1) + 0;
+	unsigned char addr_plus_read = (pca->addr << 1) + 1;
+	unsigned char current_output[1];
+	int bSucceed = 0;
+
+	bSucceed = parent->i2c_start(parent);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_write(parent, addr_plus_read, I2C_TYPE_GPIO);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_read(parent, current_output, 1, I2C_TYPE_GPIO);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_stop(parent);
+	if (bSucceed) return bSucceed;
+
+	unsigned char output_data = (current_output[0] & (~pca->gpio_device.pin_bitmask)) | (bit_value & pca->gpio_device.pin_bitmask);
+	//read current input register
+	bSucceed = parent->i2c_start(parent);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_GPIO);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_write(parent, output_data, I2C_TYPE_GPIO);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_stop(parent);
+	if (bSucceed) return bSucceed;
+
+	return 0;
+}
+
+int pca9670_read(void* pca9670, unsigned char* bit_value_buffer)
+{
+	struct pca9670* pca = pca9670;
+	struct i2c_device* parent = (void*)pca->gpio_device.device.parent;
+	unsigned char addr_plus_read = (pca->addr << 1) + 1;
+	int bSucceed = 0;
+
+	bSucceed = parent->i2c_start(parent);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_write(parent, addr_plus_read, I2C_TYPE_GPIO);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_read(parent, bit_value_buffer, 1, I2C_TYPE_GPIO);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_stop(parent);
+	if (bSucceed) return bSucceed;
+
+	//mask away unwanted value;
+	*bit_value_buffer = (*bit_value_buffer) & (pca->gpio_device.pin_bitmask);
+	return 0;
+}
+
+int pca9670_get_output(void* pca9670, unsigned char* current_output)
+{
+	struct pca9670* pca = pca9670;
+	struct i2c_device* parent = (void*)pca->gpio_device.device.parent;
+	unsigned char addr_plus_write = (pca->addr << 1) + 0;
+	unsigned char addr_plus_read = (pca->addr << 1) + 1;
+	int bSucceed = 0;
+
+	bSucceed = parent->i2c_start(parent);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_write(parent, addr_plus_read, I2C_TYPE_GPIO);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_read(parent, current_output, 1, I2C_TYPE_GPIO);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_stop(parent);
+	if (bSucceed) return bSucceed;
+
+	*current_output = (*current_output) & pca->gpio_device.pin_bitmask;
 
 	return 0;
 }
