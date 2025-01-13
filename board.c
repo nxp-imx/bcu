@@ -1874,7 +1874,7 @@ struct mapping imx943evk19_board[] = {
 	{"sw4_csense",		power, IMX943EVK_POWER_PATH(7, 4, 0x1A, 10, 10), 0x00},
 
 	{"boot_mode",		gpio, IMX943EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=0;pin_bitmask=0x0F;opendrain=0;}", 0x50},
-	{"mode_dir",		gpio, IMX943EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=0;pin_bitmask=0x10;opendrain=0;}", 0x20},
+	{"mode_dir",		gpio, IMX943EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=0;pin_bitmask=0x10;opendrain=0;}", 0x21},
 	{"remote_en",		gpio, IMX943EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=0;pin_bitmask=0x20;opendrain=0;}", 0x10},
 	{"onoff",		gpio, IMX943EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=0;pin_bitmask=0x40;opendrain=0;}", 0x31},
 	{"reset",		gpio, IMX943EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=0;pin_bitmask=0x80;opendrain=0;}", 0x41},
