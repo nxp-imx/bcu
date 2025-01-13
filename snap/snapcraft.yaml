@@ -74,7 +74,7 @@ parts:
     override-stage: |
       set -xe
       snapcraftctl stage
-      snapcraftctl set-version "1.1.103"
+      snapcraftctl set-version "1.1.105"
     filesets:
       docs-copyright:
       - usr/share/doc/*/copyright
