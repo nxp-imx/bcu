@@ -1853,7 +1853,7 @@ struct board_power_group bench_mcu_power_groups[] = {
 #define IMX943EVK_POWER_PATH(group, sensor, addr, rsense1, rsense2) "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0xF0}/pac1934{group="#group";sensor="#sensor";addr="#addr";rsense1="#rsense1";rsense2="#rsense2"}"
 #define IMX943EVK_GPIO_EXTENDER_PATH "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0xF0}"
 struct mapping imx943evk19_board[] = {
-	{"lp_vdd_soc",		power, IMX943EVK_POWER_PATH(1, 1, 0x11, 10000, 10000), 0x00},
+	{"lp_vdd_soc",		power, IMX943EVK_POWER_PATH(1, 1, 0x11, 200, 200), 0x00},
 	{"vdd_soc",		power, IMX943EVK_POWER_SWITCH_GROUP_PATH(6, 3, 0x17, 10, 1, 2, 5010), 0x00},
 	{"cpu_vdd_ddr",		power, IMX943EVK_POWER_SWITCH_GROUP_PATH(5, 3, 0x16, 10, 1, 3, 10010), 0x00},
 	{"cpu_vdd2h_ddr",	power, IMX943EVK_POWER_SWITCH_GROUP_PATH(6, 2, 0x17, 200, 2, 1, 10200), 0x00},
