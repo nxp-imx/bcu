@@ -50,6 +50,7 @@
 struct options_setting {
 	char board[100]; //indicating the model of the board, i.e. i.MX8QMEVK
 	int restore;
+	int keep_settings;
 	int auto_find_board;
 	int delay;
 	int hold;

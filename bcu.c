@@ -1022,7 +1022,7 @@ GET_GPIO:
 	if (gpio == NULL)
 	{
 		printf("reset: error building device linked list\n");
-		return;
+		goto err;
 	}
 
 	//delay
@@ -1060,7 +1060,7 @@ GET_GPIO:
 			if (gpio == NULL)
 			{
 				printf("reset: error building device linked list\n");
-				return;
+				goto err;
 			}
 			status |= gpio->gpio_write(gpio, 0xFF) << 2; //bootmode_sel high to disable it.
 			free_gpio(gpio);
@@ -1072,7 +1072,7 @@ GET_GPIO:
 			if (gpio == NULL)
 			{
 				printf("reset: error building device linked list\n");
-				return;
+				goto err;
 			}
 			status |= gpio->gpio_write(gpio, mask ? 0xFF : 0x00) << 3; //reset high
 			free_gpio(gpio);
@@ -1090,7 +1090,7 @@ GET_GPIO:
 			if (gpio == NULL)
 			{
 				printf("reset: error building device linked list\n");
-				return;
+				goto err;
 			}
 			status |= gpio->gpio_write(gpio, mask ? 0x00 : 0xFF) << 2; //remote_en low
 			if (!status)
@@ -1103,6 +1103,28 @@ GET_GPIO:
 		printf("reset failed, error = 0x%x\n", status);
 	else
 		printf("reset successfully\n");
+
+	return;
+
+err:
+	deinitialize(setting);
+	return;
+}
+
+static void reset_board(struct options_setting* setting)
+{
+	if (setting->keep_settings <= 0)
+		enable_exit_handler = 1;
+
+	reset(setting);
+
+	if (enable_exit_handler)
+	{
+		msleep(500);
+		deinitialize(setting);
+		printf("deinitialized the BCU settings, BOOTMODE returns to %sBOOT SWITCH%s.\n", g_vt_yellow, g_vt_default);
+		printf("use [%s-keep%s] to keep BCU settings after exited reset command\n", g_vt_green, g_vt_default);
+	}
 }
 
 static void onoff(struct options_setting* setting, int delay_ms, int is_init)
@@ -4052,7 +4074,7 @@ int main(int argc, char** argv)
 	}
 	else if (strcmp(cmd, "reset") == 0)
 	{
-		reset(&setting);
+		reset_board(&setting);
 	}
 	else if (strcmp(cmd, "onoff") == 0)
 	{
