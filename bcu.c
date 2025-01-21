@@ -1907,6 +1907,11 @@ GET_PATH2:
 				int sensor = pd->power_get_sensor(pd) - 1;
 				voltage = pac_data[group].vbus[sensor] - (pac_data[group].vsense[sensor] / 1000000);
 				current = pac_data[group].vsense[sensor] / pd->power_get_cur_res(pd);
+				if (current < -1000 && voltage < 0.4)
+				{
+					voltage = 0;
+					current = 0;
+				}
 				cnow_fwrite[j] = current;
 				pnow_fwrite[j] = current * voltage;
 
@@ -2231,6 +2236,8 @@ GET_PATH2:
 			{
 				int k = get_power_index_by_showid(m, board);
 				if (k < 0)
+					continue;
+				if (pavg[k] == 0 && times > 5)
 					continue;
 
 				//printf("%-10s|",board->mappings[name[k]].name);
