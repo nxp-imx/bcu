@@ -3750,6 +3750,20 @@ static int enable_vt_mode()
 #endif
 }
 
+void notice_print(struct options_setting* setting, char* cmd)
+{
+	if (!strcmp(setting->board, "imx943evk19"))
+		printf("\nPlease set SW7-1 as ON to ensure the proper functioning of the BCU!\n\n");
+
+	if (!strcmp(setting->board, "imx95evk19") &&
+	    !strcmp(cmd, "reset") &&
+	    setting->keep_settings) {
+		printf("\n%sNOTE:%s Use this command after reset command to use M7 UART:\n", g_vt_red, g_vt_default);
+		printf("    %s# ./bcu set_gpio ft_fta_sel 0 -board=imx95evk19%s\n", g_vt_red, g_vt_default);
+		printf("Please check BCU release note 3.7.1 section for more informations.\n\n");
+	}
+}
+
 void terminateBCU(void)
 {
 	ft4232h_i2c_remove_all(enable_exit_handler);
@@ -3951,6 +3965,8 @@ int main(int argc, char** argv)
 
 	if (setting.restore == 1)
 		enable_exit_handler = 1;
+
+	notice_print(&setting, cmd);
 
 	//check board eeprom
 	if (strcmp(setting.board, "imx8mpevk") &&
