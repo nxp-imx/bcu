@@ -2060,6 +2060,72 @@ struct boot_mode val_board_10_boot_modes[] = {
 	{NULL, 0}
 };
 
+#define VAL_BOARD_11_POWER_SWITCH_PATH(group, sensor1, addr, rsense1, sensor2, rsense2) "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0xF0}/pac1934{group="#group";sensor="#sensor1";addr="#addr";rsense1="#rsense1";sensor2="#sensor2";rsense2="#rsense2"}"
+#define VAL_BOARD_11_POWER_PATH(group, sensor, addr, rsense1, rsense2) "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0xF0}/pac1934{group="#group";sensor="#sensor";addr="#addr";rsense1="#rsense1";rsense2="#rsense2"}"
+#define VAL_BOARD_11_GPIO_EXTENDER_PATH "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0xF0}"
+
+struct mapping val_board_11_board[] = {
+	{"J1_Rail",	power, VAL_BOARD_11_POWER_PATH(1, 	1, 0x10, 20, 0), 0x00},
+	{"J2_Rail",	power, VAL_BOARD_11_POWER_PATH(2, 	1, 0x11, 20, 0), 0x00},
+	{"J3_Rail",	power, VAL_BOARD_11_POWER_PATH(3, 	1, 0x12, 20, 0), 0x00},
+	{"J4_Rail",	power, VAL_BOARD_11_POWER_PATH(4, 	1, 0x13, 20, 0), 0x00},
+	{"J1_Rail",	power, VAL_BOARD_11_POWER_PATH(5, 	1, 0x14, 20, 0), 0x00},
+	{"J2_Rail",	power, VAL_BOARD_11_POWER_PATH(6, 	1, 0x15, 20, 0), 0x00},
+	{"J3_Rail",	power, VAL_BOARD_11_POWER_PATH(7, 	1, 0x16, 20, 0), 0x00},
+	{"J4_Rail",	power, VAL_BOARD_11_POWER_PATH(8, 	1, 0x17, 20, 0), 0x00},
+	{"J1_Rail",	power, VAL_BOARD_11_POWER_PATH(9, 	1, 0x18, 20, 0), 0x00},
+	{"J2_Rail",	power, VAL_BOARD_11_POWER_PATH(10, 	1, 0x19, 20, 0), 0x00},
+	{"J3_Rail",	power, VAL_BOARD_11_POWER_PATH(11, 	1, 0x1a, 20, 0), 0x00},
+	{"J4_Rail",	power, VAL_BOARD_11_POWER_PATH(12, 	1, 0x1b, 20, 0), 0x00},
+	{"J1_Rail",	power, VAL_BOARD_11_POWER_PATH(13, 	1, 0x1c, 20, 0), 0x00},
+	{"J2_Rail",	power, VAL_BOARD_11_POWER_PATH(14, 	1, 0x1d, 20, 0), 0x00},
+	{"J3_Rail",	power, VAL_BOARD_11_POWER_PATH(15, 	1, 0x1e, 20, 0), 0x00},
+	{"J4_Rail",	power, VAL_BOARD_11_POWER_PATH(16, 	1, 0x1f, 20, 0), 0x00},
+	
+	{"J1",		gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x02;opendrain=1;}", 0x11},
+	{"J2",		gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x08;opendrain=1;}", 0x21},
+	{"J3",		gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x20;opendrain=1;}", 0x31},
+	{"J4",		gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x80;opendrain=1;}", 0x41},
+	{"J5",		gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=2;pin_bitmask=0x02;opendrain=1;}", 0x01},
+	{"J6",		gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=2;pin_bitmask=0x08;opendrain=1;}", 0x51},
+	{"J7",		gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=2;pin_bitmask=0x20;opendrain=1;}", 0x61},
+	{"J8",		gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=2;pin_bitmask=0x80;opendrain=1;}", 0x71},
+	{"J9",		gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=0;pin_bitmask=0x40;opendrain=1;}", 0x81},
+	{"J10",		gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=0;pin_bitmask=0x10;opendrain=1;}", 0x91},
+	{"J11",		gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=0;pin_bitmask=0x04;opendrain=1;}", 0xa1},
+	{"J12",		gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=0;pin_bitmask=0x01;opendrain=1;}", 0xb1},
+	{"J13",		gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x20;port=0;pin_bitmask=0x02;opendrain=1;}", 0xc1},
+	{"J14",		gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x20;port=0;pin_bitmask=0x08;opendrain=1;}", 0xd1},
+	{"J15",		gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x20;port=0;pin_bitmask=0x20;opendrain=1;}", 0xe1},
+	{"J16",		gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x20;port=0;pin_bitmask=0x80;opendrain=1;}", 0xf1},
+
+	{"ft_io_nint",	gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x08}", 0x00},
+	{"ft_io_nrst",	gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x10}", 0x00},
+	
+	{"ft_io_nint1",	gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x40}", 0x00},
+	{"ft_io_nrst1",	gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x20}", 0x00},
+	
+	{"ft_io_nint2",	gpio, "/ft4232h_gpio{channel=0;pin_bitmask=0x40}", 0x00},
+	{"ft_io_nrst2",	gpio, "/ft4232h_gpio{channel=0;pin_bitmask=0x80}", 0x00},
+
+	{"93lcx6",		ftdi_eeprom, "/ft4232h_eeprom{uasize=0xFF}", 0x00},
+	{"temp",		temperature, "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}/pct2075{addr=0x48}", 0x00},
+
+	{NULL, 0, NULL, 0} //null terminated
+};
+
+struct board_power_group val_board_11_power_groups[] = {
+	// {"GROUP_SOC", "J1_Rail,J2_Rail,J3_Rail,J4_Rail,J5_Rail,J6_Rail,J7_Rail,J8_Rail,J9_Rail,J10_Rail"},
+	{NULL, 0}
+};
+
+struct boot_mode val_board_11_boot_modes[] = {
+	{"emmc", 0x08},
+	{"sd", 0x0C},
+	{"serial", 0x04},
+	{NULL, 0}
+};
+
 struct board_info board_list[] =
 {
 	{"imx8dxlevk",		imx8xxl,		imx8xxl_boot_modes,		0,	NULL,				imx8xxl_power_groups,		imx8xxlevk_board_links,		&imx8dxlevk_ftdi_eeprom_user_area_info,		500},
@@ -2100,8 +2166,9 @@ struct board_info board_list[] =
 	{"bench_mcu",		bench_mcu_board,	null_boot_mode,			0,	NULL,				bench_mcu_power_groups,		null_board_links,		&bench_mcu_ftdi_eeprom_user_area_info,		500},
 	{"imx943evk19",		imx943evk19_board,	imx943_board_boot_modes,	0,	NULL,				NULL,				null_board_links,		&imx943evk19_ftdi_eeprom_user_area_info,	500},
 	{"val_board_7",		val_board_7_board,	imx943_board_boot_modes,	0,	NULL,				NULL,				null_board_links,		&val_board_7_ftdi_eeprom_user_area_info,	500},
-	{"val_board_9",		val_board_9_board,	null_boot_mode,			0,	NULL,				val_board_9_power_groups,	null_board_links,		&val_board_9_ftdi_eeprom_user_area_info,	500},
-	{"val_board_10",	val_board_10_board,	val_board_10_boot_modes,	0,	NULL,				val_board_10_power_groups,	null_board_links,		&val_board_10_ftdi_eeprom_user_area_info,	500},
+	{"val_board_9",		val_board_9_board,		null_boot_mode,					0,	NULL,							val_board_9_power_groups,		null_board_links,			&val_board_9_ftdi_eeprom_user_area_info,			500},
+	{"val_board_10",	val_board_10_board,		val_board_10_boot_modes,					0,	NULL,					val_board_10_power_groups,		null_board_links,			&val_board_10_ftdi_eeprom_user_area_info,			500},
+	{"val_board_11",	val_board_11_board,		val_board_11_boot_modes,					0,	NULL,					val_board_11_power_groups,		null_board_links,			&val_board_11_ftdi_eeprom_user_area_info,			500},
 	//"imx9xxl",&imx9xxl_pins,
 };
 int num_of_boards = sizeof(board_list) / sizeof(struct board_info);
