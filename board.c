@@ -1911,6 +1911,13 @@ struct mapping imx943evk19_board[] = {
 	{NULL, 0, NULL, 0} //null terminated
 };
 
+struct board_power_group imx943evk19_power_groups[] = {
+	{"GROUP_SOC", "lp_vdd_soc,vdd_soc,nvcc_bbsm,ana_0v8,cpu_1v8,cpu_3v3,cpu_vdd_ddr,cpu_vddq_ddr,cpu_vdd2h_ddr"},
+	{"GROUP_SOC_FULL", "lp_vdd_soc,vdd_soc,nvcc_bbsm,ana_0v8,cpu_1v8,cpu_3v3,cpu_vdd_ddr,cpu_vddq_ddr,cpu_vdd2h_ddr,sd_card_3v3,nvcc_sd2,vcc_1p8,vcc_3p3"},
+	{"GROUP_DRAM", "vdd2h_ddr,vcc_vddq_ddr,vcc_1p8"},
+	{NULL, 0}
+};
+
 struct mapping val_board_7_board[] = {
 	{"vdd1_1v8_lp4_mem",		power, IMX943EVK_POWER_PATH(1, 1, 0x11, 400, 400), 0x00},
 	{"vdd_ddr_0v8",			power, IMX943EVK_POWER_PATH(1, 2, 0x11, 10, 10), 0x00},
@@ -2164,7 +2171,7 @@ struct board_info board_list[] =
 	{"bench_imx8mq",	bench_imx8mq_board,	bench_imx8mq_boot_modes,	0,	NULL,				bench_imx8mq_power_groups,	null_board_links,		&bench_imx8mq_ftdi_eeprom_user_area_info,	500},
 	{"bench_imx6ull",	bench_imx6ull_revB_board, bench_imx6ull_revB_boot_modes, 0,	NULL,				bench_imx6ull_revB_power_groups, null_board_links,		&bench_imx6ull_revB_ftdi_eeprom_user_area_info,	500},
 	{"bench_mcu",		bench_mcu_board,	null_boot_mode,			0,	NULL,				bench_mcu_power_groups,		null_board_links,		&bench_mcu_ftdi_eeprom_user_area_info,		500},
-	{"imx943evk19",		imx943evk19_board,	imx943_board_boot_modes,	0,	NULL,				NULL,				null_board_links,		&imx943evk19_ftdi_eeprom_user_area_info,	500},
+	{"imx943evk19",		imx943evk19_board,	imx943_board_boot_modes,	0,	NULL,				imx943evk19_power_groups,				null_board_links,		&imx943evk19_ftdi_eeprom_user_area_info,	500},
 	{"val_board_7",		val_board_7_board,	imx943_board_boot_modes,	0,	NULL,				NULL,				null_board_links,		&val_board_7_ftdi_eeprom_user_area_info,	500},
 	{"val_board_9",		val_board_9_board,		null_boot_mode,					0,	NULL,							val_board_9_power_groups,		null_board_links,			&val_board_9_ftdi_eeprom_user_area_info,			500},
 	{"val_board_10",	val_board_10_board,		val_board_10_boot_modes,					0,	NULL,					val_board_10_power_groups,		null_board_links,			&val_board_10_ftdi_eeprom_user_area_info,			500},
