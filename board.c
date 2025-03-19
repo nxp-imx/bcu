@@ -1921,7 +1921,7 @@ struct board_power_group imx943evk19_power_groups[] = {
 struct mapping val_board_7_board[] = {
 	{"vdd1_1v8_lp4_mem",		power, IMX943EVK_POWER_PATH(1, 1, 0x11, 400, 400), 0x00},
 	{"vdd_ddr_0v8",			power, IMX943EVK_POWER_PATH(1, 2, 0x11, 10, 10), 0x00},
-	{"vdd_soc_lp",			power, IMX943EVK_POWER_PATH(1, 3, 0x11, 2000, 2000), 0x00},
+	{"vdd_soc_lp",			power, IMX943EVK_POWER_PATH(1, 3, 0x11, 100, 100), 0x00},
 	{"nvcc_bbsm_1v8",		power, IMX943EVK_POWER_PATH(1, 4, 0x11, 10000, 10000), 0x00},
 	{"vdd_soc",			power, IMX943EVK_POWER_PATH(2, 1, 0x12, 5, 5), 0x00},
 	{"nvcc_1v8_3v3_enet_ccm",	power, IMX943EVK_POWER_PATH(2, 2, 0x12, 100, 100), 0x00},
