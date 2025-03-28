@@ -32,7 +32,7 @@ license: BSD-3-Clause
 adopt-info: main
 assumes:
   - command-chain
-base: core18
+base: core20
 confinement: strict
 grade: stable
 
@@ -42,7 +42,7 @@ parts:
     source: snap/local/launchers
     plugin: dump
     organize:
-      '*': ../../main/install/bin/
+      '*': bin/
   main:
     source: https://github.com/NXPmicro/bcu.git
     source-depth: 50
@@ -69,7 +69,7 @@ parts:
       - libftdi1-dev
       - libyaml-0-2
       - libusb-1.0-0
-      - libssl1.0.0
+      - libssl-dev
       - openssl
     override-stage: |
       set -xe
