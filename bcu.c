@@ -81,7 +81,8 @@ extern struct board_info board_list[];
 int GV_MONITOR_TERMINATED = 0;
 static int enable_exit_handler = 0;
 
-char* g_vt_red = (char*)"\x1B[91m";
+char* g_vt_red = (char*)"\x1B[0;91m";
+char* g_vt_dark_red = (char*)"\x1B[2;91m";
 char* g_vt_green = (char*)"\x1B[92m";
 char* g_vt_yellow = (char*)"\x1B[93m";
 char* g_vt_kcyn = (char*)"\x1B[36m";
@@ -2356,7 +2357,12 @@ GET_PATH2:
 				}
 				else
 				{
-					printf("|[%s]%-8.2f [%s]%-8.2f", sr_level[k] ? "*" : " ", sr_level[k] ? cur_range[k] : unused_range[k], sr_level[k] ? " " : "*", sr_level[k] ? unused_range[k] : cur_range[k]);
+					printf("|%s[%s]%-8.2f %s[%s]%-8.2f", sr_level[k] ? g_vt_red : g_vt_dark_red,
+									     sr_level[k] ? "*" : " ",
+									     sr_level[k] ? cur_range[k] : unused_range[k],
+									     sr_level[k] ? g_vt_dark_red : g_vt_red,
+									     sr_level[k] ? " " : "*",
+									     sr_level[k] ? unused_range[k] : cur_range[k]);
 				}
 
 				printf("%s\n", g_vt_clear_line);
@@ -3759,6 +3765,7 @@ void notice_print(struct options_setting* setting, char* cmd)
 	    !strcmp(cmd, "reset") &&
 	    setting->keep_settings) {
 		printf("\n%sNOTE:%s Use this command after reset command to use M7 UART:\n", g_vt_red, g_vt_default);
+		printf("    %s# ./bcu reset [BOOTMODE] -keep -board=imx95evk19%s\n", g_vt_red, g_vt_default);
 		printf("    %s# ./bcu set_gpio ft_fta_sel 0 -board=imx95evk19%s\n", g_vt_red, g_vt_default);
 		printf("Please check BCU release note 3.7.1 section for more informations.\n\n");
 	}
