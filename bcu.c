@@ -1166,6 +1166,21 @@ static void onoff(struct options_setting* setting, int delay_ms, int is_init)
 		printf("onoff execute successfully\n");
 }
 
+static void onoff_board(struct options_setting* setting, int delay_ms, int is_init)
+{
+	if (setting->keep_settings <= 0)
+		enable_exit_handler = 1;
+
+	onoff(setting, delay_ms, is_init);
+
+	if (enable_exit_handler)
+	{
+		msleep(500);
+		deinitialize(setting);
+		printf("use [%s-keep%s] to keep BCU settings after exited onoff command\n", g_vt_green, g_vt_default);
+	}
+}
+
 static void uuu(struct options_setting* setting)
 {
 #ifndef __APPLE__
@@ -4101,7 +4116,7 @@ int main(int argc, char** argv)
 	}
 	else if (strcmp(cmd, "onoff") == 0)
 	{
-		onoff(&setting, setting.hold, INIT_NOW);
+		onoff_board(&setting, setting.hold, INIT_NOW);
 	}
 	else if (strcmp(cmd, "init") == 0)
 	{
