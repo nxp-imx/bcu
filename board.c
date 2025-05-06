@@ -2218,7 +2218,7 @@ struct board_info board_list[] =
 	{"bench_imx6ull",	bench_imx6ull_revB_board, bench_imx6ull_revB_boot_modes, 0,	NULL,				bench_imx6ull_revB_power_groups, null_board_links,		&bench_imx6ull_revB_ftdi_eeprom_user_area_info,	500},
 	{"bench_mcu",		bench_mcu_board,	null_boot_mode,			0,	NULL,				bench_mcu_power_groups,		null_board_links,		&bench_mcu_ftdi_eeprom_user_area_info,		500},
 	{"imx943evk19a0",	imx943evk19a0_board,	imx943_board_boot_modes,	0,	NULL,				imx943evk19_power_groups,	null_board_links,		&imx943evk19_ftdi_eeprom_user_area_info,	500},
-	{"imx943evk19b1",	imx943evk19b1_board,	imx943_board_boot_modes,	0,	NULL,				imx943evk19_power_groups,	null_board_links,		&imx943evk19_ftdi_eeprom_user_area_info,	500},
+	{"imx943evk19b1",	imx943evk19b1_board,	imx943_board_boot_modes,	0,	NULL,				imx943evk19_power_groups,	null_board_links,		&imx943evk19b1_ftdi_eeprom_user_area_info,	500},
 	{"val_board_7",		val_board_7_board,	imx943_board_boot_modes,	0,	NULL,				NULL,				null_board_links,		&val_board_7_ftdi_eeprom_user_area_info,	500},
 	{"val_board_9",		val_board_9_board,	null_boot_mode,			0,	NULL,				val_board_9_power_groups,	null_board_links,		&val_board_9_ftdi_eeprom_user_area_info,	500},
 	{"val_board_10",	val_board_10_board,	val_board_10_boot_modes,	0,	NULL,				val_board_10_power_groups,	null_board_links,		&val_board_10_ftdi_eeprom_user_area_info,	500},
