@@ -156,7 +156,6 @@
   <ItemGroup>
     <ClCompile Include="bcu.c" />
     <ClCompile Include="bcu_ftdi_eeprom.c" />
-    <ClCompile Include="bcu_https.c" />
     <ClCompile Include="bcu_parser.c" />
     <ClCompile Include="bcu_yaml.c" />
     <ClCompile Include="board.c" />
@@ -165,7 +164,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bcu_ftdi_eeprom.h" />
-    <ClInclude Include="bcu_https.h" />
     <ClInclude Include="bcu_yaml.h" />
     <ClInclude Include="board.h" />
     <ClInclude Include="chip.h" />

@@ -44,7 +44,7 @@ parts:
     organize:
       '*': bin/
   main:
-    source: https://github.com/NXPmicro/bcu.git
+    source: https://github.com/nxp-imx/bcu.git
     source-depth: 50
     build-snaps:
       - cmake
@@ -54,7 +54,6 @@ parts:
       - make
       - libftdi1-dev
       - libusb-1.0-0-dev
-      - libssl-dev
       - libyaml-dev
       - libncurses5-dev
       - libconfuse-dev
@@ -69,8 +68,6 @@ parts:
       - libftdi1-dev
       - libyaml-0-2
       - libusb-1.0-0
-      - libssl-dev
-      - openssl
     override-stage: |
       set -xe
       snapcraftctl stage
