@@ -1,0 +1,98 @@
+name: BCU CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+        configuration: [Release]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      # Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Initialize the sub-module
+      - name: Initialize submodules
+        run: git submodule update --init
+
+      # Install dependencies
+      - name: Install dependencies
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libyaml-dev libftdi1-dev libusb-1.0-0-dev
+
+      - name: Install dependencies (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew reinstall pkgconfig
+          export PATH="/usr/local/Cellar/pkg-config/0.29.2_3/bin:${PATH}"
+          brew reinstall libyaml
+          brew install libftdi
+          pkg-config --list-all
+
+      # Build Project
+      - name: Build
+        run: |
+          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+            cmake .
+          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+            export PATH="/usr/local/Cellar/pkg-config/0.29.2_3/bin:${PATH}"
+            cmake .
+          fi
+          make
+
+      # Windows build
+      - name: Build (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          msbuild Board_Control_Utilities.sln /p:Configuration=${{ matrix.configuration }} /verbosity:minimal
+
+      # Upload build artifacts
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bcu-artifacts
+          path: |
+            ${{ github.workspace }}/bcu.exe
+            ${{ github.workspace }}/bcu
+            ${{ github.workspace }}/bcu_mac
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      # Check out the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Download build artifacts
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: bcu-artifacts
+
+      # GitHub Releases
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ github.sha }}
+          release_name: Prebuild for ${{ github.sha }}
+          body: |
+            Prebuild for commit ${{ github.sha }}
+            Commit message: ${{ github.event.head_commit.message }}
+          draft: true
+          files: |
+            bcu.exe
+            bcu
+            bcu_mac
