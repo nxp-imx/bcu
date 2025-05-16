@@ -70,11 +70,6 @@ jobs:
         uses: microsoft/setup-msbuild@v1.1
         if: matrix.os == 'windows-latest'
 
-      - name: Install Windows SDK
-        if: matrix.os == 'windows-latest'
-        run: |
-          choco install windows-sdk-10.0 -y
-
       - name: Build step2 (Windows)
         if: matrix.os == 'windows-latest'
         run: |
