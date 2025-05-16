@@ -127,7 +127,7 @@ jobs:
 
       # GitHub Releases
       - name: Create GitHub Release
-        uses: actions/create-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: bcu_1.2.${{ github.run_number }}
           release_name: Prebuild for bcu_1.2.${{ github.run_number }}
@@ -139,3 +139,5 @@ jobs:
             artifacts/ubuntu-latest/bcu
             artifacts/macos-latest/bcu_mac
             artifacts/windows-latest/bcu.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
