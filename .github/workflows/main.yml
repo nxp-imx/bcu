@@ -1,0 +1,135 @@
+name: BCU CI
+
+on:
+  push:
+    tags:
+      - 'bcu_*'
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+        configuration: [Release]
+        platform: ['x64']
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      # Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Initialize the sub-module
+      - name: Initialize submodules
+        run: git submodule update --init
+
+      # Install dependencies
+      - name: Install dependencies
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libyaml-dev libftdi1-dev libusb-1.0-0-dev
+
+      - name: Install dependencies (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew reinstall pkgconfig
+          export PATH="/usr/local/Cellar/pkg-config/0.29.2_3/bin:${PATH}"
+          brew reinstall libyaml
+          brew install libftdi
+          pkg-config --list-all
+
+      - name: Create env variables (Linux/macOS)
+        if: matrix.os != 'windows-latest'
+        run: |
+          echo "CI_BUILD_VERSION=${{ github.ref_name }}" >> $GITHUB_ENV
+
+      - name: Create env variables (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          echo "CI_BUILD_VERSION=${{ github.ref_name }}" >> $env:GITHUB_ENV
+
+      # Build Project
+      - name: Build (Linux/macOS)
+        if: matrix.os != 'windows-latest'
+        run: |
+          echo $CI_BUILD_VERSION
+          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+            cmake .
+          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+            export PATH="/usr/local/Cellar/pkg-config/0.29.2_3/bin:${PATH}"
+            cmake .
+          fi
+          make
+
+      # Windows build
+      - name: Windows setup selection
+        uses: microsoft/setup-msbuild@v1.1
+        if: matrix.os == 'windows-latest'
+
+      - name: Build step2 (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          echo $env.CI_BUILD_VERSION
+          msbuild /p:Configuration=${{ matrix.configuration }} /p:PlatformToolset=v143 /p:Platform=${{ matrix.platform }} Board_Control_Utilities.sln
+
+      - name: Copy Board_Control_Utilities.exe to bcu.exe
+        if: matrix.os == 'windows-latest'
+        run: |
+          if (Test-Path "${{ github.workspace }}\x64\Release\Board_Control_Utilities.exe") {
+            Copy-Item "${{ github.workspace }}\x64\Release\Board_Control_Utilities.exe" "${{ github.workspace }}\bcu.exe"
+          }
+
+      # Upload build artifacts
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bcu-artifacts-${{ github.run_id }}-${{ matrix.os }}
+          path: |
+            ${{ github.workspace }}/bcu.exe
+            ${{ github.workspace }}/bcu
+            ${{ github.workspace }}/bcu_mac
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      # Check out the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Download build artifacts for all OS
+      - name: Download artifacts (Ubuntu)
+        uses: actions/download-artifact@v4
+        with:
+          name: bcu-artifacts-${{ github.run_id }}-ubuntu-latest
+          path: artifacts/ubuntu-latest
+
+      - name: Download artifacts (macOS)
+        uses: actions/download-artifact@v4
+        with:
+          name: bcu-artifacts-${{ github.run_id }}-macos-latest
+          path: artifacts/macos-latest
+
+      - name: Download artifacts (Windows)
+        uses: actions/download-artifact@v4
+        with:
+          name: bcu-artifacts-${{ github.run_id }}-windows-latest
+          path: artifacts/windows-latest
+
+      # GitHub Releases
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: Prebuild for ${{ github.ref_name }}
+          body: |
+            Prebuild for commit ${{ github.sha }}
+            Commit message: ${{ github.event.head_commit.message }}
+          draft: true
+          files: |
+            artifacts/ubuntu-latest/bcu
+            artifacts/macos-latest/bcu_mac
+            artifacts/windows-latest/bcu.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
