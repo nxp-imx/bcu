@@ -1,6 +1,6 @@
 # bcu (Board Control Utilities)
 
-[![Build status](https://ci.appveyor.com/api/projects/status/github/nxp-imx/bcu?svg=true)](https://ci.appveyor.com/project/nxpfrankli/bcu)
+[![Build status](https://github.com/nxp-imx/bcu/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/nxp-imx/bcu/actions/workflows/main.yml/badge.svg?branch=master)
 ![GitHub](https://img.shields.io/github/license/nxp-imx/bcu.svg)
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/18825/badge.svg)](https://scan.coverity.com/projects/nxpmicro-bcu)
 
@@ -16,7 +16,7 @@ ________________________________________________________________________________
 
 # **Running environment**
 
- - Windows 10, 64bit
+ - Windows 10/11, 64bit
     - Need install FTDI Driver for Windows.
     - Early Windows version(below 1.2.0) need install vs2017 redistribute package
 
@@ -37,7 +37,7 @@ ________________________________________________________________________________
 
  - Ubuntu 18.04 or above, 64bit, using binary provided from release page
     - Need install these libraries
-      - $ sudo apt-get install libftdi1-2 libyaml-dev openssl lsb_release(*only needed on 18.04*) libssl-dev libconfuse-dev
+      - $ sudo apt-get install libftdi1-2 libyaml-dev libconfuse-dev
     - If you do not want to run BCU as root in Linux, please follow the steps below to set the rules.
       - $ cd /etc/udev/rules.d/
       - $ sudo vim xx-ftdi.rules
@@ -64,34 +64,45 @@ ________________________________________________________________________________
 
 ## i.MX8MP-EVK
 
-- imx8mpevk: do not have power measurement function
-- imx8mpevkpwra0: have power measurement function
-- imx8mpevkpwra1: have power measurement function
-- imx8mpddr3l: VDB
-- imx8mpddr4: VDB
+- imx8mpevk
+- imx8mpevkpwra0
+- imx8mpevkpwra1
+- imx8mpddr3l
+- imx8mpddr4
 
 ## i.MX8DXL-EVK
 
-- imx8dxlevk: have power measurement function
-- imx8dxl_ddr3_evk: VDB
+- imx8dxlevk
+- imx8dxl_ddr3_evk
 - imx8dxl_obx
 
 ## i.MX8ULP-EVK
 
-- imx8ulpevk: have power measurement function
-- imx8ulpevk9: have power measurement function
-- imx8ulpwatchval: VDB
-
-## Val_board_x
-
-- val_board_1: VDB
-- val_board_2: VDB
-- val_board_3: VDB
+- imx8ulpevk
+- imx8ulpevk9
+- imx8ulpwatchval
+- imx8ulpwatchuwb
 
 ## i.MX93
 
-- imx93evk11/imx93evk11b1: have power measurement function
+- imx93evk11/imx93evk11b1
 - imx93qsb
+- imx93evk14
+
+## i.MX91
+
+- imx91evk11
+- imx91qsb
+
+## i.MX95
+
+- imx95evk19
+- imx95evk15
+
+## i.MX943
+
+- imx943evk19a0/imx943evk19b1
+
 
 _______________________________________________________________________________________________________
 
