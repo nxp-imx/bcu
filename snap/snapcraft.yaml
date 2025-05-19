@@ -71,7 +71,8 @@ parts:
     override-stage: |
       set -xe
       snapcraftctl stage
-      snapcraftctl set-version "1.1.118"
+      VERSION=$(cd ../project; git describe --tags --abbrev=0 | sed 's/^bcu_//')
+      snapcraftctl set-version "$VERSION"
     filesets:
       docs-copyright:
       - usr/share/doc/*/copyright
