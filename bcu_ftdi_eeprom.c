@@ -417,6 +417,15 @@ struct ftdi_eeprom_user_area imx943evk19_ftdi_eeprom_user_area_info = {
 	1
 };
 
+struct ftdi_eeprom_user_area imx943evk19b1_ftdi_eeprom_user_area_info = {
+	0x1,		//config
+	0x24, 0x1, 0x1,	//board_id, board_rev_number, board_rev_char
+	0x14, 0x0, 0x0,	//soc_id, soc_rev_number, soc_rev_char
+	0x18, 0xf, 0xf,	//pmic_id, pmic_rev_number, pmic_rev_char
+	19,		//no of power rails
+	1
+};
+
 struct ftdi_eeprom_user_area val_board_7_ftdi_eeprom_user_area_info = {
 	0x1,		//config
 	0x1f, 0x0, 0x0,	//board_id, board_rev_number, board_rev_char

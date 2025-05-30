@@ -1690,20 +1690,19 @@ void* pcal6524h_create(char* chip_specification, void* parent)
 	pca->addr = extract_parameter_value(chip_specification, "addr");
 	pca->port = extract_parameter_value(chip_specification, "port");
 
-	if (pca->gpio_device.opendrain <= 0)
-		pcal6524h_set_direction(pca, ~pca->gpio_device.pin_bitmask);
-	else
-		pcal6524h_set_output(pca, ~pca->gpio_device.pin_bitmask);
-
 	return pca;
 }
 
 int pcal6524h_write(void* pcal6524h, unsigned char bit_value)
 {
 	struct pcal6524h* pca = pcal6524h;
-	if (pca->gpio_device.opendrain > 0)
-		return pcal6524h_set_direction(pca, bit_value);
 
+	if (pca->gpio_device.opendrain > 0){
+		pcal6524h_set_output(pca, ~pca->gpio_device.pin_bitmask);
+		return pcal6524h_set_direction(pca, bit_value);
+	}
+
+	pcal6524h_set_direction(pca, ~pca->gpio_device.pin_bitmask);
 	return pcal6524h_set_output(pca, bit_value);
 }
 int pcal6524h_set_output(struct pcal6524h* pcal6524h, unsigned char bit_value)
@@ -1749,9 +1748,43 @@ int pcal6524h_set_output(struct pcal6524h* pcal6524h, unsigned char bit_value)
 	return 0;
 }
 
+int pcal6524h_get_direction(void* pcal6524h, unsigned char* bit_value_buffer)
+{
+	struct pcal6524h* pca = pcal6524h;
+	struct i2c_device* parent = (void*)pca->gpio_device.device.parent;
+	unsigned char addr_plus_write = (pca->addr << 1) + 0;
+	unsigned char addr_plus_read = (pca->addr << 1) + 1;
+	unsigned char input_cmd = (pca->port) + 0x0C; //x0Ch is the io configuration command
+	int bSucceed = 0;
+
+	bSucceed = parent->i2c_start(parent);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_GPIO);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_write(parent, input_cmd, I2C_TYPE_GPIO);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_start(parent);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_write(parent, addr_plus_read, I2C_TYPE_GPIO);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_read(parent, bit_value_buffer, 1, I2C_TYPE_GPIO);
+	if (bSucceed) return bSucceed;
+	bSucceed = parent->i2c_stop(parent);
+	if (bSucceed) return bSucceed;
+
+	if (pca->gpio_device.opendrain <= 0)
+		(*bit_value_buffer) = ~(*bit_value_buffer);
+
+	//mask away unwanted value;
+	*bit_value_buffer = (*bit_value_buffer) & (pca->gpio_device.pin_bitmask);
+	return 0;
+}
+
 int pcal6524h_read(void* pcal6524h, unsigned char* bit_value_buffer)
 {
 	struct pcal6524h* pca = pcal6524h;
+	if (pca->gpio_device.opendrain > 0)
+		return pcal6524h_get_direction(pca, bit_value_buffer);
 	struct i2c_device* parent = (void*)pca->gpio_device.device.parent;
 	unsigned char addr_plus_write = (pca->addr << 1) + 0;
 	unsigned char addr_plus_read = (pca->addr << 1) + 1;
@@ -1827,7 +1860,7 @@ int pcal6524h_toggle(void* pcal6524h)
 	unsigned char addr_plus_write = (pca->addr << 1) + 0;
 	unsigned char addr_plus_read = (pca->addr << 1) + 1;
 
-	unsigned char output_cmd = (pca->port) + 0x04; //x02h is the output command for port 0
+	unsigned char output_cmd = (pca->port) + 0x04; //x04h is the output command for port 0
 	unsigned char current_output[1];
 	int bSucceed = 0;
 
@@ -1869,7 +1902,7 @@ int pcal6524h_get_output(void* pcal6524h, unsigned char* current_output)
 	struct i2c_device* parent = (void*)pca->gpio_device.device.parent;
 	unsigned char addr_plus_write = (pca->addr << 1) + 0;
 	unsigned char addr_plus_read = (pca->addr << 1) + 1;
-	unsigned char output_cmd = (pca->port) + 0x04; //x02h is the output command for port 0
+	unsigned char output_cmd = (pca->port) + 0x04; //x04h is the output command for port 0
 	int bSucceed = 0;
 
 	if (pca->gpio_device.opendrain > 0)

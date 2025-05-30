@@ -32,7 +32,7 @@ license: BSD-3-Clause
 adopt-info: main
 assumes:
   - command-chain
-base: core18
+base: core20
 confinement: strict
 grade: stable
 
@@ -42,9 +42,9 @@ parts:
     source: snap/local/launchers
     plugin: dump
     organize:
-      '*': ../../main/install/bin/
+      '*': bin/
   main:
-    source: https://github.com/NXPmicro/bcu.git
+    source: https://github.com/nxp-imx/bcu.git
     source-depth: 50
     build-snaps:
       - cmake
@@ -54,7 +54,6 @@ parts:
       - make
       - libftdi1-dev
       - libusb-1.0-0-dev
-      - libssl-dev
       - libyaml-dev
       - libncurses5-dev
       - libconfuse-dev
@@ -69,12 +68,11 @@ parts:
       - libftdi1-dev
       - libyaml-0-2
       - libusb-1.0-0
-      - libssl1.0.0
-      - openssl
     override-stage: |
       set -xe
       snapcraftctl stage
-      snapcraftctl set-version "1.1.109"
+      VERSION=$(cd ../project; git describe --tags --abbrev=0 | sed 's/^bcu_//')
+      snapcraftctl set-version "$VERSION"
     filesets:
       docs-copyright:
       - usr/share/doc/*/copyright

@@ -57,7 +57,6 @@
 #include "board.h"
 #include "version.h"
 #include "bcu_yaml.h"
-#include "bcu_https.h"
 #include "bcu_ftdi_eeprom.h"
 
 #define DONT_RESET	0
@@ -81,7 +80,8 @@ extern struct board_info board_list[];
 int GV_MONITOR_TERMINATED = 0;
 static int enable_exit_handler = 0;
 
-char* g_vt_red = (char*)"\x1B[91m";
+char* g_vt_red = (char*)"\x1B[0;91m";
+char* g_vt_dark_red = (char*)"\x1B[2;91m";
 char* g_vt_green = (char*)"\x1B[92m";
 char* g_vt_yellow = (char*)"\x1B[93m";
 char* g_vt_kcyn = (char*)"\x1B[36m";
@@ -164,91 +164,6 @@ char* shellcmd(char* cmd, char* buff, int size)
 }
 #endif
 
-static void upgrade_bcu(struct options_setting* setting)
-{
-	printf("now version %s\n", GIT_VERSION);
-
-	int res = 0;
-	char version[15];
-	struct latest_git_info bcu_download_info;
-	strcpy(bcu_download_info.download_url_base, "https://github.com/nxp-imx/bcu/releases/download/");
-
-	if (setting->download_pre_release == 1)
-	{
-		if (https_get_by_url("https://api.github.com/repos/nxp-imx/bcu/releases", &bcu_download_info))
-		{
-			printf("Fail to get the latest pre-released BCU!\n");
-			return;
-		}
-	}
-	else
-	{
-		if (https_get_by_url("https://api.github.com/repos/nxp-imx/bcu/releases/latest", &bcu_download_info))
-		{
-			printf("Fail to get the latest released BCU!\n");
-			return;
-		}
-	}
-	https_response_parse(&bcu_download_info);
-
-	if (setting->download_doc)
-	{
-		strcpy(bcu_download_info.download_name, "BCU");
-		strcpy(bcu_download_info.extension_name, ".pdf");
-		https_download(&bcu_download_info);
-		return;
-	}
-
-	strcpy(bcu_download_info.download_name, "bcu");
-#if defined(linux)
-	char sysversion[15], sys_ver = 0;
-
-	memset(sysversion, 0, sizeof(sysversion));
-	shellcmd("lsb_release -r -s", sysversion, sizeof(sysversion));
-	sys_ver = (sysversion[0] - '0') * 10 + (sysversion[1] - '0');
-	switch (sys_ver)
-	{
-		case 22:
-			strcpy(bcu_download_info.extension_name, "_Ubuntu22");
-			break;
-		case 20:
-			strcpy(bcu_download_info.extension_name, "_Ubuntu20");
-			break;
-		case 18:
-			strcpy(bcu_download_info.extension_name, "_Ubuntu18");
-			break;
-		default:
-			printf("Unsupported OS version!\n");
-			return;
-	}
-#elif defined(__APPLE__)
-	strcpy(bcu_download_info.extension_name, "_mac");
-#else
-	strcpy(bcu_download_info.extension_name, ".exe");
-#endif
-
-	strncpy(version, GIT_VERSION, 11);
-	if (compare_version(&bcu_download_info.tag_name[4], &GIT_VERSION[4]) > 0 || setting->force)
-	{
-		printf("\nRelease Note for %s:\n%s\n\n", bcu_download_info.tag_name, bcu_download_info.release_note);
-		res = https_download(&bcu_download_info);
-#if defined(linux) || defined(__APPLE__)
-		if (!res)
-		{
-			char cmd[50] = { 0 }, filename[25] = { 0 };
-			strcat(filename, bcu_download_info.tag_name);
-			// strcat(filename, bcu_download_info.extension_name);
-			sprintf(cmd, "chmod a+x %s", filename);
-			system(cmd);
-		}
-#endif
-	}
-	else
-	{
-		printf("Latest release version is %s, no need to upgrade\n", bcu_download_info.tag_name);
-	}
-}
-
 static void print_help(char* cmd)
 {
 	if (cmd == NULL) {
@@ -256,8 +171,8 @@ static void print_help(char* cmd)
 		printf("%s\n\n", "bcu command [-options]");
 		printf("%s\n", "list of available commands:");
 		printf("	%s%-60s%s%s\n", g_vt_default, "reset  [BOOTMODE_NAME] [-hold=] [-board=/-auto] [-id=]", g_vt_green, "reset the board, and then boot from BOOTMODE_NAME");
-		printf("	%s%-60s%s%s\n", g_vt_default, "       [-boothex=] [-bootbin=]", g_vt_green, "or the boot mode value set by [-boothex=] [-bootbin=]");
-		printf("	%s%-60s%s%s\n", g_vt_default, "onoff  [-hold=] [-board=/-auto] [-id=]", g_vt_green, "press the ON/OFF button once for -hold= time(ms)");
+		printf("	%s%-60s%s%s\n", g_vt_default, "       [-boothex=] [-bootbin=] [-keep]", g_vt_green, "or the boot mode value set by [-boothex=] [-bootbin=]");
+		printf("	%s%-60s%s%s\n", g_vt_default, "onoff  [-hold=] [-board=/-auto] [-id=] [-keep]", g_vt_green, "press the ON/OFF button once for -hold= time(ms)");
 		printf("	%s%-60s%s%s\n", g_vt_default, "init   [BOOTMODE_NAME] [-board=/-auto] [-id=]", g_vt_green, "enable the remote control with a boot mode");
 		printf("	%s%-60s%s%s\n", g_vt_default, "deinit [BOOTMODE_NAME] [-board=/-auto] [-id=]", g_vt_green, "disable the remote control");
 		printf("\n");
@@ -284,11 +199,6 @@ static void print_help(char* cmd)
 		printf("	%s%-60s%s%s\n", g_vt_default, "lsboard", g_vt_green, "list all supported board models");
 		printf("	%s%-60s%s%s\n", g_vt_default, "lsbootmode [-board=/-auto]", g_vt_green, "show a list of available BOOTMODE_NAME of a board");
 		printf("	%s%-60s%s%s\n", g_vt_default, "lsgpio     [-board=/-auto]", g_vt_green, "show a list of available GPIO_NAME of a board");
-		printf("\n");
-		printf("	%s%-60s%s%s\n", g_vt_default, "upgrade    [-doc] [-f] [-pre]", g_vt_green, "get the latest BCU release");
-#ifndef __APPLE__
-		printf("	%s%-60s%s%s\n", g_vt_default, "uuu        [-doc]", g_vt_green, "download the latest UUU");
-#endif
 		printf("\n");
 		printf("	%s%-60s%s%s\n", g_vt_default, "version", g_vt_green, "print version number");
 		printf("	%s%-60s%s%s%s\n", g_vt_default, "-h,  help", g_vt_green, "show command details", g_vt_default);
@@ -1165,49 +1075,19 @@ static void onoff(struct options_setting* setting, int delay_ms, int is_init)
 		printf("onoff execute successfully\n");
 }
 
-static void uuu(struct options_setting* setting)
+static void onoff_board(struct options_setting* setting, int delay_ms, int is_init)
 {
-#ifndef __APPLE__
-	int res = 0;
-	struct latest_git_info uuu_download_info;
-	strcpy(uuu_download_info.download_url_base, "https://github.com/nxp-imx/mfgtools/releases/download/");
+	if (setting->keep_settings <= 0)
+		enable_exit_handler = 1;
 
-	if (https_get_by_url("https://api.github.com/repos/nxp-imx/mfgtools/releases", &uuu_download_info))
+	onoff(setting, delay_ms, is_init);
+
+	if (enable_exit_handler)
 	{
-		printf("Fail to get the latest UUU!\n");
-		return;
+		msleep(500);
+		deinitialize(setting);
+		printf("use [%s-keep%s] to keep BCU settings after exited onoff command\n", g_vt_green, g_vt_default);
 	}
-	https_response_parse(&uuu_download_info);
-
-	if (setting->download_doc)
-	{
-		strcpy(uuu_download_info.download_name, "UUU");
-		strcpy(uuu_download_info.extension_name, ".pdf");
-		https_download(&uuu_download_info);
-		return;
-	}
-
-	strcpy(uuu_download_info.download_name, "uuu");
-#if defined(linux)
-	strcpy(uuu_download_info.extension_name, "");
-#else
-	strcpy(uuu_download_info.extension_name, ".exe");
-#endif
-
-	printf("\nRelease Note for %s:\n%s\n\n", uuu_download_info.tag_name, uuu_download_info.release_note);
-	res = https_download(&uuu_download_info);
-#if defined(linux)
-	if (!res)
-	{
-		char cmd[30];
-		sprintf(cmd, "chmod a+x %s", uuu_download_info.tag_name);
-		system(cmd);
-	}
-#endif
-
-#else
-	printf("\nuuu is not support MacOS for now.\n");
-#endif
 }
 
 static int monitor_size(int columns_or_rows)
@@ -2356,7 +2236,12 @@ GET_PATH2:
 				}
 				else
 				{
-					printf("|[%s]%-8.2f [%s]%-8.2f", sr_level[k] ? "*" : " ", sr_level[k] ? cur_range[k] : unused_range[k], sr_level[k] ? " " : "*", sr_level[k] ? unused_range[k] : cur_range[k]);
+					printf("|%s[%s]%-8.2f %s[%s]%-8.2f", sr_level[k] ? g_vt_red : g_vt_dark_red,
+									     sr_level[k] ? "*" : " ",
+									     sr_level[k] ? cur_range[k] : unused_range[k],
+									     sr_level[k] ? g_vt_dark_red : g_vt_red,
+									     sr_level[k] ? " " : "*",
+									     sr_level[k] ? unused_range[k] : cur_range[k]);
 				}
 
 				printf("%s\n", g_vt_clear_line);
@@ -3752,13 +3637,14 @@ static int enable_vt_mode()
 
 void notice_print(struct options_setting* setting, char* cmd)
 {
-	if (!strcmp(setting->board, "imx943evk19"))
+	if (strcmp(setting->board, "imx943evk19a0") == 0)
 		printf("\nPlease set SW7-1 as ON to ensure the proper functioning of the BCU!\n\n");
 
 	if (!strcmp(setting->board, "imx95evk19") &&
 	    !strcmp(cmd, "reset") &&
 	    setting->keep_settings) {
 		printf("\n%sNOTE:%s Use this command after reset command to use M7 UART:\n", g_vt_red, g_vt_default);
+		printf("    %s# ./bcu reset [BOOTMODE] -keep -board=imx95evk19%s\n", g_vt_red, g_vt_default);
 		printf("    %s# ./bcu set_gpio ft_fta_sel 0 -board=imx95evk19%s\n", g_vt_red, g_vt_default);
 		printf("Please check BCU release note 3.7.1 section for more informations.\n\n");
 	}
@@ -4094,7 +3980,7 @@ int main(int argc, char** argv)
 	}
 	else if (strcmp(cmd, "onoff") == 0)
 	{
-		onoff(&setting, setting.hold, INIT_NOW);
+		onoff_board(&setting, setting.hold, INIT_NOW);
 	}
 	else if (strcmp(cmd, "init") == 0)
 	{
@@ -4104,18 +3990,10 @@ int main(int argc, char** argv)
 	{
 		deinitialize(&setting);
 	}
-	else if (strcmp(cmd, "uuu") == 0)
-	{
-		uuu(&setting);
-	}
 	else if (strcmp(cmd, "version") == 0)
 	{
 		// skip the version print, because it has been printed at the beginning
 		// print_version();
-	}
-	else if (strcmp(cmd, "upgrade") == 0)
-	{
-		upgrade_bcu(&setting);
 	}
 	else
 	{
