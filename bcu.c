@@ -2733,18 +2733,15 @@ GET_PATH2:
 		if (ch == ':') //special character used to know that data received by the BCU software should be transferred to the PTC device
 		{
 			int num = 0;
-			int start_time = 0;
-			int time = 0;
+			long unsigned int start_time = 0;
+			long unsigned int time = 0;
 			get_msecond(&start_time);
 			while ((ch = catch_input_char()) != '\n') {
 				if (ch >= '0' && ch <= '9') {
 					num = num * 10 + (ch - '0');
-				}else{
-					break;
 				}
 				get_msecond(&time);
 				if((time - start_time) > 500)break; //timeout 500ms
-
 			}
 			setting->ptc_temp = num / 100.0;
 			ptc_set_current_temperature(setting);
