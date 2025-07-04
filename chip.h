@@ -49,6 +49,7 @@ struct device {
 #define I2C_TYPE_PCA9548	2
 #define I2C_TYPE_AT24		3
 #define I2C_TYPE_TEMP		4
+#define I2C_TYPE_PTC		5
 
 struct i2c_device {
 	struct device device;
@@ -112,6 +113,19 @@ struct name_and_init_func {
 	char* name;
 	void* (*create_funcptr)(char*, void*);
 };
+struct ptc_device {
+	struct device device;
+	float (*ptc_read)(void*, unsigned int);
+	float (*ptc_write)(void*, unsigned char*, unsigned int, int);
+};
+///////////////////////////////////////////////////////////////////////
+struct ptc_revA {
+	struct ptc_device ptc_dev;
+	int addr;
+};
+void* ptc_revA_create(char* chip_specification, void* parent);
+float ptc_revA_read(void* ptc_revA, unsigned int register_addr);
+float ptc_revA_write(void* ptc_revA, unsigned char* data_buffer, unsigned int register_addr, int size);
 
 ///////////////////////////////////////////////////////////////////////
 struct pct2075 {

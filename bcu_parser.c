@@ -289,6 +289,9 @@ void set_options_default(struct options_setting* setting)
 	setting->eeprom_function = 0;
 	setting->download_doc = 0;
 	setting->download_pre_release = 0;
+	setting->ptc_temp = -100;
+	setting->ptc_onoff = -1;
+	setting->ptc_sensor = -1;
 }
 
 
@@ -564,6 +567,21 @@ int parse_options(char* cmd, int argc, char** argv, struct options_setting* sett
 		else if (strncmp(argv[i], "-board=", 7) == 0 && strlen(argv[i]) > 7)
 		{
 			//do nothing
+		}
+		else if (strncmp(argv[i], "-ptc_temp=", 6) == 0 && strlen(argv[i]) > 6)
+		{
+			setting->ptc_temp = atoi(input);
+			printf("CPU Current Temp is %f Celsius.\n", setting->ptc_temp);
+		}
+		else if (strncmp(argv[i], "-ptc_onoff=", 11) == 0)
+		{
+			setting->ptc_onoff = atoi(input);
+			printf("PTC is %d \n", setting->ptc_onoff);
+		}
+		else if (strncmp(argv[i], "-ptc_sensor=", 12) == 0 && strlen(argv[i]) > 12)
+		{
+			setting->ptc_sensor = atoi(input);
+			printf("PTC sensor is set to %d\n", setting->ptc_sensor);
 		}
 		else
 		{
