@@ -82,6 +82,9 @@ struct options_setting {
 	int download_pre_release;
 	char groups[MAX_NUMBER_OF_POWER * MAX_MAPPING_NAME_LENGTH];
 	int init;
+	float ptc_temp;
+	int ptc_onoff;
+	int ptc_sensor;
 };
 
 struct group {
