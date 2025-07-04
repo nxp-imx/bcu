@@ -360,6 +360,236 @@ void free_gpio(struct gpio_device* gpio)
 	return;
 }
 
+static void ptc_set_target_temperature(struct options_setting *setting)
+{
+	struct board_info *board = get_board(setting->board);
+	if (board == NULL)
+		return;
+	void *head = NULL;
+	void *end_point;
+	char path[MAX_PATH_LENGTH];
+	int status = -1;
+	if (strlen(setting->path) == 0)
+	{
+		if (get_path(path, "ptc", board) == -1)
+		{
+			printf("temperature: failed to find temperature path\n");
+			return;
+		}
+		end_point = build_device_linkedlist_forward(&head, path);
+	}
+	else
+	{
+		end_point = build_device_linkedlist_forward(&head, setting->path);
+	}
+	if (end_point == NULL)
+	{
+		printf("temperature: error building device linked list\n");
+		return;
+	}
+	struct ptc_device *ptc = end_point;
+	unsigned char data_buffer[2] = {0};
+	if (setting->ptc_temp != -100)
+	{
+		float degree = 0;
+		__uint16_t temperature = setting->ptc_temp * 100;
+		////////////////////////////////////////////////
+		data_buffer[1] = (char)(temperature >> 8);
+		data_buffer[0] = (char)temperature;
+		ptc->ptc_write(ptc, data_buffer, 0x00, 2); // set target temperature
+		degree = ptc->ptc_read(ptc, 0x00) / 100.0;
+		if (setting->ptc_temp != degree)
+		{
+			printf("Temperature cannot be set!\n");
+			exit(-1);
+		}
+		else
+		{
+			printf("Temperature was set to %.3f Celsius.\n", degree);
+		}
+	}
+	////////////////////////////////////////////////
+	if (setting->ptc_sensor != -1)
+	{
+		data_buffer[1] = (char)(setting->ptc_sensor >> 8);
+		data_buffer[0] = (char)setting->ptc_sensor;
+
+		ptc->ptc_write(ptc, data_buffer, 0x02, 2); // chose which sensor will be used in PID loop
+	}
+	////////////////////////////////////////////////
+	if (setting->ptc_onoff != -1)
+	{
+		if (setting->ptc_onoff == 1)
+		{
+			data_buffer[1] = 0;
+			data_buffer[0] = 1;
+			printf("PTC is power on!\n");
+		}
+		else
+		{
+			data_buffer[1] = 0;
+			data_buffer[0] = 0;
+			printf("PTC is power off!\n");
+		}
+		ptc->ptc_write(ptc, data_buffer, 0x03, 2); // activate the PID loop
+	}
+	free_device_linkedlist_backward(end_point);
+}
+
+static void ptc_set_current_temperature(struct options_setting *setting)
+{
+	struct board_info *board = get_board(setting->board);
+	if (board == NULL)
+		return;
+	void *head = NULL;
+	void *end_point;
+	char path[MAX_PATH_LENGTH];
+	int status = -1;
+	if (strlen(setting->path) == 0)
+	{
+		if (get_path(path, "ptc", board) == -1)
+		{
+			printf("temperature: failed to find temperature path\n");
+			return;
+		}
+		end_point = build_device_linkedlist_forward(&head, path);
+	}
+	else
+	{
+		end_point = build_device_linkedlist_forward(&head, setting->path);
+	}
+	if (end_point == NULL)
+	{
+		printf("temperature: error building device linked list\n");
+		return;
+	}
+	struct ptc_device *ptc = end_point;
+	unsigned char data_buffer[2] = {0};
+	float degree = 0;
+	__uint16_t temperature = setting->ptc_temp * 100;
+	////////////////////////////////////////////////
+	data_buffer[1] = (char)(temperature >> 8);
+	data_buffer[0] = (char)temperature;
+	ptc->ptc_write(ptc, data_buffer, 0x01, 2); // set current temperature
+	free_device_linkedlist_backward(end_point);
+}
+
+static void ptc_get_temperature(struct options_setting *setting) //
+{
+	struct board_info *board = get_board(setting->board);
+	if (board == NULL)
+		return;
+	void *head = NULL;
+	void *end_point;
+	char path[MAX_PATH_LENGTH];
+	int status = -1;
+	if (strlen(setting->path) == 0)
+	{
+		if (get_path(path, "ptc", board) == -1)
+		{
+			printf("temperature: failed to find temperature path\n");
+			return;
+		}
+		end_point = build_device_linkedlist_forward(&head, path);
+	}
+	else
+	{
+		end_point = build_device_linkedlist_forward(&head, setting->path);
+	}
+	if (end_point == NULL)
+	{
+		printf("temperature: error building device linked list\n");
+		return;
+	}
+	struct ptc_device *ptc = end_point;
+	float degree = 0;
+	degree = ptc->ptc_read(ptc, 0x01) / 100;
+	printf("PTC Temperature is %.3f Celsius.\n", degree);
+	free_device_linkedlist_backward(end_point);
+}
+
+static void ptc_get_is_stable(struct options_setting *setting) //
+{
+	struct board_info *board = get_board(setting->board);
+	if (board == NULL)
+		return;
+	void *head = NULL;
+	void *end_point;
+	char path[MAX_PATH_LENGTH];
+	int status = -1;
+	if (strlen(setting->path) == 0)
+	{
+		if (get_path(path, "ptc", board) == -1)
+		{
+			printf("temperature: failed to find temperature path\n");
+			return;
+		}
+		end_point = build_device_linkedlist_forward(&head, path);
+	}
+	else
+	{
+		end_point = build_device_linkedlist_forward(&head, setting->path);
+	}
+	if (end_point == NULL)
+	{
+		printf("temperature: error building device linked list\n");
+		return;
+	}
+	struct ptc_device *ptc = end_point;
+	__uint16_t is_stable = 0;
+	is_stable = ptc->ptc_read(ptc, 0x04);
+	if (is_stable == 1)
+	{
+		printf("PTC is stable!\r\n");
+	}
+	else
+	{
+		printf("PTC is not stable!\r\n");
+	}
+	free_device_linkedlist_backward(end_point);
+}
+
+static void ptc_get_is_enable(struct options_setting *setting) //
+{
+	struct board_info *board = get_board(setting->board);
+	if (board == NULL)
+		return;
+	void *head = NULL;
+	void *end_point;
+	char path[MAX_PATH_LENGTH];
+	int status = -1;
+	if (strlen(setting->path) == 0)
+	{
+		if (get_path(path, "ptc", board) == -1)
+		{
+			printf("temperature: failed to find temperature path\n");
+			return;
+		}
+		end_point = build_device_linkedlist_forward(&head, path);
+	}
+	else
+	{
+		end_point = build_device_linkedlist_forward(&head, setting->path);
+	}
+	if (end_point == NULL)
+	{
+		printf("temperature: error building device linked list\n");
+		return;
+	}
+	struct ptc_device *ptc = end_point;
+	__uint16_t is_stable = 0;
+	is_stable = ptc->ptc_read(ptc, 0x03);
+	if (is_stable == 1)
+	{
+		printf("PTC is enable!\r\n");
+	}
+	else
+	{
+		printf("PTC is disable!\r\n");
+	}
+	free_device_linkedlist_backward(end_point);
+}
+
 static void get_temp(struct options_setting* setting)//
 {
 	struct board_info* board = get_board(setting->board);
@@ -2363,12 +2593,9 @@ GET_PATH2:
 				printf("Ctrl-C to exit...%s\n", g_vt_clear_line);
 			printf("%s\n", g_vt_clear_line);
 		}
-		
-		//finally,switch the SR
-		if (!setting->nodisplay)
-			ch = catch_input_char();
-		else
-			ch = 0;
+
+		ch = catch_input_char();
+
 		if (setting->nodisplay == 0 && candisplay == 1 && available_height >= 43)
 		{
 			printf("Hot-key: 1=reset %s; 2=reset MaxMin; 3=reset %s and MaxMin; 4=switch show mA/auto/uA;%s\n",
@@ -2381,7 +2608,7 @@ GET_PATH2:
 		{
 			printf("press letter to switch sense resistor%s(Please pay attention to letter case)%s; Ctrl-C to exit...%s\n", g_vt_red, g_vt_default, g_vt_clear_line);
 		}
-		if (isxdigit(ch))
+		if (isxdigit(ch) && !setting->nodisplay)
 		{
 			int hotkey_index = (int)ch - '0';
 			int bootmodenum = 0;
@@ -2523,7 +2750,28 @@ GET_PATH2:
 				break;
 			}
 		}
-		if (isalpha(ch) && setting->rangefixed == 0)
+
+		if (ch == ':') // special character used to know that data received by the BCU software should be transferred to the PTC device
+		{
+			int num = 0;
+			long unsigned int start_time = 0;
+			long unsigned int time = 0;
+			get_msecond(&start_time);
+			while ((ch = catch_input_char()) != '\n')
+			{
+				if (ch >= '0' && ch <= '9')
+				{
+					num = num * 10 + (ch - '0');
+				}
+				get_msecond(&time);
+				if ((time - start_time) > 500)
+					break; // timeout 500ms
+			}
+			setting->ptc_temp = num / 100.0;
+			ptc_set_current_temperature(setting);
+		}
+
+		if (isalpha(ch) && setting->rangefixed == 0 && !setting->nodisplay)
 		{
 			int sr_index;
 			// ch = toupper(ch);
@@ -3672,6 +3920,9 @@ void terminateBCU(void)
 
 int main(int argc, char** argv)
 {
+	setbuf(stdin, NULL);
+	setbuf(stdout, NULL);
+
 	print_version();
 
 	if (enable_vt_mode())
@@ -3965,6 +4216,26 @@ int main(int argc, char** argv)
 	else if (strcmp(cmd, "temp") == 0)
 	{
 		get_temp(&setting);
+	}
+	else if (strcmp(cmd, "ptc_set_target") == 0)
+	{
+		ptc_set_target_temperature(&setting);
+	}
+	else if (strcmp(cmd, "ptc_set_curr") == 0)
+	{
+		ptc_set_current_temperature(&setting);
+	}
+	else if (strcmp(cmd, "ptc_get_temp") == 0)
+	{
+		ptc_get_temperature(&setting);
+	}
+	else if (strcmp(cmd, "ptc_get_is_stable") == 0)
+	{
+		ptc_get_is_stable(&setting);
+	}
+	else if (strcmp(cmd, "ptc_get_is_enable") == 0)
+	{
+		ptc_get_is_enable(&setting);
 	}
 	/*
 	due to the unavoidable large chunk size of monitor() function,

@@ -1131,6 +1131,7 @@ struct mapping imx95evk19_board[] = {
 	{"ft_sd_pwren",		gpio, IMX93EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x20;opendrain=0;}", 0x11},
 	{"ft_sd_cd",		gpio, IMX93EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x40;opendrain=0;}", 0x21},
 	{"ft_fta_sel",		gpio, IMX93EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x80;opendrain=0;}", 0x31},
+	{"onoff_ptc",	gpio, IMX95EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=2;pin_bitmask=0x01;opendrain=0;}", 0x91},
 
 	{"ft_io_nrst1",		gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x08}", 0x00},
 	{"ft_io_nint1",		gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x10}", 0x00},
@@ -1139,6 +1140,8 @@ struct mapping imx95evk19_board[] = {
 
 	{"93lcx6",		ftdi_eeprom, "/ft4232h_eeprom{uasize=0xFF}", 0x00},
 	{"temp",		temperature, "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}/pct2075{addr=0x48}", 0x00},
+
+	{"ptc",		ptc, "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}/ptc_revA{addr=0x57}", 0x00},
 
 	{NULL, 0, NULL, 0} //null terminated
 };
@@ -1304,7 +1307,8 @@ struct mapping nxp_custom_revB_board[] = {
 	// {"boot_mode",		gpio, NXP_CUSTOM_revB_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=0;pin_bitmask=0x3F;opendrain=1;}", 0x10},
 	// // {"ft_por_b",		gpio, IMX93EVK_GPIO_EXTENDER_PATH"/pca9655e{addr=0x21;port=1;pin_bitmask=0x01;opendrain=0;}", 0x70},
 	{"reset",		gpio, NXP_CUSTOM_revB_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=0;pin_bitmask=0x01;opendrain=1;}", 0x21},
-	{"onoff",		gpio, NXP_CUSTOM_revB_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=2;pin_bitmask=0x80;opendrain=1;}", 0x31},
+	{"onoff",               gpio, NXP_CUSTOM_revB_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=2;pin_bitmask=0x80;opendrain=1;}", 0x31},
+	{"ptc_onoff",		gpio, NXP_CUSTOM_revB_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x02;opendrain=0;}", 0x31},
 	// {"remote_en",		gpio, NXP_CUSTOM_revB_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=0;pin_bitmask=0x80;opendrain=1;}", 0x41},
 	// {"mode_dir",		gpio, IMX93EVK_GPIO_EXTENDER_PATH"/pca9655e{addr=0x21;port=1;pin_bitmask=0x10;opendrain=0;}", 0x31},
 	// {"ft_sd_pwren",		gpio, IMX93EVK_GPIO_EXTENDER_PATH"/pca9655e{addr=0x21;port=1;pin_bitmask=0x20;opendrain=0;}", 0x11},
@@ -1321,6 +1325,8 @@ struct mapping nxp_custom_revB_board[] = {
 
 	{"93lcx6",		ftdi_eeprom, "/ft4232h_eeprom{uasize=0xFF}", 0x00},
 	{"temp",		temperature, "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}/pct2075{addr=0x48}", 0x00},
+
+	{"ptc",		ptc, "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}/ptc_revA{addr=0x32}", 0x00},
 
 	{NULL, 0, NULL, 0} //null terminated
 };
@@ -2209,14 +2215,14 @@ struct mapping val_board_11_board[] = {
 	{"GPIO7",	gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=0;pin_bitmask=0x40;opendrain=0;}", 0x11},
 	{"GPIO8",	gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=0;pin_bitmask=0x80;opendrain=0;}", 0x11},
 
-	{"GPIO9",	gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=1;pin_bitmask=0x01;opendrain=0;}", 0x11},
-	{"GPIO10",	gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=1;pin_bitmask=0x02;opendrain=0;}", 0x11},
-	{"GPIO11",	gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=1;pin_bitmask=0x04;opendrain=0;}", 0x11},
-	{"GPIO12",	gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=1;pin_bitmask=0x08;opendrain=0;}", 0x11},
-	{"GPIO13",	gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=1;pin_bitmask=0x10;opendrain=0;}", 0x11},
-	{"GPIO14",	gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=1;pin_bitmask=0x20;opendrain=0;}", 0x11},
-	{"GPIO15",	gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=1;pin_bitmask=0x40;opendrain=0;}", 0x11},
-	{"GPIO16",	gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=1;pin_bitmask=0x80;opendrain=0;}", 0x11},
+	{"GPIO9",	gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=1;pin_bitmask=0x01;opendrain=1;}", 0x11},
+	{"GPIO10",	gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=1;pin_bitmask=0x02;opendrain=1;}", 0x11},
+	{"GPIO11",	gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=1;pin_bitmask=0x04;opendrain=1;}", 0x11},
+	{"GPIO12",	gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=1;pin_bitmask=0x08;opendrain=1;}", 0x11},
+	{"GPIO13",	gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=1;pin_bitmask=0x10;opendrain=1;}", 0x11},
+	{"GPIO14",	gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=1;pin_bitmask=0x20;opendrain=1;}", 0x11},
+	{"GPIO15",	gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=1;pin_bitmask=0x40;opendrain=1;}", 0x11},
+	{"GPIO16",	gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=1;pin_bitmask=0x80;opendrain=1;}", 0x11},
 
 	{"GPIO17",	gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=2;pin_bitmask=0x01;opendrain=1;}", 0x11},
 	{"GPIO18",	gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=2;pin_bitmask=0x02;opendrain=1;}", 0x11},
