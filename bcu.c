@@ -177,7 +177,7 @@ static void print_help(char* cmd)
 		printf("	%s%-60s%s%s\n", g_vt_default, "deinit [BOOTMODE_NAME] [-board=/-auto] [-id=]", g_vt_green, "disable the remote control");
 		printf("\n");
 		printf("	%s%-60s%s%s\n", g_vt_default, "monitor [-board=/-auto] [-id=]", g_vt_green, "monitor power consumption");
-		printf("	%s%-60s%s%s\n", g_vt_default, "        [-dump/-dump=] [-nodisplay] [-pmt] [-stats]", g_vt_green, "");
+		printf("	%s%-60s%s%s\n", g_vt_default, "        [-dump/-dump=] [-nodisplay] [-pmt] [-stats] [-autoranging]", g_vt_green, "");
 		printf("	%s%-60s%s%s\n", g_vt_default, "        [-hz=] [-rms]", g_vt_green, "");
 		printf("	%s%-60s%s%s\n", g_vt_default, "        [-hwfilter] [-unipolar]", g_vt_green, "");
 		printf("	%s%-60s%s%s\n", g_vt_default, "        [-temp]", g_vt_green, "");
@@ -2487,8 +2487,58 @@ GET_PATH2:
 				}
 
 				printf("%s\n", g_vt_clear_line);
-			}
 
+				if (sr_level[k] != -1 && setting->autoranging) // auto switch the range
+				{
+					double min = cur_range[k] > unused_range[k] ? unused_range[k] : cur_range[k];
+					double max = cur_range[k] < unused_range[k] ? unused_range[k] : cur_range[k];
+					double scale = 1;
+					if (range_level[k] == 0x01 || range_level[k] == 0x11)
+					{
+						scale = 1000;
+					}
+					if (((cnow[k] <= (min * scale)) && ((max * scale) == (cur_range[k] * scale))) ||
+					    ((cnow[k] >= (min * 0.95 * scale)) && ((min * scale) == (cur_range[k] * scale))))
+					{
+						if (k < n && k < MAX_NUMBER_OF_POWER && k >= 0)
+						{
+							strcpy(sr_name, "SR_");
+							if (board->mappings[name[k]].name == NULL)
+								return;
+							strcat(sr_name, board->mappings[name[k]].name);
+GET_PATH4:
+							if (get_path(sr_path, sr_name, board) != -1)
+							{
+								end_point = build_device_linkedlist_smart(&head, sr_path, head, previous_path);
+								strcpy(previous_path, sr_path);
+								if (end_point == NULL)
+								{
+									printf("monitor:failed to build device linkedlist\n");
+									return;
+								}
+								struct gpio_device *gd = end_point;
+								unsigned char data;
+								get_gpiod(gd, &data);
+
+								if (data == 0)
+									set_gpiod(gd, 1);
+								else
+									set_gpiod(gd, 0);
+
+								msleep(2);
+								reset_flag = 1; // to force refresh sr_level, if some rails share SR_ pin
+							}
+
+							if (strncmp(sr_name, "SR_", 3) == 0)
+							{
+								strcpy(sr_name, "SRD_");
+								strcat(sr_name, board->mappings[name[k]].name);
+								goto GET_PATH4;
+							}
+						}
+					}
+				}
+			}
 			//then display group
 			int max_group_length = 17;
 			if (num_of_groups > 0)
