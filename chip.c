@@ -57,9 +57,82 @@ struct name_and_init_func chip_list[] =
 	"adp5585", adp5585_create,
 	"at24cxx", at24cxx_create,
 	"pct2075", pct2075_create,
+	"ptc_revA", ptc_revA_create,
 };
 int num_of_chips = sizeof(chip_list) / sizeof(struct name_and_init_func);
 
+
+//////////////////////////PTC_revA//////////////////////////////////
+void* ptc_revA_create(char* chip_specification, void* parent)
+{
+	struct ptc_revA* ptc = (struct ptc_revA*)malloc(sizeof(struct ptc_revA));
+
+	if (ptc == NULL)
+	{
+		printf("malloc failed\n");
+		return NULL;
+	}
+	ptc->ptc_dev.device.parent = parent;
+	ptc->ptc_dev.ptc_read = ptc_revA_read;
+	ptc->ptc_dev.ptc_write = ptc_revA_write;
+	ptc->addr = extract_parameter_value(chip_specification, "addr");
+
+	printf("PTC was initialized!!!\n");
+	return ptc;
+}
+
+float ptc_revA_read(void* ptc_revA, unsigned int register_addr)
+{
+	struct ptc_revA* ptc = ptc_revA;
+	struct i2c_device* parent = (void*)ptc->ptc_dev.device.parent;
+	char addr_plus_write = (ptc->addr) << 1;
+	char addr_plus_read = (ptc->addr << 1) + 1;
+	int status, i = 0;
+	unsigned char data_buffer[2] = {0};
+	int data = 0;
+
+	parent->i2c_start(parent);
+	status = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_PTC);
+	if (status)
+	{
+		printf("oh no! no ack received!\n");
+		return -10;
+	}
+	parent->i2c_write(parent, register_addr, I2C_TYPE_PTC);
+	parent->i2c_start(parent);
+	parent->i2c_write(parent, addr_plus_read, I2C_TYPE_PTC);
+	parent->i2c_read(parent, &data_buffer[0], 0, I2C_TYPE_PTC);
+	parent->i2c_read(parent, &data_buffer[1], 1, I2C_TYPE_PTC);
+	parent->i2c_stop(parent);
+
+	data = (data_buffer[1] << 8 | data_buffer[0]);
+
+	return data;
+
+}
+float ptc_revA_write(void* ptc_revA, unsigned char* data_buffer, unsigned int register_addr, int size)
+{
+	struct ptc_revA* ptc = ptc_revA;
+	struct i2c_device* parent = (void*)ptc->ptc_dev.device.parent;
+	char addr_plus_write = (ptc->addr) << 1;
+	char addr_plus_read = (ptc->addr << 1) + 1;
+	int status;
+
+	parent->i2c_start(parent);
+	status = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_PTC);
+	if (status)
+	{
+		printf("oh no! no ack received!\n");
+		return -10;
+	}
+	parent->i2c_write(parent, register_addr, I2C_TYPE_PTC);
+	for(int i = 0; i < size; i++)
+	{
+		parent->i2c_write(parent, data_buffer[i], I2C_TYPE_PTC);
+	}
+	parent->i2c_stop(parent);
+	return 0;
+}
 //////////////////////////PCT2075//////////////////////////////////
 void* pct2075_create(char* chip_specification, void* parent)
 {
@@ -75,6 +148,7 @@ void* pct2075_create(char* chip_specification, void* parent)
 	temp->temp_dev.temp_enable = temp_enable;
 	temp->addr = extract_parameter_value(chip_specification, "addr");
 	//printf("AT24CXX created!\n");
+	printf("Temp was initialized!!!\n");
 	return temp;
 }
 
