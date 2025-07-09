@@ -292,6 +292,7 @@ void set_options_default(struct options_setting* setting)
 	setting->ptc_temp = -100;
 	setting->ptc_onoff = -1;
 	setting->ptc_sensor = -1;
+	setting->autoranging = 0;
 }
 
 
@@ -582,6 +583,10 @@ int parse_options(char* cmd, int argc, char** argv, struct options_setting* sett
 		{
 			setting->ptc_sensor = atoi(input);
 			printf("PTC sensor is set to %d\n", setting->ptc_sensor);
+		}
+		else if (strcmp(argv[i], "-autoranging") == 0)
+		{
+			setting->autoranging = 1;
 		}
 		else
 		{

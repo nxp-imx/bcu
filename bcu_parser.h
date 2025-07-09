@@ -85,6 +85,7 @@ struct options_setting {
 	float ptc_temp;
 	int ptc_onoff;
 	int ptc_sensor;
+	int autoranging;
 };
 
 struct group {
