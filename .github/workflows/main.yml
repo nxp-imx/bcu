@@ -23,20 +23,26 @@ jobs:
       - name: Initialize submodules
         run: git submodule update --init
 
-      # Install dependencies
-      - name: Install dependencies
+      # Install dependencies and build
+      - name: Build with Ubuntu 20.04 Docker
         if: matrix.os == 'ubuntu-latest'
         run: |
-          sudo apt-get update
-          sudo apt-get install -y libyaml-dev libftdi1-dev libusb-1.0-0-dev
+          echo $CI_BUILD_VERSION
+          # Use Docker to build in Ubuntu 20.04 environment
+          docker run --rm -v ${{ github.workspace }}:/workspace -w /workspace -e CI_BUILD_VERSION="$CI_BUILD_VERSION" -e DEBIAN_FRONTEND=noninteractive -e TZ=UTC ubuntu:20.04 bash -c "
+            apt-get update && 
+            apt-get install -y libyaml-dev libftdi1-dev libusb-1.0-0-dev libncurses5-dev cmake build-essential pkg-config git &&
+            git config --global --add safe.directory /workspace &&
+            cmake . &&
+            make
+          "
+          # The built binary should already be named 'bcu' for Linux
 
       - name: Install dependencies (macOS)
         if: matrix.os == 'macos-latest'
         run: |
-          brew reinstall pkgconfig
-          export PATH="/usr/local/Cellar/pkg-config/0.29.2_3/bin:${PATH}"
-          brew reinstall libyaml
-          brew install libftdi
+          brew update
+          brew install pkgconfig libyaml libftdi libusb
           pkg-config --list-all
 
       - name: Create env variables (Linux/macOS)
@@ -49,18 +55,18 @@ jobs:
         run: |
           echo "CI_BUILD_VERSION=${{ github.ref_name }}" >> $env:GITHUB_ENV
 
-      # Build Project
-      - name: Build (Linux/macOS)
-        if: matrix.os != 'windows-latest'
+      - name: Build (macOS)
+        if: matrix.os == 'macos-latest'
         run: |
           echo $CI_BUILD_VERSION
-          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
-            cmake .
-          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
-            export PATH="/usr/local/Cellar/pkg-config/0.29.2_3/bin:${PATH}"
-            cmake .
-          fi
+          # Use pkg-config from homebrew
+          export PKG_CONFIG_PATH="$(brew --prefix)/lib/pkgconfig:$PKG_CONFIG_PATH"
+          cmake .
           make
+          # Rename the binary for macOS
+          if [ -f "bcu" ]; then
+            mv bcu bcu_mac
+          fi
 
       # Windows build
       - name: Windows setup selection
@@ -81,14 +87,26 @@ jobs:
           }
 
       # Upload build artifacts
-      - name: Upload artifact
+      - name: Upload artifact (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
         uses: actions/upload-artifact@v4
         with:
           name: bcu-artifacts-${{ github.run_id }}-${{ matrix.os }}
-          path: |
-            ${{ github.workspace }}/bcu.exe
-            ${{ github.workspace }}/bcu
-            ${{ github.workspace }}/bcu_mac
+          path: ${{ github.workspace }}/bcu
+
+      - name: Upload artifact (macOS)
+        if: matrix.os == 'macos-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: bcu-artifacts-${{ github.run_id }}-${{ matrix.os }}
+          path: ${{ github.workspace }}/bcu_mac
+
+      - name: Upload artifact (Windows)
+        if: matrix.os == 'windows-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: bcu-artifacts-${{ github.run_id }}-${{ matrix.os }}
+          path: ${{ github.workspace }}/bcu.exe
 
   deploy:
     needs: build
