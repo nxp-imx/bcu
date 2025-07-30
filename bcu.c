@@ -3916,7 +3916,10 @@ static int enable_vt_mode()
 void notice_print(struct options_setting* setting, char* cmd)
 {
 	if (strcmp(setting->board, "imx943evk19a0") == 0)
-		printf("\nPlease set SW7-1 as ON to ensure the proper functioning of the BCU!\n\n");
+		printf("\nPlease set SW7-1 as %sON%s to ensure the proper functioning of the BCU!\n\n", g_vt_red, g_vt_default);
+
+	if (strcmp(setting->board, "imx943evk19b1") == 0)
+		printf("\nPlease set SW7-1 as %sOFF%s to ensure the proper functioning of the BCU!\n\n", g_vt_red, g_vt_default);
 
 	if (!strcmp(setting->board, "imx95evk19") &&
 	    !strcmp(cmd, "reset") &&
