@@ -1215,6 +1215,62 @@ struct board_power_group imx95evk15_power_groups[] = {
 	{NULL, 0}
 };
 
+struct mapping imx952evk19_board[] = {
+	{"vdd_sd2_3v3",		power, IMX95EVK_POWER_PATH(1, 1, 0x11, 5, 5), 0x00},
+	{"vdd_soc",		power, IMX95EVK_POWER_PATH(1, 2, 0x11, 5, 5), 0x00},
+	{"lpd5_vddq",		power, IMX95EVK_POWER_PATH(1, 3, 0x11, 10, 10), 0x00},
+	{"lpd5_vdd2",		power, IMX95EVK_POWER_PATH(1, 4, 0x11, 10, 10), 0x00},
+	{"lpd5_vdd1",		power, IMX95EVK_POWER_PATH(2, 1, 0x12, 400, 400), 0x00},
+	{"vdd_ddr",		power, IMX95EVK_POWER_PATH(2, 2, 0x12, 10, 10), 0x00},  //95 Only
+	{"vddq_ddr",		power, IMX95EVK_POWER_PATH(2, 3, 0x12, 10, 10), 0x00},
+	{"vdd2_ddr",		power, IMX95EVK_POWER_PATH(2, 4, 0x12, 250, 250), 0x00},
+	{"nvcc_sdio2",		power, IMX95EVK_POWER_PATH(3, 1, 0x13, 100, 100), 0x00},
+	{"nvcc_3v3",		power, IMX95EVK_POWER_PATH(3, 2, 0x13, 100, 100), 0x00},
+	{"vdd_usb_3v3",		power, IMX95EVK_POWER_PATH(3, 3, 0x13, 400, 400), 0x00},
+	{"vdd_ana_0v8",		power, IMX95EVK_POWER_PATH(3, 4, 0x13, 10, 10), 0x00},
+	{"vdd_ana_1v8",		power, IMX95EVK_POWER_PATH(4, 1, 0x14, 50, 50), 0x00},
+	{"nvcc_enet_ccm",	power, IMX95EVK_POWER_PATH(4, 2, 0x14, 100, 100), 0x00},
+	{"nvcc_wakeup",		power, IMX95EVK_POWER_PATH(4, 3, 0x14, 100, 100), 0x00},
+	{"nvcc_bbsm_1v8",	power, IMX95EVK_POWER_PATH(4, 4, 0x14, 10000, 10000), 0x00},
+
+	{"boot_mode",		gpio, IMX95EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=0;pin_bitmask=0x0F;opendrain=0;}", 0x80},
+	{"ft_por_b",		gpio, IMX95EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x01;opendrain=0;}", 0x00},
+	{"reset",		gpio, IMX95EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x02;opendrain=0;}", 0x70},
+	{"onoff",		gpio, IMX95EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x04;opendrain=0;}", 0x60},
+	{"remote_en",		gpio, IMX95EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x08;opendrain=0;}", 0x51},
+	{"mode_dir",		gpio, IMX95EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x10;opendrain=0;}", 0x41},
+	{"ft_sd_pwren",		gpio, IMX95EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x20;opendrain=0;}", 0x11},
+	{"ft_sd_cd",		gpio, IMX95EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x40;opendrain=0;}", 0x21},
+	{"ft_fta_sel",		gpio, IMX95EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x80;opendrain=0;}", 0x31},
+
+	{"ft_io_nrst1",		gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x08}", 0x00},
+	{"ft_io_nint1",		gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x10}", 0x00},
+	{"ft_io_nint",		gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x20}", 0x00},
+	{"ft_io_nrst",		gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x40}", 0x00},
+
+	{"93lcx6",		ftdi_eeprom, "/ft4232h_eeprom{uasize=0xFF}", 0x00},
+	{"temp",		temperature, "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}/pct2075{addr=0x48}", 0x00},
+
+	{NULL, 0, NULL, 0} //null terminated
+};
+
+struct boot_mode imx952evk_board_boot_modes[] = {
+	{"usb", 0x09},
+	{"emmc", 0x0a},
+	{"sd", 0x0b},
+	{"nor", 0x0c},
+	{"nand_2k", 0x0d},
+	{"nand_4k", 0x0e},
+	{NULL, 0}
+};
+
+struct board_power_group imx952evk19_power_groups[] = {
+	{"GROUP_SOC", "vdd_sd2_3v3,vdd_soc,nvcc_bbsm_1v8,vdd_ana_1v8,vdd_ana_0v8,vdd_usb_3v3,vdd_ddr,vddq_ddr,vdd2_ddr"},
+	{"GROUP_SOC_FULL", "vdd_sd2_3v3,vdd_soc,nvcc_bbsm_1v8,vdd_ana_1v8,vdd_ana_0v8,vdd_usb_3v3,vdd_ddr,vddq_ddr,vdd2_ddr,nvcc_sdio2,nvcc_3v3,nvcc_wakeup,nvcc_enet_ccm"},
+	{"GROUP_DRAM", "lpd5_vdd1,lpd5_vddq,lpd5_vdd2"},
+	{NULL, 0}
+};
+
 struct boot_mode null_boot_mode[] = {
 	{NULL, 0}
 };
@@ -2362,6 +2418,7 @@ struct board_info board_list[] =
 	{"imx93evk14",		imx93evk14_board,	imx93evk11_board_boot_modes,	0,	NULL,				NULL,				null_board_links,		&imx93evk14_ftdi_eeprom_user_area_info,		500},
 	{"imx95evk19",		imx95evk19_board,	imx95evk_board_boot_modes,	0,	NULL,				imx95evk19_power_groups,	null_board_links,		&imx95evk19_ftdi_eeprom_user_area_info,		500},
 	{"imx95evk15",		imx95evk15_board,	imx95evk_board_boot_modes,	0,	NULL,				imx95evk15_power_groups,	null_board_links,		&imx95evk15_ftdi_eeprom_user_area_info,		500},
+	{"imx952evk19",		imx952evk19_board,	imx952evk_board_boot_modes,	0,	NULL,				imx952evk19_power_groups,	null_board_links,		&imx952evk19_ftdi_eeprom_user_area_info,		500},
 	{"nxp_custom",		nxp_custom_board,	null_boot_mode,			0,	NULL,				nxp_custom_power_groups,	null_board_links,		&nxp_custom_ftdi_eeprom_user_area_info,		500},
 	{"nxp_custom_revB",	nxp_custom_revB_board,	nxp_custom_revB_boot_modes,	0,	NULL,				nxp_custom_revB_power_groups,	null_board_links,		&nxp_custom_revB_ftdi_eeprom_user_area_info,	500},
 	{"val_board_4",		val_board_4_board,	null_boot_mode,			0,	NULL,				val_board_4_power_groups,	null_board_links,		&val_board_4_ftdi_eeprom_user_area_info,	500},

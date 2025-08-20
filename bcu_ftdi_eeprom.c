@@ -81,6 +81,7 @@ struct ftdi_eeprom_field_code_tb ftdi_eeprom_field[] = {
 	{ftdi_eeprom_board_id, 0x26,"NXP VAL_BOARD_12 Board"},
 	{ftdi_eeprom_board_id, 0x27,"NXP i.MX943 Orange Box Board"},
 	{ftdi_eeprom_board_id, 0x28,"NXP i.MX93W EVK Board"},
+	{ftdi_eeprom_board_id, 0x29,"NXP i.MX952 EVK 19x19 Board"},
 
 	{ftdi_eeprom_soc_id, 0x1, "i.MX8DXL"},
 	{ftdi_eeprom_soc_id, 0x2, "i.MX8MP"},
@@ -109,6 +110,7 @@ struct ftdi_eeprom_field_code_tb ftdi_eeprom_field[] = {
 	{ftdi_eeprom_soc_id, 0x19, "VAL_BOARD_11 SOC"},
 	{ftdi_eeprom_soc_id, 0x1a, "VAL_BOARD_12 SOC"},
 	{ftdi_eeprom_soc_id, 0x1b, "i.MX93W"},
+	{ftdi_eeprom_soc_id, 0x1c, "i.MX952"},
 
 	{ftdi_eeprom_pmic_id, 0x1, "PPF7100BVMA1ES"},  //On imx8dxl-evk
 	{ftdi_eeprom_pmic_id, 0x2, "PCA9450CHN"},  //On imx8mpevk-cpu and imx8mpevk-cpu-pwr
@@ -310,6 +312,15 @@ struct ftdi_eeprom_user_area imx95evk19_ftdi_eeprom_user_area_info = {
 	0x1,		//config
 	0xf, 0x0, 0x0,	//board_id, board_rev_number, board_rev_char
 	0x7, 0x0, 0x0,	//soc_id, soc_rev_number, soc_rev_char
+	0x9, 0xF, 0xF,	//pmic_id, pmic_rev_number, pmic_rev_char
+	16,
+	1
+};
+
+struct ftdi_eeprom_user_area imx952evk19_ftdi_eeprom_user_area_info = {
+	0x1,		//config
+	0x26, 0x0, 0x0,	//board_id, board_rev_number, board_rev_char
+	0x1a, 0x0, 0x0,	//soc_id, soc_rev_number, soc_rev_char
 	0x9, 0xF, 0xF,	//pmic_id, pmic_rev_number, pmic_rev_char
 	16,
 	1
