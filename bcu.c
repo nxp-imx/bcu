@@ -2471,7 +2471,12 @@ GET_PATH2:
 				{
 					double min = cur_range[k] > unused_range[k] ? unused_range[k] : cur_range[k];
 					double max = cur_range[k] < unused_range[k] ? unused_range[k] : cur_range[k];
-					if((cnow[k] <= min && max == cur_range[k]) || (cnow[k] >= min-1 && min == cur_range[k])){
+					double scale = 1;
+					if (range_level[k] == 0x01 || range_level[k] == 0x11)
+					{
+						scale = 1000;
+					}
+					if(((cnow[k] <= (min * scale)) && ((max * scale) == (cur_range[k] * scale))) || ((cnow[k] >= (min * 0.95 * scale)) && ((min * scale) == (cur_range[k] * scale)))){
 						if (k < n && k < MAX_NUMBER_OF_POWER && k >= 0)
 						{
 							strcpy(sr_name, "SR_");
