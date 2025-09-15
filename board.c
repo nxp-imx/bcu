@@ -1963,7 +1963,7 @@ struct mapping imx943evk19b1_board[] = {
 
 struct board_power_group imx943evk19_power_groups[] = {
 	{"GROUP_SOC", "lp_vdd_soc,vdd_soc,nvcc_bbsm,ana_0v8,cpu_1v8,cpu_3v3,cpu_vdd_ddr,cpu_vddq_ddr,cpu_vdd2h_ddr"},
-	{"GROUP_SOC_FULL", "lp_vdd_soc,vdd_soc,nvcc_bbsm,ana_0v8,cpu_1v8,cpu_3v3,cpu_vdd_ddr,cpu_vddq_ddr,cpu_vdd2h_ddr,sd_card_3v3,nvcc_sd2"},
+	{"GROUP_SOC_FULL", "lp_vdd_soc,vdd_soc,nvcc_bbsm,ana_0v8,cpu_1v8,cpu_3v3,cpu_vdd_ddr,cpu_vddq_ddr,cpu_vdd2h_ddr,nvcc_sd2"},
 	{"GROUP_DRAM", "vdd2h_ddr,vcc_vddq_ddr,vcc_1p8"},
 	{NULL, 0}
 };
