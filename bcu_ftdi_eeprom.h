@@ -126,6 +126,7 @@ extern struct ftdi_eeprom_user_area val_board_8_ftdi_eeprom_user_area_info;
 extern struct ftdi_eeprom_user_area val_board_9_ftdi_eeprom_user_area_info;
 extern struct ftdi_eeprom_user_area val_board_10_ftdi_eeprom_user_area_info;
 extern struct ftdi_eeprom_user_area val_board_11_ftdi_eeprom_user_area_info;
+extern struct ftdi_eeprom_user_area val_board_12_ftdi_eeprom_user_area_info;
 extern struct ftdi_eeprom_field_code_tb ftdi_eeprom_field[];
 
 
