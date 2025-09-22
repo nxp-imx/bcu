@@ -1961,6 +1961,50 @@ struct mapping imx943evk19b1_board[] = {
 	{NULL, 0, NULL, 0} //null terminated
 };
 
+struct mapping imx943obx_board[] = {
+	{"vcc_vddq_ddr",	power, IMX943EVK_POWER_PATH(1, 2, 0x11, 20, 20), 0x00},
+	{"cpu_vdd2h_ddr",	power, IMX943EVK_POWER_SWITCH_GROUP_PATH(6, 3, 0x17, 200, 2, 1, 2200), 0x00},
+	{"vdd2h_ddr",		power, IMX943EVK_POWER_PATH(2, 2, 0x12, 10, 10), 0x00},
+	{"sd_card_3v3",		power, IMX943EVK_POWER_PATH(2, 3, 0x12, 100, 100), 0x00},
+	{"nvcc_sd2",		power, IMX943EVK_POWER_PATH(2, 4, 0x12, 100, 100), 0x00},
+	{"cpu_vdd_ddr",		power, IMX943EVK_POWER_SWITCH_GROUP_PATH(3, 4, 0x13, 10, 3, 1, 2010), 0x00},
+	{"vcc_1p8",		power, IMX943EVK_POWER_PATH(3, 2, 0x13, 100, 100), 0x00},
+	{"cpu_vddq_ddr",	power, IMX943EVK_POWER_SWITCH_GROUP_PATH(6, 2, 0x17, 20, 3, 3, 10020), 0x00},
+	{"nvcc_bbsm",		power, IMX943EVK_POWER_PATH(4, 1, 0x15, 10000, 10000), 0x00},
+	{"cpu_3v3",		power, IMX943EVK_POWER_SWITCH_GROUP_PATH(4, 2, 0x15, 50, 4, 4, 2050), 0x00},
+	{"vcc_3p3",		power, IMX943EVK_POWER_PATH(4, 3, 0x15, 100, 100), 0x00},
+	{"cpu_1v8",		power, IMX943EVK_POWER_SWITCH_GROUP_PATH(5, 1, 0x16, 50, 5, 2, 2050), 0x00},
+	{"vdd_soc",		power, IMX943EVK_POWER_PATH(5, 3, 0x16, 10, 10), 0x00},
+	{"lp_vdd_soc",		power, IMX943EVK_POWER_PATH(5, 4, 0x16, 200, 200), 0x00},
+	{"ana_0v8",		power, IMX943EVK_POWER_SWITCH_GROUP_PATH(6, 4, 0x17, 10, 6, 1, 2010), 0x00},
+
+	{"boot_mode",		gpio, IMX943EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=0;pin_bitmask=0x0F;opendrain=0;}", 0x50},
+	{"mode_dir",		gpio, IMX943EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=0;pin_bitmask=0x10;opendrain=0;}", 0x21},
+	{"remote_en",		gpio, IMX943EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=0;pin_bitmask=0x20;opendrain=0;}", 0x10},
+	{"onoff",		gpio, IMX943EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=0;pin_bitmask=0x40;opendrain=0;}", 0x31},
+	{"reset",		gpio, IMX943EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=0;pin_bitmask=0x80;opendrain=0;}", 0x41},
+	{"fta_jtag_host_en",	gpio, IMX943EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x01;opendrain=0;}", 0x00},
+	{"fta_jtag_uart_sel",	gpio, IMX943EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x02;opendrain=0;}", 0x00},
+	{"temp_int_bb_ft4232h_b",	gpio, IMX943EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x10;opendrain=0;}", 0x00},
+	{"ft_sys_rst_b",	gpio, IMX943EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x20;opendrain=0;}", 0x00},
+	{"ft_som_pf9455_pgood",	gpio, IMX943EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=2;pin_bitmask=0x01;opendrain=0;}", 0x00},
+	{"ft_som_pf5302_pgood",	gpio, IMX943EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=2;pin_bitmask=0x02;opendrain=0;}", 0x00},
+	{"ft_som_pmic_pwron",	gpio, IMX943EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=2;pin_bitmask=0x40;opendrain=0;}", 0x00},
+	{"ft_pmic_stby",	gpio, IMX943EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=2;pin_bitmask=0x80;opendrain=0;}", 0x00},
+
+	{"SR_cpu_3v3",		gpio, IMX943EVK_GPIO_EXTENDER_PATH"/pca9670{addr=0x24;port=0;pin_bitmask=0x01;opendrain=0;}", 0x00},
+	{"SR_cpu_vdd_ddr",	gpio, IMX943EVK_GPIO_EXTENDER_PATH"/pca9670{addr=0x24;port=0;pin_bitmask=0x02;opendrain=0;}", 0x00},
+	{"SR_ana_0v8",		gpio, IMX943EVK_GPIO_EXTENDER_PATH"/pca9670{addr=0x24;port=0;pin_bitmask=0x02;opendrain=0;}", 0x00},
+	{"SR_cpu_1v8",		gpio, IMX943EVK_GPIO_EXTENDER_PATH"/pca9670{addr=0x24;port=0;pin_bitmask=0x04;opendrain=0;}", 0x00},
+	{"SR_cpu_vddq_ddr",	gpio, IMX943EVK_GPIO_EXTENDER_PATH"/pca9670{addr=0x24;port=0;pin_bitmask=0x08;opendrain=0;}", 0x00},
+	{"SR_cpu_vdd2h_ddr",	gpio, IMX943EVK_GPIO_EXTENDER_PATH"/pca9670{addr=0x24;port=0;pin_bitmask=0x10;opendrain=0;}", 0x00},
+
+	{"93lcx6",		ftdi_eeprom, "/ft4232h_eeprom{uasize=0xFF}", 0x00},
+	{"temp",		temperature, "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}/pct2075{addr=0x48}", 0x00},
+
+	{NULL, 0, NULL, 0} //null terminated
+};
+
 struct board_power_group imx943evk19_power_groups[] = {
 	{"GROUP_SOC", "lp_vdd_soc,vdd_soc,nvcc_bbsm,ana_0v8,cpu_1v8,cpu_3v3,cpu_vdd_ddr,cpu_vddq_ddr,cpu_vdd2h_ddr"},
 	{"GROUP_SOC_FULL", "lp_vdd_soc,vdd_soc,nvcc_bbsm,ana_0v8,cpu_1v8,cpu_3v3,cpu_vdd_ddr,cpu_vddq_ddr,cpu_vdd2h_ddr,nvcc_sd2"},
@@ -2223,6 +2267,7 @@ struct board_info board_list[] =
 	{"bench_mcu",		bench_mcu_board,	null_boot_mode,			0,	NULL,				bench_mcu_power_groups,		null_board_links,		&bench_mcu_ftdi_eeprom_user_area_info,		500},
 	{"imx943evk19a0",	imx943evk19a0_board,	imx943_board_boot_modes,	0,	NULL,				imx943evk19_power_groups,	null_board_links,		&imx943evk19_ftdi_eeprom_user_area_info,	500},
 	{"imx943evk19b1",	imx943evk19b1_board,	imx943_board_boot_modes,	0,	NULL,				imx943evk19_power_groups,	null_board_links,		&imx943evk19b1_ftdi_eeprom_user_area_info,	500},
+	{"imx943obx",		imx943obx_board,	imx943_board_boot_modes,	0,	NULL,				imx943evk19_power_groups,	null_board_links,		&imx943obx_ftdi_eeprom_user_area_info,		500},
 	{"val_board_7",		val_board_7_board,	imx943_board_boot_modes,	0,	NULL,				NULL,				null_board_links,		&val_board_7_ftdi_eeprom_user_area_info,	500},
 	{"val_board_9",		val_board_9_board,	null_boot_mode,			0,	NULL,				val_board_9_power_groups,	null_board_links,		&val_board_9_ftdi_eeprom_user_area_info,	500},
 	{"val_board_10",	val_board_10_board,	val_board_10_boot_modes,	0,	NULL,				val_board_10_power_groups,	null_board_links,		&val_board_10_ftdi_eeprom_user_area_info,	500},
