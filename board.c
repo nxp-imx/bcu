@@ -2247,6 +2247,7 @@ struct board_info board_list[] =
 	{"imx91evk11",		imx93evk11b1_board,	imx91qsb_board_boot_modes,	0,	NULL,				imx93evk11_power_groups,	null_board_links,		&imx91evk11_ftdi_eeprom_user_area_info,		500},
 	{"imx93evk11",		imx93evk11_board,	imx93evk11_board_boot_modes,	0,	NULL,				imx93evk11_power_groups,	null_board_links,		&imx93evk11_ftdi_eeprom_user_area_info,		500},
 	{"imx93evk11b1",	imx93evk11b1_board,	imx93evk11_board_boot_modes,	0,	NULL,				imx93evk11_power_groups,	null_board_links,		&imx93evk11b1_ftdi_eeprom_user_area_info,	500},
+	{"imx93wevk",		imx93evk11b1_board,	imx93evk11_board_boot_modes,	0,	NULL,				imx93evk11_power_groups,	null_board_links,		&imx93wevk_ftdi_eeprom_user_area_info,		500},
 	{"val_board_3",		val_board_3,		imx93evk11_board_boot_modes,	0,	NULL,				imx93evk11_power_groups,	null_board_links,		&val_board_3_ftdi_eeprom_user_area_info,	500},
 	{"imx93qsb",		imx93qsb_board,		imx93evk11_board_boot_modes,	0,	NULL,				NULL,				null_board_links,		NULL,						500},
 	{"imx93evk14",		imx93evk14_board,	imx93evk11_board_boot_modes,	0,	NULL,				NULL,				null_board_links,		&imx93evk14_ftdi_eeprom_user_area_info,		500},
