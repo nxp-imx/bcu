@@ -432,7 +432,12 @@ void* ft4232h_eeprom_create(char* chip_specification, void* parent)
 		printf("malloc failed\n");
 		return NULL;
 	}
+
+#if defined(__linux__) || defined(__APPLE__)
 	ftee->ftdi_info = &g_ftdi_info[0];
+#else
+	ftee->ftdi_info = &g_ftdi_info[1];
+#endif
 	ftee->eeprom_device.device.parent = parent;
 	ftee->eeprom_device.eeprom_read = ft4232h_eeprom_read;
 	ftee->eeprom_device.eeprom_write = ft4232h_eeprom_write;
@@ -572,7 +577,11 @@ void ft4232h_i2c_remove_all(int enable_1_exit_handler)
 	int i;
 	for (i = 0; i < MAX_FT_I2C_CHANNEL_NUMBER; i++)
 	{
+#ifdef _WIN32
+		if (i == 1)
+#else
 		if (!enable_1_exit_handler && i == 1)
+#endif
 			continue;
 
 		if (g_ftdi_info[i].isinit)
