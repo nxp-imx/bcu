@@ -359,10 +359,10 @@ void* ft4232h_eeprom_create(char* chip_specification, void* parent)
 		return NULL;
 	}
 
-#if defined(__linux__) || defined(__APPLE__)
 	ftee->ftdi_info = &g_ftdi_info[0];
-#else
-	ftee->ftdi_info = &g_ftdi_info[1];
+#ifdef _WIN32
+	if (ftee->ftdi_info->ftdi == NULL && g_ftdi_info[1].ftdi)
+		ftee->ftdi_info = &g_ftdi_info[1];
 #endif
 	ftee->eeprom_device.device.parent = parent;
 	ftee->eeprom_device.eeprom_read = ft4232h_eeprom_read;
