@@ -1023,8 +1023,12 @@ err:
 
 static void reset_board(struct options_setting* setting)
 {
+	int save_enable_exit_handler = enable_exit_handler;
+
 	if (setting->keep_settings <= 0)
 		enable_exit_handler = 1;
+	else
+		enable_exit_handler = 0;
 
 	reset(setting);
 
@@ -1035,6 +1039,8 @@ static void reset_board(struct options_setting* setting)
 		printf("deinitialized the BCU settings, BOOTMODE returns to %sBOOT SWITCH%s.\n", g_vt_yellow, g_vt_default);
 		printf("use [%s-keep%s] to keep BCU settings after exited reset command\n", g_vt_green, g_vt_default);
 	}
+
+	enable_exit_handler = save_enable_exit_handler;
 }
 
 static void onoff(struct options_setting* setting, int delay_ms, int is_init)
@@ -1077,8 +1083,12 @@ static void onoff(struct options_setting* setting, int delay_ms, int is_init)
 
 static void onoff_board(struct options_setting* setting, int delay_ms, int is_init)
 {
+	int save_enable_exit_handler = enable_exit_handler;
+
 	if (setting->keep_settings <= 0)
 		enable_exit_handler = 1;
+	else
+		enable_exit_handler = 0;
 
 	onoff(setting, delay_ms, is_init);
 
@@ -1088,6 +1098,8 @@ static void onoff_board(struct options_setting* setting, int delay_ms, int is_in
 		deinitialize(setting);
 		printf("use [%s-keep%s] to keep BCU settings after exited onoff command\n", g_vt_green, g_vt_default);
 	}
+
+	enable_exit_handler = save_enable_exit_handler;
 }
 
 static int monitor_size(int columns_or_rows)
