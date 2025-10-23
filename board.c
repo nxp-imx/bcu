@@ -2177,6 +2177,13 @@ struct boot_mode val_board_10_boot_modes[] = {
 	{"emmc_imx8qm", 0x08},
 	{"sd_imx8qm", 0x0C},
 	{"qspi_imx8qm", 0x18},
+
+	{"fuse_imx8qxp", 0x00},
+	{"usb_imx8qxp", 0x01},
+	{"emmc_imx8qxp", 0x02},
+	{"sd_imx8qxp", 0x03},
+	{"qspi_imx8qxp", 0x06},
+
 	{NULL, 0}
 };
 
@@ -2302,6 +2309,9 @@ struct mapping val_board_12_board[] = {
 	{"SR_CPU_VCC1833_4",	gpio, VAL_BOARD_12_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=0;pin_bitmask=0x10;opendrain=0;}", 0x00},
 	{"SR_CPU_VCC1833_5",	gpio, VAL_BOARD_12_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=0;pin_bitmask=0x04;opendrain=0;}", 0x00},
 	{"SR_CPU_VCC1833_6",	gpio, VAL_BOARD_12_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=0;pin_bitmask=0x01;opendrain=0;}", 0x00},
+
+	{"reset",		gpio, VAL_BOARD_12_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=0;pin_bitmask=0x01;opendrain=0;}", 0x01},
+	{"remote_en",	gpio, VAL_BOARD_12_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=0;pin_bitmask=0x02;opendrain=0;}", 0x10},
 
 	{"ft_io_nint",	gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x08}", 0x00},
 	{"ft_io_nrst",	gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x10}", 0x00},
