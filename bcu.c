@@ -177,16 +177,24 @@ static void print_help(char* cmd)
 		printf("	%s%-60s%s%s\n", g_vt_default, "deinit [BOOTMODE_NAME] [-board=/-auto] [-id=]", g_vt_green, "disable the remote control");
 		printf("\n");
 		printf("	%s%-60s%s%s\n", g_vt_default, "monitor [-board=/-auto] [-id=]", g_vt_green, "monitor power consumption");
-		printf("	%s%-60s%s%s\n", g_vt_default, "        [-dump/-dump=] [-nodisplay] [-pmt] [-stats] [-autoranging]", g_vt_green, "");
+		printf("	%s%-60s%s%s\n", g_vt_default, "        [-dump/-dump=] [-nodisplay] [-pmt] [-stats]", g_vt_green, "");
 		printf("	%s%-60s%s%s\n", g_vt_default, "        [-hz=] [-rms]", g_vt_green, "");
 		printf("	%s%-60s%s%s\n", g_vt_default, "        [-hwfilter] [-unipolar]", g_vt_green, "");
 		printf("	%s%-60s%s%s\n", g_vt_default, "        [-temp]", g_vt_green, "");
+		printf("	%s%-60s%s%s\n", g_vt_default, "        [-autoranging]", g_vt_green, "");
 		printf("\n");
 		printf("	%s%-60s%s%s\n", g_vt_default, "server  [-board=/-auto] [-id=]", g_vt_green, "monitor power consumption");
 		printf("	%s%-60s%s%s\n", g_vt_default, "        [-hwfilter] [-unipolar]", g_vt_green, "");
 		printf("\n");
 		printf("	%s%-60s%s%s\n", g_vt_default, "eeprom  [-w] [-r] [-erase]", g_vt_green, "EEPROM read and program");
 		printf("	%s%-60s%s%s\n", g_vt_default, "        [-wsn=] [-brev=] [-srev=]", g_vt_green, "");
+		printf("\n");
+		printf("	%s%-60s%s%s\n", g_vt_default, "ptc_set_target  [-ptc_temp] [-ptc_onoff] [-ptc_sensor]", g_vt_green, "Set PTC target temperature and control");
+		printf("	%s%-60s%s%s\n", g_vt_default, "                [-board=/-auto] [-id=]", g_vt_green, "");
+		printf("	%s%-60s%s%s\n", g_vt_default, "ptc_set_curr_temp  [-ptc_temp] [-board=/-auto] [-id=]", g_vt_green, "Set current PTC temperature if sensor chosen is 0");
+		printf("	%s%-60s%s%s\n", g_vt_default, "ptc_get_temp [-board=/-auto] [-id=]", g_vt_green, "Get current PTC temperature");
+		printf("	%s%-60s%s%s\n", g_vt_default, "ptc_get_is_stable [-board=/-auto] [-id=]", g_vt_green, "Get if PTC temperature is stable");
+		printf("	%s%-60s%s%s\n", g_vt_default, "ptc_get_is_enable [-board=/-auto] [-id=]", g_vt_green, "Get if PTC is enabled");
 		printf("\n");
 		printf("	%s%-60s%s%s\n", g_vt_default, "temp    [-board=/-auto] [-id=]", g_vt_green, "Get temperature value");
 		printf("	%s%-60s%s%s\n", g_vt_default, "get_level [GPIO_NAME] [-board=/-auto] [-id=]", g_vt_green, "get level state of pin GPIO_NAME");
@@ -4256,7 +4264,7 @@ int main(int argc, char** argv)
 	{
 		ptc_set_target_temperature(&setting);
 	}
-	else if (strcmp(cmd, "ptc_set_curr") == 0)
+	else if (strcmp(cmd, "ptc_set_curr_temp") == 0)
 	{
 		ptc_set_current_temperature(&setting);
 	}
