@@ -400,7 +400,7 @@ static void ptc_set_target_temperature(struct options_setting *setting)
 	if (setting->ptc_temp != -100)
 	{
 		float degree = 0;
-		__uint16_t temperature = setting->ptc_temp * 100;
+		unsigned short temperature = setting->ptc_temp * 100;
 		////////////////////////////////////////////////
 		data_buffer[1] = (char)(temperature >> 8);
 		data_buffer[0] = (char)temperature;
@@ -474,7 +474,7 @@ static void ptc_set_current_temperature(struct options_setting *setting)
 	struct ptc_device *ptc = end_point;
 	unsigned char data_buffer[2] = {0};
 	float degree = 0;
-	__uint16_t temperature = setting->ptc_temp * 100;
+	unsigned short temperature = setting->ptc_temp * 100;
 	////////////////////////////////////////////////
 	data_buffer[1] = (char)(temperature >> 8);
 	data_buffer[0] = (char)temperature;
@@ -544,7 +544,7 @@ static void ptc_get_is_stable(struct options_setting *setting) //
 		return;
 	}
 	struct ptc_device *ptc = end_point;
-	__uint16_t is_stable = 0;
+	unsigned short is_stable = 0;
 	is_stable = ptc->ptc_read(ptc, 0x04);
 	if (is_stable == 1)
 	{
@@ -585,7 +585,7 @@ static void ptc_get_is_enable(struct options_setting *setting) //
 		return;
 	}
 	struct ptc_device *ptc = end_point;
-	__uint16_t is_stable = 0;
+	unsigned short is_stable = 0;
 	is_stable = ptc->ptc_read(ptc, 0x03);
 	if (is_stable == 1)
 	{
