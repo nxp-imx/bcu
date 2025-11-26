@@ -82,6 +82,7 @@ struct ftdi_eeprom_field_code_tb ftdi_eeprom_field[] = {
 	{ftdi_eeprom_board_id, 0x27,"NXP i.MX943 Orange Box Board"},
 	{ftdi_eeprom_board_id, 0x28,"NXP i.MX93W EVK Board"},
 	{ftdi_eeprom_board_id, 0x29,"NXP i.MX952 EVK 19x19 Board"},
+	{ftdi_eeprom_board_id, 0x2a,"NXP i.MX952 EVK 15x15 Board"},
 
 	{ftdi_eeprom_soc_id, 0x1, "i.MX8DXL"},
 	{ftdi_eeprom_soc_id, 0x2, "i.MX8MP"},
@@ -319,8 +320,17 @@ struct ftdi_eeprom_user_area imx95evk19_ftdi_eeprom_user_area_info = {
 
 struct ftdi_eeprom_user_area imx952evk19_ftdi_eeprom_user_area_info = {
 	0x1,		//config
-	0x26, 0x0, 0x0,	//board_id, board_rev_number, board_rev_char
-	0x1a, 0x0, 0x0,	//soc_id, soc_rev_number, soc_rev_char
+	0x29, 0x0, 0x0,	//board_id, board_rev_number, board_rev_char
+	0x1c, 0x0, 0x0,	//soc_id, soc_rev_number, soc_rev_char
+	0x9, 0xF, 0xF,	//pmic_id, pmic_rev_number, pmic_rev_char
+	16,
+	1
+};
+
+struct ftdi_eeprom_user_area imx952evk15_ftdi_eeprom_user_area_info = {
+	0x1,		//config
+	0x2a, 0x0, 0x0,	//board_id, board_rev_number, board_rev_char
+	0x1c, 0x0, 0x0,	//soc_id, soc_rev_number, soc_rev_char
 	0x9, 0xF, 0xF,	//pmic_id, pmic_rev_number, pmic_rev_char
 	16,
 	1
