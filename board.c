@@ -1311,7 +1311,7 @@ struct board_power_group imx952evk19_power_groups[] = {
 };
 
 struct board_power_group imx952evk15_power_groups[] = {
-	{"GROUP_SOC", "vdd_soc,nvcc_bbsm_1v8,vdd_ana_1v8,vdd_ana_0v8,vdd_usb_3v3,nvcc_ld_3v3,vddq_ddr,vdd2_ddr"},
+	{"GROUP_SOC", "vdd_soc,nvcc_bbsm_1v8,vdd_ana_1v8,vdd_ana_0v8,vdd_usb_3v3,vddq_ddr,vdd2_ddr"},
 	{"GROUP_SOC_FULL", "vdd_soc,nvcc_bbsm_1v8,vdd_ana_1v8,vdd_ana_0v8,vdd_usb_3v3,nvcc_ld_3v3,vddq_ddr,vdd2_ddr,nvcc_sd2,nvcc_3v3,nvcc_wakeup,nvcc_enet"},
 	{"GROUP_DRAM", "lpddr_vdd1,lpddr_vddq,lpddr_vdd2"},
 	{NULL, 0}
