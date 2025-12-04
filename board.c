@@ -1304,11 +1304,19 @@ struct boot_mode imx952evk_board_boot_modes[] = {
 };
 
 struct board_power_group imx952evk19_power_groups[] = {
-	{"GROUP_SOC", "vdd_sd2_3v3,vdd_soc,nvcc_bbsm_1v8,vdd_ana_1v8,vdd_ana_0v8,vdd_usb_3v3,vdd_ddr,vddq_ddr,vdd2_ddr"},
-	{"GROUP_SOC_FULL", "vdd_sd2_3v3,vdd_soc,nvcc_bbsm_1v8,vdd_ana_1v8,vdd_ana_0v8,vdd_usb_3v3,vdd_ddr,vddq_ddr,vdd2_ddr,nvcc_sdio2,nvcc_3v3,nvcc_wakeup,nvcc_enet_ccm"},
+	{"GROUP_SOC", "vdd_soc,nvcc_bbsm_1v8,vdd_ana_1v8,vdd_ana_0v8,vdd_usb_3v3,vdd_ddr,vddq_ddr,vdd2_ddr"},
+	{"GROUP_SOC_FULL", "vdd_soc,nvcc_bbsm_1v8,vdd_ana_1v8,vdd_ana_0v8,vdd_usb_3v3,vdd_ddr,vddq_ddr,vdd2_ddr,nvcc_sdio2,nvcc_3v3,nvcc_wakeup,nvcc_enet_ccm"},
 	{"GROUP_DRAM", "lpddr_vdd1,lpddr_vddq,lpddr_vdd2"},
 	{NULL, 0}
 };
+
+struct board_power_group imx952evk15_power_groups[] = {
+	{"GROUP_SOC", "vdd_soc,nvcc_bbsm_1v8,vdd_ana_1v8,vdd_ana_0v8,vdd_usb_3v3,nvcc_ld_3v3,vddq_ddr,vdd2_ddr"},
+	{"GROUP_SOC_FULL", "vdd_soc,nvcc_bbsm_1v8,vdd_ana_1v8,vdd_ana_0v8,vdd_usb_3v3,nvcc_ld_3v3,vddq_ddr,vdd2_ddr,nvcc_sd2,nvcc_3v3,nvcc_wakeup,nvcc_enet"},
+	{"GROUP_DRAM", "lpddr_vdd1,lpddr_vddq,lpddr_vdd2"},
+	{NULL, 0}
+};
+
 
 struct boot_mode null_boot_mode[] = {
 	{NULL, 0}
@@ -2457,8 +2465,8 @@ struct board_info board_list[] =
 	{"imx93evk14",		imx93evk14_board,	imx93evk11_board_boot_modes,	0,	NULL,				NULL,				null_board_links,		&imx93evk14_ftdi_eeprom_user_area_info,		500},
 	{"imx95evk19",		imx95evk19_board,	imx95evk_board_boot_modes,	0,	NULL,				imx95evk19_power_groups,	null_board_links,		&imx95evk19_ftdi_eeprom_user_area_info,		500},
 	{"imx95evk15",		imx95evk15_board,	imx95evk_board_boot_modes,	0,	NULL,				imx95evk15_power_groups,	null_board_links,		&imx95evk15_ftdi_eeprom_user_area_info,		500},
-	{"imx952evk15",		imx952evk15_board,	imx952evk_board_boot_modes,	0,	NULL,				NULL,				null_board_links,		&imx952evk15_ftdi_eeprom_user_area_info,		500},
-	{"imx952evk19",		imx952evk19_board,	imx952evk_board_boot_modes,	0,	NULL,				imx952evk19_power_groups,	null_board_links,		&imx952evk19_ftdi_eeprom_user_area_info,		500},
+	{"imx952evk15",		imx952evk15_board,	imx952evk_board_boot_modes,	0,	NULL,				imx952evk15_power_groups,	null_board_links,		&imx952evk15_ftdi_eeprom_user_area_info,	500},
+	{"imx952evk19",		imx952evk19_board,	imx952evk_board_boot_modes,	0,	NULL,				imx952evk19_power_groups,	null_board_links,		&imx952evk19_ftdi_eeprom_user_area_info,	500},
 	{"nxp_custom",		nxp_custom_board,	null_boot_mode,			0,	NULL,				nxp_custom_power_groups,	null_board_links,		&nxp_custom_ftdi_eeprom_user_area_info,		500},
 	{"nxp_custom_revB",	nxp_custom_revB_board,	nxp_custom_revB_boot_modes,	0,	NULL,				nxp_custom_revB_power_groups,	null_board_links,		&nxp_custom_revB_ftdi_eeprom_user_area_info,	500},
 	{"val_board_4",		val_board_4_board,	null_boot_mode,			0,	NULL,				val_board_4_power_groups,	null_board_links,		&val_board_4_ftdi_eeprom_user_area_info,	500},
