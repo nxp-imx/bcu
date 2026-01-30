@@ -2,20 +2,20 @@
   "SPDXID": "SPDXRef-DOCUMENT",
   "spdxVersion": "SPDX-2.3",
   "creationInfo": {
-    "created": "2025-11-10T14:11:39Z",
+    "created": "2026-01-26T02:01:40Z",
     "creators": [
       "Organization: NXP"
     ],
-    "licenseListVersion": "3.20"
+    "licenseListVersion": "3.26"
   },
-  "name": "bcu-1.1.123",
+  "name": "bcu-1.1.128",
   "dataLicense": "CC0-1.0",
-  "documentNamespace": "https://nxp.com/spdx/b357191f-41fe-44f0-9686-213045c4db55",
+  "documentNamespace": "https://nxp.com/spdx/31aeef1d-f0d2-498b-9783-c465d3fafb2a",
   "packages": [
     {
-      "SPDXID": "SPDXRef-package-b357191f-41fe-44f0-9686-213045c4db55",
+      "SPDXID": "SPDXRef-package-31aeef1d-f0d2-498b-9783-c465d3fafb2a",
       "name": "bcu",
-      "versionInfo": "1.1.123",
+      "versionInfo": "1.1.128",
       "licenseConcluded": "(BSD-3-Clause)",
       "licenseDeclared": "(BSD-3-Clause)",
       "downloadLocation": "https://github.com/nxp-imx/bcu.git -b master",
@@ -29,7 +29,7 @@
     {
       "spdxElementId": "SPDXRef-DOCUMENT",
       "relationshipType": "DESCRIBES",
-      "relatedSpdxElement": "SPDXRef-package-b357191f-41fe-44f0-9686-213045c4db55"
+      "relatedSpdxElement": "SPDXRef-package-31aeef1d-f0d2-498b-9783-c465d3fafb2a"
     }
   ]
 }
