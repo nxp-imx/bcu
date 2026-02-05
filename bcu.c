@@ -31,6 +31,8 @@
 
 #ifdef _WIN32
 #define _CRT_SECURE_NO_WARNINGS //in order to use strcpy without error
+#include <winsock2.h>
+#include <ws2tcpip.h> // must be included before <windows.h>
 #include <windows.h>
 #include <processthreadsapi.h>
 #endif
@@ -2960,11 +2962,6 @@ GET_PATH3:
 #if defined(linux) || defined(__APPLE__)
 #include <arpa/inet.h>
 #include <sys/socket.h>
-#endif
-
-#ifdef _WIN32
-#include <winsock2.h>
-#include <ws2tcpip.h>
 #endif
 
 #define PORT 65432
