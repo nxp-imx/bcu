@@ -1,5 +1,5 @@
 /*
-* Copyright 2019-2021 NXP.
+* Copyright 2019-2021, 2026 NXP.
 *
 * Redistribution and use in source and binary forms, with or without modification,
 * are permitted provided that the following conditions are met:
@@ -308,6 +308,8 @@ void ft_list_devices(char location_str[][MAX_LOCATION_ID_LENGTH], int *board_num
 	char Description[64]; // create the device information list
 	DWORD board_table[MAX_NUMBER_OF_USB_DEVICES][5]; //used for recording the location id of the board
 	char location_id_str[MAX_NUMBER_OF_USB_DEVICES][MAX_LOCATION_ID_LENGTH];
+	char board_serial[MAX_NUMBER_OF_USB_DEVICES][16]; // Add array to store serial numbers
+	char board_description[MAX_NUMBER_OF_USB_DEVICES][64]; // Add array to store product descriptions
 	int detected_boards = 0;
 
 	ftStatus = ft.FT_create_device_info_list(&numDevs);
@@ -344,6 +346,8 @@ void ft_list_devices(char location_str[][MAX_LOCATION_ID_LENGTH], int *board_num
 					if (strcmp("A", &Description[strlen(Description) - 1]) == 0) {
 						board_table[k][0] = loc_id;
 						sprintf(location_id_str[k], "%x", loc_id);
+						strncpy(board_serial[k], SerialNumber, strlen(SerialNumber) - 1);
+						board_serial[k][strlen(SerialNumber) - 1] = '\0';
 					}
 					else if (strcmp("B", &Description[strlen(Description) - 1]) == 0)
 						board_table[k][1] = loc_id;
@@ -390,10 +394,49 @@ void ft_list_devices(char location_str[][MAX_LOCATION_ID_LENGTH], int *board_num
 		else
 			*board_num = detected_boards;
 
+		// Read EEPROM product description for each detected board
+		for (int j = 0; j < detected_boards; j++)
+		{
+			EEPROM_DATA ep_data;
+			char temp[64];
+			char desc_buf[64] = { 0 };
+			ep_data.verify1 = 0x00000000;
+			ep_data.verify2 = 0xffffffff;
+			ep_data.ver = 0x4;
+			ep_data.mfr = temp;
+			ep_data.mfrid = temp;
+			ep_data.desc = desc_buf;
+			ep_data.sn = temp;
+
+			FT_HANDLE temp_handle;
+			// Open channel B (most reliable)
+			int status = ft.FT_open_ex((PVOID)board_table[j][1], OPEN_BY_LOCATION, &temp_handle);
+			if (status == 0)
+			{
+				status = ft.FT_EEPROM_read(temp_handle, &ep_data);
+				if (status == 0)
+				{
+					strncpy(board_description[j], desc_buf, sizeof(board_description[j]) - 1);
+					board_description[j][sizeof(board_description[j]) - 1] = '\0';
+				}
+				else
+				{
+					strcpy(board_description[j], "N/A");
+				}
+				ft.FT_close(temp_handle);
+			}
+			else
+			{
+				strcpy(board_description[j], "N/A");
+			}
+		}
+
 		for (int j = 0; j < detected_boards; j++)
 		{
 			if (mode == LIST_DEVICE_MODE_PRINT)
-				printf("board [%d] location_id=%s\n", j, location_id_str[j]);
+				printf("board[%d] location_id=%s serial_no: %s product Desc: %s\n", j, location_id_str[j],
+					board_serial[j][0] == '\0' ? "N/A" : board_serial[j],
+					board_description[j][0] == '\0' ? "N/A" : board_description[j]);
 			else
 				strcpy(location_str[j], location_id_str[j]);
 			//printf("id: %s\n", location_id_str[j]);
@@ -435,6 +478,7 @@ void ft_list_devices(char location_str[][MAX_LOCATION_ID_LENGTH], int *board_num
 	memset(location_id, 0, sizeof(location_id));
 	struct libusb_device_descriptor desc;
 	char serial[33];
+	char product[128];
 
 	i = 0;
 	for (curdev = devlist; curdev != NULL; i++)
@@ -466,23 +510,33 @@ void ft_list_devices(char location_str[][MAX_LOCATION_ID_LENGTH], int *board_num
 			}
 		}
 
-		if (!libusb_get_device_descriptor(curdev->dev, &desc))
-		{
-			libusb_device_handle *handle;
+		memset(serial, 0, sizeof(serial));
+		memset(product, 0, sizeof(product));
 
-			memset(serial, 0, sizeof(serial));
-
-			ret = libusb_open(curdev->dev, &handle);
-			if (!ret)
+		// Read EEPROM product description
+		struct ftdi_context* temp_ftdi = ftdi_new();
+		if (temp_ftdi) {
+			if (ftdi_set_interface(temp_ftdi, INTERFACE_B) == 0)
 			{
-				if (handle && desc.iSerialNumber)
-					libusb_get_string_descriptor_ascii(handle, desc.iSerialNumber, serial, 31);
-				libusb_close(handle);
+				if (ftdi_usb_open_dev(temp_ftdi, curdev->dev) == 0)
+				{
+					if (ftdi_read_eeprom(temp_ftdi) == 0)
+					{
+						if (ftdi_eeprom_decode(temp_ftdi, 0) == 0)
+						{
+							ftdi_eeprom_get_strings(temp_ftdi, NULL, 0, product, sizeof(product) - 1, serial, sizeof(serial) - 1);
+						}
+					}
+					ftdi_usb_close(temp_ftdi);
+				}
 			}
+			ftdi_free(temp_ftdi);
 		}
 
 		if (mode == LIST_DEVICE_MODE_PRINT)
-			printf("board[%d] location_id=%s serial_no: %s\n", i, location_id[i], serial[0] == '\0' ? "N/A" : serial);
+			printf("board[%d] location_id=%s serial_no: %s product Desc: %s\n", i, location_id[i],
+				serial[0] == '\0' ? "N/A" : serial,
+				product[0] == '\0' ? "N/A" : product);
 		else
 			strcpy(location_str[i], location_id[i]);
 
