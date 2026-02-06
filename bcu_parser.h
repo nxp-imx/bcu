@@ -1,5 +1,5 @@
 /*
-* Copyright 2019-2021 NXP.
+* Copyright 2019-2021, 2026 NXP.
 *
 * Redistribution and use in source and binary forms, with or without modification,
 * are permitted provided that the following conditions are met:
@@ -40,6 +40,7 @@
 #define PARSER_EEPROM_WRITE_FROM_FILE	4
 #define PARSER_EEPROM_UPDATE_USER_SN	5
 #define PARSER_EEPROM_ERASE		6
+#define PARSER_EEPROM_UPDATE_FTDI_SN	7
 
 #define NO_BOARD_AND_ID	1
 #define NO_BOARD	2
@@ -76,6 +77,7 @@ struct options_setting {
 	int dump_statistics;
 	int eeprom_function;
 	short eeprom_usr_sn;
+	char* eeprom_ftdi_sn;
 	unsigned char eeprom_board_rev[3];
 	unsigned char eeprom_soc_rev[3];
 	int download_doc;

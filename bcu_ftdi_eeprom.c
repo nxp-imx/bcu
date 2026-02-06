@@ -1,5 +1,5 @@
 /*
-* Copyright 2020-2021 NXP.
+* Copyright 2020-2021, 2026 NXP.
 *
 * Redistribution and use in source and binary forms, with or without modification,
 * are permitted provided that the following conditions are met:
@@ -862,6 +862,10 @@ int bcu_ftdi_eeprom_write(struct eeprom_device* eeprom, unsigned int write_idx, 
 		memcpy(&temp, write_buf, sizeof(short));
 		eeprom_ua_data->sn = temp;
 		break;
+	case ftdi_eeprom_ftdi_sn:
+		memset(eeprom_data.ftdi_sn, 0, BCU_FTDI_EEPROM_SN_LEN); // Clear the buffer first
+		strncpy((char*)eeprom_data.ftdi_sn, (char*)write_buf, BCU_FTDI_EEPROM_SN_LEN - 1);
+		break;
 	default:
 		break;
 	}
@@ -876,6 +880,11 @@ int bcu_ftdi_eeprom_write(struct eeprom_device* eeprom, unsigned int write_idx, 
 int bcu_ftdi_eeprom_update_usr_sn(struct eeprom_device* eeprom, unsigned short ua_sn)
 {
 	return bcu_ftdi_eeprom_write(eeprom, ftdi_eeprom_sn, &ua_sn);
+}
+
+int bcu_ftdi_eeprom_update_ftdi_sn(struct eeprom_device* eeprom, unsigned char* ftdi_sn)
+{
+	return bcu_ftdi_eeprom_write(eeprom, ftdi_eeprom_ftdi_sn, ftdi_sn);
 }
 
 int bcu_ftdi_eeprom_update_board_rev(struct eeprom_device* eeprom, unsigned char* ua_sn)
