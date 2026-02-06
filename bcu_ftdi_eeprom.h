@@ -1,5 +1,5 @@
 /*
-* Copyright 2020 NXP.
+* Copyright 2020, 2026 NXP.
 *
 * Redistribution and use in source and binary forms, with or without modification,
 * are permitted provided that the following conditions are met:
@@ -46,7 +46,8 @@ enum ftdi_eeprom_field {
 	ftdi_eeprom_pmic_id,
 	ftdi_eeprom_pmic_rev,
 	ftdi_eeprom_nbr_pwr_rails,
-	ftdi_eeprom_sn
+	ftdi_eeprom_sn,
+	ftdi_eeprom_ftdi_sn
 };
 
 struct ftdi_eeprom_field_code_tb {
