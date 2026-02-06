@@ -1,5 +1,5 @@
 /*
-* Copyright 2019-2021 NXP.
+* Copyright 2019-2021, 2026 NXP.
 *
 * Redistribution and use in source and binary forms, with or without modification,
 * are permitted provided that the following conditions are met:
@@ -58,6 +58,8 @@ struct name_and_init_func chip_list[] =
 	"at24cxx", at24cxx_create,
 	"pct2075", pct2075_create,
 	"ptc_revA", ptc_revA_create,
+	"pcal9555a", pcal9555a_create,
+	"pca9847", pca9847_create,
 };
 int num_of_chips = sizeof(chip_list) / sizeof(struct name_and_init_func);
 
@@ -411,6 +413,89 @@ int pca9548_set_channel(struct pca9548* pca9548)
 	if (status)
 	{
 		printf("oh no! no ack received!\n");
+	}
+	parent->i2c_write(parent, change_channel_cmd, I2C_TYPE_PCA9548);
+	parent->i2c_stop(parent);
+
+	return 0;
+}
+
+//////////////////////////PCA9847//////////////////////////////////
+void* pca9847_create(char* chip_specification, void* parent)
+{
+	struct pca9847* pca = calloc(1, sizeof(struct pca9847));
+
+	if (pca == NULL)
+	{
+		printf("failed to create pca9847 struct ...\n");
+		return NULL;
+	}
+	pca->i2c_device.device.parent = parent;
+	pca->i2c_device.i2c_read = pca9847_read;
+	pca->i2c_device.i2c_readn = pca9847_readn;
+	pca->i2c_device.i2c_write = pca9847_write;
+	pca->i2c_device.i2c_start = pca9847_start;
+	pca->i2c_device.i2c_stop = pca9847_stop;
+	pca->channel = extract_parameter_value(chip_specification, "channel");
+	pca->addr = extract_parameter_value(chip_specification, "addr");
+	pca9847_set_channel(pca);
+
+	return pca;
+}
+
+int pca9847_read(void* pca9847, unsigned char* data_buffer, int is_nack, int type)
+{
+	struct pca9847* pca = pca9847;
+	struct i2c_device* parent = (void*)pca->i2c_device.device.parent;
+	parent->i2c_read(parent, data_buffer, is_nack, type);
+	return 0;
+}
+
+int pca9847_readn(void* pca9847, unsigned char* data_buffer, int type, int len)
+{
+	struct pca9847* pca = pca9847;
+	struct i2c_device* parent = (void*)pca->i2c_device.device.parent;
+	parent->i2c_readn(parent, data_buffer, type, len);
+	return 0;
+}
+
+int pca9847_write(void* pca9847, unsigned char data, int type)
+{
+	struct pca9847* pca = pca9847;
+	struct i2c_device* parent = (void*)pca->i2c_device.device.parent;
+	return 	parent->i2c_write(parent, data, type);
+}
+
+int pca9847_start(void* pca9847)
+{
+	struct pca9847* pca = pca9847;
+	struct i2c_device* parent = (void*)pca->i2c_device.device.parent;
+	parent->i2c_start(parent);
+	return 0;
+}
+
+int pca9847_stop(void* pca9847)
+{
+	struct pca9847* pca = pca9847;
+	struct i2c_device* parent = (void*)pca->i2c_device.device.parent;
+	parent->i2c_stop(parent);
+	return 0;
+}
+
+int pca9847_set_channel(struct pca9847* pca9847)
+{
+	struct pca9847* pca = pca9847;
+	struct i2c_device* parent = (void*)pca->i2c_device.device.parent;
+	unsigned char addr_plus_write = pca->addr << 1;
+	unsigned char change_channel_cmd = 0X08 | (pca->channel);
+	int status;
+
+	parent->i2c_start(parent);
+	status = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_PCA9548);
+	if (status)
+	{
+		printf("oh no! no ack received!\n");
+		return -10;
 	}
 	parent->i2c_write(parent, change_channel_cmd, I2C_TYPE_PCA9548);
 	parent->i2c_stop(parent);
@@ -1747,6 +1832,196 @@ int pca6416a_get_output(void* pca6416a, unsigned char* current_output)
 	*current_output = (*current_output) & pca->gpio_device.pin_bitmask;
 
 	return 0;
+}
+
+////////////////////////PCAL9555AH//////////////////////////////////
+// from datasheet: Power-up with all channels configured as inputs and weak pull-up resistors
+// The chip has ONLY push-pull mode when a pin is set as output.
+
+#define PCAL9555A_INPUT_PORT0      0x00 // read actual values of pins (either input or output)
+#define PCAL9555A_OUTPUT_PORT0     0x02 // set the voltage value of a pin if configured as output. If no polarity inversion is selected, 1 corresponds to aprox. Vdd and 0 is GND
+#define PCAL9555A_CONFIG_PORT0     0x06 // set pin as input or output. 1 is for input, 0 is for output
+
+void* pcal9555a_create(char* chip_specification, void* parent)
+{
+	struct pcal9555a* pcal = calloc(1, sizeof(struct pcal9555a));
+
+	if (pcal == NULL)
+	{
+		printf("failed to create pcal9555a struct ...\n");
+		return NULL;
+	}
+
+	pcal->gpio_device.device.parent = parent;
+	pcal->gpio_device.gpio_read = pcal9555a_read;
+	pcal->gpio_device.gpio_write = pcal9555a_write;
+	pcal->gpio_device.gpio_toggle = pcal9555a_toggle;
+	pcal->gpio_device.gpio_get_output = pcal9555a_get_output;
+	pcal->gpio_device.pin_bitmask = extract_parameter_value(chip_specification, "pin_bitmask");
+	pcal->gpio_device.opendrain = extract_parameter_value(chip_specification, "opendrain");
+	pcal->gpio_device.active_level = extract_parameter_value(chip_specification, "active_level");
+	pcal->addr = extract_parameter_value(chip_specification, "addr");
+	pcal->port = extract_parameter_value(chip_specification, "port");
+
+	return pcal;
+}
+
+int pcal9555a_read(void* pcal9555a, unsigned char* bit_value_buffer)
+{
+	struct pcal9555a* pcal = (struct pcal9555a*)pcal9555a;
+	struct i2c_device* parent = (void*)pcal->gpio_device.device.parent;
+	unsigned char addr_plus_write = (pcal->addr << 1);
+	unsigned char addr_plus_read = (pcal->addr << 1) | 1;
+	unsigned char input_cmd = PCAL9555A_INPUT_PORT0 + pcal->port;
+	int status = 0;
+
+	status = parent->i2c_start(parent);
+	if (status) return status;
+	status = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_GPIO);
+	if (status) return status;
+	status = parent->i2c_write(parent, input_cmd, I2C_TYPE_GPIO);
+	if (status) return status;
+	status = parent->i2c_start(parent);
+	if (status) return status;
+	status = parent->i2c_write(parent, addr_plus_read, I2C_TYPE_GPIO);
+	if (status) return status;
+	status = parent->i2c_read(parent, bit_value_buffer, 1, I2C_TYPE_GPIO);
+	if (status) return status;
+	status = parent->i2c_stop(parent);
+	return status;
+
+	//mask away unwanted value;
+	*bit_value_buffer = (*bit_value_buffer) & (pcal->gpio_device.pin_bitmask);
+}
+
+int pcal9555a_write(void* pcal9555a, unsigned char bits_value)
+{
+	struct pcal9555a* pcal = (struct pcal9555a*)pcal9555a;
+	// since the chip has no opendrain mode for a pin set as output, it is implied that when opendrain is selected, the pin must be in input mode
+	pcal9555a_set_direction(pcal, pcal->gpio_device.pin_bitmask);
+	return pcal9555a_set_output(pcal, bits_value);
+}
+
+int pcal9555a_toggle(void* pcal9555a)
+{
+	struct pcal9555a* pcal = (struct pcal9555a*)pcal9555a;
+	unsigned char current_output;
+	int result = pcal9555a_get_output(pcal, &current_output);
+
+	if (result) {
+		return result;
+	}
+	return pcal9555a_set_output(pcal, ~current_output);
+}
+
+int pcal9555a_set_direction(struct pcal9555a* pcal, unsigned char value)
+{
+	struct i2c_device* parent = (void*)pcal->gpio_device.device.parent;
+	unsigned char addr_plus_write = (pcal->addr << 1);
+	unsigned char addr_plus_read = (pcal->addr << 1) | 1;
+	unsigned char config_cmd = PCAL9555A_CONFIG_PORT0 + pcal->port;
+	unsigned char config_reg_initial_value[1];
+	int status = 0;
+
+	// first read the value of PCAL9555A_CONFIG_PORT0/1. It is important not to break the initial setup bcu finds.
+	status = parent->i2c_start(parent);
+	if (status) return status;
+	status = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_GPIO);
+	if (status) return status;
+	status = parent->i2c_write(parent, config_cmd, I2C_TYPE_GPIO);
+	if (status) return status;
+	status = parent->i2c_start(parent);
+	if (status) return status;
+	status = parent->i2c_write(parent, addr_plus_read, I2C_TYPE_GPIO);
+	if (status) return status;
+	status = parent->i2c_read(parent, config_reg_initial_value, 1, I2C_TYPE_GPIO);
+	if (status) return status;
+	status = parent->i2c_stop(parent);
+	if (status) return status;
+	unsigned char config_reg_final_value;
+
+	if (pcal->gpio_device.opendrain <= 0) { // pin is output
+		config_reg_final_value = ~value & config_reg_initial_value[0];
+	}
+	else { // pins are input
+		config_reg_final_value = value | config_reg_initial_value[0];
+	}
+
+	// write the new calculated value on the PCAL9555A_CONFIG_PORT0/1
+	status = parent->i2c_start(parent);
+	if (status) return status;
+	status = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_GPIO);
+	if (status) return status;
+	status = parent->i2c_write(parent, config_cmd, I2C_TYPE_GPIO);
+	if (status) return status;
+	status = parent->i2c_write(parent, config_reg_final_value, I2C_TYPE_GPIO);
+	if (status) return status;
+	status = parent->i2c_stop(parent);
+	return status;
+}
+
+int pcal9555a_set_output(struct pcal9555a* pcal, unsigned char bits_value)
+{
+	struct i2c_device* parent = (void*)pcal->gpio_device.device.parent;
+	unsigned char addr_plus_write = (pcal->addr << 1);
+	unsigned char addr_plus_read = (pcal->addr << 1) | 1;
+	unsigned char output_cmd = PCAL9555A_OUTPUT_PORT0 + pcal->port;
+	unsigned char output_reg_initial_value[1];
+	int status = 0;
+
+	status = parent->i2c_start(parent);
+	if (status) return status;
+	status = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_GPIO);
+	if (status) return status;
+	status = parent->i2c_write(parent, output_cmd, I2C_TYPE_GPIO);
+	if (status) return status;
+	status = parent->i2c_start(parent);
+	if (status) return status;
+	status = parent->i2c_write(parent, addr_plus_read, I2C_TYPE_GPIO);
+	if (status) return status;
+	status = parent->i2c_read(parent, output_reg_initial_value, 1, I2C_TYPE_GPIO);
+	if (status) return status;
+	status = parent->i2c_stop(parent);
+	if (status) return status;
+
+	unsigned char output_reg_final_value = (output_reg_initial_value[0] & ~pcal->gpio_device.pin_bitmask) |
+		(bits_value & pcal->gpio_device.pin_bitmask);
+
+	status = parent->i2c_start(parent);
+	if (status) return status;
+	status = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_GPIO);
+	if (status) return status;
+	status = parent->i2c_write(parent, output_cmd, I2C_TYPE_GPIO);
+	if (status) return status;
+	status = parent->i2c_write(parent, output_reg_final_value, I2C_TYPE_GPIO);
+	if (status) return status;
+	status = parent->i2c_stop(parent);
+	return status;
+}
+
+int pcal9555a_get_output(void* pcal9555a, unsigned char* current_output)
+{
+	struct pcal9555a* pcal = (struct pcal9555a*)pcal9555a;
+	struct i2c_device* parent = (void*)pcal->gpio_device.device.parent;
+	unsigned char addr_plus_write = (pcal->addr << 1);
+	unsigned char addr_plus_read = (pcal->addr << 1) | 1;
+	unsigned char output_cmd = PCAL9555A_OUTPUT_PORT0 + pcal->port;
+	int status = 0;
+
+	status = parent->i2c_start(parent);
+	if (status) return status;
+	status = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_GPIO);
+	if (status) return status;
+	status = parent->i2c_write(parent, output_cmd, I2C_TYPE_GPIO);
+	if (status) return status;
+	status = parent->i2c_start(parent);
+	if (status) return status;
+	status = parent->i2c_write(parent, addr_plus_read, I2C_TYPE_GPIO);
+	if (status) return status;
+	status = parent->i2c_read(parent, current_output, 1, I2C_TYPE_GPIO);
+	if (status) return status;
+	status = parent->i2c_stop(parent);
+	return status;
 }
 
 ////////////////////////PCAL6524H//////////////////////////////////
