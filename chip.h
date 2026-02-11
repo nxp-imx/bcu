@@ -180,6 +180,7 @@ int pca9847_start(void* pca9847);
 int pca9847_stop(void* pca9847);
 void* pca9847_create(char* chip_specification, void* parent);
 int pca9847_set_channel(struct pca9847* pca9847);
+void* pca9847_s32n79_i2cmux_create(char* chip_specification, void* parent);
 
 ///////////////////////////////////////////////////////////////////////
 struct ft4232h_eeprom {
