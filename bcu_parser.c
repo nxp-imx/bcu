@@ -530,6 +530,12 @@ int parse_options(char* cmd, int argc, char** argv, struct options_setting* sett
 			setting->eeprom_usr_sn = atoi(input);
 			printf("eeprom user SN will be set to %d\n", setting->eeprom_usr_sn);
 		}
+		else if (strncmp(argv[i], "-w_ftdi_sn=", 11) == 0 && strlen(argv[i]) > 11)
+		{
+			setting->eeprom_function = PARSER_EEPROM_UPDATE_FTDI_SN;
+			setting->eeprom_ftdi_sn = input;
+			printf("eeprom FTDI SN will be set to %s\n", setting->eeprom_ftdi_sn);
+		}
 		else if (strncmp(argv[i], "-sn=", 4) == 0 && strlen(argv[i]) > 4)
 		{
 			setting->eeprom_usr_sn = atoi(input);
