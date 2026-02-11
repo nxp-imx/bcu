@@ -60,6 +60,7 @@ struct name_and_init_func chip_list[] =
 	"ptc_revA", ptc_revA_create,
 	"pcal9555a", pcal9555a_create,
 	"pca9847", pca9847_create,
+	"pca9847_s32n79_i2cmux", pca9847_s32n79_i2cmux_create,
 };
 int num_of_chips = sizeof(chip_list) / sizeof(struct name_and_init_func);
 
@@ -501,6 +502,18 @@ int pca9847_set_channel(struct pca9847* pca9847)
 	parent->i2c_stop(parent);
 
 	return 0;
+}
+
+//////////////////////////pca9847 i2c mux on S32N79RDB//////////////////////////////////
+void* pca9847_s32n79_i2cmux_create(char* chip_specification, void* parent)
+{
+	// get access to the i2c mux via the level translator. Disable EN_RCON_I2C
+	struct pcal9555a* pcal = pcal9555a_create("pcal9555a{addr=0x25;port=0;pin_bitmask=0x0C;opendrain=0}", parent);
+	pcal->gpio_device.gpio_write(pcal, 0x04);
+	msleep(100); // stabilize the line
+
+	struct pca9847* pca = pca9847_create(chip_specification, parent);
+	return pca;
 }
 
 ////////////////////////////////ft4232h_eeprom///////////////////////////////////
