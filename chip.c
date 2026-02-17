@@ -61,6 +61,7 @@ struct name_and_init_func chip_list[] =
 	"pcal9555a", pcal9555a_create,
 	"pca9847", pca9847_create,
 	"pca9847_s32n79_i2cmux", pca9847_s32n79_i2cmux_create,
+	"at24c01_s32n79_rcon", at24c01_s32n79_rcon_create,
 };
 int num_of_chips = sizeof(chip_list) / sizeof(struct name_and_init_func);
 
@@ -336,6 +337,18 @@ int at24cxx_check_board(void* at24cxx)
 		parent->i2c_stop(parent);
 		return 0;
 	}
+}
+
+//////////////////////////24c01 S32N79RDB RCON//////////////////////////////////
+void* at24c01_s32n79_rcon_create(char* chip_specification, void* parent)
+{
+	// get access to the EEPROM via the level translator. Disable EN_CNTL_I2C
+	struct pcal9555a* pcal = pcal9555a_create("pcal9555a{addr=0x25;port=0;pin_bitmask=0x0C;opendrain=0}", parent);
+	pcal->gpio_device.gpio_write(pcal, 0x08);
+	msleep(100); // stabilize the line.
+
+	struct at24cxx* at24 = at24cxx_create(chip_specification, parent);
+	return at24;
 }
 
 //////////////////////////PCA9548//////////////////////////////////
