@@ -611,6 +611,7 @@ void* ft4232h_i2c_create(char* chip_specification, void* parent)
 	ft->i2c_device.i2c_start = ft4232h_i2c_start;
 	ft->i2c_device.i2c_stop = ft4232h_i2c_stop;
 	ft->i2c_device.device.free = ft4232h_i2c_free;
+	ft->i2c_device.frequency_khz = extract_parameter_value(chip_specification, "frequency");
 	ft->channel = extract_parameter_value(chip_specification, "channel");
 	if (extract_parameter_value(chip_specification, "dir_bitmask") == -1)
 	{
@@ -912,6 +913,15 @@ int ft4232h_i2c_init(struct ft4232h* ft)
 {
 	unsigned char buffer[MAX_FTDI_BUFFER_SIZE];
 	int i = 0, ftStatus = 0;
+	static const struct freq_map freq_table[] = {
+		{100, CLOCK_DIVISOR_100K},
+		{200, CLOCK_DIVISOR_200K},
+		{400, CLOCK_DIVISOR_400K},
+		{1000, CLOCK_DIVISOR_1M},
+	};
+	static const size_t freq_table_size = sizeof(freq_table) / sizeof(freq_table[0]);
+	int frequency_khz = 400; // default frequency
+	unsigned char frequency_divisor = CLOCK_DIVISOR_400K;
 
 	ft_set_bitmode(ft->ftdi_info, 0, 0); //resetting the controller
 	ft_set_bitmode(ft->ftdi_info, 0, BM_MPSSE);//set as MPSSE
@@ -930,8 +940,18 @@ int ft4232h_i2c_init(struct ft4232h* ft)
 	// The SK clock frequency can be worked out by below algorithm with divide by 5 set as off
 	// SK frequency = 60MHz /((1 + [(1 +0xValueH*256) OR 0xValueL])*2)
 	buffer[i++] = MPSSE_CMD_SET_CLOCK_DIVISOR; //Command to set clock divisor
-	buffer[i++] = (unsigned char)(CLOCK_DIVISOR_400K & '\xFF'); //Set 0xValueL of clock divisor
-	buffer[i++] = (unsigned char)((CLOCK_DIVISOR_400K >> 8) & '\xFF'); //Set 0xValueH of clock divisor
+	// change default frequency
+	for (size_t i = 0; i < freq_table_size; i++)
+	{
+		if (ft->i2c_device.frequency_khz == freq_table[i].f_khz) {
+			frequency_khz = freq_table[i].f_khz;
+			frequency_divisor = freq_table[i].divisor;
+			break;
+		}
+	}
+	printf("I2C frequency: %dKHz\n", frequency_khz);
+	buffer[i++] = (unsigned char)(frequency_divisor & '\xFF'); //Set 0xValueL of clock divisor
+	buffer[i++] = (unsigned char)((frequency_divisor >> 8) & '\xFF'); //Set 0xValueH of clock divisor
 
 	ftStatus = ft_write(ft->ftdi_info, buffer, i);
 	if (ftStatus < 0)
