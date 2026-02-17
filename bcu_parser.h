@@ -58,6 +58,8 @@ struct options_setting {
 	int output_state;
 	int boot_mode_hex;
 	int boot_config_hex[MAX_BOOT_CONFIG_BYTE];
+	int boot_config_hex_size; // in case boot_mode is "custom" will be populated with read CLI boot_config_hex array size
+	int eeprom_cfg_addr; // in case of eeprom boot, holds the address in the internal eeprom memory layout from where the configuration starts.
 	int active_low;
 	char path[MAX_PATH_LENGTH];
 	char gpio_name[MAX_MAPPING_NAME_LENGTH];

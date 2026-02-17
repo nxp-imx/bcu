@@ -52,6 +52,7 @@
 #include <signal.h>
 #include <ctype.h>
 #include <math.h>
+#include <limits.h>
 
 #include "port.h"
 #include "bcu_parser.h"
@@ -204,6 +205,7 @@ static void print_help(char* cmd)
 		printf("	%s%-60s%s%s\n", g_vt_default, "set_gpio [GPIO_NAME] [1/0] [-board=/-auto] [-id=]", g_vt_green, "set pin GPIO_NAME to be high(1) or low(0)");
 		printf("	%s%-60s%s%s\n", g_vt_default, "set_boot_mode [BOOTMODE_NAME] [-board=/-auto] [-id=]", g_vt_green, "set BOOTMODE_NAME as boot mode");
 		printf("	%s%-60s%s%s\n", g_vt_default, "              [-boothex=] [-bootbin=]", g_vt_green, "");
+		printf("	%s%-60s%s%s\n", g_vt_default, "              [-cfg_addr=]", g_vt_green, "set start address to write from in RCON EEPROM (if target supports it)");
 		printf("	%s%-60s%s%s\n", g_vt_default, "get_boot_mode [-board=/-auto] [-id=]", g_vt_green, "read the boot mode set by BCU before");
 		printf("\n");
 		printf("	%s%-60s%s%s\n", g_vt_default, "lsftdi", g_vt_green, "list all boards connected by ftdi device");
@@ -799,17 +801,9 @@ static void set_boot_config(struct options_setting* setting)
 	}
 }
 
-static void set_boot_mode(struct options_setting* setting)
+static void set_gpio_boot_mode(struct options_setting* setting)
 {
-	if (setting->boot_mode_hex == -1)
-	{
-		printf("could not detect a valid boot_mode,\nplease entered a valid boot mode\n");
-		printf("set_boot_mode failed\n");
-		return;
-	}
 	struct board_info* board = get_board(setting->board);
-	if (board == NULL)
-		return;
 	struct gpio_device* gpio = NULL;
 	int status = -1;
 
@@ -838,6 +832,115 @@ static void set_boot_mode(struct options_setting* setting)
 
 	if (board->boot_cfg_byte_num > 0)
 		set_boot_config(setting);
+}
+
+static void set_eeprom_boot_mode(struct options_setting* setting)
+{
+	struct board_info* board = get_board(setting->board);
+	void* head = NULL;
+	struct eeprom_device* end_point;
+	char path[MAX_PATH_LENGTH] = "";
+	int i = 0, j = 0;
+
+	if (get_path(path, "boot_mode", board) == -1)
+	{
+		printf("Failed to find boot_mode path\n");
+		return;
+	}
+	end_point = (struct eeprom_device*)build_device_linkedlist_forward(&head, path);
+
+	while (board->boot_modes[i].name != NULL)
+	{
+		if (board->boot_modes[i].boot_mode_hex == setting->boot_mode_hex)
+		{
+			break;
+		}
+		i++;
+	}
+
+	unsigned char found = 0;
+	unsigned char* data_buffer;
+	unsigned int eeprom_start_address;
+	int data_buffer_size;
+
+	while (board->boot_configs[j].name != NULL)
+	{
+		if (strcmp(board->boot_configs[j].name, board->boot_modes[i].name) == 0)
+		{
+			if (setting->eeprom_cfg_addr == -1)
+			{
+				eeprom_start_address = board->boot_configs[j].boot_config_hex[0];
+			}
+			else
+			{
+				eeprom_start_address = setting->eeprom_cfg_addr;
+			}
+			if (strcmp(board->boot_configs[j].name, "custom") == 0)
+			{
+				data_buffer_size = setting->boot_config_hex_size;
+				data_buffer = malloc(data_buffer_size * sizeof(unsigned char));
+				for (int k = 0; k < data_buffer_size; k++)
+				{
+					*(data_buffer + k) = (unsigned char)setting->boot_config_hex[k];
+					if ( *(data_buffer + k) != setting->boot_config_hex[k] )
+					{
+						*(data_buffer + k) = (unsigned char)setting->boot_config_hex[k];
+						printf("%X must be hex. no. less or equal to 0XFF.", setting->boot_config_hex[k]);
+					}
+				}
+			}
+			else
+			{
+				data_buffer_size = board->boot_configs[j].actual_length - 1;
+				data_buffer = malloc(data_buffer_size * sizeof(unsigned char));
+				for (int k = 0; k < data_buffer_size; k++)
+				{
+					*(data_buffer + k) = board->boot_configs[j].boot_config_hex[k + 1];
+				}
+			}
+
+			end_point->eeprom_write(end_point, data_buffer, eeprom_start_address, data_buffer_size, data_buffer);
+			printf("boot_mode: %s", board->boot_modes[i].name);
+			printf("\n");
+			printf("addr: 0X%X", eeprom_start_address);
+			printf("\n");
+			printf("eeprom_data: ");
+			for (i = 0; i < data_buffer_size; i++)
+			{
+				printf("0X%X ", *(data_buffer + i));
+			}
+			free(data_buffer);
+			printf("\nPlease check data was written correctly using get_boot_mode option!\n");
+			break;
+		}
+		j++;
+	}
+
+	if (board->boot_configs[j].name == NULL) {
+		printf("set_boot_mode: No correct boot configuration provided for boot_mode %s!\n", board->boot_modes[i].name);
+	}
+	free_device_linkedlist_backward(end_point);
+}
+
+static void set_boot_mode(struct options_setting* setting)
+{
+	if (setting->boot_mode_hex == -1)
+	{
+		printf("could not detect a valid boot_mode,\nplease entered a valid boot mode\n");
+		printf("set_boot_mode failed\n");
+		return;
+	}
+	struct board_info* board = get_board(setting->board);
+	if (board == NULL)
+		return;
+	
+	if (get_mapping_type("boot_mode", board) == boot_eeprom)
+	{
+		set_eeprom_boot_mode(setting);
+	}
+	else {
+		set_gpio_boot_mode(setting);
+	}
 }
 
 static void get_boot_config(struct options_setting* setting, unsigned char boot_modehex)
@@ -899,79 +1002,166 @@ static void get_boot_mode(struct options_setting* setting)
 	struct board_info* board = get_board(setting->board);
 	if (board == NULL)
 		return;
-	struct gpio_device* gpio = NULL;
-	int status = -1;
-	unsigned char read_buf;
 
-	gpio = get_gpio("bootmode_sel", board);
-	if (gpio != NULL)
+	if (get_mapping_type("boot_mode", board) == boot_eeprom)
 	{
-		status = gpio->gpio_read(gpio, &read_buf);
-		if (status)
-			printf("get_boot_mode failed, error = 0x%x\n", status);
-		if (read_buf > 0)
-			read_buf = 1;
-		if (read_buf != (board->mappings[get_gpio_id("bootmode_sel", board)].initinfo & 0xF))
-		{
-			printf("get_boot_mode: bootmode_sel is disabled, boot from BOOT SWITCH!\n");
-			free_gpio(gpio);
-			return;
-		}
-		free_gpio(gpio);
-	}
-	else
-	{
-		gpio = get_gpio("remote_en", board);
-		if (gpio == NULL)
-		{
-			printf("get_boot_mode: Cannot find gpio remote_en!\n");
-			free_gpio(gpio);
-			return;
-		}
-		status = gpio->gpio_read(gpio, &read_buf);
-		if (status)
-			printf("get_boot_mode failed, error = 0x%x\n", status);
-		if (read_buf > 0)
-			read_buf = 1;
-		if (read_buf != (board->mappings[get_gpio_id("remote_en", board)].initinfo & 0xF))
-		{
-			printf("get_boot_mode: remote_en is disabled, boot from BOOT SWITCH!\n");
-			free_gpio(gpio);
-			return;
-		}
-		free_gpio(gpio);
-	}
+		void* head = NULL;
+		struct eeprom_device* end_point;
+		char path[MAX_PATH_LENGTH] = "";
+		unsigned char data_buff[20];
+		int status = -1;
+		unsigned char buff = 0;
+		unsigned char found = 0;
+		unsigned char* data_buffer;
+		char* boot_mode;
+		unsigned int eeprom_start_address;
+		int data_buffer_size;
+		int i = 0;
 
-	gpio = get_gpio("boot_mode", board);
-	if (gpio == NULL)
-	{
-		printf("get_boot_mode: No boot_mode configuration!\n");
-		free_gpio(gpio);
-		return;
+		if (get_path(path, "boot_mode", board) == -1)
+		{
+			printf("Failed to find boot_mode path.\n");
+			return;
+		}
+
+		end_point = (struct eeprom_device*)build_device_linkedlist_forward(&head, path);
+		while (board->boot_configs[i].name != NULL)
+		{
+			boot_mode = board->boot_configs[i].name;
+			eeprom_start_address = board->boot_configs[i].boot_config_hex[0];
+			data_buffer_size = board->boot_configs[i].actual_length - 1;
+			data_buffer = malloc(data_buffer_size * sizeof(unsigned char));
+
+			if (data_buffer == NULL)
+			{
+				fprintf(stderr, "Memory allocation failed\n");
+				return;
+			}
+
+			end_point->eeprom_read(end_point, data_buffer, eeprom_start_address, data_buffer_size, data_buffer);
+
+			if (strcmp(board->boot_configs[i].name, "custom") == 0)
+			{
+				found = 1;
+			}
+			else
+			{
+				for (int j = 0; j < data_buffer_size; j++)
+				{
+					if (data_buffer[j] == board->boot_configs[i].boot_config_hex[j + 1])
+					{
+						found = 1;
+					}
+					else
+					{
+						found = 0;
+						free(data_buffer);
+						break;
+					}
+				}
+			}
+
+			if (found)
+			{
+				break;
+			}
+			i++;
+		}
+
+		if (!found)
+		{
+			printf("No valid boot mode set in eeprom. Use lsbootmode to see available bootmodes.\n");
+		}
+		else {
+			printf("boot_mode: %s", boot_mode);
+			printf("\n");
+			printf("addr: 0X%X", eeprom_start_address);
+			printf("\n");
+			printf("eeprom_data: ");
+			for (i = 0; i < data_buffer_size; i++) {
+				printf("0X%X ", *(data_buffer + i));
+			}
+			printf("\n");
+
+			free(data_buffer);
+		}
 	}
-	if (get_boot_mode_offset(gpio->pin_bitmask) < 0)
+	else 
 	{
-		free_gpio(gpio);
-		return;
-	}
-	status = gpio->gpio_read(gpio, &read_buf);
-	read_buf = read_buf >> get_boot_mode_offset(gpio->pin_bitmask);
-	free_gpio(gpio);
-	if (status)
-		printf("get_boot_mode failed, error = 0x%x\n", status);
-	else
-	{
-		if (get_boot_mode_name_from_hex(board, read_buf) == NULL)
-			printf("get_boot_mode hex value: %s0x%x%s, cannot find the boot mode string.\n",
-				g_vt_red, read_buf, g_vt_default);
+		struct gpio_device* gpio = NULL;
+		int status = -1;
+		unsigned char read_buf;
+
+		gpio = get_gpio("bootmode_sel", board);
+		if (gpio != NULL)
+		{
+			status = gpio->gpio_read(gpio, &read_buf);
+			if (status)
+				printf("get_boot_mode failed, error = 0x%x\n", status);
+			if (read_buf > 0)
+				read_buf = 1;
+			if (read_buf != (board->mappings[get_gpio_id("bootmode_sel", board)].initinfo & 0xF))
+			{
+				printf("get_boot_mode: bootmode_sel is disabled, boot from BOOT SWITCH!\n");
+				free_gpio(gpio);
+				return;
+			}
+			free_gpio(gpio);
+		}
 		else
 		{
-			if (!board->boot_cfg_byte_num)
-				printf("get_boot_mode: %s%s%s, hex value: %s0x%x%s\n",
-					g_vt_red, get_boot_mode_name_from_hex(board, read_buf),
-					g_vt_default, g_vt_red, read_buf, g_vt_default);
+			gpio = get_gpio("remote_en", board);
+			if (gpio == NULL)
+			{
+				printf("get_boot_mode: Cannot find gpio remote_en!\n");
+				free_gpio(gpio);
+				return;
+			}
+			status = gpio->gpio_read(gpio, &read_buf);
+			if (status)
+				printf("get_boot_mode failed, error = 0x%x\n", status);
+			if (read_buf > 0)
+				read_buf = 1;
+			if (read_buf != (board->mappings[get_gpio_id("remote_en", board)].initinfo & 0xF))
+			{
+				printf("get_boot_mode: remote_en is disabled, boot from BOOT SWITCH!\n");
+				free_gpio(gpio);
+				return;
+			}
+			free_gpio(gpio);
+		}
+
+		gpio = get_gpio("boot_mode", board);
+		if (gpio == NULL)
+		{
+			printf("get_boot_mode: No boot_mode configuration!\n");
+			free_gpio(gpio);
+			return;
+		}
+		if (get_boot_mode_offset(gpio->pin_bitmask) < 0)
+		{
+			free_gpio(gpio);
+			return;
+		}
+		status = gpio->gpio_read(gpio, &read_buf);
+		read_buf = read_buf >> get_boot_mode_offset(gpio->pin_bitmask);
+		free_gpio(gpio);
+		if (status)
+			printf("get_boot_mode failed, error = 0x%x\n", status);
+		else
+		{
+			if (get_boot_mode_name_from_hex(board, read_buf) == NULL)
+				printf("get_boot_mode hex value: %s0x%x%s, cannot find the boot mode string.\n",
+					g_vt_red, read_buf, g_vt_default);
 			else
-				get_boot_config(setting, read_buf);
+			{
+				if (!board->boot_cfg_byte_num)
+					printf("get_boot_mode: %s%s%s, hex value: %s0x%x%s\n",
+						g_vt_red, get_boot_mode_name_from_hex(board, read_buf),
+						g_vt_default, g_vt_red, read_buf, g_vt_default);
+				else
+					get_boot_config(setting, read_buf);
+			}
 		}
 	}
 }

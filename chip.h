@@ -153,6 +153,7 @@ int at24cxx_read(void* at24cxx, unsigned char* data_buffer, unsigned int startad
 int at24cxx_write(void* at24cxx, unsigned char* data_buffer, unsigned int startaddr, int size, unsigned char* sn_buf);
 int at24cxx_check_board(void* at24cxx);
 void* at24cxx_create(char* chip_specification, void* parent);
+void* at24c01_s32n79_rcon_create(char* chip_specification, void* parent);
 ///////////////////////////////////////////////////////////////////////
 struct pca9548 {
 	struct i2c_device i2c_device;
