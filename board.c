@@ -2525,7 +2525,7 @@ struct mapping s32n79_mappings[] = {
 
 	// pins that are exposed as Testing Points (TPs) and act as GPIOs to control devices from outside the board:
 	{"TP32",      gpio, "/ft4232h_gpio{channel=2;pin_bitmask=0x01}", 0x00},
-	{"TP30",      gpio, "/ft4232h_gpio{channel=2;pin_bitmask=0x02", 0x00},
+	{"TP30",      gpio, "/ft4232h_gpio{channel=2;pin_bitmask=0x02}", 0x00},
 	{"TP29",      gpio, "/ft4232h_gpio{channel=3;pin_bitmask=0x01}", 0x00},
 	{"TP27",      gpio, "/ft4232h_gpio{channel=3;pin_bitmask=0x02}", 0x00},
 
@@ -2548,6 +2548,13 @@ struct boot_config s32n79_boot_config[] = {
 	{"sd",	{0x00, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, 21},
 	{"custom",	{0x00}, 21}, // must provide configuration from CLI
 	{NULL,		{0}}
+};
+
+// pins that must be set to a certain state. Without this some functionalities of S32N79RDB are affected
+struct gpio_state_on_exit s32n79_pins_on_exit[] = {
+	{"EN_CNTL_I2C", 0},
+	{"EN_RCON_I2C", 0},
+	{NULL, 0}
 };
 
 struct board_info board_list[] =
@@ -2594,7 +2601,7 @@ struct board_info board_list[] =
 	{"imx943evk19a0",	imx943evk19a0_board,	imx943_board_boot_modes,	0,	NULL,				imx943evk19_power_groups,	null_board_links,		&imx943evk19_ftdi_eeprom_user_area_info,	500},
 	{"imx943evk19b1",	imx943evk19b1_board,	imx943_board_boot_modes,	0,	NULL,				imx943evk19_power_groups,	null_board_links,		&imx943evk19b1_ftdi_eeprom_user_area_info,	500},
 	{"imx943obx",		imx943obx_board,	imx943_board_boot_modes,	0,	NULL,				imx943evk19_power_groups,	null_board_links,		&imx943obx_ftdi_eeprom_user_area_info,		500},
-	{"s32n79rdb",		s32n79_mappings,	s32n79_boot_modes,	0,	s32n79_boot_config,	NULL,	null_board_links,	&s32n79rdb_ftdi_eeprom_user_area_info,	500},
+	{"s32n79rdb",		s32n79_mappings,	s32n79_boot_modes,	0,	s32n79_boot_config,	NULL,	null_board_links,	&s32n79rdb_ftdi_eeprom_user_area_info,	500, s32n79_pins_on_exit},
 	{"val_board_7",		val_board_7_board,	imx943_board_boot_modes,	0,	NULL,				NULL,				null_board_links,		&val_board_7_ftdi_eeprom_user_area_info,	500},
 	{"val_board_9",		val_board_9_board,	null_boot_mode,			0,	NULL,				val_board_9_power_groups,	null_board_links,		&val_board_9_ftdi_eeprom_user_area_info,	500},
 	{"val_board_10",	val_board_10_board,	val_board_10_boot_modes,	0,	NULL,				val_board_10_power_groups,	null_board_links,		&val_board_10_ftdi_eeprom_user_area_info,	500},

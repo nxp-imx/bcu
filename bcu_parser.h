@@ -90,6 +90,7 @@ struct options_setting {
 	int ptc_onoff;
 	int ptc_sensor;
 	int autoranging;
+	int no_release_pins; // no need to release pins before exit
 };
 
 struct group {
