@@ -76,6 +76,12 @@ struct boot_config {
 								*/
 };
 
+// there are cases when before exit certain pins used as enablers for hw functionalities must be brought to a known value
+struct gpio_state_on_exit {
+	const char* name;
+	int value;
+};
+
 struct board_links {
 	char* flashbin;
 	char* sdcard;
@@ -96,6 +102,7 @@ struct board_info {
 	struct board_links* links;
 	struct ftdi_eeprom_user_area* eeprom_data;
 	unsigned int reset_time_ms;
+	struct gpio_state_on_exit* gpio_on_exit;
 };
 
 /*find if there is the gpio_name on the board*/

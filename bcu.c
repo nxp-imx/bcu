@@ -231,6 +231,7 @@ static void print_help(char* cmd)
 
 static void lsgpio(struct options_setting* setting)
 {
+	setting->no_release_pins = 1;
 	struct board_info* board = get_board(setting->board);
 	if (board == NULL)
 		return;
@@ -248,6 +249,7 @@ static void lsgpio(struct options_setting* setting)
 
 static void lsboard(struct options_setting* setting)
 {
+	setting->no_release_pins = 1;
 	printf("\nlist of supported board model:\n\n");
 	for (int i = 0; i < num_of_boards; i++)
 	{
@@ -375,6 +377,7 @@ void free_gpio(struct gpio_device* gpio)
 
 static void ptc_set_target_temperature(struct options_setting *setting)
 {
+	setting->no_release_pins = 1;
 	struct board_info *board = get_board(setting->board);
 	if (board == NULL)
 		return;
@@ -451,6 +454,7 @@ static void ptc_set_target_temperature(struct options_setting *setting)
 
 static void ptc_set_current_temperature(struct options_setting *setting)
 {
+	setting->no_release_pins = 1;
 	struct board_info *board = get_board(setting->board);
 	if (board == NULL)
 		return;
@@ -489,6 +493,7 @@ static void ptc_set_current_temperature(struct options_setting *setting)
 
 static void ptc_get_temperature(struct options_setting *setting) //
 {
+	setting->no_release_pins = 1;
 	struct board_info *board = get_board(setting->board);
 	if (board == NULL)
 		return;
@@ -523,6 +528,7 @@ static void ptc_get_temperature(struct options_setting *setting) //
 
 static void ptc_get_is_stable(struct options_setting *setting) //
 {
+	setting->no_release_pins = 1;
 	struct board_info *board = get_board(setting->board);
 	if (board == NULL)
 		return;
@@ -564,6 +570,7 @@ static void ptc_get_is_stable(struct options_setting *setting) //
 
 static void ptc_get_is_enable(struct options_setting *setting) //
 {
+	setting->no_release_pins = 1;
 	struct board_info *board = get_board(setting->board);
 	if (board == NULL)
 		return;
@@ -605,6 +612,7 @@ static void ptc_get_is_enable(struct options_setting *setting) //
 
 static void get_temp(struct options_setting* setting)//
 {
+	setting->no_release_pins = 1;
 	struct board_info* board = get_board(setting->board);
 	if (board == NULL)
 		return;
@@ -699,7 +707,7 @@ static void set_gpio(struct options_setting* setting)
 	if (status)
 		printf("set gpio failed, error = 0x%x\n", status);
 	else
-		printf("set gpio successfully\n");
+		printf("%s gpio set to %d successfully\n", setting->gpio_name, setting->output_state);
 
 	//hold time
 	msleep(setting->hold);
@@ -1620,6 +1628,7 @@ static int eeprom(struct options_setting* setting)
 	void* head = NULL;
 	void* end_point;
 	int j = 0;
+	setting->no_release_pins = 1;
 
 	struct board_info* board=get_board(setting->board);
 	if (board == NULL)
@@ -1790,6 +1799,7 @@ static char catch_input_char_block()
 static void monitor(struct options_setting* setting)
 {
 	signal(SIGINT, handle_sigint);
+	setting->no_release_pins = 1;
 	struct board_info* board = get_board(setting->board);
 	if (board == NULL) {
 		// printf("entered board model are not supported.\n");
@@ -3184,6 +3194,7 @@ char *iso8601(char *local_time)
 static int server_monitor(struct options_setting* setting)
 {
 	signal(SIGINT, handle_sigint);
+	setting->no_release_pins = 1;
 	struct board_info* board = get_board(setting->board);
 	if (board == NULL) {
 		// printf("entered board model are not supported.\n");
@@ -4049,6 +4060,7 @@ static int lsftdi(struct options_setting* setting)
 
 
 	int board_num = 0;
+	setting->no_release_pins = 1;
 	char location_id_str[MAX_NUMBER_OF_USB_DEVICES][MAX_LOCATION_ID_LENGTH];
 	if (!setting->auto_find_board)
 		ft_list_devices(location_id_str, &board_num, LIST_DEVICE_MODE_PRINT);
@@ -4166,6 +4178,36 @@ void notice_print(struct options_setting* setting, char* cmd)
 void terminateBCU(void)
 {
 	ft4232h_i2c_remove_all(enable_exit_handler);
+}
+
+static int release_pins_before_exit(struct options_setting* setting)
+{
+
+	if (setting->no_release_pins)
+	{
+		return 0;
+	}
+
+	struct board_info* board = get_board(setting->board);
+	if (board == NULL || !board->gpio_on_exit)
+	{
+		return 0;
+	}
+
+	int i = 0;
+	while (board->gpio_on_exit[i].name != NULL)
+	{
+		if (i == 0)
+		{
+			setting->hold = 0;
+			printf("\nReleasing pins before exit:\n");
+		}
+		strcpy(setting->gpio_name, board->gpio_on_exit[i].name);
+		setting->output_state = board->gpio_on_exit[i].value;
+		set_gpio(setting);
+		i++;
+	}
+	return 1;
 }
 
 int main(int argc, char** argv)
@@ -4534,9 +4576,16 @@ int main(int argc, char** argv)
 	else
 	{
 		printf("%s is a invalid command\n\n", cmd);
+		setting.no_release_pins = 1;
 		print_help(NULL);
 	}
 
+	// exit by setting required pins to a predefined state
+	if(!release_pins_before_exit(&setting) && !setting.no_release_pins)
+	{
+		printf("No pins release before exit required.\n");
+	}
+	
 	printf("done\n");
 	return 0;
 }
