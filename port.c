@@ -178,7 +178,7 @@ int ft_open_channel(struct ftdi_info* fi, int channel)
 
 int ft_close(struct ftdi_info* fi)
 {
-	ft_set_bitmode(fi, 0, 0); //resetting the controller
+	//ft_set_bitmode(fi, 0, 0); //resetting the controller. This will reset port C/D which is not desired.
 #ifdef _WIN32
 	int num = fi->FT_close(fi->ftdi);
 	//printf("%d\n",num);
