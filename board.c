@@ -2351,6 +2351,10 @@ struct boot_mode val_board_10_boot_modes[] = {
 	{"sd_imx8qxp", 0x03},
 	{"qspi_imx8qxp", 0x06},
 
+	{"usb_imx95frdm", 0x01},
+	{"emmc_imx95frdm", 0x02},
+	{"sd_imx95frdm", 0x03},
+
 	{NULL, 0}
 };
 
@@ -2552,7 +2556,7 @@ struct board_info board_list[] =
 	{"val_board_10",	val_board_10_board,	val_board_10_boot_modes,	0,	NULL,				val_board_10_power_groups,	null_board_links,		&val_board_10_ftdi_eeprom_user_area_info,	500},
 	{"val_board_11",	val_board_11_board,	val_board_11_boot_modes,	0,	NULL,				val_board_11_power_groups,	null_board_links,		&val_board_11_ftdi_eeprom_user_area_info,	500},
 	{"val_board_12",	val_board_12_board,	null_boot_mode,			0,	NULL,				val_board_12_power_groups,	null_board_links,		&val_board_12_ftdi_eeprom_user_area_info,	500},
-	{"imx95frdm15",		bench_imx95frdm15_board,	bench_imx95frdm15_boot_modes,			0,	NULL,				bench_imx95frdm15_power_groups,	null_board_links,		&imx95frdm15_ftdi_eeprom_user_area_info,			500},
+	{"bench_imx95frdm15",		bench_imx95frdm15_board,	bench_imx95frdm15_boot_modes,			0,	NULL,				bench_imx95frdm15_power_groups,	null_board_links,		&imx95frdm15_ftdi_eeprom_user_area_info,			500},
 	//"imx9xxl",&imx9xxl_pins,
 };
 int num_of_boards = sizeof(board_list) / sizeof(struct board_info);
