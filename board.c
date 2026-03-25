@@ -1376,6 +1376,8 @@ struct mapping bench_imx95frdm15_board[] = {
 
 struct board_power_group bench_imx95frdm15_power_groups[] = {
 	{"GROUP_SOC_FULL", "vdd_soc,vdd_arm,vdd_3v3,vdd_1v8,vdd_0v8,vcc_dram_1v1,vcc_dram_0v6"},
+	{"GROUP_M2", "vdd_M2"},
+	{"GROUP_PLATFORM", "vdd_platform"},
 	{NULL, 0}
 };
 
