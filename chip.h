@@ -1,5 +1,5 @@
 /*
-* Copyright 2019-2020 NXP.
+* Copyright 2019-2020, 2026 NXP.
 *
 * Redistribution and use in source and binary forms, with or without modification,
 * are permitted provided that the following conditions are met:
@@ -168,6 +168,21 @@ void* pca9548_create(char* chip_specification, void* parent);
 int pca9548_set_channel(struct pca9548* pca9548);
 
 ///////////////////////////////////////////////////////////////////////
+struct pca9847 {
+	struct i2c_device i2c_device;
+	int channel; //indicate which i2c channel to choose
+	int addr;
+};
+int pca9847_read(void* pca9847, unsigned char* data_buffer, int is_nack, int type);
+int pca9847_readn(void* pca9847, unsigned char* data_buffer, int type, int len);
+int pca9847_write(void* pca9847, unsigned char data, int type);
+int pca9847_start(void* pca9847);
+int pca9847_stop(void* pca9847);
+void* pca9847_create(char* chip_specification, void* parent);
+int pca9847_set_channel(struct pca9847* pca9847);
+void* pca9847_s32n79_i2cmux_create(char* chip_specification, void* parent);
+
+///////////////////////////////////////////////////////////////////////
 struct ft4232h_eeprom {
 	struct eeprom_device eeprom_device;
 	struct ftdi_info* ftdi_info;
@@ -274,6 +289,22 @@ int pca6416a_set_direction(struct pca6416a* pca, unsigned char value);
 int pca6416a_get_direction(void* pca6416a, unsigned char* bit_value_buffer);
 int pca6416a_set_output(struct pca6416a* pca, unsigned char value);
 int pca6416a_get_output(void* pca6416a, unsigned char* current_output);
+
+////////////////////////////////////////////////////////////////////////
+struct pcal9555a {
+	struct gpio_device gpio_device;
+	int addr;
+	int port;
+	unsigned char pin_bitmask; //specify which pin to use
+};
+int pcal9555a_read(void* pcal9555a, unsigned char* bit_value_buffer);
+int pcal9555a_write(void* pcal9555a, unsigned char bit_value);
+int pcal9555a_toggle(void* pcal9555a);
+void* pcal9555a_create(char* chip_specification, void* parent);
+int pcal9555a_set_direction(struct pcal9555a* pca, unsigned char value);
+int pcal9555a_set_output(struct pcal9555a* pca, unsigned char value);
+int pcal9555a_get_output(void* pcal9555a, unsigned char* current_output);
+
 ////////////////////////////////////////////////////////////////////////
 struct pcal6524h {
 	struct gpio_device gpio_device;

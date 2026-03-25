@@ -1,5 +1,5 @@
 /*
-* Copyright 2019-2021 NXP.
+* Copyright 2019-2021, 2026 NXP.
 *
 * Redistribution and use in source and binary forms, with or without modification,
 * are permitted provided that the following conditions are met:
@@ -2439,6 +2439,97 @@ struct board_power_group val_board_12_power_groups[] = {
 	{NULL, 0}
 };
 
+#define S32N79_DBG_PCAL9555_EXTENDER_PATH(port, pin_bitmask, pin_opendrain) "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}/pcal9555a{addr=0x25;port="#port";pin_bitmask="#pin_bitmask";opendrain="#pin_opendrain"}"
+#define BRDCFG_IOEXPANDERS(address, port, bitmask, pin_opendrain) "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}/pca9847_s32n79_i2cmux{channel=0;addr=0x71}/pcal6524h{addr="#address";port="#port";pin_bitmask="#bitmask";opendrain="#pin_opendrain"}"
+
+struct mapping s32n79_mappings[] = {
+	{"93lcx6", ftdi_eeprom , "/ft4232h_eeprom{uasize=0xFF}", 0x00},
+	// all pins are named exactly as in the board's schematics for revision v1.0. These might change with future revisions.
+
+	// PCAL9555
+	{"SYS_POWEROFF", gpio, S32N79_DBG_PCAL9555_EXTENDER_PATH(0, 0x01, 0), 0x00}, // IO0_0: Active on logic 1.
+	{"POR_DRV_B", gpio, S32N79_DBG_PCAL9555_EXTENDER_PATH(0, 0x02, 0), 0x01}, // IO0_1: Active on logic 0.
+	{"EN_CNTL_I2C", gpio, S32N79_DBG_PCAL9555_EXTENDER_PATH(0, 0x04, 0), 0x01}, // IO0_2: Active on logic 1.
+	{"EN_RCON_I2C", gpio, S32N79_DBG_PCAL9555_EXTENDER_PATH(0, 0x08, 0), 0x01}, // IO0_3: Active on logic 1.
+	{"RST_IN_DRV_B", gpio, S32N79_DBG_PCAL9555_EXTENDER_PATH(0, 0x10, 0), 0x01}, // IO0_4: Active on logic 0.
+	{"PORB_DETECTION", gpio, S32N79_DBG_PCAL9555_EXTENDER_PATH(0, 0x20, 0), 0x01}, // IO0_5: input.
+	{"RESET_IN_B_DETECTION", gpio, S32N79_DBG_PCAL9555_EXTENDER_PATH(0, 0x40, 0), 0x01}, // IO0_6: input.
+	{"RESET_OUT_B_DETECTION", gpio, S32N79_DBG_PCAL9555_EXTENDER_PATH(0, 0x80, 1), 0x01}, // IO0_7: input.
+
+	{"DBG_BMODE2", gpio, S32N79_DBG_PCAL9555_EXTENDER_PATH(1, 0x04, 0), 0x01}, // IO1_2: Active on logic 0.
+	{"DBG_BMODE3", gpio, S32N79_DBG_PCAL9555_EXTENDER_PATH(1, 0x08, 0), 0x01}, // IO1_3: Active on logic 0.
+	{"GPIO_LED_EN", gpio, S32N79_DBG_PCAL9555_EXTENDER_PATH(1, 0x40, 0), 0x11}, // test if PCAL9555 is active. Active on logic 1.
+	{"SYS_RST_B", gpio, S32N79_DBG_PCAL9555_EXTENDER_PATH(1, 0x80, 0), 0x01}, // IO1_7: Active on logic 0.
+
+	// PCAL6524 #1
+	{"SDHC_SD_CARD_SEL", gpio, BRDCFG_IOEXPANDERS(0x23, 0, 0x01, 0), 0x00}, // IO0_0: Active on logic 1.
+	{"SD0_DATA01_PCIE1_M.2_SEL", gpio, BRDCFG_IOEXPANDERS(0x23, 0, 0x02, 0), 0x01}, // P0_1: Active on logic 1. SW1 pos 6.
+	{"SD0_DATA_3_PCIE1_SGMIIPHY_SEL", gpio, BRDCFG_IOEXPANDERS(0x23, 0, 0x04, 0), 0x01}, // P0_2: Active on logic 1. SW1 pos 7.
+	{"SPI3_SENT_SEL", gpio, BRDCFG_IOEXPANDERS(0x23, 0, 0x08, 0), 0x01}, // P0_3: Active on logic 1. SW2 pos 4.
+	{"JTAG_FTDI_SEL", gpio, BRDCFG_IOEXPANDERS(0x23, 0, 0x10, 0), 0x01}, // P0_4: Active on logic 1. SW1 pos 9.
+	{"EN_PORB_BMODE_FRM_FTDI_B", gpio, BRDCFG_IOEXPANDERS(0x23, 0, 0x20, 0), 0x01}, // P0_5: Active on logic 1. SW1 pos 10.
+	{"HKI_SPI_SEL_B", gpio, BRDCFG_IOEXPANDERS(0x23, 0, 0x40, 0), 0x01}, // P0_6: Active on logic 1. SW1 pos 8.
+	{"SD1_PCIE2_CEMSLOT_EN", gpio, BRDCFG_IOEXPANDERS(0x23, 0, 0x80, 0), 0x01}, // P0_7: Active on logic 1. SW3 pos 1.
+
+	{"SD1_PCIE3_EN", gpio, BRDCFG_IOEXPANDERS(0x23, 1, 0x01, 0), 0x01}, // P1_0: Active on logic 1. SW3 pos 2.
+	{"CANXL0_EN_3.3V", gpio, BRDCFG_IOEXPANDERS(0x23, 1, 0x02, 0), 0x01}, // P1_1: Active on logic 0. Used to disable CANXL0
+	{"CANXL1_EN_3.3V", gpio, BRDCFG_IOEXPANDERS(0x23, 1, 0x04, 0), 0x01}, // P1_2: Active on logic 0. Used to disable CANXL1
+	{"FR0_A_EN", gpio, BRDCFG_IOEXPANDERS(0x23, 1, 0x08, 0), 0x01}, // P1_3: Active on logic 1.
+	{"LIN0_SLP_B_3.3V", gpio, BRDCFG_IOEXPANDERS(0x23, 1, 0x10, 0), 0x01}, // P1_4: Active on logic 0.
+	{"LIN1_SLP_B_3.3V", gpio, BRDCFG_IOEXPANDERS(0x23, 1, 0x20, 0), 0x01}, // P1_5: Active on logic 0.
+	{"KHZ_A_RST", gpio, BRDCFG_IOEXPANDERS(0x23, 1, 0x40, 0), 0x01}, // P1_6: Active on logic 0.
+	{"KHZ_A_INT_3.3V_B", gpio, BRDCFG_IOEXPANDERS(0x23, 1, 0x80, 1), 0x01}, // P1_7: input. INT trigger on logic 0
+
+	{"TJA1120B_PHY_RST_B", gpio, BRDCFG_IOEXPANDERS(0x23, 2, 0x01, 0), 0x01}, // P2_0: Active on logic 0.
+	{"TJA1120B_PHY_INT_3.3V_B", gpio, BRDCFG_IOEXPANDERS(0x23, 2, 0x02, 1), 0x01}, // P2_1: Input. INT trigger on logic 0
+	{"AD2433_RST_B", gpio, BRDCFG_IOEXPANDERS(0x23, 2, 0x04, 0), 0x01}, // P2_2: Active on logic 0.
+	{"AD2433_INT_B", gpio, BRDCFG_IOEXPANDERS(0x23, 2, 0x08, 1), 0x01}, // P2_3: Input. INT trigger on logic 0
+	{"BRD_VER0", gpio, BRDCFG_IOEXPANDERS(0x23, 2, 0x20, 1), 0x01}, // P2_5: Input. version pin
+	{"BRD_VER1", gpio, BRDCFG_IOEXPANDERS(0x23, 2, 0x40, 1), 0x01}, // P2_6: Input. version pin
+	{"BRD_VER2", gpio, BRDCFG_IOEXPANDERS(0x23, 2, 0x80, 1), 0x01}, // P2_7: Input. version pin
+
+	// PCAL6524#2
+	{"Si5332_PROFILESEL0", gpio, BRDCFG_IOEXPANDERS(0x22, 0, 0x01, 0), 0x01}, // P0_0: Active on logic 1. SW2 pos 1
+	{"Si5332_PROFILESEL1", gpio, BRDCFG_IOEXPANDERS(0x22, 0, 0x02, 0), 0x01}, // P0_1: Active on logic 1. SW2 pos 2
+	{"Si5332_PROFILESEL2", gpio, BRDCFG_IOEXPANDERS(0x22, 0, 0x04, 0), 0x01}, // P0_2: Active on logic 1. SW2 pos 3
+	{"CAN_BOOT_SNM_SEL", gpio, BRDCFG_IOEXPANDERS(0x22, 0, 0x08, 0), 0x01}, // P0_3: Active on logic 0.
+	{"SD0_SLOT1_EP_SEL", gpio, BRDCFG_IOEXPANDERS(0x22, 0, 0x10, 0), 0x01}, // P0_4: Active on logic 1. SW3 pos 2.
+	{"SD0_SLOT2_EP_SEL", gpio, BRDCFG_IOEXPANDERS(0x22, 0, 0x20, 0), 0x01}, // P0_5: Active on logic 1. SW3 pos 3.
+	{"SD0_SLOT3_EP_SEL", gpio, BRDCFG_IOEXPANDERS(0x22, 0, 0x40, 0), 0x01}, // P0_6: Active on logic 1. SW3 pos 4.
+	{"SD0_SLOT4_EP_SEL", gpio, BRDCFG_IOEXPANDERS(0x22, 0, 0x80, 0), 0x01}, // P0_7: Active on logic 1. SW3 pos 5.
+
+	{"SFP1_TX_DISABLE", gpio, BRDCFG_IOEXPANDERS(0x22, 1, 0x01, 0), 0x01}, // P1_0: Active on logic 1. SW2 pos 7.
+	{"SFP1_TX_FAULT", gpio, BRDCFG_IOEXPANDERS(0x22, 1, 0x02, 1), 0x01}, // P1_1: input.
+	{"SFP1_RX_LOS", gpio, BRDCFG_IOEXPANDERS(0x22, 1, 0x04, 1), 0x01}, // P1_2: input.
+	{"SFP1_MOD_ABS", gpio, BRDCFG_IOEXPANDERS(0x22, 1, 0x08, 1), 0x1}, // P1_3: input.
+	{"SFP2_TX_DISABLE", gpio, BRDCFG_IOEXPANDERS(0x22, 1, 0x10, 0), 0x01}, // P1_4: Active on logic 1. SW2 pos 8.
+	{"SFP2_TX_FAULT", gpio, BRDCFG_IOEXPANDERS(0x22, 1, 0x20, 1), 0x01}, // P1_5: input.
+	{"SFP2_RX_LOS", gpio, BRDCFG_IOEXPANDERS(0x22, 1, 0x40, 1), 0x01}, // P1_6: input.
+	{"SFP2_MOD_ABS", gpio, BRDCFG_IOEXPANDERS(0x22, 1, 0x80, 1), 0x01}, // P1_7: input.
+
+	{"SFP3_TX_DISABLE", gpio, BRDCFG_IOEXPANDERS(0x22, 2, 0x01, 0), 0x01}, // P2_0: Active on logic 1. SW2 pos 9.
+	{"SFP3_TX_FAULT", gpio, BRDCFG_IOEXPANDERS(0x22, 2, 0x02, 1), 0x01}, // P2_1: input.
+	{"SFP3_RX_LOS", gpio, BRDCFG_IOEXPANDERS(0x22, 2, 0x04, 1), 0x01}, // P2_2: input.
+	{"SFP3_MOD_ABS", gpio, BRDCFG_IOEXPANDERS(0x22, 2, 0x08, 1), 0x01}, // P2_3: input.
+	{"SFP4_TX_DISABLE", gpio, BRDCFG_IOEXPANDERS(0x22, 2, 0x10, 0), 0x01}, // P2_4: Active on logic 1. SW2 pos 10.
+	{"SFP3_TX_FAULT", gpio, BRDCFG_IOEXPANDERS(0x22, 2, 0x20, 1), 0x01}, // P2_5: input.
+	{"SFP3_RX_LOS", gpio, BRDCFG_IOEXPANDERS(0x22, 2, 0x40, 1), 0x01}, // P2_6: input.
+	{"SFP3_MOD_ABS", gpio, BRDCFG_IOEXPANDERS(0x22, 2, 0x80, 1), 0x01}, // P2_7: input.
+
+	// pins used for specific functionality:
+	{"onoff", gpio, S32N79_DBG_PCAL9555_EXTENDER_PATH(0, 0x01, 0), 0x00}, // IO0_0: Active on logic 1. Alias for SYS_POWEROFF
+	{"reset", gpio, S32N79_DBG_PCAL9555_EXTENDER_PATH(0, 0x02, 0), 0x01}, // reset is done by POR_DRV_B -> resets the CPU
+	{"remote_en", gpio, S32N79_DBG_PCAL9555_EXTENDER_PATH(1, 0x40, 0), 0x11}, // no real meaning in s32n79 context.
+
+	// pins that are exposed as Testing Points (TPs) and act as GPIOs to control devices from outside the board:
+	{"TP32",      gpio, "/ft4232h_gpio{channel=2;pin_bitmask=0x01}", 0x00},
+	{"TP30",      gpio, "/ft4232h_gpio{channel=2;pin_bitmask=0x02", 0x00},
+	{"TP29",      gpio, "/ft4232h_gpio{channel=3;pin_bitmask=0x01}", 0x00},
+	{"TP27",      gpio, "/ft4232h_gpio{channel=3;pin_bitmask=0x02}", 0x00},
+
+	{NULL, 0, NULL, 0} // null terminated
+};
+
 struct board_info board_list[] =
 {
 	{"imx8dxlevk",		imx8xxl,		imx8xxl_boot_modes,		0,	NULL,				imx8xxl_power_groups,		imx8xxlevk_board_links,		&imx8dxlevk_ftdi_eeprom_user_area_info,		500},
@@ -2483,6 +2574,7 @@ struct board_info board_list[] =
 	{"imx943evk19a0",	imx943evk19a0_board,	imx943_board_boot_modes,	0,	NULL,				imx943evk19_power_groups,	null_board_links,		&imx943evk19_ftdi_eeprom_user_area_info,	500},
 	{"imx943evk19b1",	imx943evk19b1_board,	imx943_board_boot_modes,	0,	NULL,				imx943evk19_power_groups,	null_board_links,		&imx943evk19b1_ftdi_eeprom_user_area_info,	500},
 	{"imx943obx",		imx943obx_board,	imx943_board_boot_modes,	0,	NULL,				imx943evk19_power_groups,	null_board_links,		&imx943obx_ftdi_eeprom_user_area_info,		500},
+	{"s32n79rdb",		s32n79_mappings,	null_boot_mode,	0,	NULL,	NULL,	null_board_links,	&s32n79rdb_ftdi_eeprom_user_area_info,	500},
 	{"val_board_7",		val_board_7_board,	imx943_board_boot_modes,	0,	NULL,				NULL,				null_board_links,		&val_board_7_ftdi_eeprom_user_area_info,	500},
 	{"val_board_9",		val_board_9_board,	null_boot_mode,			0,	NULL,				val_board_9_power_groups,	null_board_links,		&val_board_9_ftdi_eeprom_user_area_info,	500},
 	{"val_board_10",	val_board_10_board,	val_board_10_boot_modes,	0,	NULL,				val_board_10_power_groups,	null_board_links,		&val_board_10_ftdi_eeprom_user_area_info,	500},
