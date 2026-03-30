@@ -1054,8 +1054,7 @@ void* ft4232h_gpio_create(char* chip_specification, void* parent)
 int ft4232h_gpio_write(void* ft4232h, unsigned char bit_value)
 {
 	struct ft4232h_gpio* ft = ft4232h;
-	int mask = 0xFF;
-	if (ft_set_bitmode(ft->ftdi_info, mask, BM_BITBANG) < 0)
+	if (ft_set_bitmode(ft->ftdi_info, ft->gpio_device.pin_bitmask, BM_BITBANG) < 0)
 		printf("failed to set bitmode\n");
 
 	unsigned char current_output;
