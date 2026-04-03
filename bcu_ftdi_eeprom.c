@@ -83,7 +83,7 @@ struct ftdi_eeprom_field_code_tb ftdi_eeprom_field[] = {
 	{ftdi_eeprom_board_id, 0x28,"NXP i.MX93W EVK Board"},
 	{ftdi_eeprom_board_id, 0x29,"NXP i.MX952 EVK 19x19 Board"},
 	{ftdi_eeprom_board_id, 0x2a,"NXP i.MX952 EVK 15x15 Board"},
-	{ftdi_eeprom_board_id, 0x26,"NXP S32N79-RDB Board"},
+	{ftdi_eeprom_board_id, 0x2b,"NXP S32N79-RDB Board"},
 
 	{ftdi_eeprom_soc_id, 0x1, "i.MX8DXL"},
 	{ftdi_eeprom_soc_id, 0x2, "i.MX8MP"},
@@ -538,7 +538,7 @@ struct ftdi_eeprom_user_area val_board_12_ftdi_eeprom_user_area_info = {
 
 struct ftdi_eeprom_user_area s32n79rdb_ftdi_eeprom_user_area_info = {
 	0x1,		//config
-	0x27, 0x1, 0x0,	//board_id, board_rev_number, board_rev_char
+	0x2b, 0x1, 0x0,	//board_id, board_rev_number, board_rev_char
 	0x20, 0x01, 0x01,	//soc_id, soc_rev_number, soc_rev_char
 	0x25, 0x01, 0x01,	//pmic_id, pmic_rev_number, pmic_rev_char
 	2,		//no of power rails
