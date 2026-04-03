@@ -83,7 +83,7 @@ struct ftdi_eeprom_field_code_tb ftdi_eeprom_field[] = {
 	{ftdi_eeprom_board_id, 0x28,"NXP i.MX93W EVK Board"},
 	{ftdi_eeprom_board_id, 0x29,"NXP i.MX952 EVK 19x19 Board"},
 	{ftdi_eeprom_board_id, 0x2a,"NXP i.MX952 EVK 15x15 Board"},
-	{ftdi_eeprom_board_id, 0x26,"NXP S32N79-RDB Board"},
+	{ftdi_eeprom_board_id, 0x2b,"NXP S32N79-RDB Board"},
 
 	{ftdi_eeprom_soc_id, 0x1, "i.MX8DXL"},
 	{ftdi_eeprom_soc_id, 0x2, "i.MX8MP"},
