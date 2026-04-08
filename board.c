@@ -2441,6 +2441,7 @@ struct board_power_group val_board_12_power_groups[] = {
 
 #define S32N79_DBG_PCAL9555_EXTENDER_PATH(port, pin_bitmask, pin_opendrain) "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}/pcal9555a{addr=0x25;port="#port";pin_bitmask="#pin_bitmask";opendrain="#pin_opendrain"}"
 #define BRDCFG_IOEXPANDERS(address, port, bitmask, pin_opendrain) "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}/pca9847_s32n79_i2cmux{channel=0;addr=0x71}/pcal6524h{addr="#address";port="#port";pin_bitmask="#bitmask";opendrain="#pin_opendrain"}"
+#define RCON_BOOT_MODE_SEL_EEPROM "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00;frequency=100}/at24c01_s32n79_rcon{addr=0x50;type=0}" // at24c01 is behind an NTSX2102 level translator that is activated by PCAL9555_IO_03. It is configured for 100KHz clock.
 
 struct mapping s32n79_mappings[] = {
 	{"93lcx6", ftdi_eeprom , "/ft4232h_eeprom{uasize=0xFF}", 0x00},
@@ -2520,6 +2521,7 @@ struct mapping s32n79_mappings[] = {
 	{"onoff", gpio, S32N79_DBG_PCAL9555_EXTENDER_PATH(0, 0x01, 0), 0x00}, // IO0_0: Active on logic 1. Alias for SYS_POWEROFF
 	{"reset", gpio, S32N79_DBG_PCAL9555_EXTENDER_PATH(0, 0x02, 0), 0x01}, // reset is done by POR_DRV_B -> resets the CPU
 	{"remote_en", gpio, S32N79_DBG_PCAL9555_EXTENDER_PATH(1, 0x40, 0), 0x11}, // no real meaning in s32n79 context.
+	{"boot_mode", boot_eeprom, RCON_BOOT_MODE_SEL_EEPROM, 0x10},
 
 	// pins that are exposed as Testing Points (TPs) and act as GPIOs to control devices from outside the board:
 	{"TP32",      gpio, "/ft4232h_gpio{channel=2;pin_bitmask=0x01}", 0x00},
@@ -2528,6 +2530,31 @@ struct mapping s32n79_mappings[] = {
 	{"TP27",      gpio, "/ft4232h_gpio{channel=3;pin_bitmask=0x02}", 0x00},
 
 	{NULL, 0, NULL, 0} // null terminated
+};
+
+struct boot_mode s32n79_boot_modes[] = {
+	{"mmc", 0x00},
+	{"octal-spi-nor", 0x01},
+	{"sd", 0x02},
+	{"custom", 0x03},
+	{NULL, 0}
+};
+
+// {<name of boot mode>, {<address_in_eeprom_mem_to_start_from>, byte1, byte2 ...}}; s32n79rdb boots only from RCON eeprom. No DIP SW to select a boot mode.
+// To select where to boot from, the RCOM must be written accordingly.
+struct boot_config s32n79_boot_config[] = {
+	{"mmc",	{0x00, 0x60, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, 21},
+	{"octal-spi-nor",		{0x00, 0x0C, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, 21},
+	{"sd",	{0x00, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, 21},
+	{"custom",	{0x00}, 21}, // must provide configuration from CLI
+	{NULL,		{0}}
+};
+
+// pins that must be set to a certain state. Without this some functionalities of S32N79RDB are affected
+struct gpio_state_on_exit s32n79_pins_on_exit[] = {
+	{"EN_CNTL_I2C", 1},
+	{"EN_RCON_I2C", 1},
+	{NULL, 0}
 };
 
 struct board_info board_list[] =
@@ -2574,7 +2601,7 @@ struct board_info board_list[] =
 	{"imx943evk19a0",	imx943evk19a0_board,	imx943_board_boot_modes,	0,	NULL,				imx943evk19_power_groups,	null_board_links,		&imx943evk19_ftdi_eeprom_user_area_info,	500},
 	{"imx943evk19b1",	imx943evk19b1_board,	imx943_board_boot_modes,	0,	NULL,				imx943evk19_power_groups,	null_board_links,		&imx943evk19b1_ftdi_eeprom_user_area_info,	500},
 	{"imx943obx",		imx943obx_board,	imx943_board_boot_modes,	0,	NULL,				imx943evk19_power_groups,	null_board_links,		&imx943obx_ftdi_eeprom_user_area_info,		500},
-	{"s32n79rdb",		s32n79_mappings,	null_boot_mode,	0,	NULL,	NULL,	null_board_links,	&s32n79rdb_ftdi_eeprom_user_area_info,	500},
+	{"s32n79rdb",		s32n79_mappings,	s32n79_boot_modes,	0,	s32n79_boot_config,	NULL,	null_board_links,	&s32n79rdb_ftdi_eeprom_user_area_info,	500, s32n79_pins_on_exit},
 	{"val_board_7",		val_board_7_board,	imx943_board_boot_modes,	0,	NULL,				NULL,				null_board_links,		&val_board_7_ftdi_eeprom_user_area_info,	500},
 	{"val_board_9",		val_board_9_board,	null_boot_mode,			0,	NULL,				val_board_9_power_groups,	null_board_links,		&val_board_9_ftdi_eeprom_user_area_info,	500},
 	{"val_board_10",	val_board_10_board,	val_board_10_boot_modes,	0,	NULL,				val_board_10_power_groups,	null_board_links,		&val_board_10_ftdi_eeprom_user_area_info,	500},
@@ -2808,4 +2835,18 @@ char* get_boot_config_name_from_hex(struct board_info* board, int *boot_config_h
 		i++;
 	}
 	return NULL;
+}
+
+enum mapping_type get_mapping_type(char* mapping_name, struct board_info* board)
+{
+	int i = 0;
+	while (board->mappings[i].name != NULL)
+	{
+		if (strcmp(board->mappings[i].name, mapping_name) == 0)
+		{
+			return board->mappings[i].type;
+		}
+		i++;
+	}
+	return invalid_mapping;
 }

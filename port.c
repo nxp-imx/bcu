@@ -178,7 +178,6 @@ int ft_open_channel(struct ftdi_info* fi, int channel)
 
 int ft_close(struct ftdi_info* fi)
 {
-	//ft_set_bitmode(fi, 0, 0); //resetting the controller. This will reset port C/D which is not desired.
 #ifdef _WIN32
 	int num = fi->FT_close(fi->ftdi);
 	//printf("%d\n",num);
@@ -366,6 +365,8 @@ void ft_list_devices(char location_str[][MAX_LOCATION_ID_LENGTH], int *board_num
 				if (strcmp("A", &Description[strlen(Description) - 1]) == 0) {
 					board_table[detected_boards][0] = loc_id;
 					sprintf(location_id_str[detected_boards], "%x", loc_id);
+					strncpy(board_serial[detected_boards], SerialNumber, strlen(SerialNumber) - 1);
+					board_serial[detected_boards][strlen(SerialNumber) - 1] = '\0';
 					detected_boards++;
 				}
 				else if (strcmp("B", &Description[strlen(Description) - 1]) == 0) {

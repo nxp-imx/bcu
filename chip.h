@@ -58,6 +58,7 @@ struct i2c_device {
 	int (*i2c_write)(void*, unsigned char, int); //Write one byte, check ack/nack
 	int (*i2c_start)(void*);
 	int (*i2c_stop)(void*); //sending Start/Stop Condition
+	int frequency_khz; // frequency in KHz of the SCL line; ensure compatibility over a wide range of used devices
 };
 
 #define MAX_PAC193X_CHANNELS 4
@@ -152,6 +153,7 @@ int at24cxx_read(void* at24cxx, unsigned char* data_buffer, unsigned int startad
 int at24cxx_write(void* at24cxx, unsigned char* data_buffer, unsigned int startaddr, int size, unsigned char* sn_buf);
 int at24cxx_check_board(void* at24cxx);
 void* at24cxx_create(char* chip_specification, void* parent);
+void* at24c01_s32n79_rcon_create(char* chip_specification, void* parent);
 ///////////////////////////////////////////////////////////////////////
 struct pca9548 {
 	struct i2c_device i2c_device;
@@ -210,6 +212,11 @@ void* ft4232h_i2c_create(char* chip_specification, void* parent);
 int ft4232h_i2c_init(struct ft4232h* ft);
 int ft4232h_i2c_free(void* ft4232h);
 void ft4232h_i2c_remove_all(int disable_1_exit_handler);
+
+struct freq_map {
+	int f_khz;
+	unsigned char divisor;
+};
 ///////////////////////////////////////////////////////////////////////
 
 struct ft4232h_gpio {
