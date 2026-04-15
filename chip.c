@@ -1901,10 +1901,11 @@ int pcal9555a_read(void* pcal9555a, unsigned char* bit_value_buffer)
 	status = parent->i2c_read(parent, bit_value_buffer, 1, I2C_TYPE_GPIO);
 	if (status) return status;
 	status = parent->i2c_stop(parent);
-	return status;
 
 	//mask away unwanted value;
 	*bit_value_buffer = (*bit_value_buffer) & (pcal->gpio_device.pin_bitmask);
+
+	return status;
 }
 
 int pcal9555a_write(void* pcal9555a, unsigned char bits_value)
