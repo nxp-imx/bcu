@@ -1173,6 +1173,7 @@ struct mapping imx95evk15_board[] = {
 	{"ft_sd_pwren",		gpio, IMX93EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x20;opendrain=0;}", 0x11},
 	{"ft_sd_cd",		gpio, IMX93EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x40;opendrain=0;}", 0x21},
 	{"ft_fta_sel",		gpio, IMX93EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x80;opendrain=0;}", 0x21},
+	{"onoff_ptc",	gpio, IMX95EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=2;pin_bitmask=0x01;opendrain=0;}", 0x91},
 
 	{"ft_io_nrst1",		gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x08}", 0x00},
 	{"ft_io_nint1",		gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x10}", 0x00},
@@ -1181,6 +1182,8 @@ struct mapping imx95evk15_board[] = {
 
 	{"93lcx6",		ftdi_eeprom, "/ft4232h_eeprom{uasize=0xFF}", 0x00},
 	{"temp",		temperature, "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}/pct2075{addr=0x48}", 0x00},
+
+	{"ptc",		ptc, "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}/ptc_revA{addr=0x57}", 0x00},
 
 	{NULL, 0, NULL, 0} //null terminated
 };
@@ -1332,15 +1335,21 @@ struct board_links null_board_links[] = {
 #define BENCH_IMX95FRDM15_GPIO_EXTENDER_PATH "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0xF0}"
 
 struct mapping bench_imx95frdm15_board[] = {
-	{"vdd_soc",			power, BENCH_IMX95FRDM15_POWER_SWITCH_PATH(1, 	2, 0x10, 20, 1, 996), 0x00},//L6
-	{"vdd_arm",			power, BENCH_IMX95FRDM15_POWER_SWITCH_PATH(2, 	2, 0x11, 20, 1, 996), 0x00},//L7
-	{"vdd_3v3",			power, BENCH_IMX95FRDM15_POWER_SWITCH_PATH(3, 	2, 0x12, 20, 1, 996), 0x00},//L1
-	{"vdd_1v8",			power, BENCH_IMX95FRDM15_POWER_SWITCH_PATH(4, 	2, 0x13, 20, 1, 996), 0x00},//L3
-	{"vdd_0v8",			power, BENCH_IMX95FRDM15_POWER_SWITCH_PATH(5, 	2, 0x14, 20, 1, 996), 0x00},//L2
-	{"vcc_dram_1v1",	power, BENCH_IMX95FRDM15_POWER_SWITCH_PATH(6, 	2, 0x15, 20, 1, 996), 0x00},//L5
-	{"vcc_dram_0v6",	power, BENCH_IMX95FRDM15_POWER_SWITCH_PATH(7, 	2, 0x16, 20, 1, 996), 0x00},//L4
-	{"vdd_M2",		power, BENCH_IMX95FRDM15_POWER_SWITCH_PATH(8, 	2, 0x17, 20, 1, 996), 0x00},//M2 connector
-	{"vdd_platform",	power, BENCH_IMX95FRDM15_POWER_PATH(9, 	1, 0x18, 20, 20), 0x00},
+	{"vdd_soc",					power, BENCH_IMX95FRDM15_POWER_SWITCH_PATH(1, 	2, 0x10, 20, 1, 996), 0x00},//L6
+	{"vdd_arm",					power, BENCH_IMX95FRDM15_POWER_SWITCH_PATH(2, 	2, 0x11, 20, 1, 996), 0x00},//L7
+	{"vdd_3v3",					power, BENCH_IMX95FRDM15_POWER_SWITCH_PATH(3, 	2, 0x12, 20, 1, 996), 0x00},//L1
+	{"vdd_1v8",					power, BENCH_IMX95FRDM15_POWER_SWITCH_PATH(4, 	2, 0x13, 20, 1, 996), 0x00},//L3
+	{"vdd_0v8",					power, BENCH_IMX95FRDM15_POWER_SWITCH_PATH(5, 	2, 0x14, 20, 1, 996), 0x00},//L2
+	{"vcc_dram_1v1",			power, BENCH_IMX95FRDM15_POWER_SWITCH_PATH(6, 	2, 0x15, 20, 1, 996), 0x00},//L5
+	{"vcc_dram_0v6",			power, BENCH_IMX95FRDM15_POWER_SWITCH_PATH(7, 	2, 0x16, 20, 1, 996), 0x00},//L4
+	{"vdd_M2",					power, BENCH_IMX95FRDM15_POWER_SWITCH_PATH(8, 	2, 0x17, 20, 1, 996), 0x00},//M2 connector
+	{"vdd_platform",			power, BENCH_IMX95FRDM15_POWER_PATH(9, 	1, 0x18, 20, 20), 0x00},
+	{"VCC12A_PCIE_TXRX_ARA2",	power, BENCH_IMX95FRDM15_POWER_SWITCH_PATH(10,	2, 0x19, 20, 1, 996), 0x00},//L5
+	{"VDD_CORE_U12_ARA2",		power, BENCH_IMX95FRDM15_POWER_SWITCH_PATH(11, 	2, 0x1a, 2, 1, 20), 0x00},//L4
+	{"VDD_CORE_U11_ARA2",		power, BENCH_IMX95FRDM15_POWER_SWITCH_PATH(12, 	2, 0x1b, 2, 1, 20), 0x00},//L3
+	{"VDDQ_ARA2",				power, BENCH_IMX95FRDM15_POWER_SWITCH_PATH(13, 	2, 0x1c, 20, 1, 996), 0x00},//L13
+	{"VDDQ_MEM_1V1_ARA2",		power, BENCH_IMX95FRDM15_POWER_SWITCH_PATH(14, 	2, 0x1d, 20, 1, 996), 0x00},//L1
+	{"VDD_1V8_ARA2",			power, BENCH_IMX95FRDM15_POWER_SWITCH_PATH(15, 	2, 0x1e, 20, 1, 996), 0x00},//L2
 
 	{"SR_vdd_soc",	gpio, BENCH_IMX95FRDM15_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x02;opendrain=0;}", 0x00},
 	{"SR_vdd_arm",	gpio, BENCH_IMX95FRDM15_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x08;opendrain=0;}", 0x00},
@@ -1350,6 +1359,12 @@ struct mapping bench_imx95frdm15_board[] = {
 	{"SR_vcc_dram_1v1",	gpio, BENCH_IMX95FRDM15_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=2;pin_bitmask=0x08;opendrain=0;}", 0x00},
 	{"SR_vcc_dram_0v6",	gpio, BENCH_IMX95FRDM15_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=2;pin_bitmask=0x20;opendrain=0;}", 0x00},
 	{"SR_vdd_M2",	gpio, BENCH_IMX95FRDM15_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=2;pin_bitmask=0x80;opendrain=0;}", 0x00},
+	{"SR_VCC12A_PCIE_TXRX_ARA2",	gpio, BENCH_IMX95FRDM15_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=0;pin_bitmask=0x10;opendrain=0;}", 0x00},
+	{"SR_VDD_CORE_U12_ARA2",	gpio, BENCH_IMX95FRDM15_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=0;pin_bitmask=0x04;opendrain=0;}", 0x00},
+	{"SR_VDD_CORE_U11_ARA2",	gpio, BENCH_IMX95FRDM15_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=0;pin_bitmask=0x01;opendrain=0;}", 0x00},
+	{"SR_VDDQ_ARA2",	gpio, BENCH_IMX95FRDM15_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x20;port=0;pin_bitmask=0x02;opendrain=0;}", 0x00},
+	{"SR_VDDQ_MEM_1V1_ARA2",	gpio, BENCH_IMX95FRDM15_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x20;port=0;pin_bitmask=0x08;opendrain=0;}", 0x00},
+	{"SR_VDD_1V8_ARA2",	gpio, BENCH_IMX95FRDM15_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x20;port=0;pin_bitmask=0x20;opendrain=0;}", 0x00},
 
 	{"boot_mode",		gpio, BENCH_IMX95FRDM15_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=0;pin_bitmask=0x03;opendrain=0;}", 0x10},
 	{"reset",		gpio, BENCH_IMX95FRDM15_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=0;pin_bitmask=0x04;opendrain=1;}", 0x21},
@@ -1368,7 +1383,7 @@ struct mapping bench_imx95frdm15_board[] = {
 	{"93lcx6",		ftdi_eeprom, "/ft4232h_eeprom{uasize=0xFF}", 0x00},
 	{"temp",		temperature, "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}/pct2075{addr=0x48}", 0x00},
 
-	{"ptc",		ptc, "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}/ptc_revA{addr=0x32}", 0x00},
+	{"ptc",		ptc, "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}/ptc_revA{addr=0x57}", 0x00},
 
 	{NULL, 0, NULL, 0} //null terminated
 };
@@ -1377,6 +1392,8 @@ struct mapping bench_imx95frdm15_board[] = {
 struct board_power_group bench_imx95frdm15_power_groups[] = {
 	{"GROUP_SOC_FULL", "vdd_soc,vdd_arm,vdd_3v3,vdd_1v8,vdd_0v8,vcc_dram_1v1,vcc_dram_0v6"},
 	{"GROUP_M2", "vdd_M2"},
+	{"GROUP_ARA2", "VDD_CORE_U12_ARA2,VDD_CORE_U11_ARA2,VCC12A_PCIE_TXRX_ARA2,VDDQ_ARA2,VDDQ_MEM_1V1_ARA2,VDD_1V8_ARA2"},
+	{"GROUP_ARA2_CORE", "VDD_CORE_U12_ARA2,VDD_CORE_U11_ARA2"},
 	{"GROUP_PLATFORM", "vdd_platform"},
 	{NULL, 0}
 };
@@ -1442,10 +1459,10 @@ struct mapping nxp_custom_revB_board[] = {
 	{"J5_Rail",		power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(5, 	2, 0x14, 20, 1, 996), 0x00},
 	{"J6_Rail",		power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(6, 	2, 0x15, 20, 1, 996), 0x00},
 	{"J7_Rail",		power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(7, 	2, 0x16, 20, 1, 996), 0x00},
-	{"J8_Rail",		power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(8, 	2, 0x17, 20, 1, 996), 0x00},
-	{"J9_Rail",		power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(9, 	2, 0x18, 20, 1, 996), 0x00},
-	{"J10_Rail",	power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(10,	2, 0x19, 20, 1, 996), 0x00},
-	{"J11_Rail",	power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(11, 	2, 0x1a, 20, 1, 996), 0x00},
+	// {"J8_Rail",	power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(8, 	2, 0x17, 20, 1, 996), 0x00},
+	// {"J9_Rail",	power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(9, 	2, 0x18, 20, 1, 996), 0x00},
+	// {"J10_Rail",	power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(10,	2, 0x19, 20, 1, 996), 0x00},
+	// {"J11_Rail",	power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(11, 	2, 0x1a, 20, 1, 996), 0x00},
 	// {"J12_Rail",	power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(12, 	2, 0x1b, 20, 1, 30120), 0x00},
 	// {"J13_Rail",	power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(13, 	2, 0x1c, 20, 1, 30120), 0x00},
 	// {"J14_Rail",	power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(14, 	2, 0x1d, 20, 1, 30120), 0x00},
@@ -1491,13 +1508,14 @@ struct mapping nxp_custom_revB_board[] = {
 	{"93lcx6",		ftdi_eeprom, "/ft4232h_eeprom{uasize=0xFF}", 0x00},
 	{"temp",		temperature, "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}/pct2075{addr=0x48}", 0x00},
 
-	{"ptc",		ptc, "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}/ptc_revA{addr=0x32}", 0x00},
+	{"ptc",		ptc, "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}/ptc_revA{addr=0x57}", 0x00},
 
 	{NULL, 0, NULL, 0} //null terminated
 };
 
 struct board_power_group nxp_custom_revB_power_groups[] = {
-	// {"GROUP_SOC", "J1_Rail,J2_Rail,J3_Rail,J4_Rail,J5_Rail,J6_Rail,J7_Rail,J8_Rail,J9_Rail,J10_Rail"},
+	{"GROUP_SOC", "J2_Rail,J3_Rail,J4_Rail,J5_Rail,J6_Rail,J7_Rail"},
+	{"GROUP_CORE", "J3_Rail,J4_Rail"},
 	{NULL, 0}
 };
 
@@ -2498,7 +2516,7 @@ struct mapping val_board_12_board[] = {
 	{"93lcx6",	ftdi_eeprom, "/ft4232h_eeprom{uasize=0xFF}", 0x00},
 	{"temp",	temperature, "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}/pct2075{addr=0x48}", 0x00},
 
-	{"ptc",		ptc, "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}/ptc_revA{addr=0x32}", 0x00},
+	{"ptc",		ptc, "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}/ptc_revA{addr=0x57}", 0x00},
 
 	{NULL, 0, NULL, 0} //null terminated
 };
