@@ -86,7 +86,7 @@ struct ftdi_eeprom_field_code_tb ftdi_eeprom_field[] = {
 	{ftdi_eeprom_board_id, 0x2b,"NXP S32N79-RDB Board"},
 	//{ftdi_eeprom_board_id, 0x2c,"NXP FRDM-IMX91 Board"}, //Reserved
 	//{ftdi_eeprom_board_id, 0x2d,"NXP FRDM-IMX93 Board"}, //Reserved
-	//{ftdi_eeprom_board_id, 0x2e,"NXP FRDM-IMX95 Board"}, //Reserved
+	{ftdi_eeprom_board_id, 0x2e,"NXP FRDM-IMX95 Board"}, //Reserved
 	//{ftdi_eeprom_board_id, 0x2f,"NXP FRDM-IMX91S Board"}, //Reserved
 	//{ftdi_eeprom_board_id, 0x30,"NXP FRDM-IMX8MPlus Board"}, //Reserved
 	//{ftdi_eeprom_board_id, 0x31,"NXP FRDM-IMX95-PRO Board"}, //Reserved
@@ -545,7 +545,7 @@ struct ftdi_eeprom_user_area val_board_12_ftdi_eeprom_user_area_info = {
 
 struct ftdi_eeprom_user_area imx95frdm15_ftdi_eeprom_user_area_info = {
 	0x1,		//config
-	0x2b, 0x3, 0xa,	//board_id, board_rev_number, board_rev_char
+	0x2e, 0x3, 0xa,	//board_id, board_rev_number, board_rev_char
 	0x7, 0x1, 0x1,	//soc_id, soc_rev_number, soc_rev_char
 	0x14, 0x1, 0x1,	//pmic_id, pmic_rev_number, pmic_rev_char
 	11,		//no of power rails
