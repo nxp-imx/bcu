@@ -37,7 +37,7 @@
 #define MAX_NUMBER_OF_POWER	100	//maximum number of power types
 #define MAX_NUMBER_OF_GROUP	10	//maximum number of power groups
 #define MAX_MAPPING_NAME_LENGTH	30	//maximum length of the name of the mapping
-#define MAX_BOOT_CONFIG_BYTE	5
+#define MAX_BOOT_CONFIG_BYTE	30
 
 enum mapping_type {
 	power,
@@ -45,7 +45,9 @@ enum mapping_type {
 	bcu_eeprom,
 	ftdi_eeprom,
 	temperature,
-	ptc
+	ptc,
+	boot_eeprom,
+	invalid_mapping
 };
 
 /*
@@ -69,6 +71,15 @@ struct boot_mode {
 struct boot_config {
 	char* name;
 	unsigned char boot_config_hex[MAX_BOOT_CONFIG_BYTE];
+	unsigned char actual_length; /* need a way to signal where to stop iterating the initialized value of boot_config_hex.
+									boot_config_hex will always have MAX_BOOT_CONFIG_BYTE elements no matter the init values.
+								*/
+};
+
+// there are cases when before exit certain pins used as enablers for hw functionalities must be brought to a known value
+struct gpio_state_on_exit {
+	const char* name;
+	int value;
 };
 
 struct board_links {
@@ -91,6 +102,7 @@ struct board_info {
 	struct board_links* links;
 	struct ftdi_eeprom_user_area* eeprom_data;
 	unsigned int reset_time_ms;
+	struct gpio_state_on_exit* gpio_on_exit;
 };
 
 /*find if there is the gpio_name on the board*/
@@ -114,5 +126,6 @@ int get_max_power_name_length(struct board_info* board);
 int get_boot_mode_offset(unsigned char boot_mode_pin_bitmask);
 char* get_boot_mode_name_from_hex(struct board_info* board, int boot_mode_hex);
 char* get_boot_config_name_from_hex(struct board_info* board, int *boot_config_hex, int boot_mode_hex);
+enum mapping_type get_mapping_type(char* mapping_name, struct board_info* board);
 
 #endif //BOARD_H
