@@ -272,6 +272,7 @@ void set_options_default(struct options_setting* setting)
 	{
 		setting->boot_config_hex[i] = -1;
 	}
+	setting->eeprom_cfg_addr = -1;
 	setting->gpio_name[0] = '\0';
 	setting->temperature = 0;
 	setting->dump = 0;
@@ -353,6 +354,45 @@ int parse_board_id_options(int argc, char** argv, struct options_setting* settin
 
 	return 0;
 }
+
+unsigned char boot_config_hex_from_cli[MAX_BOOT_CONFIG_BYTE];
+/**
+ * @brief Parse custom config from cli
+ *
+ * This function parses the values that represent the boot config. hex values
+ *
+ * @param setting Struct containing the CLI parsed options and arguments
+ * @param parsed_config Array where config. words will be retained
+ * @param config_from_cli Received config from CLI
+ *
+ * @return The no of values containd inside boot_config hex values
+ *
+ */
+int read_boot_config_from_cli(struct options_setting* setting, char* config_from_cli)
+{
+	int count = 0;
+	// Tokenize by comma
+	char* token = strtok(config_from_cli, ",");
+	while (token != NULL && count < MAX_BOOT_CONFIG_BYTE)
+	{
+		// Trim leading/trailing whitespace if present
+		while (*token == ' ') token++;
+		char* end = token + strlen(token) - 1;
+		while (end > token && isspace(*end))
+		{
+			*end = '\0';
+			end--;
+		}
+		unsigned char value = (unsigned char)strtoul(token, NULL, 0);
+		setting->boot_config_hex[count] = value;
+		count++;
+		token = strtok(NULL, ",");
+	}
+	setting->boot_config_hex_size = count;
+
+	return count;
+}
+
 
 int parse_options(char* cmd, int argc, char** argv, struct options_setting* setting)
 {
@@ -594,6 +634,27 @@ int parse_options(char* cmd, int argc, char** argv, struct options_setting* sett
 		{
 			setting->autoranging = 1;
 		}
+		else if (strncmp(argv[i], "-cfg_addr=", 10) == 0 && strlen(argv[i]) > 10)
+		{
+			char* token = strtok(argv[i], "=");
+			while (token != NULL)
+			{
+				// Trim leading/trailing whitespace if present
+				while (*token == ' ' || *token == '"') token++;
+				char* end = token + strlen(token) - 1;
+				while (end > token && isspace(*end))
+				{
+					*end = '\0';
+					end--;
+				}
+				if (*(token + 1) == 'x' || *(token + 1) == 'X')
+				{
+					setting->eeprom_cfg_addr = (unsigned char)strtoul(token, NULL, 0);
+					break;
+				}
+				token = strtok(NULL, "=");
+			}
+		}
 		else
 		{
 			if (board == NULL)
@@ -632,9 +693,22 @@ int parse_options(char* cmd, int argc, char** argv, struct options_setting* sett
 					if (strcmp(board->boot_configs[k].name, argv[i]) == 0)
 					{
 						found = 1;
-						for (int bootcfg_n = 0; bootcfg_n < MAX_BOOT_CONFIG_BYTE; bootcfg_n++)
+						if (strcmp(board->boot_configs[k].name, "custom") == 0)
 						{
-							setting->boot_config_hex[bootcfg_n] = board->boot_configs[k].boot_config_hex[bootcfg_n];
+							int read_elements;
+							read_elements = read_boot_config_from_cli(setting, argv[++i]);
+							if (read_elements == 0)
+							{
+								printf("You provided custom as boot mode. Read help on how to use it!\n");
+								return -1;
+							}
+						}
+						else
+						{
+							for (int bootcfg_n = 0; bootcfg_n < MAX_BOOT_CONFIG_BYTE; bootcfg_n++)
+							{
+								setting->boot_config_hex[bootcfg_n] = board->boot_configs[k].boot_config_hex[bootcfg_n];
+							}
 						}
 						break;
 					}
