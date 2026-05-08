@@ -86,7 +86,7 @@ struct ftdi_eeprom_field_code_tb ftdi_eeprom_field[] = {
 	{ftdi_eeprom_board_id, 0x2b,"NXP S32N79-RDB Board"},
 	//{ftdi_eeprom_board_id, 0x2c,"NXP FRDM-IMX91 Board"}, //Reserved
 	//{ftdi_eeprom_board_id, 0x2d,"NXP FRDM-IMX93 Board"}, //Reserved
-	{ftdi_eeprom_board_id, 0x2e,"NXP FRDM-IMX95 Board"}, //Reserved
+	{ftdi_eeprom_board_id, 0x2e,"NXP FRDM-IMX95 Board"},
 	//{ftdi_eeprom_board_id, 0x2f,"NXP FRDM-IMX91S Board"}, //Reserved
 	//{ftdi_eeprom_board_id, 0x30,"NXP FRDM-IMX8MPlus Board"}, //Reserved
 	//{ftdi_eeprom_board_id, 0x31,"NXP FRDM-IMX95-PRO Board"}, //Reserved
