@@ -1376,7 +1376,7 @@ struct mapping bench_imx95frdm15_ara2_board[] = {
 	{"reset",		gpio, BENCH_IMX95FRDM15_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=0;pin_bitmask=0x04;opendrain=1;}", 0x21},
 	{"onoff",               gpio, BENCH_IMX95FRDM15_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=0;pin_bitmask=0x40;opendrain=0;}", 0x31},
 	{"remote_en",		gpio, BENCH_IMX95FRDM15_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=0;pin_bitmask=0x80;opendrain=1;}", 0x41},
-	{"onoff_ptc",	gpio, IMX95EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x20;port=0;pin_bitmask=0x20;opendrain=0;}", 0x91},
+	{"onoff_ptc",	gpio, IMX95EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x20;port=0;pin_bitmask=0x80;opendrain=0;}", 0x91},
 
 	{"ft_io_nint",	gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x08}", 0x00},
 	{"ft_io_nrst",	gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x10}", 0x00},
@@ -1429,7 +1429,7 @@ struct mapping bench_imx95frdm15_board[] = {
 	{"reset",		gpio, BENCH_IMX95FRDM15_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=0;pin_bitmask=0x04;opendrain=1;}", 0x21},
 	{"onoff",               gpio, BENCH_IMX95FRDM15_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=0;pin_bitmask=0x40;opendrain=0;}", 0x31},
 	{"remote_en",		gpio, BENCH_IMX95FRDM15_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=0;pin_bitmask=0x80;opendrain=1;}", 0x41},
-	{"onoff_ptc",	gpio, IMX95EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x20;port=0;pin_bitmask=0x20;opendrain=0;}", 0x91},
+	{"onoff_ptc",	gpio, IMX95EVK_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x20;port=0;pin_bitmask=0x80;opendrain=0;}", 0x91},
 
 	{"ft_io_nint",	gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x08}", 0x00},
 	{"ft_io_nrst",	gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x10}", 0x00},
