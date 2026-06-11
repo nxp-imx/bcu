@@ -1468,22 +1468,22 @@ struct boot_mode bench_imx95frdm15_boot_modes[] = {
 #define NXP_CUSTOM_revB_GPIO_EXTENDER_PATH "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0xF0}"
 
 struct mapping nxp_custom_revB_board[] = {
-	{"J1_Rail",		power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(1, 	2, 0x10, 20, 1, 996), 0x00},
-	{"J2_Rail",		power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(2, 	2, 0x11, 20, 1, 996), 0x00},
-	{"J3_Rail",		power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(3, 	2, 0x12, 20, 1, 996), 0x00},
-	{"J4_Rail",		power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(4, 	2, 0x13, 20, 1, 996), 0x00},
-	{"J5_Rail",		power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(5, 	2, 0x14, 20, 1, 996), 0x00},
-	{"J6_Rail",		power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(6, 	2, 0x15, 20, 1, 996), 0x00},
-	{"J7_Rail",		power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(7, 	2, 0x16, 20, 1, 996), 0x00},
-	{"J8_Rail",		power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(8, 	2, 0x17, 20, 1, 996), 0x00},
-	{"J9_Rail",		power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(9, 	2, 0x18, 20, 1, 996), 0x00},
-	{"J10_Rail",	power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(10,	2, 0x19, 20, 1, 996), 0x00},
-	{"J11_Rail",	power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(11, 	2, 0x1a, 20, 1, 996), 0x00},
-	{"J12_Rail",	power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(12, 	2, 0x1b, 20, 1, 996), 0x00},
-	{"J13_Rail",	power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(13, 	2, 0x1c, 20, 1, 996), 0x00},
-	{"J14_Rail",	power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(14, 	2, 0x1d, 20, 1, 996), 0x00},
-	{"J15_Rail",	power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(15, 	2, 0x1e, 20, 1, 996), 0x00},
-	{"J16_Rail",	power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(16, 	2, 0x1f, 20, 1, 996), 0x00},
+	{"J1_Rail",		power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(1, 	2, 0x10, 2, 1, 182), 0x00},
+	{"J2_Rail",		power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(2, 	2, 0x11, 2, 1, 182), 0x00},
+	{"J3_Rail",		power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(3, 	2, 0x12, 2, 1, 182), 0x00},
+	{"J4_Rail",		power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(4, 	2, 0x13, 2, 1, 182), 0x00},
+	{"J5_Rail",		power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(5, 	2, 0x14, 2, 1, 182), 0x00},
+	{"J6_Rail",		power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(6, 	2, 0x15, 2, 1, 182), 0x00},
+	{"J7_Rail",		power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(7, 	2, 0x16, 2, 1, 182), 0x00},
+	{"J8_Rail",		power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(8, 	2, 0x17, 2, 1, 182), 0x00},
+	{"J9_Rail",		power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(9, 	2, 0x18, 2, 1, 182), 0x00},
+	{"J10_Rail",	power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(10,	2, 0x19, 2, 1, 182), 0x00},
+	{"J11_Rail",	power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(11, 	2, 0x1a, 2, 1, 182), 0x00},
+	{"J12_Rail",	power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(12, 	2, 0x1b, 2, 1, 182), 0x00},
+	{"J13_Rail",	power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(13, 	2, 0x1c, 2, 1, 182), 0x00},
+	{"J14_Rail",	power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(14, 	2, 0x1d, 2, 1, 182), 0x00},
+	{"J15_Rail",	power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(15, 	2, 0x1e, 2, 1, 182), 0x00},
+	{"J16_Rail",	power, NXP_CUSTOM_revB_POWER_SWITCH_PATH(16, 	2, 0x1f, 2, 1, 182), 0x00},
 	//{"Jx_Rail",	power, NXP_CUSTOM_revB_POWER_PATH(x, 	1, 0xnn, 20, 0), 0x00}, //use this format if the probe has only one range connected
 
 	{"SR_J1_Rail",	gpio, NXP_CUSTOM_revB_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x02;opendrain=0;}", 0x00},
@@ -1527,7 +1527,7 @@ struct mapping nxp_custom_revB_board[] = {
 };
 
 struct board_power_group nxp_custom_revB_power_groups[] = {
-	{"GROUP_ALL", "J1_Rail,J2_Rail,J3_Rail,J4_Rail,J5_Rail,J6_Rail,J7_Rail,J8_Rail,J9_Rail,J10_Rail,J11_Rail,J12_Rail,J13_Rail,J14_Rail,J15_Rail,J16_Rail"},
+	// {"GROUP_ALL", "J1_Rail,J2_Rail,J3_Rail,J4_Rail,J5_Rail,J6_Rail,J7_Rail,J8_Rail,J9_Rail,J10_Rail,J11_Rail,J12_Rail,J13_Rail,J14_Rail,J15_Rail,J16_Rail"},
 	{NULL, 0}
 };
 
@@ -2315,22 +2315,22 @@ struct boot_mode val_board_10_boot_modes[] = {
 #define VAL_BOARD_11_GPIO_EXTENDER_PATH "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0xF0}"
 
 struct mapping val_board_11_board[] = {
-	{"J1_Rail",	power, VAL_BOARD_11_POWER_PATH(1, 	1, 0x10, 20, 0), 0x00},
-	{"J2_Rail",	power, VAL_BOARD_11_POWER_PATH(2, 	1, 0x11, 20, 0), 0x00},
-	{"J3_Rail",	power, VAL_BOARD_11_POWER_PATH(3, 	1, 0x12, 20, 0), 0x00},
-	{"J4_Rail",	power, VAL_BOARD_11_POWER_PATH(4, 	1, 0x13, 20, 0), 0x00},
-	{"J1_Rail",	power, VAL_BOARD_11_POWER_PATH(5, 	1, 0x14, 20, 0), 0x00},
-	{"J2_Rail",	power, VAL_BOARD_11_POWER_PATH(6, 	1, 0x15, 20, 0), 0x00},
-	{"J3_Rail",	power, VAL_BOARD_11_POWER_PATH(7, 	1, 0x16, 20, 0), 0x00},
-	{"J4_Rail",	power, VAL_BOARD_11_POWER_PATH(8, 	1, 0x17, 20, 0), 0x00},
-	{"J1_Rail",	power, VAL_BOARD_11_POWER_PATH(9, 	1, 0x18, 20, 0), 0x00},
-	{"J2_Rail",	power, VAL_BOARD_11_POWER_PATH(10, 	1, 0x19, 20, 0), 0x00},
-	{"J3_Rail",	power, VAL_BOARD_11_POWER_PATH(11, 	1, 0x1a, 20, 0), 0x00},
-	{"J4_Rail",	power, VAL_BOARD_11_POWER_PATH(12, 	1, 0x1b, 20, 0), 0x00},
-	{"J1_Rail",	power, VAL_BOARD_11_POWER_PATH(13, 	1, 0x1c, 20, 0), 0x00},
-	{"J2_Rail",	power, VAL_BOARD_11_POWER_PATH(14, 	1, 0x1d, 20, 0), 0x00},
-	{"J3_Rail",	power, VAL_BOARD_11_POWER_PATH(15, 	1, 0x1e, 20, 0), 0x00},
-	{"J4_Rail",	power, VAL_BOARD_11_POWER_PATH(16, 	1, 0x1f, 20, 0), 0x00},
+	{"J1_Rail",		power, VAL_BOARD_11_POWER_PATH(1, 	1, 0x10, 20, 0), 0x00},
+	{"J2_Rail",		power, VAL_BOARD_11_POWER_PATH(2, 	1, 0x11, 20, 0), 0x00},
+	{"J3_Rail",		power, VAL_BOARD_11_POWER_PATH(3, 	1, 0x12, 20, 0), 0x00},
+	{"J4_Rail",		power, VAL_BOARD_11_POWER_PATH(4, 	1, 0x13, 20, 0), 0x00},
+	{"J5_Rail",		power, VAL_BOARD_11_POWER_PATH(5, 	1, 0x14, 20, 0), 0x00},
+	{"J6_Rail",		power, VAL_BOARD_11_POWER_PATH(6, 	1, 0x15, 20, 0), 0x00},
+	{"J7_Rail",		power, VAL_BOARD_11_POWER_PATH(7, 	1, 0x16, 20, 0), 0x00},
+	{"J8_Rail",		power, VAL_BOARD_11_POWER_PATH(8, 	1, 0x17, 20, 0), 0x00},
+	{"J9_Rail",		power, VAL_BOARD_11_POWER_PATH(9, 	1, 0x18, 20, 0), 0x00},
+	{"J10_Rail",	power, VAL_BOARD_11_POWER_PATH(10, 	1, 0x19, 20, 0), 0x00},
+	{"J11_Rail",	power, VAL_BOARD_11_POWER_PATH(11, 	1, 0x1a, 20, 0), 0x00},
+	{"J12_Rail",	power, VAL_BOARD_11_POWER_PATH(12, 	1, 0x1b, 20, 0), 0x00},
+	{"J13_Rail",	power, VAL_BOARD_11_POWER_PATH(13, 	1, 0x1c, 20, 0), 0x00},
+	{"J14_Rail",	power, VAL_BOARD_11_POWER_PATH(14, 	1, 0x1d, 20, 0), 0x00},
+	{"J15_Rail",	power, VAL_BOARD_11_POWER_PATH(15, 	1, 0x1e, 20, 0), 0x00},
+	{"J16_Rail",	power, VAL_BOARD_11_POWER_PATH(16, 	1, 0x1f, 20, 0), 0x00},
 	
 	{"J1",		gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x02;opendrain=1;}", 0x11},
 	{"J2",		gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x08;opendrain=1;}", 0x21},
@@ -2577,6 +2577,77 @@ struct gpio_state_on_exit s32n79_pins_on_exit[] = {
 	{NULL, 0}
 };
 
+#define VAL_BOARD_13_POWER_SWITCH_PATH(group, sensor1, addr, rsense1, sensor2, rsense2) "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0xF0}/pac1934{group="#group";sensor="#sensor1";addr="#addr";rsense1="#rsense1";sensor2="#sensor2";rsense2="#rsense2"}"
+#define VAL_BOARD_13_POWER_PATH(group, sensor, addr, rsense1, rsense2) "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0xF0}/pac1934{group="#group";sensor="#sensor";addr="#addr";rsense1="#rsense1";rsense2="#rsense2"}"
+#define VAL_BOARD_13_GPIO_EXTENDER_PATH "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0xF0}"
+
+struct mapping val_board_13_board[] = {
+	{"J1_Rail",		power, VAL_BOARD_13_POWER_SWITCH_PATH(1, 	2, 0x10, 20, 1, 996), 0x00},
+	{"J2_Rail",		power, VAL_BOARD_13_POWER_SWITCH_PATH(2, 	2, 0x11, 20, 1, 996), 0x00},
+	{"J3_Rail",		power, VAL_BOARD_13_POWER_SWITCH_PATH(3, 	2, 0x12, 20, 1, 996), 0x00},
+	{"J4_Rail",		power, VAL_BOARD_13_POWER_SWITCH_PATH(4, 	2, 0x13, 20, 1, 996), 0x00},
+	{"J5_Rail",		power, VAL_BOARD_13_POWER_SWITCH_PATH(5, 	2, 0x14, 20, 1, 996), 0x00},
+	{"J6_Rail",		power, VAL_BOARD_13_POWER_SWITCH_PATH(6, 	2, 0x15, 20, 1, 996), 0x00},
+	{"J7_Rail",		power, VAL_BOARD_13_POWER_SWITCH_PATH(7, 	2, 0x16, 20, 1, 996), 0x00},
+	{"J8_Rail",		power, VAL_BOARD_13_POWER_SWITCH_PATH(8, 	2, 0x17, 20, 1, 996), 0x00},
+	{"J9_Rail",		power, VAL_BOARD_13_POWER_SWITCH_PATH(9, 	2, 0x18, 20, 1, 996), 0x00},
+	{"J10_Rail",	power, VAL_BOARD_13_POWER_SWITCH_PATH(10,	2, 0x19, 20, 1, 996), 0x00},
+	{"J11_Rail",	power, VAL_BOARD_13_POWER_SWITCH_PATH(11, 	2, 0x1a, 2, 1, 182), 0x00},
+	{"J12_Rail",	power, VAL_BOARD_13_POWER_SWITCH_PATH(12, 	2, 0x1b, 2, 1, 182), 0x00},
+	{"J13_Rail",	power, VAL_BOARD_13_POWER_SWITCH_PATH(13, 	2, 0x1c, 2, 1, 182), 0x00},
+	{"J14_Rail",	power, VAL_BOARD_13_POWER_SWITCH_PATH(14, 	2, 0x1d, 2, 1, 182), 0x00},
+	{"J15_Rail",	power, VAL_BOARD_13_POWER_PATH(15, 	1, 0x1e, 2, 0), 0x00},
+
+	{"SR_J1_Rail",	gpio, VAL_BOARD_13_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x02;opendrain=0;}", 0x00},
+	{"SR_J2_Rail",	gpio, VAL_BOARD_13_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x08;opendrain=0;}", 0x00},
+	{"SR_J3_Rail",	gpio, VAL_BOARD_13_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x20;opendrain=0;}", 0x00},
+	{"SR_J4_Rail",	gpio, VAL_BOARD_13_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x80;opendrain=0;}", 0x00},
+	{"SR_J5_Rail",	gpio, VAL_BOARD_13_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=2;pin_bitmask=0x02;opendrain=0;}", 0x00},
+	{"SR_J6_Rail",	gpio, VAL_BOARD_13_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=2;pin_bitmask=0x08;opendrain=0;}", 0x00},
+	{"SR_J7_Rail",	gpio, VAL_BOARD_13_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=2;pin_bitmask=0x20;opendrain=0;}", 0x00},
+	{"SR_J8_Rail",	gpio, VAL_BOARD_13_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=2;pin_bitmask=0x80;opendrain=0;}", 0x00},
+	{"SR_J9_Rail",	gpio, VAL_BOARD_13_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=0;pin_bitmask=0x40;opendrain=0;}", 0x00},
+	{"SR_J10_Rail",	gpio, VAL_BOARD_13_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=0;pin_bitmask=0x10;opendrain=0;}", 0x00},
+	{"SR_J11_Rail",	gpio, VAL_BOARD_13_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=0;pin_bitmask=0x04;opendrain=0;}", 0x00},
+	{"SR_J12_Rail",	gpio, VAL_BOARD_13_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=0;pin_bitmask=0x01;opendrain=0;}", 0x00},
+	{"SR_J13_Rail",	gpio, VAL_BOARD_13_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x20;port=0;pin_bitmask=0x02;opendrain=0;}", 0x00},
+	{"SR_J14_Rail",	gpio, VAL_BOARD_13_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x20;port=0;pin_bitmask=0x08;opendrain=0;}", 0x00},
+
+	{"boot_mode",	gpio, VAL_BOARD_13_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=0;pin_bitmask=0x3F;opendrain=1;}", 0x10},
+	{"reset",		gpio, VAL_BOARD_13_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=0;pin_bitmask=0x01;opendrain=1;}", 0x21},
+	{"onoff",		gpio, VAL_BOARD_13_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=2;pin_bitmask=0x80;opendrain=1;}", 0x31},
+	{"ptc_onoff",	gpio, VAL_BOARD_13_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x02;opendrain=0;}", 0x31},
+	{"remote_en",	gpio, VAL_BOARD_13_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x23;port=0;pin_bitmask=0x80;opendrain=1;}", 0x41},
+	
+	{"ft_io_nint",	gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x08}", 0x00},
+	{"ft_io_nrst",	gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x10}", 0x00},
+	
+	{"ft_io_nint1",	gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x40}", 0x00},
+	{"ft_io_nrst1",	gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x20}", 0x00},
+	
+	{"ft_io_nint2",	gpio, "/ft4232h_gpio{channel=0;pin_bitmask=0x40}", 0x00},
+	{"ft_io_nrst2",	gpio, "/ft4232h_gpio{channel=0;pin_bitmask=0x80}", 0x00},
+
+	{"93lcx6",		ftdi_eeprom, "/ft4232h_eeprom{uasize=0xFF}", 0x00},
+	{"temp",		temperature, "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}/pct2075{addr=0x48}", 0x00},
+
+	{"ptc",		ptc, "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}/ptc_revA{addr=0x57}", 0x00},
+
+	{NULL, 0, NULL, 0} //null terminated
+};
+
+struct board_power_group val_board_13_power_groups[] = {
+	{"GROUP_ALL", "J1_Rail,J2_Rail,J3_Rail,J4_Rail,J5_Rail,J6_Rail,J7_Rail,J8_Rail,J9_Rail,J10_Rail,J11_Rail,J12_Rail,J13_Rail,J14_Rail,J15_Rail"},
+	{NULL, 0}
+};
+
+struct boot_mode val_board_13_boot_modes[] = {
+	{"emmc", 0x00},
+	{"sd", 0x00},
+	{"serial", 0x00},
+	{NULL, 0}
+};
+
 struct board_info board_list[] =
 {
 	{"imx8dxlevk",		imx8xxl,		imx8xxl_boot_modes,		0,	NULL,				imx8xxl_power_groups,		imx8xxlevk_board_links,		&imx8dxlevk_ftdi_eeprom_user_area_info,		500},
@@ -2624,6 +2695,7 @@ struct board_info board_list[] =
 	{"val_board_10",	val_board_10_board,	val_board_10_boot_modes,	0,	NULL,				val_board_10_power_groups,	null_board_links,		&val_board_10_ftdi_eeprom_user_area_info,	500},
 	{"val_board_11",	val_board_11_board,	val_board_11_boot_modes,	0,	NULL,				val_board_11_power_groups,	null_board_links,		&val_board_11_ftdi_eeprom_user_area_info,	500},
 	{"val_board_12",	val_board_12_board,	null_boot_mode,			0,	NULL,				val_board_12_power_groups,	null_board_links,		&val_board_12_ftdi_eeprom_user_area_info,	500},
+	{"val_board_13",	val_board_13_board,	null_boot_mode,			0,	NULL,				val_board_13_power_groups,	null_board_links,		&val_board_13_ftdi_eeprom_user_area_info,	500},
 	{"bench_imx95frdm15_ara2",	bench_imx95frdm15_ara2_board,	bench_imx95frdm15_boot_modes,			0,	NULL,				bench_imx95frdm15_ara2_power_groups,	null_board_links,		&imx95frdm15_ftdi_eeprom_user_area_info,			500},
 	{"bench_imx95frdm15",		bench_imx95frdm15_board,	bench_imx95frdm15_boot_modes,			0,	NULL,				bench_imx95frdm15_power_groups,	null_board_links,		&imx95frdm15_ftdi_eeprom_user_area_info,			500},
 	//"imx9xxl",&imx9xxl_pins,
