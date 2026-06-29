@@ -192,6 +192,7 @@ static void print_help(char* cmd)
 		printf("	%s%-60s%s%s\n", g_vt_default, "eeprom  [-w] [-r] [-erase]", g_vt_green, "EEPROM read and program");
 		printf("	%s%-60s%s%s\n", g_vt_default, "        [-wsn=] [-brev=] [-srev=]", g_vt_green, "");
 		printf("	%s%-60s%s%s\n", g_vt_default, "        [-w_ftdi_sn=] ", g_vt_green, "Change serial_no (max. 6 hexadecimal chars). Visible after USB replug.");
+		printf("	%s%-60s%s%s\n", g_vt_default, "                      ", g_vt_green, "If auto is given as value instead of hexdecimal chars, the serial_no is randomly generated.");
 		printf("\n");
 		printf("	%s%-60s%s%s\n", g_vt_default, "ptc_set_target  [-ptc_temp] [-ptc_onoff] [-ptc_sensor]", g_vt_green, "Set PTC target temperature and control");
 		printf("	%s%-60s%s%s\n", g_vt_default, "                [-board=/-auto] [-id=]", g_vt_green, "");
@@ -1668,6 +1669,20 @@ static int eeprom(struct options_setting* setting)
 						return -1;
 				bcu_ftdi_eeprom_print(eeprom);
 				break;
+			case PARSER_EEPROM_WRITE_DEFAULT_NO_FTDI_SN_UPDATE:
+			{
+				if (setting->eeprom_usr_sn)
+					if (bcu_ftdi_eeprom_update_usr_sn(eeprom, setting->eeprom_usr_sn))
+						return -1;
+				if (setting->eeprom_board_rev[0] != 0)
+					if (bcu_ftdi_eeprom_update_board_rev(eeprom, setting->eeprom_board_rev))
+						return -1;
+				if (setting->eeprom_soc_rev[0] != 0)
+					if (bcu_ftdi_eeprom_update_soc_rev(eeprom, setting->eeprom_soc_rev))
+						return -1;
+				bcu_ftdi_eeprom_print(eeprom);
+				break;
+			}
 			case PARSER_EEPROM_WRITE_FROM_FILE:
 				break;
 			case PARSER_EEPROM_UPDATE_USER_SN:
