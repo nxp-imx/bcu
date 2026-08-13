@@ -509,6 +509,7 @@ int pca9847_set_channel(struct pca9847* pca9847)
 	if (status)
 	{
 		printf("oh no! no ack received!\n");
+		parent->i2c_stop(parent);
 		return -10;
 	}
 	parent->i2c_write(parent, change_channel_cmd, I2C_TYPE_PCA9548);
