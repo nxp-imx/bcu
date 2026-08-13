@@ -452,7 +452,13 @@ void* pca9847_create(char* chip_specification, void* parent)
 	pca->i2c_device.i2c_stop = pca9847_stop;
 	pca->channel = extract_parameter_value(chip_specification, "channel");
 	pca->addr = extract_parameter_value(chip_specification, "addr");
-	pca9847_set_channel(pca);
+	if (pca9847_set_channel(pca))
+	{
+		printf("pca9847: failed to select channel %d on the mux at 0x%x\n",
+		       pca->channel, pca->addr);
+		free(pca);
+		return NULL;
+	}
 
 	return pca;
 }
