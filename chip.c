@@ -1338,10 +1338,11 @@ int pac1934_get_data(void* pac1934, struct pac193x_reg_data* pac_reg)
 	// printf("voltage %d: %f\n", 2, ((double)(((data[2] << 8) + data[3]) * 32)) / (65535));
 	// printf("voltage %d: %f\n", 3, ((double)(((data[4] << 8) + data[5]) * 32)) / (65535));
 	// printf("voltage %d: %f\n", 4, ((double)(((data[6] << 8) + data[7]) * 32)) / (65535));
-	pac_reg->vbus[0] = ((double)(((data[0] << 8) + data[1]) * 32)) / (65535);
-	pac_reg->vbus[1] = ((double)(((data[2] << 8) + data[3]) * 32)) / (65535);
-	pac_reg->vbus[2] = ((double)(((data[4] << 8) + data[5]) * 32)) / (65535);
-	pac_reg->vbus[3] = ((double)(((data[6] << 8) + data[7]) * 32)) / (65535);
+	/* Vsource = 32V * VBUS / 2^16 for unipolar VBUS measurements */
+	pac_reg->vbus[0] = ((double)(((data[0] << 8) + data[1]) * 32)) / (65536);
+	pac_reg->vbus[1] = ((double)(((data[2] << 8) + data[3]) * 32)) / (65536);
+	pac_reg->vbus[2] = ((double)(((data[4] << 8) + data[5]) * 32)) / (65536);
+	pac_reg->vbus[3] = ((double)(((data[6] << 8) + data[7]) * 32)) / (65536);
 
 	// printf("current %d: %f\n", 1, (((double)(((data[8] << 8) + data[9]) * 1)) / (65535)) * 100000);
 	// printf("current %d: %f\n", 2, (((double)(((data[10] << 8) + data[11]) * 1)) / (65535)) * 100000);
