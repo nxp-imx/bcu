@@ -2137,8 +2137,12 @@ GET_PATH1:
 			pd->power_set_snapshot(pd);
 			pac_group_count--;
 		}
-		if (pac_group_num < 4)
-			msleep(1);
+		/*
+		 * The PAC193x data registers are only guaranteed stable 1ms after a
+		 * REFRESH; until then they keep changing. Every group was refreshed
+		 * in the loop above, so one wait here covers all of them.
+		 */
+		msleep(1);
 		int cannotacc = 0;
 		pac_group_count = pac_group_num;
 		for(a = 0; a < MAX_NUMBER_OF_POWER; a++)
@@ -3604,8 +3608,12 @@ retry:
 			pd->power_set_snapshot(pd);
 			pac_group_count--;
 		}
-		if (pac_group_num < 4)
-			msleep(1);
+		/*
+		 * The PAC193x data registers are only guaranteed stable 1ms after a
+		 * REFRESH; until then they keep changing. Every group was refreshed
+		 * in the loop above, so one wait here covers all of them.
+		 */
+		msleep(1);
 		int cannotacc = 0;
 		pac_group_count = pac_group_num;
 		for(a = 0; a < MAX_NUMBER_OF_POWER; a++)
