@@ -2625,6 +2625,35 @@ struct gpio_state_on_exit s32n79_pins_on_exit[] = {
 	{NULL, 0}
 };
 
+// Rails are grouped per SoC power domain, taken from the power management block diagram
+// of the S32N79 reference manual (chip_top power chapter). That diagram names its supplies
+// VDD_MAIN, VDD_SW, VDD_SW_APS and VDD_AO, which are exactly the SoC ball names used here,
+// and colours every subsystem by the domain it belongs to:
+//  VDD          -> Main domain. Powered in every mode except Power Mode 1 and 1.5.
+//                  CIS, SMMS, COSS, NWSS, HSCS, RCU, RTU0 and FSS/CSSI.
+//  VDD_SW       -> Switchable power domain A: APS0, APS1, RTU1 and RTU2.
+//  VDD_SW_APS   -> Switchable power domain B: APS2 and APS3 only.
+//  VDD_AO       -> Always-on domain. Powered in every mode, plus the SIOSC and HSE2.
+// Note that the APS clusters are split across BOTH switchable rails: VDD_SW_APS despite
+// its name carries only APS2 and APS3, while APS0 and APS1 share VDD_SW with the two
+// gateable RTUs. Neither rail on its own measures "the application cores". RTU0 is not
+// gateable and sits on VDD_MAIN. HKI has its own supplies and is the Low-power domain.
+// Each APS is one Arm Cortex-A78AE cluster of two cores, so 4 cores per switchable rail.
+struct board_power_group s32n79_power_groups[] = {
+	{"TOTAL",		"VDD_0V77,VDD_SW_0V77,VDD_SW_APS_0V77,VDD_IO_1V8_HKI,VDD2_LP5X,VDDQ_LP5X,"
+				"VDDA_1V5_ANA_A,VDDA_1V5_ANA_B,VDD_IO_1V5_SD,VDD_IO_1V2_UFS,VDD_IO_1V8,"
+				"VDD_IO_3V3,VDDA_1V5_HKI,VDD_IO_1V8_AO,VDD_AO_0V77"},
+	{"CORE_MAIN_0V77",	"VDD_0V77"},					// Main domain
+	{"APS0_1_RTU1_2_0V77",	"VDD_SW_0V77"},					// Switchable A: APS0, APS1, RTU1, RTU2
+	{"APS2_3_0V77",		"VDD_SW_APS_0V77"},				// Switchable B: APS2, APS3
+	{"ALWAYS_ON",	"VDD_AO_0V77,VDD_IO_1V8_AO"},			// Always-on core + IO
+	{"HKI",		"VDDA_1V5_HKI,VDD_IO_1V8_HKI"},			// Low-power domain
+	{"DDR",		"VDD2_LP5X,VDDQ_LP5X"},
+	{"ANA_SD_1V5",		"VDDA_1V5_ANA_A,VDDA_1V5_ANA_B,VDD_IO_1V5_SD"},	// all three fed by VDDA_1V5_ANA
+	{"IO",			"VDD_IO_1V2_UFS,VDD_IO_1V8,VDD_IO_3V3"},
+	{NULL, 0}
+};
+
 struct board_info board_list[] =
 {
 	{"imx8dxlevk",		imx8xxl,		imx8xxl_boot_modes,		0,	NULL,				imx8xxl_power_groups,		imx8xxlevk_board_links,		&imx8dxlevk_ftdi_eeprom_user_area_info,		500},
@@ -2669,7 +2698,7 @@ struct board_info board_list[] =
 	{"imx943evk19a0",	imx943evk19a0_board,	imx943_board_boot_modes,	0,	NULL,				imx943evk19_power_groups,	null_board_links,		&imx943evk19_ftdi_eeprom_user_area_info,	500},
 	{"imx943evk19b1",	imx943evk19b1_board,	imx943_board_boot_modes,	0,	NULL,				imx943evk19_power_groups,	null_board_links,		&imx943evk19b1_ftdi_eeprom_user_area_info,	500},
 	{"imx943obx",		imx943obx_board,	imx943_board_boot_modes,	0,	NULL,				imx943evk19_power_groups,	null_board_links,		&imx943obx_ftdi_eeprom_user_area_info,		500},
-	{"s32n79rdb",		s32n79_mappings,	s32n79_boot_modes,	0,	s32n79_boot_config,	NULL,	null_board_links,	&s32n79rdb_ftdi_eeprom_user_area_info,	500, s32n79_pins_on_exit},
+	{"s32n79rdb",		s32n79_mappings,	s32n79_boot_modes,	0,	s32n79_boot_config,	s32n79_power_groups,	null_board_links,	&s32n79rdb_ftdi_eeprom_user_area_info,	500, s32n79_pins_on_exit},
 	{"val_board_7",		val_board_7_board,	imx943_board_boot_modes,	0,	NULL,				NULL,				null_board_links,		&val_board_7_ftdi_eeprom_user_area_info,	500},
 	{"val_board_9",		val_board_9_board,	null_boot_mode,			0,	NULL,				val_board_9_power_groups,	null_board_links,		&val_board_9_ftdi_eeprom_user_area_info,	500},
 	{"val_board_10",	val_board_10_board,	val_board_10_boot_modes,	0,	NULL,				val_board_10_power_groups,	null_board_links,		&val_board_10_ftdi_eeprom_user_area_info,	500},
