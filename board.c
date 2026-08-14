@@ -2482,8 +2482,36 @@ struct board_power_group val_board_12_power_groups[] = {
 #define S32N79_DBG_PCAL9555_EXTENDER_PATH(port, pin_bitmask, pin_opendrain) "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}/pcal9555a{addr=0x25;port="#port";pin_bitmask="#pin_bitmask";opendrain="#pin_opendrain"}"
 #define BRDCFG_IOEXPANDERS(address, port, bitmask, pin_opendrain) "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}/pca9847_s32n79_i2cmux{channel=0;addr=0x71}/pcal6524h{addr="#address";port="#port";pin_bitmask="#bitmask";opendrain="#pin_opendrain"}"
 #define RCON_BOOT_MODE_SEL_EEPROM "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00;frequency=100}/at24c01_s32n79_rcon{addr=0x50;type=0}" // at24c01 is behind an NTSX2102 level translator that is activated by PCAL9555_IO_03. It is configured for 100KHz clock.
+// The four PAC1934 current monitors sit on I2C_CNTL_CH1, reached through channel 1
+// of the PCA9847 I2C mux at 0x71. The mux wrapper asserts EN_CNTL_I2C (PCAL9555A
+// @0x25, IO0_2) and deasserts EN_RCON_I2C (IO0_3) before selecting the channel.
+// rsense values are in milliohm. There is no SR_/SRD_ range switch on this board,
+// so rsense2 is always identical to rsense1.
+#define S32N79_POWER_PATH(group, sensor, addr, rsense1, rsense2) "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}/pca9847_s32n79_i2cmux{channel=1;addr=0x71}/pac1934{group="#group";sensor="#sensor";addr="#addr";rsense1="#rsense1";rsense2="#rsense2"}"
 
 struct mapping s32n79_mappings[] = {
+	// Current monitors. Rails are named after the regulator output they measure,
+	// the sense resistor is the 4-terminal shunt between that rail and its _SOC net.
+	// U48 - PAC1934T @0x11 (group 1)
+	{"VDD_0V77",		power, S32N79_POWER_PATH(1, 1, 0x11, 1, 1), 0x00},	// R350 1mOhm   -> 100A range. VDD_0.77V -> VDD_SOC
+	{"VDD_SW_0V77",		power, S32N79_POWER_PATH(1, 2, 0x11, 5, 5), 0x00},	// R252 5mOhm   -> 20A range. VDD_SW_0.77V -> VDD_SW_SOC
+	{"VDD_SW_APS_0V77",	power, S32N79_POWER_PATH(1, 3, 0x11, 5, 5), 0x00},	// R265 5mOhm   -> 20A range. VDD_SW_APS_0.77V -> VDD_SW_APS_SOC
+	{"VDD_IO_1V8_HKI",	power, S32N79_POWER_PATH(1, 4, 0x11, 10, 10), 0x00},	// R899 10mOhm  -> 10A range
+	// U137 - PAC1934T @0x12 (group 2)
+	{"VDD2_LP5X",		power, S32N79_POWER_PATH(2, 1, 0x12, 10, 10), 0x00},	// R886 10mOhm  -> 10A range
+	{"VDDQ_LP5X",		power, S32N79_POWER_PATH(2, 2, 0x12, 10, 10), 0x00},	// R931 10mOhm  -> 10A range
+	{"VDDA_1V5_ANA_A",	power, S32N79_POWER_PATH(2, 3, 0x12, 250, 250), 0x00},	// R1029 250mOhm -> 400mA range
+	{"VDDA_1V5_ANA_B",	power, S32N79_POWER_PATH(2, 4, 0x12, 250, 250), 0x00},	// R986 250mOhm -> 400mA range
+	// U92 - PAC1934T @0x13 (group 3)
+	{"VDD_IO_1V5_SD",	power, S32N79_POWER_PATH(3, 1, 0x13, 10, 10), 0x00},	// R834 10mOhm  -> 10A range
+	{"VDD_IO_1V2_UFS",	power, S32N79_POWER_PATH(3, 2, 0x13, 10, 10), 0x00},	// R1065 10mOhm -> 10A range
+	{"VDD_IO_1V8",		power, S32N79_POWER_PATH(3, 3, 0x13, 10, 10), 0x00},	// R1020 10mOhm -> 10A range
+	{"VDD_IO_3V3",		power, S32N79_POWER_PATH(3, 4, 0x13, 400, 400), 0x00},	// R1030 400mOhm -> 250mA range
+	// U45 - PAC1934T @0x14 (group 4). SENSE4 is not connected to any rail.
+	{"VDDA_1V5_HKI",	power, S32N79_POWER_PATH(4, 1, 0x14, 10, 10), 0x00},	// R942 10mOhm  -> 10A range
+	{"VDD_IO_1V8_AO",	power, S32N79_POWER_PATH(4, 2, 0x14, 400, 400), 0x00},	// R862 400mOhm -> 250mA range
+	{"VDD_AO_0V77",		power, S32N79_POWER_PATH(4, 3, 0x14, 400, 400), 0x00},	// R882 400mOhm -> 250mA range
+
 	{"93lcx6", ftdi_eeprom , "/ft4232h_eeprom{uasize=0xFF}", 0x00},
 	// all pins are named exactly as in the board's schematics for revision v1.0. These might change with future revisions.
 
