@@ -2712,8 +2712,12 @@ GET_PATH2:
 					{
 						scale = 1000;
 					}
-					if (((cnow[k] <= (min * scale)) && ((max * scale) == (cur_range[k] * scale))) ||
-					    ((cnow[k] >= (min * 0.95 * scale)) && ((min * scale) == (cur_range[k] * scale))))
+					  // Define hysteresis thresholds
+					double lower_threshold = min * 0.05 * scale;  // 5% for switching to small range
+					double upper_threshold = min * 0.90 * scale;  // 90% for switching to large range
+					
+					if (((cnow[k] <= lower_threshold) && ((max * scale) == (cur_range[k] * scale))) ||
+					    ((cnow[k] >= upper_threshold) && ((min * scale) == (cur_range[k] * scale))))
 					{
 						if (k < n && k < MAX_NUMBER_OF_POWER && k >= 0)
 						{
