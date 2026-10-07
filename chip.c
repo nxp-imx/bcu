@@ -452,7 +452,13 @@ void* pca9847_create(char* chip_specification, void* parent)
 	pca->i2c_device.i2c_stop = pca9847_stop;
 	pca->channel = extract_parameter_value(chip_specification, "channel");
 	pca->addr = extract_parameter_value(chip_specification, "addr");
-	pca9847_set_channel(pca);
+	if (pca9847_set_channel(pca))
+	{
+		printf("pca9847: failed to select channel %d on the mux at 0x%x\n",
+		       pca->channel, pca->addr);
+		free(pca);
+		return NULL;
+	}
 
 	return pca;
 }
@@ -509,6 +515,7 @@ int pca9847_set_channel(struct pca9847* pca9847)
 	if (status)
 	{
 		printf("oh no! no ack received!\n");
+		parent->i2c_stop(parent);
 		return -10;
 	}
 	parent->i2c_write(parent, change_channel_cmd, I2C_TYPE_PCA9548);
@@ -1224,6 +1231,7 @@ int pac1934_write_bipolar(void* pac1934, int value)
 	if(parent->i2c_write(parent, addr_plus_write, I2C_TYPE_PAC1934))
 	{
 		printf("pac1934_write_bipolar: pac 1934 failure get ack, addr: 0x%x\n", pac->addr);
+		parent->i2c_stop(parent);
 		return -1;
 	};
 	parent->i2c_write(parent, PAC1934_REG_NEG_PWR_ADDR, I2C_TYPE_PAC1934);
@@ -1249,6 +1257,7 @@ int pac1934_write_no_skip(void* pac1934, int value)
 	if(parent->i2c_write(parent, addr_plus_write, I2C_TYPE_PAC1934))
 	{
 		printf("pac1934_write_no_skip: pac 1934 failure get ack, addr: 0x%x\n", pac->addr);
+		parent->i2c_stop(parent);
 		return -1;
 	};
 	parent->i2c_write(parent, PAC1934_REG_CHANNEL_DIS_AND_SMBUS_ADDR, I2C_TYPE_PAC1934);
@@ -1275,6 +1284,7 @@ int pac1934_snapshot(void* pac1934)
 	if(parent->i2c_write(parent, addr_plus_write, I2C_TYPE_PAC1934))
 	{
 		printf("pac1934_snapshot: pac 1934 failure get ack, addr: 0x%x\n", pac->addr);
+		parent->i2c_stop(parent);
 		return -1;
 	};
 	parent->i2c_write(parent, 0x00, I2C_TYPE_PAC1934); //refresh;
@@ -1319,7 +1329,10 @@ int pac1934_get_data(void* pac1934, struct pac193x_reg_data* pac_reg)
 	parent->i2c_start(parent);
 	status = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_PAC1934);
 	if (status < 0)
+	{
+		parent->i2c_stop(parent);
 		return status;
+	}
 	parent->i2c_write(parent, start_read_reg_base, I2C_TYPE_PAC1934); //start get data;
 	parent->i2c_start(parent);
 	parent->i2c_write(parent, addr_plus_read, I2C_TYPE_PAC1934);
@@ -1338,10 +1351,11 @@ int pac1934_get_data(void* pac1934, struct pac193x_reg_data* pac_reg)
 	// printf("voltage %d: %f\n", 2, ((double)(((data[2] << 8) + data[3]) * 32)) / (65535));
 	// printf("voltage %d: %f\n", 3, ((double)(((data[4] << 8) + data[5]) * 32)) / (65535));
 	// printf("voltage %d: %f\n", 4, ((double)(((data[6] << 8) + data[7]) * 32)) / (65535));
-	pac_reg->vbus[0] = ((double)(((data[0] << 8) + data[1]) * 32)) / (65535);
-	pac_reg->vbus[1] = ((double)(((data[2] << 8) + data[3]) * 32)) / (65535);
-	pac_reg->vbus[2] = ((double)(((data[4] << 8) + data[5]) * 32)) / (65535);
-	pac_reg->vbus[3] = ((double)(((data[6] << 8) + data[7]) * 32)) / (65535);
+	/* Vsource = 32V * VBUS / 2^16 for unipolar VBUS measurements */
+	pac_reg->vbus[0] = ((double)(((data[0] << 8) + data[1]) * 32)) / (65536);
+	pac_reg->vbus[1] = ((double)(((data[2] << 8) + data[3]) * 32)) / (65536);
+	pac_reg->vbus[2] = ((double)(((data[4] << 8) + data[5]) * 32)) / (65536);
+	pac_reg->vbus[3] = ((double)(((data[6] << 8) + data[7]) * 32)) / (65536);
 
 	// printf("current %d: %f\n", 1, (((double)(((data[8] << 8) + data[9]) * 1)) / (65535)) * 100000);
 	// printf("current %d: %f\n", 2, (((double)(((data[10] << 8) + data[11]) * 1)) / (65535)) * 100000);
