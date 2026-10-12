@@ -1,5 +1,5 @@
 /*
-* Copyright 2019-2021 NXP.
+* Copyright 2019-2026 NXP.
 *
 * Redistribution and use in source and binary forms, with or without modification,
 * are permitted provided that the following conditions are met:
@@ -927,7 +927,7 @@ static void set_eeprom_boot_mode(struct options_setting* setting)
 	if (board->boot_configs[j].name == NULL) {
 		printf("set_boot_mode: No correct boot configuration provided for boot_mode %s!\n", board->boot_modes[i].name);
 	}
-	free_device_linkedlist_backward(end_point);
+	free_device_linkedlist_backward(&end_point->device);
 }
 
 static void set_boot_mode(struct options_setting* setting)
