@@ -1,0 +1,44 @@
+[
+{
+  "directory": "/home/cerebel/cristip/bcu/build",
+  "command": "/usr/bin/gcc -I/usr/include/libusb-1.0 -I/usr/include/libftdi1 -I/usr/include/libusb-1.0include -I/home/cerebel/cristip/bcu/libftdi/src -I/home/cerebel/cristip/bcu -g -o CMakeFiles/bcu.dir/bcu.c.o -c /home/cerebel/cristip/bcu/bcu.c",
+  "file": "/home/cerebel/cristip/bcu/bcu.c",
+  "output": "CMakeFiles/bcu.dir/bcu.c.o"
+},
+{
+  "directory": "/home/cerebel/cristip/bcu/build",
+  "command": "/usr/bin/gcc -I/usr/include/libusb-1.0 -I/usr/include/libftdi1 -I/usr/include/libusb-1.0include -I/home/cerebel/cristip/bcu/libftdi/src -I/home/cerebel/cristip/bcu -g -o CMakeFiles/bcu.dir/port.c.o -c /home/cerebel/cristip/bcu/port.c",
+  "file": "/home/cerebel/cristip/bcu/port.c",
+  "output": "CMakeFiles/bcu.dir/port.c.o"
+},
+{
+  "directory": "/home/cerebel/cristip/bcu/build",
+  "command": "/usr/bin/gcc -I/usr/include/libusb-1.0 -I/usr/include/libftdi1 -I/usr/include/libusb-1.0include -I/home/cerebel/cristip/bcu/libftdi/src -I/home/cerebel/cristip/bcu -g -o CMakeFiles/bcu.dir/chip.c.o -c /home/cerebel/cristip/bcu/chip.c",
+  "file": "/home/cerebel/cristip/bcu/chip.c",
+  "output": "CMakeFiles/bcu.dir/chip.c.o"
+},
+{
+  "directory": "/home/cerebel/cristip/bcu/build",
+  "command": "/usr/bin/gcc -I/usr/include/libusb-1.0 -I/usr/include/libftdi1 -I/usr/include/libusb-1.0include -I/home/cerebel/cristip/bcu/libftdi/src -I/home/cerebel/cristip/bcu -g -o CMakeFiles/bcu.dir/board.c.o -c /home/cerebel/cristip/bcu/board.c",
+  "file": "/home/cerebel/cristip/bcu/board.c",
+  "output": "CMakeFiles/bcu.dir/board.c.o"
+},
+{
+  "directory": "/home/cerebel/cristip/bcu/build",
+  "command": "/usr/bin/gcc -I/usr/include/libusb-1.0 -I/usr/include/libftdi1 -I/usr/include/libusb-1.0include -I/home/cerebel/cristip/bcu/libftdi/src -I/home/cerebel/cristip/bcu -g -o CMakeFiles/bcu.dir/bcu_parser.c.o -c /home/cerebel/cristip/bcu/bcu_parser.c",
+  "file": "/home/cerebel/cristip/bcu/bcu_parser.c",
+  "output": "CMakeFiles/bcu.dir/bcu_parser.c.o"
+},
+{
+  "directory": "/home/cerebel/cristip/bcu/build",
+  "command": "/usr/bin/gcc -I/usr/include/libusb-1.0 -I/usr/include/libftdi1 -I/usr/include/libusb-1.0include -I/home/cerebel/cristip/bcu/libftdi/src -I/home/cerebel/cristip/bcu -g -o CMakeFiles/bcu.dir/bcu_yaml.c.o -c /home/cerebel/cristip/bcu/bcu_yaml.c",
+  "file": "/home/cerebel/cristip/bcu/bcu_yaml.c",
+  "output": "CMakeFiles/bcu.dir/bcu_yaml.c.o"
+},
+{
+  "directory": "/home/cerebel/cristip/bcu/build",
+  "command": "/usr/bin/gcc -I/usr/include/libusb-1.0 -I/usr/include/libftdi1 -I/usr/include/libusb-1.0include -I/home/cerebel/cristip/bcu/libftdi/src -I/home/cerebel/cristip/bcu -g -o CMakeFiles/bcu.dir/bcu_ftdi_eeprom.c.o -c /home/cerebel/cristip/bcu/bcu_ftdi_eeprom.c",
+  "file": "/home/cerebel/cristip/bcu/bcu_ftdi_eeprom.c",
+  "output": "CMakeFiles/bcu.dir/bcu_ftdi_eeprom.c.o"
+}
+]
