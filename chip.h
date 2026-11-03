@@ -137,6 +137,18 @@ float temp_read(void* pct2075);
 int temp_enable(void* pct2075, int enable);
 void* pct2075_create(char* chip_specification, void* parent);
 ///////////////////////////////////////////////////////////////////////
+// SA56004ED dual-channel temperature sensor: channel=0 local (on-die), channel=1 remote diode
+#define SA56004_CHANNEL_LOCAL	0
+#define SA56004_CHANNEL_REMOTE	1
+struct sa56004 {
+	struct temp_device temp_dev;
+	int addr;
+	int channel;
+};
+float sa56004_temp_read(void* sa56004);
+int sa56004_temp_enable(void* sa56004, int enable);
+void* sa56004_create(char* chip_specification, void* parent);
+///////////////////////////////////////////////////////////////////////
 enum eeprom_type {
 	EEPROM_TYPE_AT24C02,
 	EEPROM_TYPE_AT24C32,
