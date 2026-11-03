@@ -2597,6 +2597,9 @@ struct mapping s32n79_mappings[] = {
 	{"TP29",      gpio, "/ft4232h_gpio{channel=3;pin_bitmask=0x01}", 0x00},
 	{"TP27",      gpio, "/ft4232h_gpio{channel=3;pin_bitmask=0x02}", 0x00},
 
+	// temperature sensor
+	{"temp",		temperature, "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}/pca9847_s32n79_i2cmux{channel=1;addr=0x71}/sa56004{addr=0x4C;channel=1}", 0x00},	// remote diode = SoC temperature
+
 	{NULL, 0, NULL, 0} // null terminated
 };
 

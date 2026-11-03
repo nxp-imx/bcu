@@ -57,6 +57,7 @@ struct name_and_init_func chip_list[] =
 	"adp5585", adp5585_create,
 	"at24cxx", at24cxx_create,
 	"pct2075", pct2075_create,
+	"sa56004", sa56004_create,
 	"ptc_revA", ptc_revA_create,
 	"pcal9555a", pcal9555a_create,
 	"pca9847", pca9847_create,
@@ -208,6 +209,116 @@ int temp_enable(void *pct2075, int enable)
 	parent->i2c_write(parent, enable ? 0x1 : 0x0, I2C_TYPE_TEMP);
 	parent->i2c_stop(parent);
 
+	return 0;
+}
+
+//////////////////////////SA56004ED//////////////////////////////////
+#define SA56004_REG_LTHB	0x00	// local temperature high byte
+#define SA56004_REG_RTHB	0x01	// remote temperature high byte
+#define SA56004_REG_CON_R	0x03	// configuration, read address
+#define SA56004_REG_CON_W	0x09	// configuration, write address
+#define SA56004_REG_RTLB	0x10	// remote temperature low byte
+#define SA56004_REG_LTLB	0x22	// local temperature low byte
+#define SA56004_CON_RUN_STOP	0x40	// 1 = standby, 0 = free-running conversions
+#define SA56004_CONV_TIME_MS	38	// one conversion, SA56004X data sheet section 7.5
+
+void *sa56004_create(char *chip_specification, void *parent)
+{
+	struct sa56004 *temp = calloc(1, sizeof(struct sa56004));
+
+	if (temp == NULL)
+	{
+		printf("malloc failed\n");
+		return NULL;
+	}
+	temp->temp_dev.device.parent = parent;
+	temp->temp_dev.temp_read = sa56004_temp_read;
+	temp->temp_dev.temp_enable = sa56004_temp_enable;
+	temp->addr = extract_parameter_value(chip_specification, "addr");
+	temp->channel = extract_parameter_value(chip_specification, "channel");
+	if (temp->channel != SA56004_CHANNEL_LOCAL && temp->channel != SA56004_CHANNEL_REMOTE)
+	{
+		printf("sa56004: channel must be 0 (local) or 1 (remote)\n");
+		free(temp);
+		return NULL;
+	}
+	return temp;
+}
+
+static int sa56004_read_reg(struct sa56004 *temp, unsigned char reg, unsigned char *value)
+{
+	struct i2c_device *parent = (void *)temp->temp_dev.device.parent;
+	unsigned char addr_plus_write = temp->addr << 1;
+	unsigned char addr_plus_read = (temp->addr << 1) + 1;
+
+	parent->i2c_start(parent);
+	if (parent->i2c_write(parent, addr_plus_write, I2C_TYPE_TEMP) ||
+	    parent->i2c_write(parent, reg, I2C_TYPE_TEMP))
+		goto err;
+	parent->i2c_start(parent);
+	if (parent->i2c_write(parent, addr_plus_read, I2C_TYPE_TEMP))
+		goto err;
+	if (parent->i2c_read(parent, value, 1, I2C_TYPE_TEMP))
+		goto err;
+	parent->i2c_stop(parent);
+	return 0;
+
+err:
+	// release the bus, the segment is shared with the PAC1934 rails
+	parent->i2c_stop(parent);
+	return -10;
+}
+
+static int sa56004_write_reg(struct sa56004 *temp, unsigned char reg, unsigned char value)
+{
+	struct i2c_device *parent = (void *)temp->temp_dev.device.parent;
+	unsigned char addr_plus_write = temp->addr << 1;
+	int status = 0;
+
+	parent->i2c_start(parent);
+	if (parent->i2c_write(parent, addr_plus_write, I2C_TYPE_TEMP) ||
+	    parent->i2c_write(parent, reg, I2C_TYPE_TEMP) ||
+	    parent->i2c_write(parent, value, I2C_TYPE_TEMP))
+		status = -10;
+	parent->i2c_stop(parent);
+	return status;
+}
+
+float sa56004_temp_read(void *sa56004)
+{
+	struct sa56004 *temp = sa56004;
+	int remote = (temp->channel == SA56004_CHANNEL_REMOTE);
+	unsigned char high_byte = 0;
+	unsigned char low_byte = 0;
+
+	if (sa56004_read_reg(temp, remote ? SA56004_REG_RTHB : SA56004_REG_LTHB, &high_byte))
+		return -10;
+	if (sa56004_read_reg(temp, remote ? SA56004_REG_RTLB : SA56004_REG_LTLB, &low_byte))
+		return -10;
+
+	// high byte: signed degC; low byte bits 7:5: 0.125 degC steps
+	return (float)((signed char)high_byte) + (low_byte >> 5) * 0.125f;
+}
+
+int sa56004_temp_enable(void *sa56004, int enable)
+{
+	struct sa56004 *temp = sa56004;
+	unsigned char con = 0;
+
+	// The part converts continuously from reset. Never put it in standby:
+	// monitor() does not call temp_enable() and would read a frozen value.
+	if (!enable)
+		return 0;
+
+	if (sa56004_read_reg(temp, SA56004_REG_CON_R, &con))
+		return -10;
+	if (!(con & SA56004_CON_RUN_STOP))
+		return 0;
+
+	if (sa56004_write_reg(temp, SA56004_REG_CON_W, con & ~SA56004_CON_RUN_STOP))
+		return -10;
+	// let the first conversion after standby complete
+	msleep(SA56004_CONV_TIME_MS);
 	return 0;
 }
 
