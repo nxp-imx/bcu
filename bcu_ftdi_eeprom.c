@@ -749,6 +749,9 @@ int bcu_ftdi_eeprom_read_code(struct eeprom_device* eeprom, unsigned int read_id
 		temp = eeprom_ua_data->sn;
 		memcpy(read_buf, &temp, sizeof(short));
 		break;
+	case ftdi_eeprom_ftdi_sn:
+		memcpy(read_buf, eeprom_data.ftdi_sn, BCU_FTDI_EEPROM_SN_LEN);
+		break;
 	default:
 		break;
 	}
