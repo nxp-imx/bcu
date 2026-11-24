@@ -549,7 +549,7 @@ int parse_options(char* cmd, int argc, char** argv, struct options_setting* sett
 		}
 		else if (strcmp(argv[i], "-w") == 0)
 		{
-			setting->eeprom_function = PARSER_EEPROM_WRITE_DEFAULT;
+			setting->eeprom_function = PARSER_EEPROM_WRITE_DEFAULT_NO_FTDI_SN_UPDATE;
 		}
 		else if (strcmp(argv[i], "-r") == 0)
 		{
@@ -566,15 +566,22 @@ int parse_options(char* cmd, int argc, char** argv, struct options_setting* sett
 		else if (strncmp(argv[i], "-wsn=", 5) == 0 && strlen(argv[i]) > 5)
 		{
 			setting->eeprom_function = PARSER_EEPROM_UPDATE_USER_SN;
-
 			setting->eeprom_usr_sn = atoi(input);
 			printf("eeprom user SN will be set to %d\n", setting->eeprom_usr_sn);
 		}
 		else if (strncmp(argv[i], "-w_ftdi_sn=", 11) == 0 && strlen(argv[i]) > 11)
 		{
-			setting->eeprom_function = PARSER_EEPROM_UPDATE_FTDI_SN;
-			setting->eeprom_ftdi_sn = input;
-			printf("eeprom FTDI SN will be set to %d\n", setting->eeprom_ftdi_sn);
+			if (strncmp(input, "auto", 4) == 0)
+			{
+				setting->eeprom_function = PARSER_EEPROM_WRITE_DEFAULT;
+				printf("eeprom FTDI SN will be set to a randomly generated value.\n");
+			}
+			else
+			{
+				setting->eeprom_function = PARSER_EEPROM_UPDATE_FTDI_SN;
+				setting->eeprom_ftdi_sn = input;
+				printf("eeprom FTDI SN will be set to %s\n", setting->eeprom_ftdi_sn);
+			}
 		}
 		else if (strncmp(argv[i], "-sn=", 4) == 0 && strlen(argv[i]) > 4)
 		{
