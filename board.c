@@ -2581,9 +2581,9 @@ struct mapping s32n79_mappings[] = {
 	{"SFP3_RX_LOS", gpio, BRDCFG_IOEXPANDERS(0x22, 2, 0x04, 1), 0x01}, // P2_2: input.
 	{"SFP3_MOD_ABS", gpio, BRDCFG_IOEXPANDERS(0x22, 2, 0x08, 1), 0x01}, // P2_3: input.
 	{"SFP4_TX_DISABLE", gpio, BRDCFG_IOEXPANDERS(0x22, 2, 0x10, 0), 0x01}, // P2_4: Active on logic 1. SW2 pos 10.
-	{"SFP3_TX_FAULT", gpio, BRDCFG_IOEXPANDERS(0x22, 2, 0x20, 1), 0x01}, // P2_5: input.
-	{"SFP3_RX_LOS", gpio, BRDCFG_IOEXPANDERS(0x22, 2, 0x40, 1), 0x01}, // P2_6: input.
-	{"SFP3_MOD_ABS", gpio, BRDCFG_IOEXPANDERS(0x22, 2, 0x80, 1), 0x01}, // P2_7: input.
+	{"SFP4_TX_FAULT", gpio, BRDCFG_IOEXPANDERS(0x22, 2, 0x20, 1), 0x01}, // P2_5: input.
+	{"SFP4_RX_LOS", gpio, BRDCFG_IOEXPANDERS(0x22, 2, 0x40, 1), 0x01}, // P2_6: input.
+	{"SFP4_MOD_ABS", gpio, BRDCFG_IOEXPANDERS(0x22, 2, 0x80, 1), 0x01}, // P2_7: input.
 
 	// pins used for specific functionality:
 	{"onoff", gpio, S32N79_DBG_PCAL9555_EXTENDER_PATH(0, 0x01, 0), 0x00}, // IO0_0: Active on logic 1. Alias for SYS_POWEROFF
