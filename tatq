@@ -1,0 +1,141 @@
+[1mdiff --git a/bcu_ftdi_eeprom.c b/bcu_ftdi_eeprom.c[m
+[1mindex 0cbad18..8628f72 100644[m
+[1m--- a/bcu_ftdi_eeprom.c[m
+[1m+++ b/bcu_ftdi_eeprom.c[m
+[36m@@ -76,6 +76,7 @@[m [mstruct ftdi_eeprom_field_code_tb ftdi_eeprom_field[] = {[m
+ 	{ftdi_eeprom_board_id, 0x21,"NXP VAL_BOARD_8 Board"},[m
+ 	{ftdi_eeprom_board_id, 0x22,"NXP VAL_BOARD_9 Board"},[m
+ 	{ftdi_eeprom_board_id, 0x23,"NXP VAL_BOARD_10 Board"},[m
+[32m+[m	[32m{ftdi_eeprom_board_id, 0x24,"NXP VAL_BOARD_11 Board"},[m
+ [m
+ 	{ftdi_eeprom_soc_id, 0x1, "i.MX8DXL"},[m
+ 	{ftdi_eeprom_soc_id, 0x2, "i.MX8MP"},[m
+[36m@@ -101,6 +102,7 @@[m [mstruct ftdi_eeprom_field_code_tb ftdi_eeprom_field[] = {[m
+ 	{ftdi_eeprom_soc_id, 0x16, "VAL_BOARD_8 SOC"},[m
+ 	{ftdi_eeprom_soc_id, 0x17, "VAL_BOARD_9 SOC"},[m
+ 	{ftdi_eeprom_soc_id, 0x18, "VAL_BOARD_10 SOC"},[m
+[32m+[m	[32m{ftdi_eeprom_soc_id, 0x19, "VAL_BOARD_11 SOC"},[m
+ [m
+ 	{ftdi_eeprom_pmic_id, 0x1, "PPF7100BVMA1ES"},  //On imx8dxl-evk[m
+ 	{ftdi_eeprom_pmic_id, 0x2, "PCA9450CHN"},  //On imx8mpevk-cpu and imx8mpevk-cpu-pwr[m
+[36m@@ -130,6 +132,7 @@[m [mstruct ftdi_eeprom_field_code_tb ftdi_eeprom_field[] = {[m
+ 	{ftdi_eeprom_pmic_id, 0x20, "VAL_BOARD_8 PMIC"},[m
+ 	{ftdi_eeprom_pmic_id, 0x21, "VAL_BOARD_9 PMIC"},[m
+ 	{ftdi_eeprom_pmic_id, 0x22, "VAL_BOARD_10 PMIC"},[m
+[32m+[m	[32m{ftdi_eeprom_pmic_id, 0x23, "VAL_BOARD_11 PMIC"},[m
+ [m
+ 	{0, 0, NULL}//null terminated[m
+ };[m
+[36m@@ -449,6 +452,15 @@[m [mstruct ftdi_eeprom_user_area val_board_10_ftdi_eeprom_user_area_info = {[m
+ 	1[m
+ };[m
+ [m
+[32m+[m[32mstruct ftdi_eeprom_user_area val_board_11_ftdi_eeprom_user_area_info = {[m
+[32m+[m	[32m0x1,		//config[m
+[32m+[m	[32m0x24, 0x3, 0xa,	//board_id, board_rev_number, board_rev_char[m
+[32m+[m	[32m0x19, 0x1, 0x1,	//soc_id, soc_rev_number, soc_rev_char[m
+[32m+[m	[32m0x23, 0x1, 0x1,	//pmic_id, pmic_rev_number, pmic_rev_char[m
+[32m+[m	[32m16,		//no of power rails[m
+[32m+[m	[32m1[m
+[32m+[m[32m};[m
+[32m+[m
+ void data_add_1(struct ftdi_eeprom_user_area* data)[m
+ {[m
+ 	data->board_id += 0x40;[m
+[1mdiff --git a/bcu_ftdi_eeprom.h b/bcu_ftdi_eeprom.h[m
+[1mindex e8afe82..7884965 100644[m
+[1m--- a/bcu_ftdi_eeprom.h[m
+[1m+++ b/bcu_ftdi_eeprom.h[m
+[36m@@ -123,6 +123,7 @@[m [mextern struct ftdi_eeprom_user_area bench_imx6ull_revB_ftdi_eeprom_user_area_inf[m
+ extern struct ftdi_eeprom_user_area val_board_8_ftdi_eeprom_user_area_info;[m
+ extern struct ftdi_eeprom_user_area val_board_9_ftdi_eeprom_user_area_info;[m
+ extern struct ftdi_eeprom_user_area val_board_10_ftdi_eeprom_user_area_info;[m
+[32m+[m[32mextern struct ftdi_eeprom_user_area val_board_11_ftdi_eeprom_user_area_info;[m
+ extern struct ftdi_eeprom_field_code_tb ftdi_eeprom_field[];[m
+ [m
+ [m
+[1mdiff --git a/board.c b/board.c[m
+[1mindex bf810dc..879a829 100644[m
+[1m--- a/board.c[m
+[1m+++ b/board.c[m
+[36m@@ -2007,6 +2007,72 @@[m [mstruct boot_mode val_board_10_boot_modes[] = {[m
+ 	{NULL, 0}[m
+ };[m
+ [m
+[32m+[m[32m#define VAL_BOARD_11_POWER_SWITCH_PATH(group, sensor1, addr, rsense1, sensor2, rsense2) "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0xF0}/pac1934{group="#group";sensor="#sensor1";addr="#addr";rsense1="#rsense1";sensor2="#sensor2";rsense2="#rsense2"}"[m
+[32m+[m[32m#define VAL_BOARD_11_POWER_PATH(group, sensor, addr, rsense1, rsense2) "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0xF0}/pac1934{group="#group";sensor="#sensor";addr="#addr";rsense1="#rsense1";rsense2="#rsense2"}"[m
+[32m+[m[32m#define VAL_BOARD_11_GPIO_EXTENDER_PATH "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0xF0}"[m
+[32m+[m
+[32m+[m[32mstruct mapping val_board_11_board[] = {[m
+[32m+[m	[32m{"J1_Rail",	power, VAL_BOARD_11_POWER_PATH(1, 	1, 0x10, 20, 0), 0x00},[m
+[32m+[m	[32m{"J2_Rail",	power, VAL_BOARD_11_POWER_PATH(2, 	1, 0x11, 20, 0), 0x00},[m
+[32m+[m	[32m{"J3_Rail",	power, VAL_BOARD_11_POWER_PATH(3, 	1, 0x12, 20, 0), 0x00},[m
+[32m+[m	[32m{"J4_Rail",	power, VAL_BOARD_11_POWER_PATH(4, 	1, 0x13, 20, 0), 0x00},[m
+[32m+[m	[32m{"J1_Rail",	power, VAL_BOARD_11_POWER_PATH(5, 	1, 0x14, 20, 0), 0x00},[m
+[32m+[m	[32m{"J2_Rail",	power, VAL_BOARD_11_POWER_PATH(6, 	1, 0x15, 20, 0), 0x00},[m
+[32m+[m	[32m{"J3_Rail",	power, VAL_BOARD_11_POWER_PATH(7, 	1, 0x16, 20, 0), 0x00},[m
+[32m+[m	[32m{"J4_Rail",	power, VAL_BOARD_11_POWER_PATH(8, 	1, 0x17, 20, 0), 0x00},[m
+[32m+[m	[32m{"J1_Rail",	power, VAL_BOARD_11_POWER_PATH(9, 	1, 0x18, 20, 0), 0x00},[m
+[32m+[m	[32m{"J2_Rail",	power, VAL_BOARD_11_POWER_PATH(10, 	1, 0x19, 20, 0), 0x00},[m
+[32m+[m	[32m{"J3_Rail",	power, VAL_BOARD_11_POWER_PATH(11, 	1, 0x1a, 20, 0), 0x00},[m
+[32m+[m	[32m{"J4_Rail",	power, VAL_BOARD_11_POWER_PATH(12, 	1, 0x1b, 20, 0), 0x00},[m
+[32m+[m	[32m{"J1_Rail",	power, VAL_BOARD_11_POWER_PATH(13, 	1, 0x1c, 20, 0), 0x00},[m
+[32m+[m	[32m{"J2_Rail",	power, VAL_BOARD_11_POWER_PATH(14, 	1, 0x1d, 20, 0), 0x00},[m
+[32m+[m	[32m{"J3_Rail",	power, VAL_BOARD_11_POWER_PATH(15, 	1, 0x1e, 20, 0), 0x00},[m
+[32m+[m	[32m{"J4_Rail",	power, VAL_BOARD_11_POWER_PATH(16, 	1, 0x1f, 20, 0), 0x00},[m
+[32m+[m[41m	[m
+[32m+[m	[32m{"J1",		gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x02;opendrain=1;}", 0x11},[m
+[32m+[m	[32m{"J2",		gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x08;opendrain=1;}", 0x21},[m
+[32m+[m	[32m{"J3",		gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x20;opendrain=1;}", 0x31},[m
+[32m+[m	[32m{"J4",		gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=1;pin_bitmask=0x80;opendrain=1;}", 0x41},[m
+[32m+[m	[32m{"J5",		gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=2;pin_bitmask=0x02;opendrain=1;}", 0x01},[m
+[32m+[m	[32m{"J6",		gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=2;pin_bitmask=0x08;opendrain=1;}", 0x51},[m
+[32m+[m	[32m{"J7",		gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=2;pin_bitmask=0x20;opendrain=1;}", 0x61},[m
+[32m+[m	[32m{"J8",		gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=2;pin_bitmask=0x80;opendrain=1;}", 0x71},[m
+[32m+[m	[32m{"J9",		gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=0;pin_bitmask=0x40;opendrain=1;}", 0x81},[m
+[32m+[m	[32m{"J10",		gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=0;pin_bitmask=0x10;opendrain=1;}", 0x91},[m
+[32m+[m	[32m{"J11",		gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=0;pin_bitmask=0x04;opendrain=1;}", 0xa1},[m
+[32m+[m	[32m{"J12",		gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x22;port=0;pin_bitmask=0x01;opendrain=1;}", 0xb1},[m
+[32m+[m	[32m{"J13",		gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x20;port=0;pin_bitmask=0x02;opendrain=1;}", 0xc1},[m
+[32m+[m	[32m{"J14",		gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x20;port=0;pin_bitmask=0x08;opendrain=1;}", 0xd1},[m
+[32m+[m	[32m{"J15",		gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x20;port=0;pin_bitmask=0x20;opendrain=1;}", 0xe1},[m
+[32m+[m	[32m{"J16",		gpio, VAL_BOARD_11_GPIO_EXTENDER_PATH"/pcal6524h{addr=0x20;port=0;pin_bitmask=0x80;opendrain=1;}", 0xf1},[m
+[32m+[m
+[32m+[m	[32m{"ft_io_nint",	gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x08}", 0x00},[m
+[32m+[m	[32m{"ft_io_nrst",	gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x10}", 0x00},[m
+[32m+[m[41m	[m
+[32m+[m	[32m{"ft_io_nint1",	gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x40}", 0x00},[m
+[32m+[m	[32m{"ft_io_nrst1",	gpio, "/ft4232h_gpio{channel=1;pin_bitmask=0x20}", 0x00},[m
+[32m+[m[41m	[m
+[32m+[m	[32m{"ft_io_nint2",	gpio, "/ft4232h_gpio{channel=0;pin_bitmask=0x40}", 0x00},[m
+[32m+[m	[32m{"ft_io_nrst2",	gpio, "/ft4232h_gpio{channel=0;pin_bitmask=0x80}", 0x00},[m
+[32m+[m
+[32m+[m	[32m{"93lcx6",		ftdi_eeprom, "/ft4232h_eeprom{uasize=0xFF}", 0x00},[m
+[32m+[m	[32m{"temp",		temperature, "/ft4232h_i2c{channel=1;dir_bitmask=0xF0;val_bitmask=0x00}/pct2075{addr=0x48}", 0x00},[m
+[32m+[m
+[32m+[m	[32m{NULL, 0, NULL, 0} //null terminated[m
+[32m+[m[32m};[m
+[32m+[m
+[32m+[m[32mstruct board_power_group val_board_11_power_groups[] = {[m
+[32m+[m	[32m// {"GROUP_SOC", "J1_Rail,J2_Rail,J3_Rail,J4_Rail,J5_Rail,J6_Rail,J7_Rail,J8_Rail,J9_Rail,J10_Rail"},[m
+[32m+[m	[32m{NULL, 0}[m
+[32m+[m[32m};[m
+[32m+[m
+[32m+[m[32mstruct boot_mode val_board_11_boot_modes[] = {[m
+[32m+[m	[32m{"emmc", 0x08},[m
+[32m+[m	[32m{"sd", 0x0C},[m
+[32m+[m	[32m{"serial", 0x04},[m
+[32m+[m	[32m{NULL, 0}[m
+[32m+[m[32m};[m
+[32m+[m
+ struct board_info board_list[] =[m
+ {[m
+ 	{"imx8dxlevk",		imx8xxl,		imx8xxl_boot_modes,		0,	NULL,				imx8xxl_power_groups,		imx8xxlevk_board_links,		&imx8dxlevk_ftdi_eeprom_user_area_info,		500},[m
+[36m@@ -2048,6 +2114,7 @@[m [mstruct board_info board_list[] =[m
+ 	{"val_board_7",		val_board_7_board,	imx943_board_boot_modes,	0,	NULL,				NULL,				null_board_links,		&val_board_7_ftdi_eeprom_user_area_info,	500},[m
+ 	{"val_board_9",		val_board_9_board,		null_boot_mode,					0,	NULL,							val_board_9_power_groups,		null_board_links,			&val_board_9_ftdi_eeprom_user_area_info,			500},[m
+ 	{"val_board_10",	val_board_10_board,		val_board_10_boot_modes,					0,	NULL,					val_board_10_power_groups,		null_board_links,			&val_board_10_ftdi_eeprom_user_area_info,			500},[m
+[32m+[m	[32m{"val_board_11",	val_board_11_board,		val_board_11_boot_modes,					0,	NULL,					val_board_11_power_groups,		null_board_links,			&val_board_11_ftdi_eeprom_user_area_info,			500},[m
+ 	//"imx9xxl",&imx9xxl_pins,[m
+ };[m
+ int num_of_boards = sizeof(board_list) / sizeof(struct board_info);[m
