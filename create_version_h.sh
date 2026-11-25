@@ -1,3 +1,4 @@
+#!/bin/sh
 echo creating ${1}/version.h
 
 if [ "${CI_BUILD_VERSION}" = "" ];
